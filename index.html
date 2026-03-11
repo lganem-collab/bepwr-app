@@ -22,14 +22,16 @@
     /* SPLASH */
     #screen-splash{position:absolute;inset:0;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:999;transition:opacity .4s ease}
     #screen-splash.out{opacity:0;pointer-events:none}
-    .splash-logo{width:200px;filter:invert(1) brightness(2)}
+    .splash-logo{width:180px}
+    .logo-html{font-size:42px;font-weight:900;letter-spacing:-1px;line-height:1;text-align:center;margin:0 auto 8px;display:block}
+    .logo-html .be{color:#ffffff}.logo-html .pwr{color:#FF5C1A}.logo-html sup{font-size:0.45em;vertical-align:super}
     .splash-spinner{width:32px;height:32px;border:3px solid #333;border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
     /* LOGIN */
     #screen-login{position:absolute;inset:0;background:var(--black);display:flex;flex-direction:column;justify-content:center;padding:36px 28px;padding-bottom:calc(36px + var(--safe-bottom));z-index:500;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;transform:translateY(16px)}
     #screen-login.active{opacity:1;pointer-events:all;transform:none}
-    .login-logo-img{width:200px;margin:0 auto 8px;display:block;filter:invert(1) brightness(2)}
+    .login-logo-img{width:200px;margin:0 auto 8px;display:block}
     .login-tagline{font-size:12px;color:var(--gray);text-align:center;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:48px}
     .field-wrap{margin-bottom:14px}
     .field-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:7px;display:block}
@@ -47,7 +49,9 @@
     #screen-app{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateY(16px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
     #screen-app.active{opacity:1;transform:none;pointer-events:all}
     .topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 24px 10px;padding-top:calc(18px + env(safe-area-inset-top,0px));background:var(--black);flex-shrink:0;z-index:50}
-    .topbar-logo{height:26px;filter:invert(1) brightness(2)}
+    .topbar-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1}
+    .topbar-logo .be{color:#ffffff}.topbar-logo .pwr{color:#FF5C1A}.topbar-logo sup{font-size:0.45em;vertical-align:super}
+    .members-badge{font-size:10px;color:#FF5C1A;font-family:'Space Mono',monospace;letter-spacing:3px;text-transform:uppercase;margin-left:10px;font-weight:400}
     .avatar-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;border:2px solid #333;cursor:pointer}
     .scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 22px;padding-bottom:calc(80px + var(--safe-bottom))}
     .scroll-area::-webkit-scrollbar{display:none}
@@ -152,14 +156,14 @@
 
   <!-- SPLASH -->
   <div id="screen-splash">
-    <img class="splash-logo" src="icons/icon-512.png" alt="bePWR" />
+    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
     <div class="splash-spinner"></div>
   </div>
 
   <!-- LOGIN -->
   <div id="screen-login">
     <div class="login-glow"></div>
-    <img class="login-logo-img" src="icons/icon-512.png" alt="bePWR" />
+    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
     <div class="login-tagline">Tu progreso · Tu poder</div>
     <div class="field-wrap">
       <label class="field-label">Email</label>
@@ -167,7 +171,10 @@
     </div>
     <div class="field-wrap">
       <label class="field-label">Contraseña</label>
-      <input class="field-input" id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+      <div style="position:relative">
+        <input class="field-input" id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:48px" />
+        <button onclick="togglePass('inp-pass','eye-login')" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1" id="eye-login">👁</button>
+      </div>
     </div>
     <button class="login-btn" id="btn-login">Entrar</button>
     <div class="login-error" id="login-error"></div>
@@ -177,7 +184,10 @@
   <!-- APP -->
   <div id="screen-app">
     <div class="topbar">
-      <img class="topbar-logo" src="icons/icon-512.png" alt="bePWR" />
+      <div style="display:flex;align-items:center">
+        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
+        <div class="members-badge">MEMBERS</div>
+      </div>
       <div class="avatar-btn" id="avatar-initials" onclick="navigate('profile')">?</div>
     </div>
 
@@ -319,6 +329,10 @@
   const appScr    = document.getElementById('screen-app');
   const errorEl   = document.getElementById('login-error');
   const btnLogin  = document.getElementById('btn-login');
+  window.togglePass = (inputId, btnId) => {
+    const inp = document.getElementById(inputId);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  };
 
   // ── AUTH STATE ──
   onAuthStateChanged(auth, async user => {

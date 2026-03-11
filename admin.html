@@ -5,117 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>bePWR — Panel Staff</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
-
-  <!-- FIREBASE CDN (no módulos) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--black:#0a0a0a;--dark:#111;--card:#181818;--border:#2a2a2a;--orange:#FF5C1A;--white:#f5f5f5;--gray:#888;--green:#4ade80;--red:#f87171}
     body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh}
-    .screen{display:none}.screen.active{display:block}
-
-    /* LOGIN */
-    #s-login{align-items:center;justify-content:center;min-height:100vh;padding:24px}
-    #s-login.active{display:flex}
+    .screen{display:none}
+    .screen.active{display:block}
+    #s-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
     .login-box{width:100%;max-width:400px}
-    .login-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;color:var(--orange);text-align:center;margin-bottom:4px}
+    .login-logo{font-size:52px;font-weight:900;letter-spacing:-1px;line-height:1;text-align:center;margin-bottom:4px}
+    .login-logo .be{color:#ffffff}.login-logo .pwr{color:#FF5C1A}.login-logo sup{font-size:0.45em;vertical-align:super}
     .login-sub{font-size:11px;color:var(--gray);text-align:center;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
-    .login-badge{background:rgba(255,92,26,.1);border:1px solid rgba(255,92,26,.3);border-radius:20px;padding:4px 14px;font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin:0 auto 32px;display:block;width:fit-content;text-align:center}
-
-    /* FIELDS */
+    .login-badge{background:rgba(255,92,26,.1);border:1px solid rgba(255,92,26,.3);border-radius:20px;padding:4px 14px;font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin:0 auto 32px;display:block;width:fit-content}
     .field{margin-bottom:16px}
     .field label{display:block;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:7px}
-    .field input,.field select,.field textarea{width:100%;background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+    .field input,.field select{width:100%;background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
     .field input:focus,.field select:focus{border-color:var(--orange)}
     .field input::placeholder{color:#333}
-    .field select option{background:#1a1a1a}
     .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-    /* BUTTONS */
-    .btn{padding:14px 24px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .1s}
+    .btn{padding:14px 24px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .1s;letter-spacing:.3px}
     .btn:active{transform:scale(.98);opacity:.85}
-    .btn:disabled{opacity:.4;cursor:not-allowed}
     .btn-primary{background:var(--orange);color:white;width:100%}
     .btn-secondary{background:transparent;color:var(--white);border:1px solid var(--border)}
-    .btn-sm{padding:8px 16px;font-size:12px;border-radius:8px}
+    .btn-sm{padding:8px 16px;font-size:12px;border-radius:8px;width:auto}
     .btn-success{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
-    .btn-danger{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3)}
-
-    /* LAYOUT */
+    .btn:disabled{opacity:.4;cursor:not-allowed}
     #s-app{min-height:100vh;display:flex;flex-direction:column}
     .topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
-    .topbar-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--orange)}
+    .topbar-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1}
+    .topbar-logo .be{color:#ffffff}.topbar-logo .pwr{color:#FF5C1A}.topbar-logo sup{font-size:0.45em;vertical-align:super}
     .topbar-badge{font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-left:12px}
-    .staff-name{font-size:13px;color:var(--gray)}
-    .logout-link{font-size:12px;color:var(--orange);cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline;background:none;border:none}
-
-    /* TABS */
+    .logout-link{font-size:12px;color:var(--orange);cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline}
     .tabs{display:flex;border-bottom:1px solid var(--border);padding:0 32px;background:var(--dark)}
     .tab{padding:14px 20px;font-size:10px;font-weight:500;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase}
     .tab.on{color:var(--orange);border-bottom-color:var(--orange)}
-
-    /* CONTENT */
     .content{flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%}
-
-    /* STATS */
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
     .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
     .stat-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:8px}
-    .stat-value{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1}
+    .stat-value{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);letter-spacing:1px;line-height:1}
     .stat-value.orange{color:var(--orange)}
-
-    /* TABLE */
     .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
     .section-title{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gray)}
-    .search-input{background:#141414;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:14px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;width:260px;transition:border-color .2s}
+    .search-input{background:#141414;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:14px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;width:240px;transition:border-color .2s}
     .search-input:focus{border-color:var(--orange)}
     .search-input::placeholder{color:#333}
     .members-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-    .table-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 140px;padding:12px 20px;border-bottom:1px solid var(--border);background:#141414}
+    .table-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:12px 20px;border-bottom:1px solid var(--border);background:#141414}
     .th{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace}
-    .table-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 140px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
+    .table-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
     .table-row:last-child{border-bottom:none}
     .table-row:hover{background:#1e1e1e}
-    .member-name{font-weight:600;font-size:14px}
+    .td{font-size:14px}
+    .td.gray{color:var(--gray);font-size:12px}
+    .td.mono{font-family:'Space Mono',monospace;font-size:12px}
+    .member-name{font-weight:600}
     .member-email{font-size:12px;color:var(--gray);margin-top:2px}
-    .td-gray{font-size:13px;color:var(--gray)}
-    .td-mono{font-family:'Space Mono',monospace;font-size:12px}
     .actions{display:flex;gap:8px}
     .empty-state{text-align:center;padding:48px;color:var(--gray);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px}
-
-    /* MODAL */
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
     .modal-overlay.open{opacity:1;pointer-events:all}
-    .modal{background:var(--dark);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .25s}
+    .modal{background:var(--dark);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .25s}
     .modal-overlay.open .modal{transform:none}
     .modal::-webkit-scrollbar{display:none}
     .modal-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:4px}
-    .modal-sub{font-size:12px;color:var(--gray);margin-bottom:24px;font-family:'Space Mono',monospace}
+    .modal-sub{font-size:12px;color:var(--gray);margin-bottom:24px;font-family:'Space Mono',monospace;letter-spacing:1px}
     .modal-footer{display:flex;gap:12px;margin-top:24px}
     .modal-section{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin:20px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-
-    /* HISTORY */
-    .mh-table{background:#141414;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
-    .mh-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center}
+    .detail-header{display:flex;align-items:center;gap:20px;margin-bottom:28px}
+    .detail-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;border:2px solid var(--orange);flex-shrink:0}
+    .detail-name{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px}
+    .detail-since{font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-top:2px}
+    .metrics-history{background:#141414;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+    .mh-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center}
     .mh-row:last-child{border-bottom:none}
     .mh-head{background:#0a0a0a;font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace}
-    .mh-date{font-size:12px;color:var(--orange);font-family:'Space Mono',monospace}
     .mh-val{font-size:13px}
-
-    /* TOAST */
+    .mh-date{font-size:12px;color:var(--orange);font-family:'Space Mono',monospace}
     #toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:13px;font-weight:500;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
     #toast.show{transform:none;opacity:1}
     #toast.success{border-color:rgba(74,222,128,.4);color:var(--green)}
     #toast.error{border-color:rgba(248,113,113,.4);color:var(--red)}
     .form-error{font-size:12px;color:var(--red);margin-top:10px;font-family:'Space Mono',monospace;min-height:16px;text-align:center}
-
     @media(max-width:768px){
       .stats-row{grid-template-columns:1fr 1fr}
-      .table-head,.table-row{grid-template-columns:2fr 1fr 100px}
-      .th:nth-child(n+3):not(:last-child),.table-row>*:nth-child(n+3):not(:last-child){display:none}
+      .table-head,.table-row{grid-template-columns:2fr 1fr 80px}
+      .th:nth-child(n+3):not(:last-child),.table-row .td:nth-child(n+3):not(:last-child){display:none}
       .content{padding:16px}
       .tabs,.topbar{padding:0 16px}
     }
@@ -126,53 +101,54 @@
 <!-- LOGIN -->
 <div id="s-login" class="screen active">
   <div class="login-box">
-    <div class="login-logo">bePWR</div>
+    <div class="login-logo"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
     <div class="login-sub">Panel de Administración</div>
     <div class="login-badge">🔒 Solo Staff</div>
     <div class="field">
       <label>Email del staff</label>
-      <input type="email" id="adm-email" placeholder="staff@bepwr.com" autocomplete="email" />
+      <input type="email" id="adm-email" placeholder="staff@bepwr.com" />
     </div>
     <div class="field">
       <label>Contraseña</label>
-      <input type="password" id="adm-pass" placeholder="••••••••" autocomplete="current-password" />
+      <div style="position:relative">
+        <input type="password" id="adm-pass" placeholder="••••••••" style="padding-right:48px" />
+        <button type="button" onclick="var i=document.getElementById('adm-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">👁</button>
+      </div>
     </div>
-    <button class="btn btn-primary" id="adm-login-btn" style="margin-top:8px">Entrar al panel</button>
-    <div class="form-error" id="adm-error"></div>
+    <button class="btn btn-primary" id="adm-login-btn" onclick="doLogin()">Entrar al panel</button>
+    <div class="form-error" id="adm-login-error"></div>
   </div>
 </div>
 
 <!-- APP -->
 <div id="s-app" class="screen">
   <div class="topbar">
-    <div style="display:flex;align-items:center">
-      <div class="topbar-logo">bePWR</div>
-      <span class="topbar-badge">&nbsp;Staff Panel</span>
-    </div>
+      <div style="display:flex;align-items:center">
+        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
+        <div class="topbar-badge">Staff Panel</div>
+      </div>
     <div style="display:flex;align-items:center;gap:16px">
-      <span class="staff-name" id="staff-name"></span>
-      <button class="logout-link" onclick="doLogout()">Salir</button>
+      <div style="font-size:13px;color:var(--gray)" id="staff-name"></div>
+      <div class="logout-link" onclick="doLogout()">Salir</div>
     </div>
   </div>
-
   <div class="tabs">
     <div class="tab on" id="tab-members" onclick="switchTab('members')">Miembros</div>
     <div class="tab" id="tab-new" onclick="switchTab('new')">+ Nuevo miembro</div>
   </div>
-
   <div class="content">
 
-    <!-- MEMBERS -->
+    <!-- MEMBERS TAB -->
     <div id="tab-content-members">
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Total miembros</div><div class="stat-value orange" id="stat-total">0</div></div>
         <div class="stat-card"><div class="stat-label">Con métricas</div><div class="stat-value" id="stat-metrics">0</div></div>
         <div class="stat-card"><div class="stat-label">Sin objetivo</div><div class="stat-value" id="stat-noobjective">0</div></div>
-        <div class="stat-card"><div class="stat-label">Última carga</div><div class="stat-value" style="font-size:18px;margin-top:8px" id="stat-time">—</div></div>
+        <div class="stat-card"><div class="stat-label">Este año</div><div class="stat-value" id="stat-month">0</div></div>
       </div>
       <div class="section-header">
         <div class="section-title">Lista de miembros</div>
-        <input class="search-input" id="search-input" placeholder="Buscar nombre o email..." oninput="filterMembers()" />
+        <input class="search-input" id="search-input" placeholder="Buscar por nombre..." oninput="filterMembers()" />
       </div>
       <div class="members-table">
         <div class="table-head">
@@ -187,32 +163,35 @@
       </div>
     </div>
 
-    <!-- NEW MEMBER -->
-    <div id="tab-content-new" style="display:none;max-width:620px">
+    <!-- NEW MEMBER TAB -->
+    <div id="tab-content-new" style="display:none;max-width:600px">
       <div style="margin-bottom:24px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Nuevo Miembro</div>
-        <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:1px">Completa los datos para dar de alta al miembro</div>
+        <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:1px">Crea el acceso y perfil del miembro</div>
       </div>
-
       <div class="modal-section">Datos personales</div>
       <div class="field-row">
         <div class="field"><label>Nombre completo *</label><input type="text" id="new-nombre" placeholder="María González" /></div>
         <div class="field"><label>Teléfono</label><input type="tel" id="new-tel" placeholder="+52 55 0000 0000" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Fecha de nacimiento</label><input type="text" id="new-dob" placeholder="14 Mar 1990" /></div>
-        <div class="field"><label>Fecha de inicio *</label><input type="text" id="new-inicio" placeholder="Mar 2026" /></div>
+        <div class="field"><label>Fecha de nacimiento</label><input type="date" id="new-dob" /></div>
+        <div class="field"><label>Fecha de inicio *</label><input type="month" id="new-inicio" /></div>
       </div>
-
       <div class="modal-section">Acceso a la app</div>
       <div class="field-row">
         <div class="field"><label>Email *</label><input type="email" id="new-email" placeholder="maria@email.com" /></div>
-        <div class="field"><label>Contraseña inicial *</label><input type="text" id="new-pass" placeholder="Mínimo 6 caracteres" /></div>
+        <div class="field"><label>Contraseña inicial *</label>
+          <div style="position:relative">
+            <input type="password" id="new-pass" placeholder="Mínimo 6 caracteres" style="padding-right:48px" />
+            <button type="button" onclick="var i=document.getElementById('new-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">👁</button>
+          </div>
+        </div>
       </div>
-
       <div class="modal-section">Objetivo</div>
       <div class="field-row">
-        <div class="field"><label>Meta principal</label>
+        <div class="field">
+          <label>Meta principal</label>
           <select id="new-meta">
             <option value="">Selecciona...</option>
             <option>Pérdida de grasa</option>
@@ -228,7 +207,6 @@
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="new-peso-ini" placeholder="70" step="0.1" /></div>
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="new-peso-meta" placeholder="65" step="0.1" /></div>
       </div>
-
       <div class="modal-section">Valoración inicial</div>
       <div class="field-row">
         <div class="field"><label>Peso actual (kg) *</label><input type="number" id="new-peso" placeholder="70" step="0.1" /></div>
@@ -238,30 +216,29 @@
         <div class="field"><label>Masa muscular (kg)</label><input type="number" id="new-musculo" placeholder="42" step="0.1" /></div>
         <div class="field"><label>IMC</label><input type="number" id="new-imc" placeholder="24.5" step="0.1" /></div>
       </div>
-      <div class="field"><label>Fecha de valoración</label><input type="text" id="new-fecha-val" placeholder="Mar 2026" /></div>
-
-      <div class="form-error" id="new-error"></div>
-      <button class="btn btn-primary" id="btn-create" onclick="createMember()" style="margin-top:8px">Crear miembro</button>
+      <div class="field"><label>Fecha de valoración</label><input type="month" id="new-fecha-val" /></div>
+      <div class="form-error" id="new-member-error"></div>
+      <button class="btn btn-primary" id="btn-create-member" onclick="createMember()" style="margin-top:8px">Crear miembro</button>
     </div>
 
   </div>
 </div>
 
-<!-- MODAL: DETAIL -->
+<!-- MODAL DETAIL -->
 <div class="modal-overlay" id="modal-detail">
   <div class="modal">
     <div id="modal-detail-content"></div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-detail')">Cerrar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: METRICS -->
+<!-- MODAL METRICS -->
 <div class="modal-overlay" id="modal-metrics">
   <div class="modal">
     <div class="modal-title">Nueva Valoración</div>
-    <div class="modal-sub" id="metrics-for">—</div>
+    <div class="modal-sub" id="metrics-modal-sub"></div>
     <input type="hidden" id="metrics-uid" />
     <div class="field-row">
       <div class="field"><label>Peso (kg) *</label><input type="number" id="m-peso" placeholder="68.5" step="0.1" /></div>
@@ -271,19 +248,23 @@
       <div class="field"><label>Masa muscular (kg)</label><input type="number" id="m-musculo" placeholder="42" step="0.1" /></div>
       <div class="field"><label>IMC</label><input type="number" id="m-imc" placeholder="24.2" step="0.1" /></div>
     </div>
-    <div class="field"><label>Fecha *</label><input type="text" id="m-fecha" placeholder="Mar 2026" /></div>
+    <div class="field"><label>Fecha *</label><input type="month" id="m-fecha" /></div>
     <div class="form-error" id="metrics-error"></div>
     <div class="modal-footer">
-      <button class="btn btn-primary" onclick="saveMetrics()">Guardar valoración</button>
-      <button class="btn btn-secondary" onclick="closeModal('modal-metrics')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoración</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-metrics')">Cancelar</button>
     </div>
   </div>
 </div>
 
 <div id="toast"></div>
 
+<!-- Firebase Compat SDK (más compatible) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-  // ── FIREBASE CONFIG ──
   const firebaseConfig = {
     apiKey: "AIzaSyCB_t4CtXh1G70t9gHuvQkckwdm4U5pv2k",
     authDomain: "bepwr-app.firebaseapp.com",
@@ -297,54 +278,73 @@
   const auth = firebase.auth();
   const db   = firebase.firestore();
 
-  // ── AUTH STATE ──
+  // AUTH STATE
   auth.onAuthStateChanged(user => {
     if (user) {
-      document.getElementById('s-login').classList.remove('active');
-      document.getElementById('s-app').classList.add('active');
+      show('s-app');
+      hide('s-login');
       document.getElementById('staff-name').textContent = user.email;
       loadMembers();
     } else {
-      document.getElementById('s-app').classList.remove('active');
-      document.getElementById('s-login').classList.add('active');
+      show('s-login');
+      hide('s-app');
+      const btn = document.getElementById('adm-login-btn');
+      btn.textContent = 'Entrar al panel';
+      btn.disabled = false;
     }
   });
 
-  // ── LOGIN ──
-  document.getElementById('adm-login-btn').addEventListener('click', tryLogin);
-  document.getElementById('adm-pass').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+  function show(id){ document.getElementById(id).classList.add('active'); }
+  function hide(id){ document.getElementById(id).classList.remove('active'); }
 
-  function tryLogin() {
+  // LOGIN
+  function doLogin() {
     const email = document.getElementById('adm-email').value.trim();
     const pass  = document.getElementById('adm-pass').value;
-    const errEl = document.getElementById('adm-error');
+    const errEl = document.getElementById('adm-login-error');
     errEl.textContent = '';
     if (!email || !pass) { errEl.textContent = 'Completa los campos'; return; }
     const btn = document.getElementById('adm-login-btn');
     btn.textContent = 'Verificando...'; btn.disabled = true;
     auth.signInWithEmailAndPassword(email, pass)
       .catch(e => {
-        const msgs = {
-          'auth/user-not-found':'Email no encontrado',
-          'auth/wrong-password':'Contraseña incorrecta',
-          'auth/invalid-credential':'Email o contraseña incorrectos',
-          'auth/invalid-email':'Email inválido',
-          'auth/too-many-requests':'Demasiados intentos, espera un momento'
-        };
-        errEl.textContent = msgs[e.code] || e.message;
+        errEl.textContent = 'Email o contraseña incorrectos';
         btn.textContent = 'Entrar al panel'; btn.disabled = false;
       });
   }
+  document.getElementById('adm-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
 
   function doLogout() { auth.signOut(); }
 
-  // ── LOAD MEMBERS ──
-  let allMembers = [];
+  // DATE HELPER: YYYY-MM → "Mar 2026"
+  function fmtMonth(val) {
+    if (!val) return '';
+    if (val.includes('-')) {
+      const [y,m] = val.split('-');
+      const d = new Date(parseInt(y), parseInt(m)-1, 1);
+      return d.toLocaleString('es',{month:'short',year:'numeric'}).replace('.','').replace(',','');
+    }
+    return val; // already formatted
+  }
+  function fmtDate(val) {
+    if (!val) return '';
+    if (val.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [y,m,d] = val.split('-');
+      const dt = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
+      return dt.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}).replace('.','').replace(',','');
+    }
+    return val;
+  }
+
+  // LOAD MEMBERS
   async function loadMembers() {
-    document.getElementById('members-list').innerHTML = '<div class="empty-state">Cargando...</div>';
+    const list = document.getElementById('members-list');
+    list.innerHTML = '<div class="empty-state">Cargando...</div>';
     try {
       const snap = await db.collection('usuarios').get();
-      allMembers = [];
+      window._allMembers = [];
       for (const d of snap.docs) {
         const data = d.data();
         let ultimaMetrica = null;
@@ -352,105 +352,98 @@
           const mSnap = await db.collection('usuarios').doc(d.id).collection('metricas').orderBy('fecha','desc').limit(1).get();
           if (!mSnap.empty) ultimaMetrica = mSnap.docs[0].data();
         } catch(e) {}
-        allMembers.push({ uid: d.id, ...data, ultimaMetrica });
+        window._allMembers.push({ uid: d.id, ...data, ultimaMetrica });
       }
       updateStats();
-      renderMembers(allMembers);
-      const now = new Date();
-      document.getElementById('stat-time').textContent = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+      renderMembers(window._allMembers);
     } catch(e) {
-      document.getElementById('members-list').innerHTML = '<div class="empty-state">Error: ' + e.message + '</div>';
+      list.innerHTML = '<div class="empty-state">Error: ' + e.message + '</div>';
     }
   }
 
   function updateStats() {
-    document.getElementById('stat-total').textContent = allMembers.length;
-    document.getElementById('stat-metrics').textContent = allMembers.filter(m => m.ultimaMetrica).length;
-    document.getElementById('stat-noobjective').textContent = allMembers.filter(m => !m.objetivo?.meta).length;
+    const m = window._allMembers || [];
+    document.getElementById('stat-total').textContent = m.length;
+    document.getElementById('stat-metrics').textContent = m.filter(x => x.ultimaMetrica).length;
+    document.getElementById('stat-noobjective').textContent = m.filter(x => !x.objetivo?.meta).length;
+    const yr = new Date().getFullYear().toString();
+    document.getElementById('stat-month').textContent = m.filter(x => x.fechaInicio && x.fechaInicio.includes(yr)).length;
   }
 
   function renderMembers(members) {
     const list = document.getElementById('members-list');
     if (!members.length) { list.innerHTML = '<div class="empty-state">No se encontraron miembros</div>'; return; }
-    list.innerHTML = members.map(m => `
-      <div class="table-row" onclick="openDetail('${m.uid}')">
-        <div><div class="member-name">${m.nombre||'Sin nombre'}</div><div class="member-email">${m.email||''}</div></div>
-        <div class="td-gray">${m.objetivo?.meta||'—'}</div>
-        <div class="td-mono">${m.ultimaMetrica?.peso ? m.ultimaMetrica.peso+' kg' : '—'}</div>
-        <div class="td-mono">${m.ultimaMetrica?.imc||'—'}</div>
-        <div class="td-gray">${m.fechaInicio||'—'}</div>
-        <div class="actions" onclick="event.stopPropagation()">
-          <button class="btn btn-sm btn-success" onclick="openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Val.</button>
-          <button class="btn btn-sm" style="background:#1e1e1e;color:var(--white);border:1px solid var(--border)" onclick="openDetail('${m.uid}')">Editar</button>
+    list.innerHTML = members.map(m => {
+      const meta = m.objetivo?.meta || '—';
+      const peso = m.ultimaMetrica?.peso ? m.ultimaMetrica.peso + ' kg' : '—';
+      const imc  = m.ultimaMetrica?.imc || '—';
+      return `<div class="table-row" onclick="openDetail('${m.uid}')">
+        <div class="td"><div class="member-name">${m.nombre||'Sin nombre'}</div><div class="member-email">${m.email||''}</div></div>
+        <div class="td gray">${meta}</div>
+        <div class="td mono">${peso}</div>
+        <div class="td mono">${imc}</div>
+        <div class="td gray">${m.fechaInicio||'—'}</div>
+        <div class="td actions" onclick="event.stopPropagation()">
+          <button class="btn btn-sm btn-success" onclick="openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Métricas</button>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }
 
   function filterMembers() {
     const q = document.getElementById('search-input').value.toLowerCase();
-    renderMembers(allMembers.filter(m =>
+    renderMembers((window._allMembers||[]).filter(m =>
       (m.nombre||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q)
     ));
   }
 
-  // ── DETAIL MODAL ──
+  // OPEN DETAIL
   async function openDetail(uid) {
-    const m = allMembers.find(x => x.uid === uid);
+    const m = (window._allMembers||[]).find(x => x.uid === uid);
     if (!m) return;
     const initials = (m.nombre||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-
-    let histHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--gray);font-family:\'Space Mono\',monospace">Sin valoraciones registradas</div>';
+    let histHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--gray);font-family:\'Space Mono\',monospace">Sin métricas registradas</div>';
     try {
       const mSnap = await db.collection('usuarios').doc(uid).collection('metricas').orderBy('fecha','desc').get();
       if (!mSnap.empty) {
-        histHTML = `<div class="mh-table">
+        histHTML = `<div class="metrics-history">
           <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>% Grasa</div><div>Músculo</div><div>IMC</div></div>
-          ${mSnap.docs.map(d => { const x=d.data(); return `
-            <div class="mh-row">
-              <div class="mh-date">${x.fecha||'—'}</div>
-              <div class="mh-val">${x.peso||'—'} kg</div>
-              <div class="mh-val">${x.grasaPct||'—'}%</div>
-              <div class="mh-val">${x.musculo||'—'} kg</div>
-              <div class="mh-val">${x.imc||'—'}</div>
-            </div>`}).join('')}
+          ${mSnap.docs.map(d => {
+            const x = d.data();
+            return `<div class="mh-row"><div class="mh-date">${x.fecha||'—'}</div><div class="mh-val">${x.peso||'—'} kg</div><div class="mh-val">${x.grasaPct!=null?x.grasaPct+'%':'—'}</div><div class="mh-val">${x.musculo||'—'} kg</div><div class="mh-val">${x.imc||'—'}</div></div>`;
+          }).join('')}
         </div>`;
       }
     } catch(e) {}
 
     document.getElementById('modal-detail-content').innerHTML = `
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
-        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;border:2px solid var(--orange);flex-shrink:0">${initials}</div>
-        <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px">${m.nombre||'Sin nombre'}</div>
-          <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">${m.fechaInicio ? 'Desde '+m.fechaInicio : ''}</div>
-        </div>
+      <div class="detail-header">
+        <div class="detail-avatar">${initials}</div>
+        <div><div class="detail-name">${m.nombre||'Sin nombre'}</div><div class="detail-since">${m.fechaInicio ? 'Miembro desde '+m.fechaInicio : 'bePWR'}</div></div>
       </div>
-
-      <div class="modal-section">Datos personales</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="field"><label>Nombre</label><input type="text" id="e-nombre" value="${m.nombre||''}" /></div>
-        <div class="field"><label>Teléfono</label><input type="text" id="e-tel" value="${m.telefono||''}" /></div>
-        <div class="field"><label>Nacimiento</label><input type="text" id="e-dob" value="${m.nacimiento||''}" /></div>
-        <div class="field"><label>Fecha inicio</label><input type="text" id="e-inicio" value="${m.fechaInicio||''}" /></div>
+      <div class="modal-section">Contacto</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div class="field"><label>Nombre</label><input type="text" id="edit-nombre" value="${m.nombre||''}" /></div>
+        <div class="field"><label>Teléfono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
+        <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${m.nacimiento||''}" /></div>
+        <div class="field"><label>Fecha inicio</label><input type="month" id="edit-inicio" value="${m.fechaInicio||''}" /></div>
       </div>
-
       <div class="modal-section">Objetivo</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div class="field"><label>Meta</label>
-          <select id="e-meta">
-            ${['Pérdida de grasa','Ganancia muscular','Mantenimiento','Mejora cardiovascular','Rendimiento deportivo']
-              .map(o=>`<option ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
+          <select id="edit-meta">
+            <option value="">Selecciona...</option>
+            ${['Pérdida de grasa','Ganancia muscular','Mantenimiento','Mejora cardiovascular','Rendimiento deportivo'].map(o=>`<option ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
           </select>
         </div>
-        <div class="field"><label>Clases/semana</label><input type="number" id="e-clases" value="${m.objetivo?.clasesSemana||''}" /></div>
-        <div class="field"><label>Peso inicial (kg)</label><input type="number" id="e-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
-        <div class="field"><label>Peso meta (kg)</label><input type="number" id="e-peso-meta" value="${m.objetivo?.pesoMeta||''}" step="0.1" /></div>
+        <div class="field"><label>Clases/semana</label><input type="number" id="edit-clases" value="${m.objetivo?.clasesSemana||''}" /></div>
+        <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
+        <div class="field"><label>Peso meta (kg)</label><input type="number" id="edit-peso-meta" value="${m.objetivo?.pesoMeta||''}" step="0.1" /></div>
       </div>
-      <button class="btn btn-primary btn-sm" style="width:auto;padding:10px 24px;margin-bottom:24px" onclick="saveMemberEdit('${uid}')">Guardar cambios</button>
-
+      <button class="btn btn-primary btn-sm" style="margin-bottom:20px" onclick="saveMemberEdit('${uid}')">Guardar cambios</button>
       <div class="modal-section">Historial de valoraciones</div>
       ${histHTML}
-      <button class="btn btn-success btn-sm" style="width:auto;margin-top:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoración</button>
+      <button class="btn btn-success btn-sm" style="margin-top:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoración</button>
     `;
     document.getElementById('modal-detail').classList.add('open');
   }
@@ -458,31 +451,32 @@
   async function saveMemberEdit(uid) {
     try {
       await db.collection('usuarios').doc(uid).update({
-        nombre: document.getElementById('e-nombre').value,
-        telefono: document.getElementById('e-tel').value,
-        nacimiento: document.getElementById('e-dob').value,
-        fechaInicio: document.getElementById('e-inicio').value,
+        nombre: document.getElementById('edit-nombre').value,
+        telefono: document.getElementById('edit-tel').value,
+        nacimiento: fmtDate(document.getElementById('edit-dob').value),
+        fechaInicio: fmtMonth(document.getElementById('edit-inicio').value),
         objetivo: {
-          meta: document.getElementById('e-meta').value,
-          clasesSemana: Number(document.getElementById('e-clases').value)||0,
-          pesoInicial: Number(document.getElementById('e-peso-ini').value)||0,
-          pesoMeta: Number(document.getElementById('e-peso-meta').value)||0,
+          meta: document.getElementById('edit-meta').value,
+          clasesSemana: Number(document.getElementById('edit-clases').value)||0,
+          pesoInicial: Number(document.getElementById('edit-peso-ini').value)||0,
+          pesoMeta: Number(document.getElementById('edit-peso-meta').value)||0,
         }
       });
       showToast('Cambios guardados ✓', 'success');
       closeModal('modal-detail');
       loadMembers();
-    } catch(e) { showToast('Error: '+e.message, 'error'); }
+    } catch(e) {
+      showToast('Error: ' + e.message, 'error');
+    }
   }
 
-  // ── METRICS MODAL ──
   function openMetricsModal(uid, nombre) {
     document.getElementById('metrics-uid').value = uid;
-    document.getElementById('metrics-for').textContent = nombre;
+    document.getElementById('metrics-modal-sub').textContent = nombre;
     document.getElementById('metrics-error').textContent = '';
     ['m-peso','m-grasa','m-musculo','m-imc'].forEach(id => document.getElementById(id).value = '');
     const now = new Date();
-    document.getElementById('m-fecha').value = now.toLocaleString('es',{month:'short',year:'numeric'}).replace('.','');
+    document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
     document.getElementById('modal-metrics').classList.add('open');
   }
 
@@ -492,64 +486,56 @@
     const grasa = parseFloat(document.getElementById('m-grasa').value);
     const musc  = parseFloat(document.getElementById('m-musculo').value);
     const imc   = parseFloat(document.getElementById('m-imc').value);
-    const fecha = document.getElementById('m-fecha').value.trim();
+    const fecha = fmtMonth(document.getElementById('m-fecha').value.trim());
     const errEl = document.getElementById('metrics-error');
     errEl.textContent = '';
     if (!peso || !fecha) { errEl.textContent = 'Peso y fecha son obligatorios'; return; }
     try {
       await db.collection('usuarios').doc(uid).collection('metricas').add({
-        peso, grasaPct: grasa||null, musculo: musc||null, imc: imc||null, fecha
+        peso, grasaPct: isNaN(grasa)?null:grasa, musculo: isNaN(musc)?null:musc, imc: isNaN(imc)?null:imc, fecha
       });
       showToast('Valoración guardada ✓', 'success');
       closeModal('modal-metrics');
       loadMembers();
-    } catch(e) { errEl.textContent = 'Error: '+e.message; }
+    } catch(e) {
+      errEl.textContent = 'Error: ' + e.message;
+    }
   }
 
-  // ── CREATE MEMBER ──
   async function createMember() {
-    const nombre   = document.getElementById('new-nombre').value.trim();
-    const email    = document.getElementById('new-email').value.trim();
-    const pass     = document.getElementById('new-pass').value.trim();
-    const tel      = document.getElementById('new-tel').value.trim();
-    const dob      = document.getElementById('new-dob').value.trim();
-    const inicio   = document.getElementById('new-inicio').value.trim();
-    const meta     = document.getElementById('new-meta').value;
-    const clases   = parseInt(document.getElementById('new-clases').value)||0;
-    const pesoIni  = parseFloat(document.getElementById('new-peso-ini').value)||0;
-    const pesoMeta = parseFloat(document.getElementById('new-peso-meta').value)||0;
-    const peso     = parseFloat(document.getElementById('new-peso').value);
-    const grasa    = parseFloat(document.getElementById('new-grasa').value);
-    const musculo  = parseFloat(document.getElementById('new-musculo').value);
-    const imc      = parseFloat(document.getElementById('new-imc').value);
-    const fechaVal = document.getElementById('new-fecha-val').value.trim();
-    const errEl    = document.getElementById('new-error');
+    const nombre  = document.getElementById('new-nombre').value.trim();
+    const email   = document.getElementById('new-email').value.trim();
+    const pass    = document.getElementById('new-pass').value.trim();
+    const tel     = document.getElementById('new-tel').value.trim();
+    const dob     = fmtDate(document.getElementById('new-dob').value.trim());
+    const inicio  = fmtMonth(document.getElementById('new-inicio').value.trim());
+    const meta    = document.getElementById('new-meta').value;
+    const clases  = parseInt(document.getElementById('new-clases').value)||0;
+    const pesoIni = parseFloat(document.getElementById('new-peso-ini').value)||0;
+    const pesoMeta= parseFloat(document.getElementById('new-peso-meta').value)||0;
+    const peso    = parseFloat(document.getElementById('new-peso').value);
+    const grasa   = parseFloat(document.getElementById('new-grasa').value);
+    const musculo = parseFloat(document.getElementById('new-musculo').value);
+    const imc     = parseFloat(document.getElementById('new-imc').value);
+    const fechaVal= fmtMonth(document.getElementById('new-fecha-val').value.trim());
+    const errEl   = document.getElementById('new-member-error');
     errEl.textContent = '';
-
     if (!nombre||!email||!pass) { errEl.textContent = 'Nombre, email y contraseña son obligatorios'; return; }
     if (pass.length < 6) { errEl.textContent = 'La contraseña debe tener al menos 6 caracteres'; return; }
     if (!peso) { errEl.textContent = 'El peso de valoración es obligatorio'; return; }
-
-    const btn = document.getElementById('btn-create');
+    const btn = document.getElementById('btn-create-member');
     btn.textContent = 'Creando...'; btn.disabled = true;
-
     try {
-      // Crear usuario en Auth
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       const uid  = cred.user.uid;
-
-      // Crear perfil en Firestore
       await db.collection('usuarios').doc(uid).set({
         nombre, telefono:tel, nacimiento:dob, fechaInicio:inicio, email,
-        objetivo: { meta, clasesSemana:clases, pesoInicial:pesoIni, pesoMeta }
+        objetivo:{ meta, clasesSemana:clases, pesoInicial:pesoIni, pesoMeta }
       });
-
-      // Primera valoración
       await db.collection('usuarios').doc(uid).collection('metricas').add({
-        peso, grasaPct:grasa||null, musculo:musculo||null, imc:imc||null,
+        peso, grasaPct:isNaN(grasa)?null:grasa, musculo:isNaN(musculo)?null:musculo, imc:isNaN(imc)?null:imc,
         fecha: fechaVal || inicio || 'Inicio'
       });
-
       showToast('✓ ' + nombre + ' creado correctamente', 'success');
       ['new-nombre','new-tel','new-dob','new-inicio','new-email','new-pass','new-clases',
        'new-peso-ini','new-peso-meta','new-peso','new-grasa','new-musculo','new-imc','new-fecha-val']
@@ -558,17 +544,12 @@
       switchTab('members');
       loadMembers();
     } catch(e) {
-      const msgs = {
-        'auth/email-already-in-use':'Ese email ya está registrado',
-        'auth/invalid-email':'Email inválido',
-        'auth/weak-password':'Contraseña muy débil (mínimo 6 caracteres)'
-      };
-      errEl.textContent = msgs[e.code] || e.message;
+      const msgs = {'auth/email-already-in-use':'Ese email ya está registrado','auth/invalid-email':'Email inválido','auth/weak-password':'Contraseña muy débil'};
+      errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
     }
     btn.textContent = 'Crear miembro'; btn.disabled = false;
   }
 
-  // ── UTILS ──
   function switchTab(tab) {
     ['members','new'].forEach(t => {
       document.getElementById('tab-'+t).classList.toggle('on', t===tab);
@@ -578,9 +559,9 @@
 
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-  function showToast(msg, type='success') {
+  function showToast(msg, type) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'show ' + type;
+    t.textContent = msg; t.className = 'show ' + (type||'success');
     setTimeout(() => t.className = '', 3000);
   }
 
