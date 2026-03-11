@@ -228,19 +228,13 @@
 
       <!-- RESERVE VIEW -->
       <div class="view" id="view-reserve">
-        <div class="reserve-hero">
-          <div class="reserve-hero-title">AGENDA TU CLASE</div>
-          <div class="reserve-hero-sub">Clases disponibles hoy y esta semana en bePWR Studio</div>
-          <button class="btn-primary" style="margin-bottom:0" onclick="window.open('https://bepwr.com','_blank')">Abrir bePWR.com →</button>
+        <div style="display:flex;flex-direction:column;height:calc(100vh - 130px)">
+          <iframe 
+            src="https://bepwr.com/classes" 
+            style="flex:1;width:100%;border:none;border-radius:16px;background:#111"
+            title="Clases bePWR"
+          ></iframe>
         </div>
-        <div class="sec-title">Hoy</div>
-        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">6</div><div class="cls-ampm">AM</div></div><div class="cls-div"></div><div><div class="cls-name">Power Functional</div><div class="cls-info">60 min · Sala A</div></div><div class="cls-spots green">4 lugares</div></div>
-        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">9</div><div class="cls-ampm">AM</div></div><div class="cls-div"></div><div><div class="cls-name">Yoga Flow</div><div class="cls-info">50 min · Sala B</div></div><div class="cls-spots green">8 lugares</div></div>
-        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">12</div><div class="cls-ampm">PM</div></div><div class="cls-div"></div><div><div class="cls-name">HIIT Express</div><div class="cls-info">45 min · Sala A</div></div><div class="cls-spots" style="color:#fb923c">2 lugares</div></div>
-        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">6</div><div class="cls-ampm">PM</div></div><div class="cls-div"></div><div><div class="cls-name">Strength &amp; Core</div><div class="cls-info">60 min · Sala A</div></div><div class="cls-spots green">6 lugares</div></div>
-        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">7:30</div><div class="cls-ampm">PM</div></div><div class="cls-div"></div><div><div class="cls-name">Body Combat</div><div class="cls-info">55 min · Sala B</div></div><div class="cls-spots red">Lleno</div></div>
-        <div style="height:14px"></div>
-        <button class="btn-secondary" onclick="window.open('https://bepwr.com','_blank')">Ver semana completa →</button>
       </div>
 
       <!-- PROFILE VIEW -->
