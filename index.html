@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Tu progreso, tus métricas, tu poder." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="bePWR" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>bePWR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    :root{--black:#0a0a0a;--card:#181818;--border:#2a2a2a;--orange:#FF5C1A;--white:#f5f5f5;--gray:#666;--safe-bottom:env(safe-area-inset-bottom,0px)}
+    html,body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;height:100%;overflow:hidden}
+    #app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--black)}
+
+    /* SPLASH */
+    #screen-splash{position:absolute;inset:0;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:999;transition:opacity .4s ease}
+    #screen-splash.out{opacity:0;pointer-events:none}
+    .splash-logo{width:200px;filter:invert(1) brightness(2)}
+    .splash-spinner{width:32px;height:32px;border:3px solid #333;border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* LOGIN */
+    #screen-login{position:absolute;inset:0;background:var(--black);display:flex;flex-direction:column;justify-content:center;padding:36px 28px;padding-bottom:calc(36px + var(--safe-bottom));z-index:500;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;transform:translateY(16px)}
+    #screen-login.active{opacity:1;pointer-events:all;transform:none}
+    .login-logo-img{width:200px;margin:0 auto 8px;display:block;filter:invert(1) brightness(2)}
+    .login-tagline{font-size:12px;color:var(--gray);text-align:center;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:48px}
+    .field-wrap{margin-bottom:14px}
+    .field-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:7px;display:block}
+    .field-input{width:100%;background:#141414;border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+    .field-input:focus{border-color:var(--orange)}
+    .field-input::placeholder{color:#333}
+    .login-btn{width:100%;padding:18px;background:var(--orange);color:white;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;transition:opacity .2s,transform .1s}
+    .login-btn:active{opacity:.85;transform:scale(.98)}
+    .login-btn:disabled{opacity:.5;cursor:not-allowed}
+    .login-error{font-size:12px;color:#f87171;text-align:center;margin-top:12px;font-family:'Space Mono',monospace;letter-spacing:.5px;min-height:16px}
+    .login-forgot{font-size:12px;color:var(--gray);text-align:center;margin-top:16px;cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline}
+    .login-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:280px;height:280px;background:radial-gradient(circle,rgba(255,92,26,.1),transparent 70%);pointer-events:none}
+
+    /* APP */
+    #screen-app{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateY(16px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+    #screen-app.active{opacity:1;transform:none;pointer-events:all}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 24px 10px;padding-top:calc(18px + env(safe-area-inset-top,0px));background:var(--black);flex-shrink:0;z-index:50}
+    .topbar-logo{height:26px;filter:invert(1) brightness(2)}
+    .avatar-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;border:2px solid #333;cursor:pointer}
+    .scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 22px;padding-bottom:calc(80px + var(--safe-bottom))}
+    .scroll-area::-webkit-scrollbar{display:none}
+    .view{display:none}
+    .view.active{display:block;animation:fadeIn .25s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    /* HOME */
+    .greeting{margin:10px 0 24px}
+    .greeting-sub{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:2.5px;font-family:'Space Mono',monospace;margin-bottom:4px}
+    .greeting-name{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;line-height:1}
+    .ai-card{background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.35);border-radius:20px;padding:18px;margin-bottom:26px;position:relative;overflow:hidden}
+    .ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.3);border-radius:20px;padding:4px 12px;font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:11px}
+    .ai-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+    .ai-message{font-size:14px;line-height:1.65;color:#e0d5cc;font-weight:300}
+    .ai-message b{color:var(--orange);font-weight:600}
+    .ai-loading{font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px}
+    .sec-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:13px}
+    .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px}
+    .m-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 14px}
+    .m-card.wide{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:18px}
+    .m-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:8px}
+    .m-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1}
+    .m-unit{font-size:13px;color:var(--gray);margin-left:3px}
+    .m-delta{font-size:11px;margin-top:6px;font-weight:500}
+    .green{color:#4ade80}.red{color:#f87171}
+    .ring-wrap{position:relative;flex-shrink:0}
+    .ring-wrap svg{transform:rotate(-90deg);display:block}
+    .ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .ring-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);line-height:1}
+    .ring-lbl{font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace}
+    .goal-body{flex:1}
+    .goal-title{font-size:15px;font-weight:600;margin-bottom:3px}
+    .goal-sub{font-size:12px;color:var(--gray);margin-bottom:12px;line-height:1.4}
+    .bar-bg{height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--orange),#ff8c00);transition:width .6s ease}
+    .bar-labels{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace}
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:26px}
+    .chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+    .chart-ttl{font-size:15px;font-weight:600}
+    .chart-sub2{font-size:11px;color:var(--gray);margin-top:2px}
+    .chart-big{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--orange);letter-spacing:1px}
+    .bars{display:flex;align-items:flex-end;gap:5px;height:55px}
+    .bar-col{flex:1;border-radius:3px 3px 0 0;background:var(--border)}
+    .bar-col.lit{background:linear-gradient(to top,var(--orange),#ff8c00)}
+    .months{display:flex;gap:5px;margin-top:7px}
+    .mo{flex:1;text-align:center;font-size:9px;color:var(--gray);font-family:'Space Mono',monospace}
+    .btn-primary{width:100%;padding:17px;background:var(--orange);color:white;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .1s}
+    .btn-primary:active{opacity:.85;transform:scale(.98)}
+    .btn-secondary{width:100%;padding:17px;background:transparent;color:var(--white);border:1px solid var(--border);border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:26px}
+    .btn-secondary:active{opacity:.7}
+
+    /* RESERVE */
+    .reserve-hero{background:linear-gradient(135deg,#1a0a00,#200e00);border:1px solid rgba(255,92,26,.2);border-radius:20px;padding:26px 20px;text-align:center;margin:10px 0 24px}
+    .reserve-hero-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;margin-bottom:8px}
+    .reserve-hero-sub{font-size:13px;color:var(--gray);line-height:1.5;margin-bottom:18px}
+    .class-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px 16px;margin-bottom:9px;display:flex;align-items:center;gap:14px;cursor:pointer}
+    .class-card:active{opacity:.75}
+    .cls-time{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:1px;min-width:48px;text-align:center}
+    .cls-ampm{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray);text-align:center;letter-spacing:1px}
+    .cls-div{width:1px;height:32px;background:var(--border)}
+    .cls-name{font-size:14px;font-weight:600;margin-bottom:2px}
+    .cls-info{font-size:11px;color:var(--gray)}
+    .cls-spots{margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;text-align:right;letter-spacing:.5px;text-transform:uppercase}
+
+    /* PROFILE */
+    .profile-head{display:flex;flex-direction:column;align-items:center;padding:16px 0 26px;gap:10px}
+    .profile-av{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:30px;border:3px solid var(--orange);box-shadow:0 0 28px rgba(255,92,26,.3)}
+    .profile-name-big{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px}
+    .profile-since{font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase}
+    .info-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px}
+    .info-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+    .info-row:last-child{border-bottom:none}
+    .info-key{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace}
+    .info-val{font-size:13px;font-weight:500}
+    .logout-btn{width:100%;padding:17px;background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.25);border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:26px}
+    .logout-btn:active{opacity:.7}
+
+    /* BOTTOM NAV */
+    .bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(12,12,12,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:10px 0;padding-bottom:calc(10px + var(--safe-bottom));z-index:100}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#444;transition:color .2s;font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:4px 0;user-select:none}
+    .nav-item.on{color:var(--orange)}
+    .nav-item svg{width:22px;height:22px}
+
+    /* SKELETON LOADER */
+    .skeleton{background:linear-gradient(90deg,#1a1a1a 25%,#242424 50%,#1a1a1a 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;height:20px;margin-bottom:8px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* INSTALL BANNER */
+    #install-banner{position:absolute;bottom:calc(72px + var(--safe-bottom));left:16px;right:16px;background:#1a1a1a;border:1px solid var(--orange);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:200;animation:slideUp .3s ease}
+    #install-banner.hidden{display:none}
+    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+    .install-text{flex:1;font-size:13px;line-height:1.4}
+    .install-text b{color:var(--orange)}
+    .install-btn-el{background:var(--orange);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif}
+    .install-close{color:var(--gray);cursor:pointer;font-size:18px;line-height:1;padding:4px}
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SPLASH -->
+  <div id="screen-splash">
+    <img class="splash-logo" src="icons/icon-512.png" alt="bePWR" />
+    <div class="splash-spinner"></div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="screen-login">
+    <div class="login-glow"></div>
+    <img class="login-logo-img" src="icons/icon-512.png" alt="bePWR" />
+    <div class="login-tagline">Tu progreso · Tu poder</div>
+    <div class="field-wrap">
+      <label class="field-label">Email</label>
+      <input class="field-input" id="inp-email" type="email" placeholder="tu@email.com" autocomplete="email" />
+    </div>
+    <div class="field-wrap">
+      <label class="field-label">Contraseña</label>
+      <input class="field-input" id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="login-btn" id="btn-login">Entrar</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-forgot" id="btn-forgot">¿Olvidaste tu contraseña?</div>
+  </div>
+
+  <!-- APP -->
+  <div id="screen-app">
+    <div class="topbar">
+      <img class="topbar-logo" src="icons/icon-512.png" alt="bePWR" />
+      <div class="avatar-btn" id="avatar-initials" onclick="navigate('profile')">?</div>
+    </div>
+
+    <div class="scroll-area">
+
+      <!-- HOME VIEW -->
+      <div class="view active" id="view-home">
+        <div class="greeting">
+          <div class="greeting-sub">Bienvenida de vuelta</div>
+          <div class="greeting-name" id="greeting-name">...</div>
+        </div>
+
+        <div class="ai-card">
+          <div class="ai-badge"><div class="ai-dot"></div> IA personalizada</div>
+          <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
+        </div>
+
+        <div class="sec-title">Mis métricas</div>
+        <div class="metrics-grid" id="metrics-grid">
+          <!-- Populated by JS -->
+          <div class="m-card wide"><div style="width:100%"><div class="skeleton" style="height:16px;width:40%"></div><div class="skeleton" style="height:12px;width:60%"></div><div class="skeleton" style="height:6px"></div></div></div>
+          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
+          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
+          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
+          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
+        </div>
+
+        <div class="sec-title">Historial de peso</div>
+        <div class="chart-card" id="chart-card">
+          <div class="skeleton" style="height:14px;width:50%;margin-bottom:16px"></div>
+          <div class="skeleton" style="height:55px"></div>
+        </div>
+
+        <div class="sec-title">Acciones rápidas</div>
+        <button class="btn-primary" onclick="navigate('reserve')">→ Reservar una clase</button>
+        <button class="btn-secondary" onclick="navigate('profile')">Ver mi perfil completo</button>
+      </div>
+
+      <!-- RESERVE VIEW -->
+      <div class="view" id="view-reserve">
+        <div class="reserve-hero">
+          <div class="reserve-hero-title">AGENDA TU CLASE</div>
+          <div class="reserve-hero-sub">Clases disponibles hoy y esta semana en bePWR Studio</div>
+          <button class="btn-primary" style="margin-bottom:0" onclick="window.open('https://bepwr.com','_blank')">Abrir bePWR.com →</button>
+        </div>
+        <div class="sec-title">Hoy</div>
+        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">6</div><div class="cls-ampm">AM</div></div><div class="cls-div"></div><div><div class="cls-name">Power Functional</div><div class="cls-info">60 min · Sala A</div></div><div class="cls-spots green">4 lugares</div></div>
+        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">9</div><div class="cls-ampm">AM</div></div><div class="cls-div"></div><div><div class="cls-name">Yoga Flow</div><div class="cls-info">50 min · Sala B</div></div><div class="cls-spots green">8 lugares</div></div>
+        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">12</div><div class="cls-ampm">PM</div></div><div class="cls-div"></div><div><div class="cls-name">HIIT Express</div><div class="cls-info">45 min · Sala A</div></div><div class="cls-spots" style="color:#fb923c">2 lugares</div></div>
+        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">6</div><div class="cls-ampm">PM</div></div><div class="cls-div"></div><div><div class="cls-name">Strength &amp; Core</div><div class="cls-info">60 min · Sala A</div></div><div class="cls-spots green">6 lugares</div></div>
+        <div class="class-card" onclick="window.open('https://bepwr.com','_blank')"><div><div class="cls-time">7:30</div><div class="cls-ampm">PM</div></div><div class="cls-div"></div><div><div class="cls-name">Body Combat</div><div class="cls-info">55 min · Sala B</div></div><div class="cls-spots red">Lleno</div></div>
+        <div style="height:14px"></div>
+        <button class="btn-secondary" onclick="window.open('https://bepwr.com','_blank')">Ver semana completa →</button>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div class="view" id="view-profile">
+        <div class="profile-head">
+          <div class="profile-av" id="profile-av">?</div>
+          <div class="profile-name-big" id="profile-name-big">...</div>
+          <div class="profile-since" id="profile-since">...</div>
+        </div>
+        <div class="sec-title">Datos de contacto</div>
+        <div class="info-card" id="contact-card">
+          <div class="info-row"><div class="info-key">Email</div><div class="info-val" id="prof-email">...</div></div>
+          <div class="info-row"><div class="info-key">Teléfono</div><div class="info-val" id="prof-phone">...</div></div>
+          <div class="info-row"><div class="info-key">Nacimiento</div><div class="info-val" id="prof-dob">...</div></div>
+        </div>
+        <button class="btn-secondary">✏️ Editar información</button>
+        <div class="sec-title">Mi objetivo</div>
+        <div class="info-card">
+          <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
+          <div class="info-row"><div class="info-key">Peso inicial</div><div class="info-val" id="prof-peso-ini">...</div></div>
+          <div class="info-row"><div class="info-key">Peso meta</div><div class="info-val" id="prof-peso-meta">...</div></div>
+          <div class="info-row"><div class="info-key">Clases / semana</div><div class="info-val" id="prof-clases">...</div></div>
+        </div>
+        <div class="sec-title">Última valoración</div>
+        <div class="info-card">
+          <div class="info-row"><div class="info-key">Peso actual</div><div class="info-val" id="val-peso">...</div></div>
+          <div class="info-row"><div class="info-key">% Grasa</div><div class="info-val" id="val-grasa">...</div></div>
+          <div class="info-row"><div class="info-key">Masa muscular</div><div class="info-val" id="val-musculo">...</div></div>
+          <div class="info-row"><div class="info-key">IMC</div><div class="info-val" id="val-imc">...</div></div>
+          <div class="info-row"><div class="info-key">Fecha</div><div class="info-val" id="val-fecha">...</div></div>
+        </div>
+        <button class="btn-secondary">📋 Ver historial completo</button>
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+      </div>
+
+    </div><!-- scroll-area -->
+
+    <div id="install-banner" class="hidden">
+      <div class="install-text"><b>Instala bePWR</b><br>Accede desde tu pantalla de inicio</div>
+      <button class="install-btn-el" id="do-install">Instalar</button>
+      <div class="install-close" onclick="this.parentElement.classList.add('hidden')">✕</div>
+    </div>
+
+    <nav class="bottom-nav">
+      <div class="nav-item on" id="nav-home" onclick="navigate('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Inicio
+      </div>
+      <div class="nav-item" id="nav-reserve" onclick="navigate('reserve')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Clases
+      </div>
+      <div class="nav-item" id="nav-profile" onclick="navigate('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </div>
+    </nav>
+  </div><!-- screen-app -->
+
+</div><!-- app -->
+
+<!-- FIREBASE SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail }
+    from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit }
+    from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+
+  // ── TU CONFIGURACIÓN DE FIREBASE ──
+  const firebaseConfig = {
+    apiKey: "AIzaSyCB_t4CtXh1G70t9gHuvQkckwdm4U5pv2k",
+    authDomain: "bepwr-app.firebaseapp.com",
+    projectId: "bepwr-app",
+    storageBucket: "bepwr-app.firebasestorage.app",
+    messagingSenderId: "756758426621",
+    appId: "1:756758426621:web:82d199589ec839a809df94"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  const splash    = document.getElementById('screen-splash');
+  const loginScr  = document.getElementById('screen-login');
+  const appScr    = document.getElementById('screen-app');
+  const errorEl   = document.getElementById('login-error');
+  const btnLogin  = document.getElementById('btn-login');
+
+  // ── AUTH STATE ──
+  onAuthStateChanged(auth, async user => {
+    splash.classList.add('out');
+    if (user) {
+      await loadUserData(user);
+      loginScr.classList.remove('active');
+      appScr.classList.add('active');
+    } else {
+      appScr.classList.remove('active');
+      loginScr.classList.add('active');
+    }
+  });
+
+  // ── LOGIN ──
+  btnLogin.addEventListener('click', tryLogin);
+  document.getElementById('inp-pass').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+  document.getElementById('inp-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('inp-pass').focus(); });
+
+  async function tryLogin() {
+    const email = document.getElementById('inp-email').value.trim();
+    const pass  = document.getElementById('inp-pass').value;
+    errorEl.textContent = '';
+    if (!email || !pass) { errorEl.textContent = 'Ingresa tu email y contraseña'; return; }
+    btnLogin.textContent = 'Verificando...';
+    btnLogin.disabled = true;
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch(e) {
+      const msgs = {
+        'auth/user-not-found': 'No encontramos ese email',
+        'auth/wrong-password': 'Contraseña incorrecta',
+        'auth/invalid-email': 'Email inválido',
+        'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
+        'auth/invalid-credential': 'Email o contraseña incorrectos'
+      };
+      errorEl.textContent = msgs[e.code] || 'Error al iniciar sesión';
+      btnLogin.textContent = 'Entrar';
+      btnLogin.disabled = false;
+    }
+  }
+
+  // ── FORGOT PASSWORD ──
+  document.getElementById('btn-forgot').addEventListener('click', async () => {
+    const email = document.getElementById('inp-email').value.trim();
+    if (!email) { errorEl.style.color='#fb923c'; errorEl.textContent = 'Escribe tu email primero'; return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      errorEl.style.color = '#4ade80';
+      errorEl.textContent = 'Te enviamos un correo para restablecer tu contraseña';
+    } catch(e) {
+      errorEl.style.color = '#f87171';
+      errorEl.textContent = 'No encontramos ese email';
+    }
+    setTimeout(() => { errorEl.style.color='#f87171'; errorEl.textContent=''; }, 4000);
+  });
+
+  // ── LOGOUT ──
+  window.doLogout = async () => {
+    await signOut(auth);
+    navigate('home');
+  };
+
+  // ── LOAD USER DATA FROM FIRESTORE ──
+  async function loadUserData(user) {
+    try {
+      const userRef  = doc(db, 'usuarios', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        // Usuario sin datos aún — mostrar nombre del email
+        const nombre = user.email.split('@')[0];
+        setGreeting(nombre.toUpperCase(), '');
+        document.getElementById('ai-message').innerHTML = 'Bienvenido a bePWR. Tu perfil está siendo configurado por el staff. 💪';
+        renderMetricsEmpty();
+        return;
+      }
+
+      const data = userSnap.data();
+      const nombre = data.nombre || user.email.split('@')[0];
+      const initials = nombre.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+
+      // Greeting & avatar
+      setGreeting(nombre.toUpperCase(), data.fechaInicio || '');
+      document.getElementById('avatar-initials').textContent = initials;
+      document.getElementById('profile-av').textContent = initials;
+      document.getElementById('profile-name-big').textContent = nombre.toUpperCase();
+      document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
+      document.getElementById('prof-email').textContent = user.email;
+      document.getElementById('prof-phone').textContent = data.telefono || '—';
+      document.getElementById('prof-dob').textContent = data.nacimiento || '—';
+
+      // Objetivo
+      const obj = data.objetivo || {};
+      document.getElementById('prof-meta').textContent = obj.meta || '—';
+      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '—';
+      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '—';
+      document.getElementById('prof-clases').textContent = obj.clasesSemana ? obj.clasesSemana + ' clases' : '—';
+
+      // Métricas — leer historial
+      const metRef = collection(db, 'usuarios', user.uid, 'metricas');
+      const metQ   = query(metRef, orderBy('fecha', 'desc'), limit(7));
+      const metSnap = await getDocs(metQ);
+      const metricas = metSnap.docs.map(d => d.data()).reverse();
+
+      if (metricas.length > 0) {
+        const ultima = metricas[metricas.length - 1];
+        renderMetrics(ultima, obj);
+        renderChart(metricas);
+        renderProfileMetrics(ultima);
+
+        // Generar mensaje IA
+        generateAIMessage(nombre, ultima, obj);
+      } else {
+        renderMetricsEmpty();
+        document.getElementById('ai-message').innerHTML = '¡Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoración aún no ha sido registrada. Habla con el staff para comenzar. 💪';
+      }
+
+    } catch(err) {
+      console.error(err);
+      document.getElementById('ai-message').innerHTML = 'Error cargando datos. Verifica tu conexión.';
+    }
+  }
+
+  function setGreeting(nombre, desde) {
+    const primerNombre = nombre.split(' ')[0];
+    document.getElementById('greeting-name').innerHTML = primerNombre + '<br>' + (nombre.split(' ')[1] || '');
+  }
+
+  function renderMetrics(m, obj) {
+    const pesoIni  = obj.pesoInicial || m.peso;
+    const pesoMeta = obj.pesoMeta || m.peso;
+    const pct = Math.round(Math.max(0, Math.min(100, ((pesoIni - m.peso) / (pesoIni - pesoMeta)) * 100))) || 0;
+    const circum = 2 * Math.PI * 34;
+
+    document.getElementById('metrics-grid').innerHTML = `
+      <div class="m-card wide">
+        <div class="ring-wrap">
+          <svg width="84" height="84" viewBox="0 0 84 84">
+            <circle cx="42" cy="42" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+            <circle cx="42" cy="42" r="34" fill="none" stroke="#FF5C1A" stroke-width="6"
+              stroke-dasharray="${circum * pct/100} ${circum}" stroke-linecap="round"/>
+          </svg>
+          <div class="ring-text"><div class="ring-val">${pct}%</div><div class="ring-lbl">META</div></div>
+        </div>
+        <div class="goal-body">
+          <div class="m-label">Objetivo</div>
+          <div class="goal-title">${obj.meta || 'Meta personal'}</div>
+          <div class="goal-sub">De ${pesoIni} kg → ${pesoMeta} kg</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <div class="bar-labels"><span>${pesoIni} kg</span><span>${m.peso} actual</span><span>${pesoMeta} kg</span></div>
+        </div>
+      </div>
+      <div class="m-card">
+        <div class="m-label">% Grasa</div>
+        <div class="m-value">${m.grasaPct || '—'}<span class="m-unit">%</span></div>
+        <div class="m-delta green">Medición actual</div>
+      </div>
+      <div class="m-card">
+        <div class="m-label">Masa muscular</div>
+        <div class="m-value">${m.musculo || '—'}<span class="m-unit">kg</span></div>
+        <div class="m-delta green">Medición actual</div>
+      </div>
+      <div class="m-card">
+        <div class="m-label">IMC</div>
+        <div class="m-value">${m.imc || '—'}</div>
+        <div class="m-delta green">${m.imc < 25 ? '↓ Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
+      </div>
+      <div class="m-card">
+        <div class="m-label">Peso actual</div>
+        <div class="m-value">${m.peso}<span class="m-unit">kg</span></div>
+        <div style="font-size:10px;color:var(--gray);margin-top:6px">${m.fecha || ''}</div>
+      </div>`;
+  }
+
+  function renderMetricsEmpty() {
+    document.getElementById('metrics-grid').innerHTML = `
+      <div class="m-card wide" style="justify-content:center;text-align:center;padding:24px">
+        <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">
+          Sin métricas registradas aún
+        </div>
+      </div>`;
+    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">Sin historial aún</div>`;
+  }
+
+  function renderChart(metricas) {
+    if (!metricas.length) return;
+    const pesos = metricas.map(m => m.peso);
+    const fechas = metricas.map(m => (m.fecha || '').slice(0,3).toUpperCase() || '—');
+    const min = Math.min(...pesos), max = Math.max(...pesos);
+    const range = max - min || 1;
+    const ultima = pesos[pesos.length-1];
+
+    const barCols = pesos.map((p, i) =>
+      `<div class="bar-col ${i===pesos.length-1?'lit':''}" style="height:${20 + ((p - min)/range)*70}%"></div>`
+    ).join('');
+    const mos = fechas.map(f => `<div class="mo">${f}</div>`).join('');
+
+    document.getElementById('chart-card').innerHTML = `
+      <div class="chart-head">
+        <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">Últimas ${metricas.length} mediciones</div></div>
+        <div class="chart-big">${ultima} <span style="font-size:15px;color:var(--gray)">kg</span></div>
+      </div>
+      <div class="bars">${barCols}</div>
+      <div class="months">${mos}</div>`;
+  }
+
+  function renderProfileMetrics(m) {
+    document.getElementById('val-peso').textContent = m.peso ? m.peso + ' kg' : '—';
+    document.getElementById('val-grasa').textContent = m.grasaPct ? m.grasaPct + '%' : '—';
+    document.getElementById('val-musculo').textContent = m.musculo ? m.musculo + ' kg' : '—';
+    document.getElementById('val-imc').textContent = m.imc || '—';
+    document.getElementById('val-fecha').textContent = m.fecha || '—';
+  }
+
+  // ── AI MESSAGE ──
+  async function generateAIMessage(nombre, metrica, objetivo) {
+    const el = document.getElementById('ai-message');
+    el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
+    try {
+      const prompt = `Eres el coach de IA de bePWR, un studio de fitness. 
+Genera un mensaje motivacional breve y personalizado (máximo 3 oraciones) para ${nombre}.
+Sus datos: peso ${metrica.peso}kg, % grasa ${metrica.grasaPct}%, masa muscular ${metrica.musculo}kg, IMC ${metrica.imc}.
+Su objetivo: ${objetivo.meta}, llegar de ${objetivo.pesoInicial}kg a ${objetivo.pesoMeta}kg.
+El mensaje debe incluir un dato específico de sus métricas y un consejo concreto de salud, nutrición o descanso.
+Responde SOLO el mensaje, sin saludos extra ni comillas.`;
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 200,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const msg = data.content?.[0]?.text || '';
+      if (msg) {
+        el.innerHTML = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      } else {
+        el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
+      }
+    } catch(e) {
+      el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
+    }
+  }
+
+  // ── PWA INSTALL ──
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferredPrompt = e;
+    document.getElementById('install-banner').classList.remove('hidden');
+  });
+  document.getElementById('do-install').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('install-banner').classList.add('hidden');
+  });
+  window.addEventListener('appinstalled', () => document.getElementById('install-banner').classList.add('hidden'));
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+
+<script>
+  // Navigation (global)
+  const views = ['home','reserve','profile'];
+  function navigate(id) {
+    views.forEach(v => {
+      document.getElementById('view-'+v).classList.toggle('active', v===id);
+      document.getElementById('nav-'+v).classList.toggle('on', v===id);
+    });
+    document.querySelector('.scroll-area').scrollTop = 0;
+  }
+</script>
+</body>
+</html>
