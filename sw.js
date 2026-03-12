@@ -1,4 +1,4 @@
-const CACHE = 'bepwr-v1';
+const CACHE = 'bepwr-v3';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -16,6 +16,11 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Never cache API calls
+  if (e.request.url.includes('/api/')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => caches.match('/index.html')))
   );
