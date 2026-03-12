@@ -405,6 +405,7 @@
       appScr.classList.add('active');
       authReady = true;
       // Check if first login
+      console.log('primerIngreso value:', cachedUserData.primerIngreso, typeof cachedUserData.primerIngreso);
       if (cachedUserData.primerIngreso === true) {
         const primerModal = document.getElementById('modal-primer-ingreso');
         primerModal.style.display = 'flex';
