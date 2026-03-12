@@ -11,8 +11,13 @@ export default async function handler(req) {
     });
   }
 
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
+  }
+
   try {
-    const { prompt } = await req.json();
+    const body = await req.json();
+    const prompt = body.prompt;
     if (!prompt) return new Response(JSON.stringify({ error: 'Missing prompt' }), { status: 400 });
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -29,15 +34,21 @@ export default async function handler(req) {
       })
     });
 
-    const data = await response.json();
-    const message = data.content?.[0]?.text || '';
-    return new Response(JSON.stringify({ message }), {
+    const raw = await response.text();
+    let data;
+    try { data = JSON.parse(raw); } catch(e) { data = {}; }
+
+    const message = data?.content?.[0]?.text || '';
+    return new Response(JSON.stringify({ message, debug: data }), {
       headers: { 
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }
     });
   } catch(e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+    return new Response(JSON.stringify({ error: e.message }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
