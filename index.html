@@ -359,6 +359,32 @@
     </div>
   </div>
 
+  <!-- MODAL PRIMER INGRESO -->
+  <div class="modal-overlay" id="modal-primer-ingreso" style="display:none;z-index:900">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Crea tu contraseña</div>
+      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contraseña segura para tu cuenta.</div>
+      <div class="modal-field"><label>Nueva contraseña</label>
+        <div class="pass-input-wrap">
+          <input type="password" id="primer-pass-new" placeholder="Mínimo 6 caracteres">
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-new',this)">👁</button>
+        </div>
+      </div>
+      <div class="modal-field"><label>Confirmar contraseña</label>
+        <div class="pass-input-wrap">
+          <input type="password" id="primer-pass-confirm" placeholder="Repite tu contraseña">
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">👁</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:16px">
+        Debe tener: mínimo 6 caracteres · mayúscula · minúscula · número · símbolo (. ! * @ #)
+      </div>
+      <div id="primer-pass-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
+      <button class="btn-primary" onclick="savePrimerIngreso()">Guardar y entrar</button>
+    </div>
+  </div>
+
 <!-- FIREBASE SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
