@@ -671,7 +671,8 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
       if (passCurrent || passNew) {
         if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual para poder cambiarla'; return; }
         if (!passNew) { errEl.textContent = 'Escribe la nueva contraseña'; return; }
-        if (passNew.length < 6) { errEl.textContent = 'La nueva contraseña debe tener al menos 6 caracteres'; return; }
+        const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
+        if (!passRegex.test(passNew)) { errEl.textContent = 'La contraseña debe tener mínimo 6 caracteres, mayúscula, minúscula, número y un símbolo (. ! * @ # etc)'; return; }
         const cred = EmailAuthProvider.credential(user.email, passCurrent);
         await reauthenticateWithCredential(user, cred);
         await updatePassword(user, passNew);
