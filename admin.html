@@ -221,8 +221,8 @@
         <div class="field"><label>Clases por semana</label><input type="number" id="new-clases" placeholder="3" min="1" max="7" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Peso inicial (kg)</label><input type="number" id="new-peso-ini" placeholder="70" step="0.1" /></div>
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="new-peso-meta" placeholder="65" step="0.1" /></div>
+        <div class="field"></div>
       </div>
       <div class="modal-section">Valoración inicial</div>
       <div class="field-row">
@@ -613,14 +613,13 @@
     const email    = document.getElementById('new-email').value.trim();
     const pass     = document.getElementById('new-pass').value.trim();
     const tel      = document.getElementById('new-tel').value.trim();
-    const alias    = document.getElementById('new-alias').value.trim();
+    const alias    = document.getElementById('new-alias').value.trim() || null;
     const nombreCompleto = apellido ? nombre + ' ' + apellido : nombre;
     const dob     = fmtDate(document.getElementById('new-dob').value.trim());
     const inicio  = fmtDate(document.getElementById('new-inicio').value.trim());
     const genero  = document.getElementById('new-genero').value;
     const meta    = document.getElementById('new-meta').value;
     const clases  = parseInt(document.getElementById('new-clases').value)||0;
-    const pesoIni = parseFloat(document.getElementById('new-peso-ini').value)||0;
     const pesoMeta= parseFloat(document.getElementById('new-peso-meta').value)||0;
     const peso       = parseFloat(document.getElementById('new-peso').value);
     const musculo    = parseFloat(document.getElementById('new-musculo').value);
@@ -643,7 +642,7 @@
       const uid  = cred.user.uid;
       await db.collection('usuarios').doc(uid).set({
         nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero,
-        objetivo:{ meta, clasesSemana:clases, pesoInicial:pesoIni, pesoMeta }
+        objetivo:{ meta, clasesSemana:clases, pesoInicial:isNaN(peso)?0:peso, pesoMeta }
       });
       await db.collection('usuarios').doc(uid).collection('metricas').add({
         peso,
@@ -658,7 +657,7 @@
       showToast('✓ ' + nombreCompleto + ' creado correctamente', 'success');
       document.getElementById('new-genero').value = 'prefiero-no-decir';
       ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-pass','new-clases',
-       'new-peso-ini','new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val']
+       'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val']
         .forEach(id => document.getElementById(id).value = '');
       document.getElementById('new-meta').value = '';
       switchTab('members');
