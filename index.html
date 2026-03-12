@@ -519,6 +519,10 @@
     const pct = Math.round(Math.max(0, Math.min(100, ((pesoIni - m.peso) / (pesoIni - pesoMeta)) * 100))) || 0;
     const circum = 2 * Math.PI * 34;
 
+    const califPct = m.calificacion || 0;
+    const califCircum = 2 * Math.PI * 34;
+    const califColor = califPct >= 90 ? '#a855f7' : califPct >= 80 ? '#60a5fa' : califPct >= 60 ? '#4ade80' : califPct >= 50 ? '#FF5C1A' : '#f87171';
+
     document.getElementById('metrics-grid').innerHTML = `
       <div class="m-card wide">
         <div class="ring-wrap">
@@ -535,6 +539,23 @@
           <div class="goal-sub">De ${pesoIni} kg → ${pesoMeta} kg</div>
           <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
           <div class="bar-labels"><span>${pesoIni} kg</span><span>${m.peso} actual</span><span>${pesoMeta} kg</span></div>
+        </div>
+      </div>
+      <div class="m-card wide">
+        <div class="ring-wrap">
+          <svg width="84" height="84" viewBox="0 0 84 84">
+            <circle cx="42" cy="42" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+            <circle cx="42" cy="42" r="34" fill="none" stroke="${califColor}" stroke-width="6"
+              stroke-dasharray="${califCircum * califPct/100} ${califCircum}" stroke-linecap="round"/>
+          </svg>
+          <div class="ring-text"><div class="ring-val" style="color:${califColor}">${califPct}</div><div class="ring-lbl">INBODY</div></div>
+        </div>
+        <div class="goal-body">
+          <div class="m-label">Calificación Inbody</div>
+          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? 'Élite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
+          <div class="goal-sub">Escala del 1 al 100</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${califPct}%;background:${califColor}"></div></div>
+          <div class="bar-labels"><span>0</span><span>${califPct} pts</span><span>100</span></div>
         </div>
       </div>
       <div class="m-card">
