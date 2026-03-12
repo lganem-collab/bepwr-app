@@ -321,6 +321,14 @@
       <div class="modal-field"><label>Nombre completo</label><input type="text" id="edit-nombre" placeholder="Tu nombre"></div>
       <div class="modal-field"><label>Teléfono</label><input type="tel" id="edit-tel" placeholder="55 1234 5678"></div>
       <div class="modal-field"><label>Fecha de nacimiento</label><input type="date" id="edit-dob"></div>
+      <div class="modal-field"><label>Género</label>
+        <select id="edit-genero" style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif">
+          <option value="prefiero-no-decir">Prefiero no decirlo</option>
+          <option value="femenino">Femenino</option>
+          <option value="masculino">Masculino</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
       <hr class="modal-divider">
       <div class="modal-section-title">Cambiar contraseña</div>
       <div class="modal-field"><label>Contraseña actual</label>
@@ -462,15 +470,20 @@
 
       const data = userSnap.data();
       cachedUserData = data;
-      const nombre = data.nombre || user.email.split('@')[0];
-      const initials = nombre.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+      const nombreReal = data.nombre || user.email.split('@')[0];
+      const nombre = data.alias || nombreReal;
+      const initials = nombreReal.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
 
       // Greeting & avatar
       setGreeting(nombre.toUpperCase(), data.fechaInicio || '');
       document.getElementById('avatar-initials').textContent = initials;
       document.getElementById('profile-av').textContent = initials;
-      document.getElementById('profile-name-big').textContent = nombre.toUpperCase();
+      document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
+      if (data.alias) {
+        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' · "' + data.alias + '"';
+      } else {
       document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
+      }
       document.getElementById('prof-email').textContent = user.email;
       document.getElementById('prof-phone').textContent = data.telefono || '—';
       document.getElementById('prof-dob').textContent = data.nacimiento || '—';
@@ -640,11 +653,21 @@
     const el = document.getElementById('ai-message');
     el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
     try {
-      const prompt = `Eres el coach de IA de bePWR, un studio de fitness especializado en entrenamiento funcional. bePWR se enfoca en movimientos funcionales que mejoran la fuerza real, movilidad, coordinación y metabolismo en la vida cotidiana.
-Genera un mensaje motivacional breve y personalizado (máximo 3 oraciones) para ${nombre}.
-Sus datos: peso ${metrica.peso}kg, músculo esquelético ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificación Inbody ${metrica.calificacion}/100.
-Su objetivo: ${objetivo.meta}, llegar de ${objetivo.pesoInicial}kg a ${objetivo.pesoMeta}kg.
-El mensaje debe: mencionar un dato específico de sus métricas, conectarlo con un beneficio concreto del entrenamiento funcional (fuerza, movilidad, composición corporal, metabolismo), y cerrar con motivación para seguir asistiendo a clases.
+      const edad = cachedUserData.nacimiento ? Math.floor((new Date() - new Date(cachedUserData.nacimiento)) / (365.25*24*60*60*1000)) : null;
+      const genero = cachedUserData.genero || null;
+      const contextoPersona = [
+        edad ? `tiene ${edad} años` : null,
+        genero && genero !== 'prefiero-no-decir' ? `género ${genero}` : null
+      ].filter(Boolean).join(', ');
+
+      const prompt = `Eres el coach de IA de bePWR, un studio de fitness especializado en entrenamiento funcional. bePWR se enfoca en movimientos funcionales que mejoran fuerza real, movilidad, coordinación y metabolismo.
+Genera un mensaje motivacional breve y personalizado (máximo 4 oraciones) para ${nombre}${contextoPersona ? ' ('+contextoPersona+')' : ''}.
+Sus métricas: peso ${metrica.peso}kg, músculo esquelético ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificación Inbody ${metrica.calificacion}/100.
+Su objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg a ${objetivo.pesoMeta}kg.
+El mensaje debe:
+1. Destacar un dato específico de sus métricas y lo que significa para su salud.
+2. Dar un consejo concreto de nutrición o hidratación apropiado para su perfil${edad && edad >= 50 ? ' (considerando que a partir de los 50 años la prioridad es preservar masa muscular, movilidad y fuerza funcional más que cardio intenso)' : ''}.
+3. Reforzar por qué el entrenamiento funcional de bePWR es ideal para su objetivo y edad.
 Responde SOLO el mensaje, sin saludos extra ni comillas.`;
 
       const res = await fetch('/api/chat', {
@@ -680,6 +703,7 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
     document.getElementById('edit-tel').value = cachedUserData.telefono || '';
     document.getElementById('edit-dob').value = cachedUserData.nacimiento || '';
+    document.getElementById('edit-genero').value = cachedUserData.genero || 'prefiero-no-decir';
     document.getElementById('edit-pass-current').value = '';
     document.getElementById('edit-pass-new').value = '';
     document.getElementById('edit-error').textContent = '';
@@ -691,21 +715,25 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     const nombre = document.getElementById('edit-nombre').value.trim();
     const tel = document.getElementById('edit-tel').value.trim();
     const dob = document.getElementById('edit-dob').value;
+    const genero = document.getElementById('edit-genero').value;
     const passCurrent = document.getElementById('edit-pass-current').value;
     const passNew = document.getElementById('edit-pass-new').value;
     const user = auth.currentUser;
     if (!user) return;
     try {
       // Guardar datos en Firestore
-      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, telefono: tel, nacimiento: dob });
-      cachedUserData = { ...cachedUserData, nombre, telefono: tel, nacimiento: dob };
+      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, telefono: tel, nacimiento: dob, genero });
+      cachedUserData = { ...cachedUserData, nombre, telefono: tel, nacimiento: dob, genero };
       // Actualizar UI
       document.getElementById('prof-phone').textContent = tel || '—';
       document.getElementById('prof-dob').textContent = dob || '—';
       const initials = nombre.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
       document.getElementById('avatar-initials').textContent = initials;
       document.getElementById('profile-av').textContent = initials;
-      document.getElementById('profile-name-big').textContent = nombre.toUpperCase();
+      document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
+      if (data.alias) {
+        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' · "' + data.alias + '"';
+      } else {
       // Cambiar contraseña si se llenaron los campos
       if (passCurrent || passNew) {
         if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual para poder cambiarla'; return; }
@@ -773,13 +801,27 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
 <script>
   // Navigation (global)
   const views = ['home','profile'];
-  function navigate(id) {
+  let currentView = 'home';
+
+  function navigate(id, pushState = true) {
     views.forEach(v => {
       document.getElementById('view-'+v).classList.toggle('active', v===id);
       document.getElementById('nav-'+v).classList.toggle('on', v===id);
     });
     document.querySelector('.scroll-area').scrollTop = 0;
+    if (pushState && id !== currentView) {
+      history.pushState({ view: id }, '', '');
+    }
+    currentView = id;
   }
+
+  window.addEventListener('popstate', (e) => {
+    const view = e.state?.view || 'home';
+    navigate(view, false);
+  });
+
+  // Set initial state
+  history.replaceState({ view: 'home' }, '', '');
 </script>
 </body>
 </html>
