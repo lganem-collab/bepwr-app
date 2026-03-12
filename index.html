@@ -668,7 +668,9 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
       document.getElementById('profile-av').textContent = initials;
       document.getElementById('profile-name-big').textContent = nombre.toUpperCase();
       // Cambiar contraseña si se llenaron los campos
-      if (passCurrent && passNew) {
+      if (passCurrent || passNew) {
+        if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual para poder cambiarla'; return; }
+        if (!passNew) { errEl.textContent = 'Escribe la nueva contraseña'; return; }
         if (passNew.length < 6) { errEl.textContent = 'La nueva contraseña debe tener al menos 6 caracteres'; return; }
         const cred = EmailAuthProvider.credential(user.email, passCurrent);
         await reauthenticateWithCredential(user, cred);
