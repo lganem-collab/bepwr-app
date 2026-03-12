@@ -392,12 +392,18 @@
   };
 
   // ── AUTH STATE ──
+  let authReady = false;
   onAuthStateChanged(auth, async user => {
     splash.classList.add('out');
     if (user) {
-      await loadUserData(user);
+      try {
+        await loadUserData(user);
+      } catch(e) {
+        console.error('loadUserData error:', e);
+      }
       loginScr.classList.remove('active');
       appScr.classList.add('active');
+      authReady = true;
       // Check if first login
       if (cachedUserData.primerIngreso === true) {
         const primerModal = document.getElementById('modal-primer-ingreso');
@@ -405,8 +411,15 @@
         setTimeout(() => primerModal.classList.add('active'), 10);
       }
     } else {
-      appScr.classList.remove('active');
-      loginScr.classList.add('active');
+      // Only show login if auth was ready (avoid flicker on init)
+      if (authReady) {
+        appScr.classList.remove('active');
+        loginScr.classList.add('active');
+      } else if (!user) {
+        appScr.classList.remove('active');
+        loginScr.classList.add('active');
+        authReady = true;
+      }
     }
   });
 
