@@ -334,6 +334,10 @@
   const auth = firebase.auth();
   const db   = firebase.firestore();
 
+  // Segunda instancia para crear usuarios sin afectar la sesión del staff
+  const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
+  const secondaryAuth = secondaryApp.auth();
+
   // ROL ACTUAL DEL STAFF
   window.currentStaffRole = null;
 
@@ -634,7 +638,8 @@
     const btn = document.getElementById('btn-create-member');
     btn.textContent = 'Creando...'; btn.disabled = true;
     try {
-      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
+      await secondaryAuth.signOut();
       const uid  = cred.user.uid;
       await db.collection('usuarios').doc(uid).set({
         nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero,
@@ -734,7 +739,8 @@
     const btn = document.getElementById('btn-create-staff');
     btn.textContent = 'Creando...'; btn.disabled = true;
     try {
-      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
+      await secondaryAuth.signOut();
       await db.collection('staff').doc(cred.user.uid).set({
         nombre, email, rol, activo: true, fechaAlta: new Date().toISOString().slice(0,10)
       });
