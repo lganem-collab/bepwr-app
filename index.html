@@ -554,6 +554,7 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
         body: JSON.stringify({ prompt })
       });
       const data = await res.json();
+      console.log('AI Response:', data);
       const msg = data.message || '';
       if (msg) {
         el.innerHTML = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -561,6 +562,7 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
         el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
       }
     } catch(e) {
+      console.error('AI Error:', e);
       el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
     }
   }
