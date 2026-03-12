@@ -641,7 +641,7 @@
       await secondaryAuth.signOut();
       const uid  = cred.user.uid;
       await db.collection('usuarios').doc(uid).set({
-        nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero,
+        nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero, primerIngreso: true,
         objetivo:{ meta, clasesSemana:clases, pesoInicial:isNaN(peso)?0:peso, pesoMeta }
       });
       await db.collection('usuarios').doc(uid).collection('metricas').add({

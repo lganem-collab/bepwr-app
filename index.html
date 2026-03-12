@@ -398,6 +398,12 @@
       await loadUserData(user);
       loginScr.classList.remove('active');
       appScr.classList.add('active');
+      // Check if first login
+      if (cachedUserData.primerIngreso === true) {
+        const primerModal = document.getElementById('modal-primer-ingreso');
+        primerModal.style.display = 'flex';
+        setTimeout(() => primerModal.classList.add('active'), 10);
+      }
     } else {
       appScr.classList.remove('active');
       loginScr.classList.add('active');
@@ -779,6 +785,33 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
         </div>`).join('');
     }
     document.getElementById('modal-historial').classList.add('active');
+  };
+
+  // ── PRIMER INGRESO ──
+  window.savePrimerIngreso = async () => {
+    const errEl = document.getElementById('primer-pass-error');
+    const passNew = document.getElementById('primer-pass-new').value;
+    const passConfirm = document.getElementById('primer-pass-confirm').value;
+    errEl.textContent = '';
+
+    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
+    if (!passNew) { errEl.textContent = 'Escribe tu nueva contraseña'; return; }
+    if (!passRegex.test(passNew)) { 
+      errEl.textContent = 'Debe tener mayúscula, minúscula, número y un símbolo'; return; 
+    }
+    if (passNew !== passConfirm) { errEl.textContent = 'Las contraseñas no coinciden'; return; }
+
+    try {
+      const user = auth.currentUser;
+      await updatePassword(user, passNew);
+      await updateDoc(doc(db, 'usuarios', user.uid), { primerIngreso: false });
+      cachedUserData.primerIngreso = false;
+      const primerModal = document.getElementById('modal-primer-ingreso');
+      primerModal.classList.remove('active');
+      setTimeout(() => primerModal.style.display = 'none', 300);
+    } catch(e) {
+      errEl.textContent = 'Error al guardar: ' + e.message;
+    }
   };
 
   // ── PWA INSTALL ──
