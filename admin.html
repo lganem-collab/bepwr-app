@@ -218,7 +218,7 @@
         <div class="field"><label>Masa muscular (kg)</label><input type="number" id="new-musculo" placeholder="42" step="0.1" /></div>
         <div class="field"><label>IMC</label><input type="number" id="new-imc" placeholder="24.5" step="0.1" /></div>
       </div>
-      <div class="field"><label>Fecha de valoración</label><input type="month" id="new-fecha-val" /></div>
+      <div class="field"><label>Fecha de valoración</label><input type="date" id="new-fecha-val" /></div>
       <div class="form-error" id="new-member-error"></div>
       <button class="btn btn-primary" id="btn-create-member" onclick="createMember()" style="margin-top:8px">Crear miembro</button>
     </div>
@@ -275,7 +275,7 @@
       <div class="field"><label>Masa muscular (kg)</label><input type="number" id="m-musculo" placeholder="42" step="0.1" /></div>
       <div class="field"><label>IMC</label><input type="number" id="m-imc" placeholder="24.2" step="0.1" /></div>
     </div>
-    <div class="field"><label>Fecha *</label><input type="month" id="m-fecha" /></div>
+    <div class="field"><label>Fecha *</label><input type="date" id="m-fecha" /></div>
     <div class="form-error" id="metrics-error"></div>
     <div class="modal-footer">
       <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoración</button>
@@ -527,7 +527,7 @@
     document.getElementById('metrics-error').textContent = '';
     ['m-peso','m-grasa','m-musculo','m-imc'].forEach(id => document.getElementById(id).value = '');
     const now = new Date();
-    document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     document.getElementById('modal-metrics').classList.add('open');
   }
 
@@ -537,7 +537,7 @@
     const grasa = parseFloat(document.getElementById('m-grasa').value);
     const musc  = parseFloat(document.getElementById('m-musculo').value);
     const imc   = parseFloat(document.getElementById('m-imc').value);
-    const fecha = fmtMonth(document.getElementById('m-fecha').value.trim());
+    const fecha = fmtDate(document.getElementById('m-fecha').value.trim());
     const errEl = document.getElementById('metrics-error');
     errEl.textContent = '';
     if (!peso || !fecha) { errEl.textContent = 'Peso y fecha son obligatorios'; return; }
@@ -568,7 +568,7 @@
     const grasa   = parseFloat(document.getElementById('new-grasa').value);
     const musculo = parseFloat(document.getElementById('new-musculo').value);
     const imc     = parseFloat(document.getElementById('new-imc').value);
-    const fechaVal= fmtMonth(document.getElementById('new-fecha-val').value.trim());
+    const fechaVal= fmtDate(document.getElementById('new-fecha-val').value.trim());
     const errEl   = document.getElementById('new-member-error');
     errEl.textContent = '';
     if (!nombre||!email||!pass) { errEl.textContent = 'Nombre, email y contraseña son obligatorios'; return; }
