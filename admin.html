@@ -136,6 +136,7 @@
   <div class="tabs">
     <div class="tab on" id="tab-members" onclick="switchTab('members')">Miembros</div>
     <div class="tab" id="tab-new" onclick="switchTab('new')">+ Nuevo miembro</div>
+    <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">👥 Staff</div>
   </div>
   <div class="content">
 
@@ -222,6 +223,31 @@
       <button class="btn btn-primary" id="btn-create-member" onclick="createMember()" style="margin-top:8px">Crear miembro</button>
     </div>
 
+    <!-- STAFF TAB -->
+    <div id="tab-content-staff" style="display:none;max-width:600px">
+      <div style="margin-bottom:24px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Gestión de Staff</div>
+        <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:1px">Agrega, desactiva o cambia el rol de cada persona</div>
+      </div>
+      <div id="staff-list" style="margin-bottom:28px"></div>
+      <div class="modal-section">Agregar nuevo staff</div>
+      <div class="field-row">
+        <div class="field"><label>Nombre completo *</label><input type="text" id="ns-nombre" placeholder="Ana López" /></div>
+        <div class="field"><label>Email *</label><input type="email" id="ns-email" placeholder="ana@bepwr.com" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Contraseña *</label><input type="password" id="ns-pass" placeholder="Mínimo 6 caracteres" /></div>
+        <div class="field"><label>Rol</label>
+          <select id="ns-rol">
+            <option value="coach">Coach</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-error" id="ns-error"></div>
+      <button class="btn btn-primary" id="btn-create-staff" onclick="createStaff()">Agregar al staff</button>
+    </div>
+
   </div>
 </div>
 
@@ -279,16 +305,38 @@
   const auth = firebase.auth();
   const db   = firebase.firestore();
 
-  // AUTH STATE
-  auth.onAuthStateChanged(user => {
+  // ROL ACTUAL DEL STAFF
+  window.currentStaffRole = null;
+
+  // AUTH STATE — con verificación de lista blanca
+  auth.onAuthStateChanged(async user => {
     if (user) {
-      show('s-app');
-      hide('s-login');
-      document.getElementById('staff-name').textContent = user.email;
-      loadMembers();
+      try {
+        const staffDoc = await db.collection('staff').doc(user.uid).get();
+        if (!staffDoc.exists || staffDoc.data().activo === false) {
+          await auth.signOut();
+          const errEl = document.getElementById('adm-login-error');
+          errEl.textContent = 'No tienes acceso al panel de staff.';
+          show('s-login'); hide('s-app');
+          return;
+        }
+        const staffData = staffDoc.data();
+        window.currentStaffRole = staffData.rol || 'coach';
+        show('s-app'); hide('s-login');
+        const rolBadge = window.currentStaffRole === 'admin' ? '🔑 Admin' : '👟 Coach';
+        document.getElementById('staff-name').innerHTML = `${staffData.nombre || user.email} <span style="font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1px">${rolBadge}</span>`;
+        // Tab de staff solo para admin
+        if (window.currentStaffRole === 'admin') {
+          document.getElementById('tab-staff').style.display = 'inline-block';
+        }
+        loadMembers();
+      } catch(e) {
+        await auth.signOut();
+        show('s-login'); hide('s-app');
+      }
     } else {
-      show('s-login');
-      hide('s-app');
+      window.currentStaffRole = null;
+      show('s-login'); hide('s-app');
       const btn = document.getElementById('adm-login-btn');
       btn.textContent = 'Entrar al panel';
       btn.disabled = false;
@@ -441,7 +489,9 @@
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="edit-peso-meta" value="${m.objetivo?.pesoMeta||''}" step="0.1" /></div>
       </div>
-      <button class="btn btn-primary btn-sm" style="margin-bottom:20px" onclick="saveMemberEdit('${uid}')">Guardar cambios</button>
+      <button class="btn btn-primary btn-sm" style="margin-bottom:20px" onclick="saveMemberEdit('${uid}')" ${window.currentStaffRole !== 'admin' ? 'disabled title="Solo admin puede editar datos"' : ''}>
+        ${window.currentStaffRole !== 'admin' ? '🔒 Editar datos (solo admin)' : 'Guardar cambios'}
+      </button>
       <div class="modal-section">Historial de valoraciones</div>
       ${histHTML}
       <button class="btn btn-success btn-sm" style="margin-top:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoración</button>
@@ -552,10 +602,86 @@
   }
 
   function switchTab(tab) {
-    ['members','new'].forEach(t => {
-      document.getElementById('tab-'+t).classList.toggle('on', t===tab);
-      document.getElementById('tab-content-'+t).style.display = t===tab ? 'block' : 'none';
+    const tabs = ['members','new','staff'];
+    tabs.forEach(t => {
+      const tabEl = document.getElementById('tab-'+t);
+      const contentEl = document.getElementById('tab-content-'+t);
+      if (tabEl) tabEl.classList.toggle('on', t===tab);
+      if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
     });
+    if (tab === 'staff') loadStaffList();
+  }
+
+  // ── GESTIÓN DE STAFF ──
+  async function loadStaffList() {
+    const listEl = document.getElementById('staff-list');
+    listEl.innerHTML = '<div style="color:var(--gray);font-size:13px">Cargando...</div>';
+    try {
+      const snap = await db.collection('staff').get();
+      if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado aún</div>'; return; }
+      listEl.innerHTML = snap.docs.map(d => {
+        const s = d.data();
+        const activo = s.activo !== false;
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1a1a1a">
+          <div>
+            <div style="font-weight:600;font-size:15px">${s.nombre||s.email}</div>
+            <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">${s.email} · <span style="color:${s.rol==='admin'?'var(--orange)':'#888'}">${s.rol||'coach'}</span></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select onchange="changeStaffRol('${d.id}',this.value)" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px">
+              <option value="coach" ${s.rol!=='admin'?'selected':''}>Coach</option>
+              <option value="admin" ${s.rol==='admin'?'selected':''}>Admin</option>
+            </select>
+            <button class="btn btn-sm ${activo?'btn-secondary':'btn-success'}" onclick="toggleStaffActivo('${d.id}',${activo})">
+              ${activo?'Desactivar':'Activar'}
+            </button>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      listEl.innerHTML = '<div style="color:#f87171;font-size:13px">Error: ' + e.message + '</div>';
+    }
+  }
+
+  async function toggleStaffActivo(uid, currentActivo) {
+    try {
+      await db.collection('staff').doc(uid).update({ activo: !currentActivo });
+      showToast(currentActivo ? 'Staff desactivado' : 'Staff activado ✓', 'success');
+      loadStaffList();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  }
+
+  async function changeStaffRol(uid, newRol) {
+    try {
+      await db.collection('staff').doc(uid).update({ rol: newRol });
+      showToast('Rol actualizado ✓', 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  }
+
+  async function createStaff() {
+    const nombre = document.getElementById('ns-nombre').value.trim();
+    const email  = document.getElementById('ns-email').value.trim();
+    const pass   = document.getElementById('ns-pass').value;
+    const rol    = document.getElementById('ns-rol').value;
+    const errEl  = document.getElementById('ns-error');
+    errEl.textContent = '';
+    if (!nombre || !email || !pass) { errEl.textContent = 'Completa todos los campos'; return; }
+    if (pass.length < 6) { errEl.textContent = 'La contraseña debe tener al menos 6 caracteres'; return; }
+    const btn = document.getElementById('btn-create-staff');
+    btn.textContent = 'Creando...'; btn.disabled = true;
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await db.collection('staff').doc(cred.user.uid).set({
+        nombre, email, rol, activo: true, fechaAlta: new Date().toISOString().slice(0,10)
+      });
+      showToast('✓ ' + nombre + ' agregado al staff', 'success');
+      ['ns-nombre','ns-email','ns-pass'].forEach(id => document.getElementById(id).value = '');
+      loadStaffList();
+    } catch(e) {
+      const msgs = {'auth/email-already-in-use':'Ese email ya está registrado','auth/invalid-email':'Email inválido','auth/weak-password':'Contraseña muy débil'};
+      errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
+    }
+    btn.textContent = 'Agregar al staff'; btn.disabled = false;
   }
 
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
