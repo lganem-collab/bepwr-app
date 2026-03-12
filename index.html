@@ -482,7 +482,7 @@
       if (data.alias) {
         document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' · "' + data.alias + '"';
       } else {
-      document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
+        document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
       }
       document.getElementById('prof-email').textContent = user.email;
       document.getElementById('prof-phone').textContent = data.telefono || '—';
@@ -733,7 +733,7 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
       document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
       if (data.alias) {
         document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' · "' + data.alias + '"';
-      } else {
+      }
       // Cambiar contraseña si se llenaron los campos
       if (passCurrent || passNew) {
         if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual para poder cambiarla'; return; }
