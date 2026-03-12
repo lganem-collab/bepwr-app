@@ -178,7 +178,7 @@
       </div>
       <div class="field-row">
         <div class="field"><label>Fecha de nacimiento</label><input type="date" id="new-dob" /></div>
-        <div class="field"><label>Fecha de inicio *</label><input type="month" id="new-inicio" /></div>
+        <div class="field"><label>Fecha de inicio *</label><input type="date" id="new-inicio" /></div>
       </div>
       <div class="modal-section">Acceso a la app</div>
       <div class="field-row">
@@ -475,7 +475,7 @@
         <div class="field"><label>Nombre</label><input type="text" id="edit-nombre" value="${m.nombre||''}" /></div>
         <div class="field"><label>Teléfono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
         <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${m.nacimiento||''}" /></div>
-        <div class="field"><label>Fecha inicio</label><input type="month" id="edit-inicio" value="${m.fechaInicio||''}" /></div>
+        <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" value="${m.fechaInicio||''}" /></div>
       </div>
       <div class="modal-section">Objetivo</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
@@ -505,7 +505,7 @@
         nombre: document.getElementById('edit-nombre').value,
         telefono: document.getElementById('edit-tel').value,
         nacimiento: fmtDate(document.getElementById('edit-dob').value),
-        fechaInicio: fmtMonth(document.getElementById('edit-inicio').value),
+        fechaInicio: fmtDate(document.getElementById('edit-inicio').value),
         objetivo: {
           meta: document.getElementById('edit-meta').value,
           clasesSemana: Number(document.getElementById('edit-clases').value)||0,
@@ -559,7 +559,7 @@
     const pass    = document.getElementById('new-pass').value.trim();
     const tel     = document.getElementById('new-tel').value.trim();
     const dob     = fmtDate(document.getElementById('new-dob').value.trim());
-    const inicio  = fmtMonth(document.getElementById('new-inicio').value.trim());
+    const inicio  = fmtDate(document.getElementById('new-inicio').value.trim());
     const meta    = document.getElementById('new-meta').value;
     const clases  = parseInt(document.getElementById('new-clases').value)||0;
     const pesoIni = parseFloat(document.getElementById('new-peso-ini').value)||0;
