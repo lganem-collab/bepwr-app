@@ -601,11 +601,11 @@
     const el = document.getElementById('ai-message');
     el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
     try {
-      const prompt = `Eres el coach de IA de bePWR, un studio de fitness. 
+      const prompt = `Eres el coach de IA de bePWR, un studio de fitness especializado en entrenamiento funcional. bePWR se enfoca en movimientos funcionales que mejoran la fuerza real, movilidad, coordinación y metabolismo en la vida cotidiana.
 Genera un mensaje motivacional breve y personalizado (máximo 3 oraciones) para ${nombre}.
 Sus datos: peso ${metrica.peso}kg, % grasa ${metrica.grasaPct}%, masa muscular ${metrica.musculo}kg, IMC ${metrica.imc}.
 Su objetivo: ${objetivo.meta}, llegar de ${objetivo.pesoInicial}kg a ${objetivo.pesoMeta}kg.
-El mensaje debe incluir un dato específico de sus métricas y un consejo concreto de salud, nutrición o descanso.
+El mensaje debe: mencionar un dato específico de sus métricas, conectarlo con un beneficio concreto del entrenamiento funcional (fuerza, movilidad, composición corporal, metabolismo), y cerrar con motivación para seguir asistiendo a clases.
 Responde SOLO el mensaje, sin saludos extra ni comillas.`;
 
       const res = await fetch('/api/chat', {
