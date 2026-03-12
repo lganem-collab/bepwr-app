@@ -64,6 +64,27 @@
     .greeting-sub{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:2.5px;font-family:'Space Mono',monospace;margin-bottom:4px}
     .greeting-name{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;line-height:1}
     .ai-card{background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.35);border-radius:20px;padding:18px;margin-bottom:26px;position:relative;overflow:hidden}
+    /* MODALES */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:800;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+    .modal-overlay.active{opacity:1;pointer-events:all}
+    .modal-sheet{background:#111;border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:24px 20px 40px;transform:translateY(40px);transition:transform .3s}
+    .modal-overlay.active .modal-sheet{transform:none}
+    .modal-handle{width:40px;height:4px;background:#333;border-radius:2px;margin:0 auto 20px}
+    .modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:20px}
+    .modal-field{margin-bottom:16px}
+    .modal-field label{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px}
+    .modal-field input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;box-sizing:border-box}
+    .modal-field input:focus{outline:none;border-color:var(--orange)}
+    .modal-divider{border:none;border-top:1px solid #222;margin:20px 0}
+    .modal-section-title{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;margin-bottom:14px}
+    .hist-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1a1a1a;font-size:14px}
+    .hist-row:last-child{border-bottom:none}
+    .hist-date{color:var(--gray);font-family:'Space Mono',monospace;font-size:11px}
+    .hist-metrics{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin-top:6px;font-size:13px}
+    .hist-metric{color:#ccc}.hist-metric span{color:#fff;font-weight:600}
+    .pass-input-wrap{position:relative}
+    .pass-input-wrap input{padding-right:44px}
+    .pass-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);cursor:pointer;font-size:16px;padding:4px}
     .ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.3);border-radius:20px;padding:4px 12px;font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:11px}
     .ai-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 2s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
@@ -201,7 +222,6 @@
         </div>
 
         <div class="ai-card">
-          <div class="ai-badge"><div class="ai-dot"></div> IA personalizada</div>
           <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
         </div>
 
@@ -248,7 +268,7 @@
           <div class="info-row"><div class="info-key">Teléfono</div><div class="info-val" id="prof-phone">...</div></div>
           <div class="info-row"><div class="info-key">Nacimiento</div><div class="info-val" id="prof-dob">...</div></div>
         </div>
-        <button class="btn-secondary">✏️ Editar información</button>
+        <button class="btn-secondary" onclick="openEditModal()">✏️ Editar información</button>
         <div class="sec-title">Mi objetivo</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
@@ -264,7 +284,7 @@
           <div class="info-row"><div class="info-key">IMC</div><div class="info-val" id="val-imc">...</div></div>
           <div class="info-row"><div class="info-key">Fecha</div><div class="info-val" id="val-fecha">...</div></div>
         </div>
-        <button class="btn-secondary">📋 Ver historial completo</button>
+        <button class="btn-secondary" onclick="openHistorialModal()">📋 Ver historial completo</button>
         <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
       </div>
 
@@ -290,12 +310,50 @@
 
 </div><!-- app -->
 
+  <!-- MODAL EDITAR INFORMACIÓN -->
+  <div class="modal-overlay" id="modal-edit">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Editar información</div>
+      <div class="modal-field"><label>Nombre completo</label><input type="text" id="edit-nombre" placeholder="Tu nombre"></div>
+      <div class="modal-field"><label>Teléfono</label><input type="tel" id="edit-tel" placeholder="55 1234 5678"></div>
+      <div class="modal-field"><label>Fecha de nacimiento</label><input type="date" id="edit-dob"></div>
+      <hr class="modal-divider">
+      <div class="modal-section-title">Cambiar contraseña</div>
+      <div class="modal-field"><label>Contraseña actual</label>
+        <div class="pass-input-wrap">
+          <input type="password" id="edit-pass-current" placeholder="••••••••">
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">👁</button>
+        </div>
+      </div>
+      <div class="modal-field"><label>Nueva contraseña</label>
+        <div class="pass-input-wrap">
+          <input type="password" id="edit-pass-new" placeholder="Mínimo 6 caracteres">
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">👁</button>
+        </div>
+      </div>
+      <div id="edit-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
+      <button class="btn-primary" onclick="saveEditInfo()">Guardar cambios</button>
+      <button class="btn-secondary" style="margin-top:10px" onclick="closeModal('modal-edit')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL HISTORIAL COMPLETO -->
+  <div class="modal-overlay" id="modal-historial">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Historial completo</div>
+      <div id="historial-list"><div style="text-align:center;color:var(--gray);padding:20px">Cargando...</div></div>
+      <button class="btn-secondary" style="margin-top:20px" onclick="closeModal('modal-historial')">Cerrar</button>
+    </div>
+  </div>
+
 <!-- FIREBASE SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail }
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit }
+  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
   // ── TU CONFIGURACIÓN DE FIREBASE ──
@@ -400,6 +458,7 @@
       }
 
       const data = userSnap.data();
+      cachedUserData = data;
       const nombre = data.nombre || user.email.split('@')[0];
       const initials = nombre.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
 
@@ -425,6 +484,7 @@
       const metQ   = query(metRef, orderBy('fecha', 'desc'), limit(7));
       const metSnap = await getDocs(metQ);
       const metricas = metSnap.docs.map(d => d.data()).reverse();
+      cachedMetricas = metricas;
 
       if (metricas.length > 0) {
         const ultima = metricas[metricas.length - 1];
@@ -566,6 +626,87 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
       el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
     }
   }
+
+  // ── MODAL HELPERS ──
+  window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+  window.toggleModalPass = (inputId, btn) => {
+    const inp = document.getElementById(inputId);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  };
+
+  // ── MODAL EDITAR INFORMACIÓN ──
+  let cachedUserData = {};
+  window.openEditModal = () => {
+    document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
+    document.getElementById('edit-tel').value = cachedUserData.telefono || '';
+    document.getElementById('edit-dob').value = cachedUserData.nacimiento || '';
+    document.getElementById('edit-pass-current').value = '';
+    document.getElementById('edit-pass-new').value = '';
+    document.getElementById('edit-error').textContent = '';
+    document.getElementById('modal-edit').classList.add('active');
+  };
+  window.saveEditInfo = async () => {
+    const errEl = document.getElementById('edit-error');
+    errEl.textContent = '';
+    const nombre = document.getElementById('edit-nombre').value.trim();
+    const tel = document.getElementById('edit-tel').value.trim();
+    const dob = document.getElementById('edit-dob').value;
+    const passCurrent = document.getElementById('edit-pass-current').value;
+    const passNew = document.getElementById('edit-pass-new').value;
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+      // Guardar datos en Firestore
+      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, telefono: tel, nacimiento: dob });
+      cachedUserData = { ...cachedUserData, nombre, telefono: tel, nacimiento: dob };
+      // Actualizar UI
+      document.getElementById('prof-phone').textContent = tel || '—';
+      document.getElementById('prof-dob').textContent = dob || '—';
+      const initials = nombre.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+      document.getElementById('avatar-initials').textContent = initials;
+      document.getElementById('profile-av').textContent = initials;
+      document.getElementById('profile-name-big').textContent = nombre.toUpperCase();
+      // Cambiar contraseña si se llenaron los campos
+      if (passCurrent && passNew) {
+        if (passNew.length < 6) { errEl.textContent = 'La nueva contraseña debe tener al menos 6 caracteres'; return; }
+        const cred = EmailAuthProvider.credential(user.email, passCurrent);
+        await reauthenticateWithCredential(user, cred);
+        await updatePassword(user, passNew);
+      }
+      errEl.style.color = '#4ade80';
+      errEl.textContent = '¡Cambios guardados!';
+      setTimeout(() => closeModal('modal-edit'), 1200);
+    } catch(e) {
+      errEl.style.color = '#f87171';
+      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+        errEl.textContent = 'Contraseña actual incorrecta';
+      } else {
+        errEl.textContent = 'Error al guardar: ' + e.message;
+      }
+    }
+  };
+
+  // ── MODAL HISTORIAL ──
+  let cachedMetricas = [];
+  window.openHistorialModal = () => {
+    const list = document.getElementById('historial-list');
+    if (!cachedMetricas.length) {
+      list.innerHTML = '<div style="text-align:center;color:var(--gray);padding:20px;font-family:Space Mono,monospace;font-size:12px">Sin historial registrado aún</div>';
+    } else {
+      list.innerHTML = [...cachedMetricas].reverse().map(m => `
+        <div class="hist-row" style="flex-direction:column">
+          <div class="hist-date">${m.fecha || '—'}</div>
+          <div class="hist-metrics">
+            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : '—'}</span></div>
+            <div class="hist-metric">% Grasa <span>${m.grasaPct ? m.grasaPct+'%' : '—'}</span></div>
+            <div class="hist-metric">Músculo <span>${m.musculo ? m.musculo+' kg' : '—'}</span></div>
+            <div class="hist-metric">IMC <span>${m.imc || '—'}</span></div>
+          </div>
+        </div>`).join('');
+    }
+    document.getElementById('modal-historial').classList.add('active');
+  };
 
   // ── PWA INSTALL ──
   let deferredPrompt;
