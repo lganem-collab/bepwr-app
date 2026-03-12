@@ -548,17 +548,13 @@ Su objetivo: ${objetivo.meta}, llegar de ${objetivo.pesoInicial}kg a ${objetivo.
 El mensaje debe incluir un dato específico de sus métricas y un consejo concreto de salud, nutrición o descanso.
 Responde SOLO el mensaje, sin saludos extra ni comillas.`;
 
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 200,
-          messages: [{ role: 'user', content: prompt }]
-        })
+        body: JSON.stringify({ prompt })
       });
       const data = await res.json();
-      const msg = data.content?.[0]?.text || '';
+      const msg = data.message || '';
       if (msg) {
         el.innerHTML = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
       } else {
