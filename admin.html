@@ -339,6 +339,9 @@
   const auth = firebase.auth();
   const db   = firebase.firestore();
 
+  // Admin Maestro — no puede ser desactivado ni degradado
+  const MASTER_UID = '1zZIfBnLGqRiPKVRVfHxlt2O3Di2';
+
   // Segunda instancia para crear usuarios sin afectar la sesión del staff
   const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
   const secondaryAuth = secondaryApp.auth();
