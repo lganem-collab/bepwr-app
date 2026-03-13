@@ -407,7 +407,9 @@
     if (!email || !pass) { errEl.textContent = 'Completa los campos'; return; }
     const btn = document.getElementById('adm-login-btn');
     btn.textContent = 'Verificando...'; btn.disabled = true;
-    auth.signInWithEmailAndPassword(email, pass)
+    // SESSION persistence: cada pestaña es independiente, no afecta la sesión del miembro
+    auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+      .then(() => auth.signInWithEmailAndPassword(email, pass))
       .catch(e => {
         errEl.textContent = 'Email o contraseña incorrectos';
         btn.textContent = 'Entrar al panel'; btn.disabled = false;
