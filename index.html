@@ -734,10 +734,14 @@
   }
 
   function renderProfileMetrics(m) {
-    document.getElementById('val-peso').textContent = m.peso ? m.peso + ' kg' : '—';
-    document.getElementById('val-grasa').textContent = m.grasaPct ? m.grasaPct + '%' : '—';
-    document.getElementById('val-musculo').textContent = m.musculo ? m.musculo + ' kg' : '—';
+    const gc = m.grasaCorporal ?? m.grasaPct;
+    document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : '—';
+    document.getElementById('val-musculo').textContent = m.musculo != null ? m.musculo + ' kg' : '—';
+    document.getElementById('val-grasa').textContent = gc != null ? gc + ' kg' : '—';
     document.getElementById('val-imc').textContent = m.imc || '—';
+    document.getElementById('val-pgc').textContent = m.pgc != null ? m.pgc + '%' : '—';
+    document.getElementById('val-grasa-visc').textContent = m.grasaVisceral || '—';
+    document.getElementById('val-calificacion').textContent = m.calificacion ? m.calificacion + '/100' : '—';
     document.getElementById('val-fecha').textContent = m.fecha || '—';
   }
 
