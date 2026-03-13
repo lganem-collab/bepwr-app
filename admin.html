@@ -414,7 +414,7 @@
     if (e.key === 'Enter') doLogin();
   });
 
-  function doLogout() { auth.signOut(); }
+  function doLogout() { auth.signOut().then(() => window.location.reload()); }
 
   function openChangePass() {
     ['sp-current','sp-new','sp-confirm'].forEach(id => document.getElementById(id).value = '');
