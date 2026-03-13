@@ -278,7 +278,6 @@
           <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
           <div class="info-row"><div class="info-key">Peso inicial</div><div class="info-val" id="prof-peso-ini">...</div></div>
           <div class="info-row"><div class="info-key">Peso meta</div><div class="info-val" id="prof-peso-meta">...</div></div>
-          <div class="info-row"><div class="info-key">Clases / semana</div><div class="info-val" id="prof-clases">...</div></div>
         </div>
         <div class="sec-title">Última valoración</div>
         <div class="info-card">
@@ -586,7 +585,6 @@
       document.getElementById('prof-meta').textContent = obj.meta || '—';
       document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '—';
       document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '—';
-      document.getElementById('prof-clases').textContent = obj.clasesSemana ? obj.clasesSemana + ' clases' : '—';
 
       // Métricas — leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');

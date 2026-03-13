@@ -222,7 +222,7 @@
             <option>Rendimiento deportivo</option>
           </select>
         </div>
-        <div class="field"><label>Clases por semana</label><input type="number" id="new-clases" placeholder="3" min="1" max="7" /></div>
+
       </div>
       <div class="field-row">
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="new-peso-meta" placeholder="65" step="0.1" /></div>
@@ -712,7 +712,6 @@
             ${['Pérdida de grasa','Ganancia muscular','Mantenimiento','Mejora cardiovascular','Rendimiento deportivo'].map(o=>`<option ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
           </select>
         </div>
-        <div class="field"><label>Clases/semana</label><input type="number" id="edit-clases" value="${m.objetivo?.clasesSemana||''}" /></div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="edit-peso-meta" value="${m.objetivo?.pesoMeta||''}" step="0.1" /></div>
       </div>
@@ -740,7 +739,6 @@
         activo: activoVal,
         objetivo: {
           meta: document.getElementById('edit-meta').value,
-          clasesSemana: Number(document.getElementById('edit-clases').value)||0,
           pesoInicial: Number(document.getElementById('edit-peso-ini').value)||0,
           pesoMeta: Number(document.getElementById('edit-peso-meta').value)||0,
         }
@@ -811,7 +809,6 @@
     const inicio  = document.getElementById('new-inicio').value.trim();
     const genero  = document.getElementById('new-genero').value;
     const meta    = document.getElementById('new-meta').value;
-    const clases  = parseInt(document.getElementById('new-clases').value)||0;
     const pesoMeta= parseFloat(document.getElementById('new-peso-meta').value)||0;
     const peso       = parseFloat(document.getElementById('new-peso').value);
     const musculo    = parseFloat(document.getElementById('new-musculo').value);
@@ -834,7 +831,7 @@
       const uid  = cred.user.uid;
       await db.collection('usuarios').doc(uid).set({
         nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero, altura: Number(document.getElementById('new-altura').value)||null, primerIngreso: true,
-        objetivo:{ meta, clasesSemana:clases, pesoInicial:isNaN(peso)?0:peso, pesoMeta }
+        objetivo:{ meta, pesoInicial:isNaN(peso)?0:peso, pesoMeta }
       });
       await db.collection('usuarios').doc(uid).collection('metricas').add({
         peso,
@@ -850,7 +847,7 @@
       });
       showToast('✓ ' + nombreCompleto + ' creado correctamente', 'success');
       document.getElementById('new-genero').value = 'prefiero-no-decir';
-      ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-pass','new-clases',
+      ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-pass',
        'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val','new-altura']
         .forEach(id => document.getElementById(id).value = '');
       document.getElementById('new-meta').value = '';
