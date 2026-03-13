@@ -801,8 +801,6 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     const errEl = document.getElementById('edit-error');
     errEl.textContent = '';
     const nombre = document.getElementById('edit-nombre').value.trim();
-    const tel = document.getElementById('edit-tel').value.trim();
-    const dob = document.getElementById('edit-dob').value;
     const genero = document.getElementById('edit-genero').value;
     const passCurrent = document.getElementById('edit-pass-current').value;
     const passNew = document.getElementById('edit-pass-new').value;
@@ -810,10 +808,9 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     if (!user) return;
     try {
       // Guardar datos en Firestore
-      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, nacimiento: dob, genero });
-      cachedUserData = { ...cachedUserData, nombre, nacimiento: dob, genero };
+      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, genero });
+      cachedUserData = { ...cachedUserData, nombre, genero };
       // Actualizar UI
-      document.getElementById('prof-dob').textContent = dob || '—';
       const nombreReal2 = nombre || user.email.split('@')[0];
       const initials = nombreReal2.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
       document.getElementById('avatar-initials').textContent = initials;
