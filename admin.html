@@ -353,9 +353,7 @@
   auth.onAuthStateChanged(async user => {
     if (user) {
       try {
-        console.log('UID:', user.uid);
         const staffDoc = await db.collection('staff').doc(user.uid).get();
-        console.log('staffDoc.exists:', staffDoc.exists, 'data:', staffDoc.data());
         if (!staffDoc.exists || staffDoc.data().activo === false) {
           await auth.signOut();
           const errEl = document.getElementById('adm-login-error');
@@ -365,9 +363,7 @@
         }
         const staffData = staffDoc.data();
         window.currentStaffRole = staffData.rol || 'coach';
-        console.log('Mostrando app...');
         show('s-app'); hide('s-login');
-        console.log('s-app visible:', document.getElementById('s-app').classList.contains('active'));
         try {
           const rolBadge = window.currentStaffRole === 'admin' ? '🔑 Admin' : '👟 Coach';
           document.getElementById('staff-name').innerHTML = `${staffData.nombre || user.email} <span style="font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1px">${rolBadge}</span>`;
@@ -925,6 +921,60 @@
     el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
   });
 </script>
+<!-- MODAL PERFIL STAFF -->
+<div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
+  <div style="max-width:480px;margin:0 auto;padding:24px 16px 60px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px">Perfil Staff</div>
+      <button onclick="closeStaffProfile()" style="background:#222;border:1px solid #333;color:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:13px">✕ Cerrar</button>
+    </div>
+    <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:20px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div id="sp-avatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;flex-shrink:0"></div>
+        <div>
+          <div id="sp-nombre" style="font-size:17px;font-weight:600"></div>
+          <div id="sp-rol-badge" style="font-size:11px;font-family:'Space Mono',monospace;letter-spacing:1.5px;margin-top:3px"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#1a1a1a;border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:3px">EMAIL</div>
+          <div id="sp-email" style="font-size:13px"></div>
+        </div>
+        <div style="background:#1a1a1a;border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:3px">TELÉFONO</div>
+          <div id="sp-tel" style="font-size:13px"></div>
+        </div>
+        <div style="background:#1a1a1a;border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:3px">FECHA ALTA</div>
+          <div id="sp-fecha-alta" style="font-size:13px"></div>
+        </div>
+        <div style="background:#1a1a1a;border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:3px">ESTADO</div>
+          <div id="sp-estado" style="font-size:13px;font-weight:600"></div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:20px;margin-bottom:16px">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Editar datos</div>
+      <div class="field" style="margin-bottom:10px"><label>Nombre completo</label><input type="text" id="sp-edit-nombre" placeholder="Nombre"></div>
+      <div class="field" style="margin-bottom:10px"><label>Teléfono</label><input type="tel" id="sp-edit-tel" placeholder="10 dígitos" maxlength="10"></div>
+      <div class="field" style="margin-bottom:14px"><label>Rol</label>
+        <select id="sp-edit-rol" style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:10px 12px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif">
+          <option value="coach">Coach</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div id="sp-edit-error" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:10px"></div>
+      <button id="sp-save-btn" onclick="saveStaffProfile()" class="btn btn-primary">Guardar cambios</button>
+    </div>
+    <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:20px">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Valoraciones registradas</div>
+      <div id="sp-historial" style="color:var(--gray);font-size:13px;font-family:'Space Mono',monospace">Cargando...</div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL CAMBIO CONTRASEÑA STAFF -->
 <div id="modal-pass-staff" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:960;align-items:center;justify-content:center">
   <div style="background:#111;border-radius:20px;padding:28px 24px;width:90%;max-width:360px;border:1px solid #2a2a2a">
