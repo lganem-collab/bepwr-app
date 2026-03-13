@@ -270,6 +270,7 @@
           <div class="info-row"><div class="info-key">Email</div><div class="info-val" id="prof-email">...</div></div>
           <div class="info-row"><div class="info-key">Teléfono</div><div class="info-val" id="prof-phone">...</div></div>
           <div class="info-row"><div class="info-key">Nacimiento</div><div class="info-val" id="prof-dob">...</div></div>
+          <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura">—</div></div>
         </div>
         <button class="btn-secondary" onclick="openEditModal()">✏️ Editar información</button>
         <div class="sec-title">Mi objetivo</div>
@@ -332,14 +333,7 @@
       <div style="text-align:right;margin-bottom:12px">
         <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar teléfono</button>
       </div>
-      <div class="modal-field"><label>Género</label>
-        <select id="edit-genero" style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif">
-          <option value="prefiero-no-decir">Prefiero no decirlo</option>
-          <option value="femenino">Femenino</option>
-          <option value="masculino">Masculino</option>
-          <option value="otro">Otro</option>
-        </select>
-      </div>
+
       <hr class="modal-divider">
       <div style="background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:16px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
@@ -532,7 +526,7 @@
   // ── LOGOUT ──
   window.doLogout = async () => {
     await signOut(auth);
-    navigate('home');
+    window.location.reload();
   };
 
   // ── LOAD USER DATA FROM FIRESTORE ──
@@ -551,6 +545,14 @@
       }
 
       const data = userSnap.data();
+      if (data.activo === false) {
+        await signOut(auth);
+        errorEl.style.color = '#f87171';
+        errorEl.textContent = 'Tu membresía está inactiva. Contacta a bePWR para reactivarla.';
+        appScr.classList.remove('active');
+        loginScr.classList.add('active');
+        return;
+      }
       cachedUserData = data;
       const nombreReal = data.nombre || user.email.split('@')[0];
       const nombre = data.alias || nombreReal;
@@ -568,7 +570,16 @@
       }
       document.getElementById('prof-email').textContent = user.email;
       document.getElementById('prof-phone').textContent = data.telefono || '—';
-      document.getElementById('prof-dob').textContent = data.nacimiento || '—';
+      let edadStr = '—';
+      if (data.nacimiento) {
+        const hoy = new Date(); const nac = new Date(data.nacimiento);
+        let age = hoy.getFullYear() - nac.getFullYear();
+        const mm = hoy.getMonth() - nac.getMonth();
+        if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) age--;
+        edadStr = age + ' años';
+      }
+      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '—';
+      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '—';
 
       // Objetivo
       const obj = data.objetivo || {};
@@ -730,15 +741,24 @@
     document.getElementById('val-fecha').textContent = m.fecha || '—';
   }
 
-  // ── AI MESSAGE ──
+  // ── AI MESSAGE — máx 1 por día por usuario ──
   async function generateAIMessage(nombre, metrica, objetivo) {
     const el = document.getElementById('ai-message');
+    try {
+      const cached = JSON.parse(localStorage.getItem('bepwr_ai_msg') || 'null');
+      const today = new Date().toISOString().slice(0,10);
+      if (cached && cached.date === today && cached.uid === auth.currentUser?.uid && cached.msg) {
+        el.innerHTML = cached.msg; return;
+      }
+    } catch(e) {}
     el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
     try {
       const edad = cachedUserData.nacimiento ? Math.floor((new Date() - new Date(cachedUserData.nacimiento)) / (365.25*24*60*60*1000)) : null;
       const genero = cachedUserData.genero || null;
+      const alturaCtx = cachedUserData.altura || null;
       const contextoPersona = [
         edad ? `tiene ${edad} años` : null,
+        alturaCtx ? `altura ${alturaCtx}cm` : null,
         genero && genero !== 'prefiero-no-decir' ? `género ${genero}` : null
       ].filter(Boolean).join(', ');
 
@@ -761,7 +781,9 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
       console.log('AI Response:', data);
       const msg = data.message || '';
       if (msg) {
-        el.innerHTML = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        const htmlMsg = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        el.innerHTML = htmlMsg;
+        try { localStorage.setItem('bepwr_ai_msg', JSON.stringify({date:new Date().toISOString().slice(0,10),uid:auth.currentUser?.uid,msg:htmlMsg})); } catch(e) {}
       } else {
         el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
       }
@@ -787,7 +809,6 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
     document.getElementById('edit-email').value = auth.currentUser?.email || '';
     document.getElementById('edit-tel').value = cachedUserData.telefono || '';
-    document.getElementById('edit-genero').value = cachedUserData.genero || 'prefiero-no-decir';
     document.getElementById('edit-pass-current').value = '';
     document.getElementById('edit-pass-new').value = '';
     document.getElementById('edit-confirm-pass').value = '';
@@ -801,15 +822,14 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     const errEl = document.getElementById('edit-error');
     errEl.textContent = '';
     const nombre = document.getElementById('edit-nombre').value.trim();
-    const genero = document.getElementById('edit-genero').value;
     const passCurrent = document.getElementById('edit-pass-current').value;
     const passNew = document.getElementById('edit-pass-new').value;
     const user = auth.currentUser;
     if (!user) return;
     try {
       // Guardar datos en Firestore
-      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, genero });
-      cachedUserData = { ...cachedUserData, nombre, genero };
+      await updateDoc(doc(db, 'usuarios', user.uid), { nombre });
+      cachedUserData = { ...cachedUserData, nombre };
       // Actualizar UI
       const nombreReal2 = nombre || user.email.split('@')[0];
       const initials = nombreReal2.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();

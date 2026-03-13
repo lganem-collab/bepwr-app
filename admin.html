@@ -21,6 +21,8 @@
     .field{margin-bottom:16px}
     .field label{display:block;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:7px}
     .field input,.field select{width:100%;background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+    input[type="date"]{background:#f0f0f0!important;color:#111!important;color-scheme:light;border-color:#ccc!important}
+    input[type="date"]::-webkit-calendar-picker-indicator{filter:none;cursor:pointer;opacity:1}
     .field input:focus,.field select:focus{border-color:var(--orange)}
     .field input::placeholder{color:#333}
     .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -78,7 +80,7 @@
     .detail-name{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px}
     .detail-since{font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-top:2px}
     .metrics-history{background:#141414;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
-    .mh-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center}
+    .mh-row{display:grid;grid-template-columns:1.2fr 0.8fr 0.8fr 0.8fr 0.7fr 0.7fr 0.7fr 0.7fr;padding:10px 12px;border-bottom:1px solid var(--border);align-items:center;font-size:12px}
     .mh-row:last-child{border-bottom:none}
     .mh-head{background:#0a0a0a;font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace}
     .mh-val{font-size:13px}
@@ -194,7 +196,7 @@
             <option value="otro">Otro</option>
           </select>
         </div>
-        <div class="field"></div>
+        <div class="field"><label>Altura (cm)</label><input type="number" id="new-altura" placeholder="170" min="100" max="230" /></div>
       </div>
       <div class="modal-section">Acceso a la app</div>
       <div class="field-row">
@@ -558,6 +560,18 @@
     return val;
   }
 
+  // Convert any date format to YYYY-MM-DD for <input type="date">
+  function toDateInput(val) {
+    if (!val) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+    const months = {ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
+    const m = val.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+    if (m) {
+      return `${m[3]}-${String((months[m[2]]??0)+1).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+    }
+    return '';
+  }
+
   // LOAD MEMBERS
   async function loadMembers() {
     const list = document.getElementById('members-list');
@@ -630,7 +644,7 @@
           <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>Músculo</div><div>Grasa Corp.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
           ${mSnap.docs.map(d => {
             const x = d.data();
-            return `<div class="mh-row"><div class="mh-date">${x.fecha||'—'}</div><div class="mh-val">${x.peso||'—'} kg</div><div class="mh-val">${x.musculo||'—'} kg</div><div class="mh-val">${x.grasaCorporal||'—'} kg</div><div class="mh-val">${x.imc||'—'}</div><div class="mh-val">${x.pgc!=null?x.pgc+'%':'—'}</div><div class="mh-val">${x.grasaVisceral||'—'}</div><div class="mh-val">${x.calificacion||'—'}</div></div>`;
+            const gc=x.grasaCorporal??x.grasaPct;return `<div class="mh-row"><div class="mh-date">${x.fecha||'—'}</div><div class="mh-val">${x.peso!=null?x.peso+' kg':'—'}</div><div class="mh-val">${x.musculo!=null?x.musculo+' kg':'—'}</div><div class="mh-val">${gc!=null?gc+' kg':'—'}</div><div class="mh-val">${x.imc||'—'}</div><div class="mh-val">${x.pgc!=null?x.pgc+'%':'—'}</div><div class="mh-val">${x.grasaVisceral||'—'}</div><div class="mh-val">${x.calificacion||'—'}</div></div>`;
           }).join('')}
         </div>`;
       }
@@ -639,7 +653,7 @@
     document.getElementById('modal-detail-content').innerHTML = `
       <div class="detail-header">
         <div class="detail-avatar">${initials}</div>
-        <div><div class="detail-name">${m.nombre||'Sin nombre'}</div><div class="detail-since">${m.fechaInicio ? 'Miembro desde '+m.fechaInicio : 'bePWR'}</div></div>
+        <div><div class="detail-name">${m.nombre||'Sin nombre'}</div><div class="detail-since">${m.fechaInicio ? 'Miembro desde '+m.fechaInicio : 'bePWR'}${m.altura?' · '+m.altura+' cm':''}</div></div>
       </div>
       <div class="modal-section">Contacto</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
@@ -647,14 +661,21 @@
         <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${m.alias||''}" placeholder="Cómo le llaman" /></div>
         <div class="field"><label>Email</label><input type="email" id="edit-email-member" value="${m.email||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
         <div class="field"><label>Teléfono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
-        <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${m.nacimiento||''}" /></div>
-        <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" value="${m.fechaInicio||''}" /></div>
+        <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${toDateInput(m.nacimiento||'')}" /></div>
+        <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" value="${toDateInput(m.fechaInicio||'')}" /></div>
+        <div class="field"><label>Altura (cm)</label><input type="number" id="edit-altura" value="${m.altura||''}" placeholder="170" min="100" max="230" /></div>
         <div class="field"><label>Género</label>
           <select id="edit-genero">
             <option value="prefiero-no-decir" ${(!m.genero||m.genero==='prefiero-no-decir')?'selected':''}>Prefiero no decirlo</option>
             <option value="femenino" ${m.genero==='femenino'?'selected':''}>Femenino</option>
             <option value="masculino" ${m.genero==='masculino'?'selected':''}>Masculino</option>
             <option value="otro" ${m.genero==='otro'?'selected':''}>Otro</option>
+          </select>
+        </div>
+        <div class="field"><label>Estado</label>
+          <select id="edit-activo">
+            <option value="true" ${m.activo !== false ? 'selected' : ''}>Activo</option>
+            <option value="false" ${m.activo === false ? 'selected' : ''}>Inactivo</option>
           </select>
         </div>
       </div>
@@ -682,13 +703,16 @@
 
   async function saveMemberEdit(uid) {
     try {
+      const activoVal = document.getElementById('edit-activo')?.value === 'false' ? false : true;
       await db.collection('usuarios').doc(uid).update({
         nombre: document.getElementById('edit-nombre').value,
         alias: document.getElementById('edit-alias').value,
         telefono: document.getElementById('edit-tel').value,
-        nacimiento: fmtDate(document.getElementById('edit-dob').value),
+        nacimiento: document.getElementById('edit-dob').value,
         genero: document.getElementById('edit-genero').value,
-        fechaInicio: fmtDate(document.getElementById('edit-inicio').value),
+        altura: Number(document.getElementById('edit-altura').value)||null,
+        fechaInicio: document.getElementById('edit-inicio').value,
+        activo: activoVal,
         objetivo: {
           meta: document.getElementById('edit-meta').value,
           clasesSemana: Number(document.getElementById('edit-clases').value)||0,
@@ -758,8 +782,8 @@
     const tel      = document.getElementById('new-tel').value.trim();
     const alias    = document.getElementById('new-alias').value.trim() || null;
     const nombreCompleto = apellido ? nombre + ' ' + apellido : nombre;
-    const dob     = fmtDate(document.getElementById('new-dob').value.trim());
-    const inicio  = fmtDate(document.getElementById('new-inicio').value.trim());
+    const dob     = document.getElementById('new-dob').value.trim();
+    const inicio  = document.getElementById('new-inicio').value.trim();
     const genero  = document.getElementById('new-genero').value;
     const meta    = document.getElementById('new-meta').value;
     const clases  = parseInt(document.getElementById('new-clases').value)||0;
@@ -784,7 +808,7 @@
       await secondaryAuth.signOut();
       const uid  = cred.user.uid;
       await db.collection('usuarios').doc(uid).set({
-        nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero, primerIngreso: true,
+        nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero, altura: Number(document.getElementById('new-altura').value)||null, primerIngreso: true,
         objetivo:{ meta, clasesSemana:clases, pesoInicial:isNaN(peso)?0:peso, pesoMeta }
       });
       await db.collection('usuarios').doc(uid).collection('metricas').add({
@@ -802,7 +826,7 @@
       showToast('✓ ' + nombreCompleto + ' creado correctamente', 'success');
       document.getElementById('new-genero').value = 'prefiero-no-decir';
       ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-pass','new-clases',
-       'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val']
+       'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val','new-altura']
         .forEach(id => document.getElementById(id).value = '');
       document.getElementById('new-meta').value = '';
       switchTab('members');
