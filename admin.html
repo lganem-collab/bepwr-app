@@ -353,7 +353,9 @@
   auth.onAuthStateChanged(async user => {
     if (user) {
       try {
+        console.log('UID:', user.uid);
         const staffDoc = await db.collection('staff').doc(user.uid).get();
+        console.log('staffDoc.exists:', staffDoc.exists, 'data:', staffDoc.data());
         if (!staffDoc.exists || staffDoc.data().activo === false) {
           await auth.signOut();
           const errEl = document.getElementById('adm-login-error');
