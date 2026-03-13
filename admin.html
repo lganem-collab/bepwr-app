@@ -120,6 +120,7 @@
     </div>
     <button class="btn btn-primary" id="adm-login-btn" onclick="doLogin()">Entrar al panel</button>
     <div class="form-error" id="adm-login-error"></div>
+    <div id="adm-forgot" onclick="doForgotPass()" style="text-align:center;margin-top:18px;font-size:11px;color:#666;cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline">¿Olvidaste tu contraseña?</div>
   </div>
 </div>
 
@@ -356,7 +357,7 @@
     if (user) {
       try {
         const staffDoc = await db.collection('staff').doc(user.uid).get();
-        if (!staffDoc.exists || staffDoc.data().activo === false) {
+        if (!staffDoc.exists || !staffDoc.data || staffDoc.data().activo === false) {
           await auth.signOut();
           const errEl = document.getElementById('adm-login-error');
           errEl.textContent = 'No tienes acceso al panel de staff.';
@@ -417,6 +418,28 @@
   });
 
   function doLogout() { auth.signOut().then(() => window.location.reload()); }
+
+  function doForgotPass() {
+    const email = document.getElementById('adm-email').value.trim();
+    const errEl = document.getElementById('adm-login-error');
+    if (!email) {
+      errEl.style.color = '#fb923c';
+      errEl.textContent = 'Escribe tu email primero';
+      setTimeout(() => { errEl.style.color = '#f87171'; errEl.textContent = ''; }, 3000);
+      return;
+    }
+    auth.sendPasswordResetEmail(email)
+      .then(() => {
+        errEl.style.color = '#4ade80';
+        errEl.textContent = 'Te enviamos un correo para restablecer tu contraseña';
+        setTimeout(() => { errEl.style.color = '#f87171'; errEl.textContent = ''; }, 5000);
+      })
+      .catch(() => {
+        errEl.style.color = '#f87171';
+        errEl.textContent = 'No encontramos ese email en el staff';
+        setTimeout(() => { errEl.textContent = ''; }, 3000);
+      });
+  }
 
   function openChangePass() {
     ['sp-current','sp-new','sp-confirm'].forEach(id => document.getElementById(id).value = '');

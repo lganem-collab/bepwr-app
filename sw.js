@@ -1,4 +1,4 @@
-const CACHE = 'bepwr-v4';
+const CACHE = 'bepwr-v5';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
