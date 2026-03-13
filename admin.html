@@ -263,7 +263,7 @@
         <div class="field"><label>Rol</label>
           <select id="ns-rol">
             <option value="coach">Coach</option>
-            <option value="admin">Admin</option>
+            <option value="admin" id="ns-rol-admin">Admin</option>
           </select>
         </div>
       </div>
@@ -645,6 +645,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div class="field"><label>Nombre completo</label><input type="text" id="edit-nombre" value="${m.nombre||''}" /></div>
         <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${m.alias||''}" placeholder="Cómo le llaman" /></div>
+        <div class="field"><label>Email</label><input type="email" id="edit-email-member" value="${m.email||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
         <div class="field"><label>Teléfono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
         <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${m.nacimiento||''}" /></div>
         <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" value="${m.fechaInicio||''}" /></div>
@@ -822,6 +823,10 @@
       if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
     });
     if (tab === 'staff') loadStaffList();
+    if (tab === 'new') {
+      const adminOpt = document.getElementById('ns-rol-admin');
+      if (adminOpt) adminOpt.style.display = window.currentStaffRole === 'admin' ? '' : 'none';
+    }
   }
 
   // ── GESTIÓN DE STAFF ──
@@ -888,6 +893,7 @@
     const errEl  = document.getElementById('ns-error');
     errEl.textContent = '';
     if (!nombre || !email || !tel || !pass) { errEl.textContent = 'Completa todos los campos'; return; }
+    if (rol === 'admin' && window.currentStaffRole !== 'admin') { errEl.textContent = 'Solo un admin puede crear otro admin'; return; }
     if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El teléfono debe tener exactamente 10 dígitos'; return; }
     if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email inválido'; return; }
     if (pass.length < 6) { errEl.textContent = 'La contraseña debe tener al menos 6 caracteres'; return; }

@@ -75,7 +75,8 @@
     .modal-field label{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px}
     .modal-field input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;box-sizing:border-box}
     .modal-field input:focus{outline:none;border-color:var(--orange)}
-    .modal-field input[type="date"]{background:#f5f5f5;color:#111;border-color:#ccc;color-scheme:light}
+    .modal-field input[type="date"]{background:#f0f0f0;color:#111;border-color:#ccc;color-scheme:light}
+    .modal-field input[type="date"]::-webkit-calendar-picker-indicator{filter:none;cursor:pointer}
     .modal-field input[type="date"]:focus{border-color:var(--orange)}
     .modal-divider{border:none;border-top:1px solid #222;margin:20px 0}
     .modal-section-title{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;margin-bottom:14px}
@@ -321,19 +322,16 @@
       <div class="modal-handle"></div>
       <div class="modal-title">Editar información</div>
       <div class="modal-field"><label>Nombre completo</label><input type="text" id="edit-nombre" placeholder="Tu nombre"></div>
-      <div class="modal-field"><label>Email</label>
-        <div style="display:flex;gap:8px;align-items:flex-end">
-          <input type="email" id="edit-email" placeholder="tu@email.com" style="flex:1">
-          <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px 14px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif">Cambiar</button>
-        </div>
+      <div class="modal-field"><label>Nuevo email</label><input type="email" id="edit-email" placeholder="tu@email.com"></div>
+      <div class="modal-field"><label>Confirmar nuevo email</label><input type="email" id="edit-confirm-email" placeholder="Repite el email"></div>
+      <div style="text-align:right;margin-bottom:12px">
+        <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar email</button>
       </div>
-      <div class="modal-field"><label>Teléfono</label>
-        <div style="display:flex;gap:8px;align-items:flex-end">
-          <input type="tel" id="edit-tel" placeholder="10 dígitos" maxlength="10" style="flex:1">
-          <button onclick="confirmTelChange()" style="background:#333;color:#fff;border:none;border-radius:10px;padding:12px 14px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif">Cambiar</button>
-        </div>
+      <div class="modal-field"><label>Nuevo teléfono</label><input type="tel" id="edit-tel" placeholder="10 dígitos" maxlength="10"></div>
+      <div class="modal-field"><label>Confirmar teléfono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el teléfono" maxlength="10"></div>
+      <div style="text-align:right;margin-bottom:12px">
+        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar teléfono</button>
       </div>
-      <div class="modal-field"><label>Fecha de nacimiento</label><input type="date" id="edit-dob"></div>
       <div class="modal-field"><label>Género</label>
         <select id="edit-genero" style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif">
           <option value="prefiero-no-decir">Prefiero no decirlo</option>
@@ -358,6 +356,12 @@
           <div class="pass-input-wrap">
             <input type="password" id="edit-pass-new" placeholder="Mínimo 6 caracteres">
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">👁</button>
+          </div>
+        </div>
+        <div class="modal-field"><label>Confirmar nueva contraseña</label>
+          <div class="pass-input-wrap">
+            <input type="password" id="edit-confirm-pass" placeholder="Repite la contraseña">
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">👁</button>
           </div>
         </div>
         <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
@@ -768,7 +772,9 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
   }
 
   // ── MODAL HELPERS ──
-  window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+  window.closeModal = (id) => {
+    document.getElementById(id).classList.remove('active');
+  };
   window.toggleModalPass = (inputId, btn) => {
     const inp = document.getElementById(inputId);
     inp.type = inp.type === 'password' ? 'text' : 'password';
@@ -781,11 +787,14 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
     document.getElementById('edit-email').value = auth.currentUser?.email || '';
     document.getElementById('edit-tel').value = cachedUserData.telefono || '';
-    document.getElementById('edit-dob').value = cachedUserData.nacimiento || '';
     document.getElementById('edit-genero').value = cachedUserData.genero || 'prefiero-no-decir';
     document.getElementById('edit-pass-current').value = '';
     document.getElementById('edit-pass-new').value = '';
+    document.getElementById('edit-confirm-pass').value = '';
+    document.getElementById('edit-confirm-email').value = '';
+    document.getElementById('edit-confirm-tel').value = '';
     document.getElementById('edit-error').textContent = '';
+    history.pushState({ modal: 'edit' }, '', '');
     document.getElementById('modal-edit').classList.add('active');
   };
   window.saveEditInfo = async () => {
@@ -814,11 +823,13 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
         document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' · "' + cachedUserData.alias + '"';
       }
       // Cambiar contraseña si se llenaron los campos
+      const passConfirm = document.getElementById('edit-confirm-pass').value;
       if (passCurrent || passNew) {
-        if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual para poder cambiarla'; return; }
+        if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual'; return; }
         if (!passNew) { errEl.textContent = 'Escribe la nueva contraseña'; return; }
         const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-        if (!passRegex.test(passNew)) { errEl.textContent = 'La contraseña debe tener mínimo 6 caracteres, mayúscula, minúscula, número y un símbolo (. ! * @ # etc)'; return; }
+        if (!passRegex.test(passNew)) { errEl.textContent = 'La contraseña debe tener mayúscula, minúscula, número y un símbolo'; return; }
+        if (passNew !== passConfirm) { errEl.textContent = 'Las contraseñas no coinciden'; return; }
         const cred = EmailAuthProvider.credential(user.email, passCurrent);
         await reauthenticateWithCredential(user, cred);
         await updatePassword(user, passNew);
@@ -890,20 +901,22 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
   // ── CONFIRMAR EMAIL ──
   window.confirmEmailChange = async () => {
     const newEmail = document.getElementById('edit-email').value.trim();
+    const confirmEmail = document.getElementById('edit-confirm-email').value.trim();
     const errEl = document.getElementById('edit-error');
+    errEl.style.color = '#f87171';
     errEl.textContent = '';
-    if (!newEmail) { errEl.textContent = 'Escribe un email'; return; }
+    if (!newEmail) { errEl.textContent = 'Escribe el nuevo email'; return; }
     if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inválido'; return; }
+    if (newEmail !== confirmEmail) { errEl.textContent = 'Los emails no coinciden'; return; }
     if (newEmail === auth.currentUser?.email) { errEl.textContent = 'Es el mismo email actual'; return; }
-    if (!confirm('¿Cambiar email a ' + newEmail + '?')) return;
     const passCurrent = document.getElementById('edit-pass-current').value;
-    if (!passCurrent) { errEl.textContent = 'Para cambiar el email necesitas escribir tu contraseña actual abajo'; return; }
+    if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual (sección de abajo) para cambiar el email'; return; }
     try {
       const cred = EmailAuthProvider.credential(auth.currentUser.email, passCurrent);
       await reauthenticateWithCredential(auth.currentUser, cred);
       await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Se envió un email de verificación a ' + newEmail + '. Confirma para que el cambio aplique.';
+      errEl.textContent = 'Se envió verificación a ' + newEmail + '. Confirma para que aplique.';
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
@@ -917,11 +930,13 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
   // ── CONFIRMAR TELÉFONO ──
   window.confirmTelChange = async () => {
     const newTel = document.getElementById('edit-tel').value.trim();
+    const confirmTel = document.getElementById('edit-confirm-tel').value.trim();
     const errEl = document.getElementById('edit-error');
+    errEl.style.color = '#f87171';
     errEl.textContent = '';
-    if (!newTel) { errEl.textContent = 'Escribe un teléfono'; return; }
+    if (!newTel) { errEl.textContent = 'Escribe el nuevo teléfono'; return; }
     if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El teléfono debe tener exactamente 10 dígitos'; return; }
-    if (!confirm('¿Cambiar teléfono a ' + newTel + '?')) return;
+    if (newTel !== confirmTel) { errEl.textContent = 'Los teléfonos no coinciden'; return; }
     try {
       const user = auth.currentUser;
       await updateDoc(doc(db, 'usuarios', user.uid), { telefono: newTel });
@@ -970,6 +985,12 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
   }
 
   window.addEventListener('popstate', (e) => {
+    // If a modal is open, close it instead of navigating
+    const openModal = document.querySelector('.modal-overlay.active');
+    if (openModal) {
+      openModal.classList.remove('active');
+      return;
+    }
     const view = e.state?.view || 'home';
     navigate(view, false);
   });
