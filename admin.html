@@ -374,12 +374,13 @@
         }
         loadMembers();
       } catch(e) {
-        console.error('Auth error:', e);
-        // Solo desloguear si es error de permisos, no cualquier error de JS
-        if (e.code && e.code.startsWith('auth/')) {
+        console.error('Auth error:', e.code, e.message, e);
+        // Solo redirigir al login si es error de autenticación/permisos
+        if (e.code && (e.code.startsWith('auth/') || e.code.startsWith('permission'))) {
           await auth.signOut();
+          show('s-login'); hide('s-app');
         }
-        show('s-login'); hide('s-app');
+        // Errores de JS (loadMembers, DOM, etc.) no sacan al usuario
       }
     } else {
       window.currentStaffRole = null;
