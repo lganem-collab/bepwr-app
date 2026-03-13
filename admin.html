@@ -130,6 +130,7 @@
       </div>
     <div style="display:flex;align-items:center;gap:16px">
       <div style="font-size:13px;color:var(--gray)" id="staff-name"></div>
+      <div class="logout-link" onclick="openChangePass()" style="color:#aaa">🔐</div>
       <div class="logout-link" onclick="doLogout()">Salir</div>
     </div>
   </div>
@@ -258,13 +259,17 @@
         <div class="field"><label>Email *</label><input type="email" id="ns-email" placeholder="ana@bepwr.com" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Contraseña *</label><input type="password" id="ns-pass" placeholder="Mínimo 6 caracteres" /></div>
+        <div class="field"><label>Teléfono *</label><input type="tel" id="ns-tel" placeholder="10 dígitos" maxlength="10" /></div>
         <div class="field"><label>Rol</label>
           <select id="ns-rol">
             <option value="coach">Coach</option>
             <option value="admin">Admin</option>
           </select>
         </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Contraseña *</label><input type="password" id="ns-pass" placeholder="Mínimo 6 caracteres" /></div>
+        <div class="field"></div>
       </div>
       <div class="form-error" id="ns-error"></div>
       <button class="btn btn-primary" id="btn-create-staff" onclick="createStaff()">Agregar al staff</button>
@@ -399,6 +404,43 @@
   });
 
   function doLogout() { auth.signOut(); }
+
+  function openChangePass() {
+    ['sp-current','sp-new','sp-confirm'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('sp-error').textContent = '';
+    const m = document.getElementById('modal-pass-staff');
+    m.style.display = 'flex';
+  }
+  function closeChangePass() {
+    document.getElementById('modal-pass-staff').style.display = 'none';
+  }
+  async function saveStaffPass() {
+    const errEl = document.getElementById('sp-error');
+    const current = document.getElementById('sp-current').value;
+    const newPass = document.getElementById('sp-new').value;
+    const confirm = document.getElementById('sp-confirm').value;
+    errEl.textContent = '';
+    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
+    if (!current) { errEl.textContent = 'Escribe tu contraseña actual'; return; }
+    if (!passRegex.test(newPass)) { errEl.textContent = 'La contraseña no cumple los requisitos'; return; }
+    if (newPass !== confirm) { errEl.textContent = 'Las contraseñas no coinciden'; return; }
+    try {
+      const user = auth.currentUser;
+      const cred = firebase.auth.EmailAuthProvider.credential(user.email, current);
+      await user.reauthenticateWithCredential(cred);
+      await user.updatePassword(newPass);
+      errEl.style.color = '#4ade80';
+      errEl.textContent = '¡Contraseña actualizada!';
+      setTimeout(closeChangePass, 1500);
+    } catch(e) {
+      errEl.style.color = '#f87171';
+      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+        errEl.textContent = 'Contraseña actual incorrecta';
+      } else {
+        errEl.textContent = 'Error: ' + e.message;
+      }
+    }
+  }
 
   // DATE HELPER: YYYY-MM → "Mar 2026"
   function fmtMonth(val) {
@@ -737,11 +779,14 @@
   async function createStaff() {
     const nombre = document.getElementById('ns-nombre').value.trim();
     const email  = document.getElementById('ns-email').value.trim();
+    const tel    = document.getElementById('ns-tel').value.trim();
     const pass   = document.getElementById('ns-pass').value;
     const rol    = document.getElementById('ns-rol').value;
     const errEl  = document.getElementById('ns-error');
     errEl.textContent = '';
-    if (!nombre || !email || !pass) { errEl.textContent = 'Completa todos los campos'; return; }
+    if (!nombre || !email || !tel || !pass) { errEl.textContent = 'Completa todos los campos'; return; }
+    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El teléfono debe tener exactamente 10 dígitos'; return; }
+    if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email inválido'; return; }
     if (pass.length < 6) { errEl.textContent = 'La contraseña debe tener al menos 6 caracteres'; return; }
     const btn = document.getElementById('btn-create-staff');
     btn.textContent = 'Creando...'; btn.disabled = true;
@@ -749,10 +794,10 @@
       const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
       await secondaryAuth.signOut();
       await db.collection('staff').doc(cred.user.uid).set({
-        nombre, email, rol, activo: true, fechaAlta: new Date().toISOString().slice(0,10)
+        nombre, email, telefono: tel, rol, activo: true, primerIngreso: true, fechaAlta: new Date().toISOString().slice(0,10)
       });
       showToast('✓ ' + nombre + ' agregado al staff', 'success');
-      ['ns-nombre','ns-email','ns-pass'].forEach(id => document.getElementById(id).value = '');
+      ['ns-nombre','ns-email','ns-tel','ns-pass'].forEach(id => document.getElementById(id).value = '');
       loadStaffList();
     } catch(e) {
       const msgs = {'auth/email-already-in-use':'Ese email ya está registrado','auth/invalid-email':'Email inválido','auth/weak-password':'Contraseña muy débil'};

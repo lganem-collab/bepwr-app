@@ -75,6 +75,8 @@
     .modal-field label{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px}
     .modal-field input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;box-sizing:border-box}
     .modal-field input:focus{outline:none;border-color:var(--orange)}
+    .modal-field input[type="date"]{background:#f5f5f5;color:#111;border-color:#ccc;color-scheme:light}
+    .modal-field input[type="date"]:focus{border-color:var(--orange)}
     .modal-divider{border:none;border-top:1px solid #222;margin:20px 0}
     .modal-section-title{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;margin-bottom:14px}
     .hist-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1a1a1a;font-size:14px}
@@ -319,7 +321,18 @@
       <div class="modal-handle"></div>
       <div class="modal-title">Editar información</div>
       <div class="modal-field"><label>Nombre completo</label><input type="text" id="edit-nombre" placeholder="Tu nombre"></div>
-      <div class="modal-field"><label>Teléfono</label><input type="tel" id="edit-tel" placeholder="55 1234 5678"></div>
+      <div class="modal-field"><label>Email</label>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <input type="email" id="edit-email" placeholder="tu@email.com" style="flex:1">
+          <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px 14px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif">Cambiar</button>
+        </div>
+      </div>
+      <div class="modal-field"><label>Teléfono</label>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <input type="tel" id="edit-tel" placeholder="10 dígitos" maxlength="10" style="flex:1">
+          <button onclick="confirmTelChange()" style="background:#333;color:#fff;border:none;border-radius:10px;padding:12px 14px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif">Cambiar</button>
+        </div>
+      </div>
       <div class="modal-field"><label>Fecha de nacimiento</label><input type="date" id="edit-dob"></div>
       <div class="modal-field"><label>Género</label>
         <select id="edit-genero" style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif">
@@ -330,17 +343,25 @@
         </select>
       </div>
       <hr class="modal-divider">
-      <div class="modal-section-title">Cambiar contraseña</div>
-      <div class="modal-field"><label>Contraseña actual</label>
-        <div class="pass-input-wrap">
-          <input type="password" id="edit-pass-current" placeholder="••••••••">
-          <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">👁</button>
+      <div style="background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:16px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span style="font-size:18px">🔐</span>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contraseña</span>
         </div>
-      </div>
-      <div class="modal-field"><label>Nueva contraseña</label>
-        <div class="pass-input-wrap">
-          <input type="password" id="edit-pass-new" placeholder="Mínimo 6 caracteres">
-          <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">👁</button>
+        <div class="modal-field"><label>Contraseña actual</label>
+          <div class="pass-input-wrap">
+            <input type="password" id="edit-pass-current" placeholder="••••••••">
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">👁</button>
+          </div>
+        </div>
+        <div class="modal-field"><label>Nueva contraseña</label>
+          <div class="pass-input-wrap">
+            <input type="password" id="edit-pass-new" placeholder="Mínimo 6 caracteres">
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">👁</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
+          Debe tener: mayúscula · minúscula · número · símbolo
         </div>
       </div>
       <div id="edit-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
@@ -758,6 +779,7 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
   let cachedUserData = {};
   window.openEditModal = () => {
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
+    document.getElementById('edit-email').value = auth.currentUser?.email || '';
     document.getElementById('edit-tel').value = cachedUserData.telefono || '';
     document.getElementById('edit-dob').value = cachedUserData.nacimiento || '';
     document.getElementById('edit-genero').value = cachedUserData.genero || 'prefiero-no-decir';
@@ -779,17 +801,17 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
     if (!user) return;
     try {
       // Guardar datos en Firestore
-      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, telefono: tel, nacimiento: dob, genero });
-      cachedUserData = { ...cachedUserData, nombre, telefono: tel, nacimiento: dob, genero };
+      await updateDoc(doc(db, 'usuarios', user.uid), { nombre, nacimiento: dob, genero });
+      cachedUserData = { ...cachedUserData, nombre, nacimiento: dob, genero };
       // Actualizar UI
-      document.getElementById('prof-phone').textContent = tel || '—';
       document.getElementById('prof-dob').textContent = dob || '—';
-      const initials = nombre.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+      const nombreReal2 = nombre || user.email.split('@')[0];
+      const initials = nombreReal2.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
       document.getElementById('avatar-initials').textContent = initials;
       document.getElementById('profile-av').textContent = initials;
-      document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
-      if (data.alias) {
-        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' · "' + data.alias + '"';
+      document.getElementById('profile-name-big').textContent = nombreReal2.toUpperCase();
+      if (cachedUserData.alias) {
+        document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' · "' + cachedUserData.alias + '"';
       }
       // Cambiar contraseña si se llenaron los campos
       if (passCurrent || passNew) {
@@ -862,6 +884,54 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
       setTimeout(() => primerModal.style.display = 'none', 300);
     } catch(e) {
       errEl.textContent = 'Error al guardar: ' + e.message;
+    }
+  };
+
+  // ── CONFIRMAR EMAIL ──
+  window.confirmEmailChange = async () => {
+    const newEmail = document.getElementById('edit-email').value.trim();
+    const errEl = document.getElementById('edit-error');
+    errEl.textContent = '';
+    if (!newEmail) { errEl.textContent = 'Escribe un email'; return; }
+    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inválido'; return; }
+    if (newEmail === auth.currentUser?.email) { errEl.textContent = 'Es el mismo email actual'; return; }
+    if (!confirm('¿Cambiar email a ' + newEmail + '?')) return;
+    const passCurrent = document.getElementById('edit-pass-current').value;
+    if (!passCurrent) { errEl.textContent = 'Para cambiar el email necesitas escribir tu contraseña actual abajo'; return; }
+    try {
+      const cred = EmailAuthProvider.credential(auth.currentUser.email, passCurrent);
+      await reauthenticateWithCredential(auth.currentUser, cred);
+      await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
+      errEl.style.color = '#4ade80';
+      errEl.textContent = 'Se envió un email de verificación a ' + newEmail + '. Confirma para que el cambio aplique.';
+    } catch(e) {
+      errEl.style.color = '#f87171';
+      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+        errEl.textContent = 'Contraseña actual incorrecta';
+      } else {
+        errEl.textContent = 'Error: ' + e.message;
+      }
+    }
+  };
+
+  // ── CONFIRMAR TELÉFONO ──
+  window.confirmTelChange = async () => {
+    const newTel = document.getElementById('edit-tel').value.trim();
+    const errEl = document.getElementById('edit-error');
+    errEl.textContent = '';
+    if (!newTel) { errEl.textContent = 'Escribe un teléfono'; return; }
+    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El teléfono debe tener exactamente 10 dígitos'; return; }
+    if (!confirm('¿Cambiar teléfono a ' + newTel + '?')) return;
+    try {
+      const user = auth.currentUser;
+      await updateDoc(doc(db, 'usuarios', user.uid), { telefono: newTel });
+      cachedUserData = { ...cachedUserData, telefono: newTel };
+      document.getElementById('prof-phone').textContent = newTel;
+      errEl.style.color = '#4ade80';
+      errEl.textContent = 'Teléfono actualizado ✓';
+    } catch(e) {
+      errEl.style.color = '#f87171';
+      errEl.textContent = 'Error: ' + e.message;
     }
   };
 
