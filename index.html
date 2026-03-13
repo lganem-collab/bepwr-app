@@ -377,6 +377,67 @@
     </div>
   </div>
 
+  <!-- MODAL TÉRMINOS Y PRIVACIDAD -->
+  <div class="modal-overlay" id="modal-terminos" style="display:none;z-index:950">
+    <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column">
+      <div class="modal-handle"></div>
+      <div class="modal-title" style="font-size:18px">Términos y Aviso de Privacidad</div>
+      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">Léelos antes de continuar</div>
+
+      <!-- Scrollable content -->
+      <div id="terminos-scroll" style="overflow-y:auto;flex:1;padding-right:4px;font-size:13px;color:#ccc;line-height:1.7">
+
+        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">TÉRMINOS Y CONDICIONES DE USO</div>
+
+        <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposición de sus miembros la aplicación bePWR (en adelante "la App") sujeta a los siguientes términos:</p>
+
+        <p><strong>1. ACEPTACIÓN.</strong> Al acceder y usar la App, el usuario acepta plena y expresamente estos Términos. Si no está de acuerdo, debe abstenerse de usar la App.</p>
+
+        <p><strong>2. USO PERMITIDO.</strong> La App es exclusiva para miembros activos de bePWR. El acceso es personal e intransferible. El usuario se compromete a no compartir sus credenciales con terceros.</p>
+
+        <p><strong>3. INFORMACIÓN DE SALUD.</strong> La información de composición corporal (peso, masa muscular, grasa, IMC, etc.) registrada en la App tiene fines de seguimiento personal. <strong>No constituye diagnóstico médico ni reemplaza la consulta con profesionales de la salud.</strong></p>
+
+        <p><strong>4. RECOMENDACIONES DE IA.</strong> Los mensajes generados por inteligencia artificial son orientativos y de carácter motivacional. bePWR no garantiza resultados específicos. Las recomendaciones no sustituyen el criterio de un médico, nutriólogo o entrenador certificado.</p>
+
+        <p><strong>5. LIMITACIÓN DE RESPONSABILIDAD.</strong> OPERADORA FIT TERRASOLA no será responsable por: (a) lesiones o daños derivados del ejercicio físico; (b) decisiones tomadas con base en la información de la App; (c) interrupciones del servicio por causas de fuerza mayor o fallas técnicas de terceros; (d) pérdida de datos por causas ajenas a bePWR.</p>
+
+        <p><strong>6. PROPIEDAD INTELECTUAL.</strong> El contenido, diseño, marca y software de la App son propiedad exclusiva de OPERADORA FIT TERRASOLA. Queda prohibida su reproducción parcial o total sin autorización escrita.</p>
+
+        <p><strong>7. MODIFICACIONES.</strong> bePWR se reserva el derecho de modificar estos Términos en cualquier momento. Las modificaciones serán notificadas a través de la App.</p>
+
+        <p><strong>8. LEGISLACIÓN APLICABLE.</strong> Estos Términos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Querétaro, Querétaro, renunciando a cualquier otro fuero.</p>
+
+        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin:20px 0 8px">AVISO DE PRIVACIDAD</div>
+        <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</p>
+
+        <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Querétaro, Querétaro, México.</p>
+
+        <p><strong>Datos que recabamos:</strong> Nombre completo, correo electrónico, teléfono, fecha de nacimiento, género, altura y datos de composición corporal (peso, masa muscular, porcentaje de grasa, IMC, grasa visceral y calificación InBody).</p>
+
+        <p><strong>Finalidades primarias:</strong> (a) Gestionar tu membresía y acceso a la App; (b) Registrar y monitorear tu progreso de composición corporal; (c) Generar mensajes de seguimiento personalizados con apoyo de inteligencia artificial; (d) Contactarte para asuntos relacionados con tu membresía.</p>
+
+        <p><strong>Finalidades secundarias:</strong> Análisis estadístico interno (datos anonimizados) para mejorar nuestros servicios. Puedes oponerte a estas finalidades enviando un correo a <strong>contacto@bepwr.com</strong>.</p>
+
+        <p><strong>Transferencia de datos:</strong> Tus datos no serán transferidos a terceros sin tu consentimiento, salvo obligación legal. Utilizamos servicios de Google Firebase para almacenamiento seguro en la nube, sujetos a sus propias políticas de privacidad.</p>
+
+        <p><strong>Derechos ARCO:</strong> Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos personales. Puedes ejercerlos enviando una solicitud a <strong>contacto@bepwr.com</strong> indicando tu nombre, datos de contacto y descripción del derecho que deseas ejercer. Atenderemos tu solicitud en un plazo máximo de 20 días hábiles.</p>
+
+        <p><strong>Cambios al aviso:</strong> Cualquier modificación se comunicará a través de la App o al correo registrado en tu cuenta.</p>
+
+        <p style="font-size:11px;color:var(--gray)">Fecha de última actualización: Marzo 2026</p>
+      </div>
+
+      <!-- Accept section -->
+      <div style="padding-top:16px;border-top:1px solid #2a2a2a;margin-top:12px">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px">
+          <input type="checkbox" id="terminos-check" onchange="toggleTerminosBtn()" style="margin-top:3px;accent-color:#FF5C1A;width:18px;height:18px;flex-shrink:0">
+          <span style="font-size:13px;color:#ccc;line-height:1.5">He leído y acepto los Términos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
+        </label>
+        <button class="btn-primary" id="terminos-btn" disabled onclick="aceptarTerminos()" style="opacity:0.4">Aceptar y continuar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL PRIMER INGRESO -->
   <div class="modal-overlay" id="modal-primer-ingreso" style="display:none;z-index:900">
     <div class="modal-sheet">
@@ -462,7 +523,12 @@
       loginScr.classList.remove('active');
       appScr.classList.add('active');
       authReady = true;
-      if (cachedUserData.primerIngreso === true) {
+      // Mostrar términos si no han sido aceptados aún
+      if (!cachedUserData.terminosAceptados) {
+        const tModal = document.getElementById('modal-terminos');
+        tModal.style.display = 'flex';
+        setTimeout(() => tModal.classList.add('active'), 10);
+      } else if (cachedUserData.primerIngreso === true) {
         const primerModal = document.getElementById('modal-primer-ingreso');
         primerModal.style.display = 'flex';
         setTimeout(() => primerModal.classList.add('active'), 10);
@@ -742,6 +808,44 @@
     document.getElementById('val-calificacion').textContent = m.calificacion ? m.calificacion + '/100' : '—';
     document.getElementById('val-fecha').textContent = m.fecha || '—';
   }
+
+  // ── TÉRMINOS Y AVISO DE PRIVACIDAD ──────────────────────────────
+  window.toggleTerminosBtn = function() {
+    const btn = document.getElementById('terminos-btn');
+    const checked = document.getElementById('terminos-check').checked;
+    btn.disabled = !checked;
+    btn.style.opacity = checked ? '1' : '0.4';
+  };
+
+  window.aceptarTerminos = async function() {
+    const btn = document.getElementById('terminos-btn');
+    btn.textContent = 'Guardando...';
+    btn.disabled = true;
+    try {
+      const user = auth.currentUser;
+      await updateDoc(doc(db, 'usuarios', user.uid), {
+        terminosAceptados: true,
+        terminosFecha: new Date().toISOString().slice(0,10)
+      });
+      cachedUserData.terminosAceptados = true;
+      // Cerrar modal términos
+      const tModal = document.getElementById('modal-terminos');
+      tModal.classList.remove('active');
+      setTimeout(() => { tModal.style.display = 'none'; }, 300);
+      // Si es primer ingreso, abrir ese modal
+      if (cachedUserData.primerIngreso === true) {
+        setTimeout(() => {
+          const primerModal = document.getElementById('modal-primer-ingreso');
+          primerModal.style.display = 'flex';
+          setTimeout(() => primerModal.classList.add('active'), 10);
+        }, 350);
+      }
+    } catch(e) {
+      btn.textContent = 'Aceptar y continuar';
+      btn.disabled = false;
+      console.error(e);
+    }
+  };
 
   // ── AI MESSAGE — máx 1 por día por usuario ──
   async function generateAIMessage(nombre, metrica, objetivo) {
