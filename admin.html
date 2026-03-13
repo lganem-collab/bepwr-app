@@ -365,14 +365,19 @@
         }
         const staffData = staffDoc.data();
         window.currentStaffRole = staffData.rol || 'coach';
+        console.log('Mostrando app...');
         show('s-app'); hide('s-login');
-        const rolBadge = window.currentStaffRole === 'admin' ? '🔑 Admin' : '👟 Coach';
-        document.getElementById('staff-name').innerHTML = `${staffData.nombre || user.email} <span style="font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1px">${rolBadge}</span>`;
-        // Tab de staff solo para admin
-        if (window.currentStaffRole === 'admin') {
-          document.getElementById('tab-staff').style.display = 'inline-block';
-        }
-        loadMembers();
+        console.log('s-app visible:', document.getElementById('s-app').classList.contains('active'));
+        try {
+          const rolBadge = window.currentStaffRole === 'admin' ? '🔑 Admin' : '👟 Coach';
+          document.getElementById('staff-name').innerHTML = `${staffData.nombre || user.email} <span style="font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1px">${rolBadge}</span>`;
+          if (window.currentStaffRole === 'admin') {
+            document.getElementById('tab-staff').style.display = 'inline-block';
+          }
+        } catch(domErr) { console.error('DOM error:', domErr); }
+        try {
+          loadMembers();
+        } catch(loadErr) { console.error('loadMembers error:', loadErr); }
       } catch(e) {
         console.error('Auth error:', e.code, e.message, e);
         // Solo redirigir al login si es error de autenticación/permisos
