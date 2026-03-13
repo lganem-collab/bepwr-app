@@ -372,7 +372,11 @@
         }
         loadMembers();
       } catch(e) {
-        await auth.signOut();
+        console.error('Auth error:', e);
+        // Solo desloguear si es error de permisos, no cualquier error de JS
+        if (e.code && e.code.startsWith('auth/')) {
+          await auth.signOut();
+        }
         show('s-login'); hide('s-app');
       }
     } else {
@@ -416,6 +420,91 @@
   }
   function closeChangePass() {
     document.getElementById('modal-pass-staff').style.display = 'none';
+  }
+
+  let currentStaffProfileUID = null;
+  let currentStaffProfileData = null;
+
+  async function openStaffProfile(uid) {
+    currentStaffProfileUID = uid;
+    const modal = document.getElementById('modal-staff-profile');
+    modal.style.display = 'block';
+    document.getElementById('sp-historial').textContent = 'Cargando...';
+    document.getElementById('sp-edit-error').textContent = '';
+
+    try {
+      const snap = await db.collection('staff').doc(uid).get();
+      if (!snap.exists) return;
+      const s = snap.data();
+      currentStaffProfileData = s;
+      const isMaster = uid === MASTER_UID;
+      const initials = (s.nombre || s.email).split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+
+      document.getElementById('sp-avatar').textContent = initials;
+      document.getElementById('sp-nombre').textContent = s.nombre || s.email;
+      document.getElementById('sp-rol-badge').innerHTML = `<span style="color:${s.rol==='admin'?'var(--orange)':'#888'}">${s.rol||'coach'}${isMaster?' ★ MAESTRO':''}</span>`;
+      document.getElementById('sp-email').textContent = s.email || '—';
+      document.getElementById('sp-tel').textContent = s.telefono || '—';
+      document.getElementById('sp-fecha-alta').textContent = s.fechaAlta || '—';
+      document.getElementById('sp-estado').innerHTML = s.activo !== false
+        ? '<span style="color:#4ade80">Activo</span>'
+        : '<span style="color:#f87171">Inactivo</span>';
+
+      // Pre-fill edit form
+      document.getElementById('sp-edit-nombre').value = s.nombre || '';
+      document.getElementById('sp-edit-tel').value = s.telefono || '';
+      document.getElementById('sp-edit-rol').value = s.rol || 'coach';
+
+      // Disable edit if master or current user is not admin
+      const canEdit = window.currentStaffRole === 'admin' && !isMaster;
+      ['sp-edit-nombre','sp-edit-tel','sp-edit-rol','sp-save-btn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !canEdit;
+      });
+
+      // Load valoraciones registered by this staff
+      const metSnap = await db.collectionGroup('metricas').where('registradoPor', '==', uid).orderBy('fecha','desc').limit(20).get();
+      if (metSnap.empty) {
+        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas aún';
+      } else {
+        document.getElementById('sp-historial').innerHTML = metSnap.docs.map(d => {
+          const m = d.data();
+          return `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px">
+            <span style="color:var(--orange)">${m.fecha||'—'}</span>
+            <span style="color:#888;margin-left:8px">${m.miembroNombre||'Miembro'}</span>
+            <span style="margin-left:8px">Peso: ${m.peso||'—'} kg · Inbody: ${m.calificacion||'—'}</span>
+          </div>`;
+        }).join('');
+      }
+    } catch(e) {
+      console.error('openStaffProfile error:', e);
+    }
+  }
+
+  function closeStaffProfile() {
+    document.getElementById('modal-staff-profile').style.display = 'none';
+    currentStaffProfileUID = null;
+  }
+
+  async function saveStaffProfile() {
+    const errEl = document.getElementById('sp-edit-error');
+    errEl.textContent = '';
+    errEl.style.color = '#f87171';
+    const nombre = document.getElementById('sp-edit-nombre').value.trim();
+    const tel = document.getElementById('sp-edit-tel').value.trim();
+    const rol = document.getElementById('sp-edit-rol').value;
+    if (!nombre) { errEl.textContent = 'El nombre es requerido'; return; }
+    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El teléfono debe tener exactamente 10 dígitos'; return; }
+    try {
+      await db.collection('staff').doc(currentStaffProfileUID).update({ nombre, telefono: tel, rol });
+      errEl.style.color = '#4ade80';
+      errEl.textContent = '¡Datos actualizados!';
+      document.getElementById('sp-nombre').textContent = nombre;
+      document.getElementById('sp-tel').textContent = tel;
+      setTimeout(() => loadStaffList(), 1000);
+    } catch(e) {
+      errEl.textContent = 'Error: ' + e.message;
+    }
   }
   async function saveStaffPass() {
     const errEl = document.getElementById('sp-error');
@@ -634,6 +723,8 @@
     errEl.textContent = '';
     if (!peso || !fecha) { errEl.textContent = 'Peso y fecha son obligatorios'; return; }
     try {
+      const miembroDoc = await db.collection('usuarios').doc(uid).get();
+      const miembroNombre = miembroDoc.exists ? (miembroDoc.data().nombre || '') : '';
       await db.collection('usuarios').doc(uid).collection('metricas').add({
         peso,
         musculo: isNaN(musculo)?null:musculo,
@@ -642,7 +733,9 @@
         pgc: isNaN(pgc)?null:pgc,
         grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
         calificacion: isNaN(calific)?null:calific,
-        fecha
+        fecha,
+        registradoPor: auth.currentUser?.uid || null,
+        miembroNombre
       });
       showToast('Valoración guardada ✓', 'success');
       closeModal('modal-metrics');
@@ -697,7 +790,9 @@
         pgc: isNaN(pgc)?null:pgc,
         grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
         calificacion: isNaN(calific)?null:calific,
-        fecha: fechaVal || inicio || 'Inicio'
+        fecha: fechaVal || inicio || 'Inicio',
+        registradoPor: auth.currentUser?.uid || null,
+        miembroNombre: nombreCompleto
       });
       showToast('✓ ' + nombreCompleto + ' creado correctamente', 'success');
       document.getElementById('new-genero').value = 'prefiero-no-decir';
@@ -744,6 +839,7 @@
             <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">${s.email} · <span style="color:${s.rol==='admin'?'var(--orange)':'#888'}">${s.rol||'coach'}</span></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-sm" style="background:#222;color:#ccc;border:1px solid #333" onclick="openStaffProfile('${d.id}')">Ver</button>
             ${canModify ? `
             <select onchange="changeStaffRol('${d.id}',this.value)" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px">
               <option value="coach" ${s.rol!=='admin'?'selected':''}>Coach</option>
@@ -821,5 +917,23 @@
     el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
   });
 </script>
+<!-- MODAL CAMBIO CONTRASEÑA STAFF -->
+<div id="modal-pass-staff" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:960;align-items:center;justify-content:center">
+  <div style="background:#111;border-radius:20px;padding:28px 24px;width:90%;max-width:360px;border:1px solid #2a2a2a">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:18px">Cambiar contraseña</div>
+    <div class="field" style="margin-bottom:12px"><label>Contraseña actual</label><input type="password" id="sp-current" placeholder="••••••••"></div>
+    <div class="field" style="margin-bottom:12px"><label>Nueva contraseña</label><input type="password" id="sp-new" placeholder="Mínimo 6 caracteres"></div>
+    <div class="field" style="margin-bottom:16px"><label>Confirmar nueva</label><input type="password" id="sp-confirm" placeholder="Repite la contraseña"></div>
+    <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:14px">
+      Debe tener: mayúscula · minúscula · número · símbolo
+    </div>
+    <div id="sp-error" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:12px"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="saveStaffPass()" class="btn btn-primary" style="flex:1">Guardar</button>
+      <button onclick="closeChangePass()" class="btn btn-secondary" style="flex:1">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
