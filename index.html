@@ -422,6 +422,20 @@
   onAuthStateChanged(auth, async user => {
     splash.classList.add('out');
     if (user) {
+      // Block staff from accessing member app
+      try {
+        const staffDoc = await getDoc(doc(db, 'staff', user.uid));
+        if (staffDoc.exists()) {
+          await signOut(auth);
+          errorEl.style.color = '#f87171';
+          errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administración.';
+          appScr.classList.remove('active');
+          loginScr.classList.add('active');
+          authReady = true;
+          return;
+        }
+      } catch(e) {}
+
       try {
         await loadUserData(user);
       } catch(e) {
@@ -430,15 +444,12 @@
       loginScr.classList.remove('active');
       appScr.classList.add('active');
       authReady = true;
-      // Check if first login
-      console.log('primerIngreso value:', cachedUserData.primerIngreso, typeof cachedUserData.primerIngreso);
       if (cachedUserData.primerIngreso === true) {
         const primerModal = document.getElementById('modal-primer-ingreso');
         primerModal.style.display = 'flex';
         setTimeout(() => primerModal.classList.add('active'), 10);
       }
     } else {
-      // Only show login if auth was ready (avoid flicker on init)
       if (authReady) {
         appScr.classList.remove('active');
         loginScr.classList.add('active');

@@ -690,19 +690,23 @@
       listEl.innerHTML = snap.docs.map(d => {
         const s = d.data();
         const activo = s.activo !== false;
+        const isMaster = d.id === MASTER_UID;
+        const isCurrentAdmin = window.currentStaffRole === 'admin';
+        const canModify = isCurrentAdmin && !isMaster;
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1a1a1a">
           <div>
-            <div style="font-weight:600;font-size:15px">${s.nombre||s.email}</div>
+            <div style="font-weight:600;font-size:15px">${s.nombre||s.email} ${isMaster ? '<span style="font-size:10px;color:var(--orange);font-family:Space Mono,monospace">★ MAESTRO</span>' : ''}</div>
             <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">${s.email} · <span style="color:${s.rol==='admin'?'var(--orange)':'#888'}">${s.rol||'coach'}</span></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
+            ${canModify ? `
             <select onchange="changeStaffRol('${d.id}',this.value)" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px">
               <option value="coach" ${s.rol!=='admin'?'selected':''}>Coach</option>
               <option value="admin" ${s.rol==='admin'?'selected':''}>Admin</option>
             </select>
             <button class="btn btn-sm ${activo?'btn-secondary':'btn-success'}" onclick="toggleStaffActivo('${d.id}',${activo})">
               ${activo?'Desactivar':'Activar'}
-            </button>
+            </button>` : `<span style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace">${isMaster?'Admin Maestro':'—'}</span>`}
           </div>
         </div>`;
       }).join('');
@@ -712,6 +716,8 @@
   }
 
   async function toggleStaffActivo(uid, currentActivo) {
+    if (uid === MASTER_UID) { showToast('No puedes desactivar al Admin Maestro', 'error'); return; }
+    if (window.currentStaffRole !== 'admin') { showToast('Solo un admin puede hacer esto', 'error'); return; }
     try {
       await db.collection('staff').doc(uid).update({ activo: !currentActivo });
       showToast(currentActivo ? 'Staff desactivado' : 'Staff activado ✓', 'success');
@@ -720,6 +726,8 @@
   }
 
   async function changeStaffRol(uid, newRol) {
+    if (uid === MASTER_UID) { showToast('No puedes cambiar el rol del Admin Maestro', 'error'); return; }
+    if (window.currentStaffRole !== 'admin') { showToast('Solo un admin puede cambiar roles', 'error'); return; }
     try {
       await db.collection('staff').doc(uid).update({ rol: newRol });
       showToast('Rol actualizado ✓', 'success');
