@@ -707,8 +707,10 @@
       const meta = m.objetivo?.meta || '—';
       const peso = m.ultimaMetrica?.peso ? m.ultimaMetrica.peso + ' kg' : '—';
       const imc  = m.ultimaMetrica?.imc || '—';
-      return `<div class="table-row" onclick="openDetail('${m.uid}')">
-        <div class="td"><div class="member-name">${m.nombre||'Sin nombre'}</div><div class="member-email">${m.email||''}</div></div>
+      const activo = m.activo !== false;
+      const dot = activo ? '<span style="display:inline-block;width:8px;height:8px;background:#4ade80;border-radius:50%;margin-right:6px;vertical-align:middle"></span>' : '<span style="display:inline-block;width:8px;height:8px;background:#f87171;border-radius:50%;margin-right:6px;vertical-align:middle"></span>';
+      return `<div class="table-row" onclick="openDetail('${m.uid}')" style="${activo?'':'opacity:.7'}">
+        <div class="td"><div class="member-name">${dot}${m.nombre||'Sin nombre'}</div><div class="member-email">${m.email||''}</div></div>
         <div class="td gray">${meta}</div>
         <div class="td mono">${peso}</div>
         <div class="td mono">${imc}</div>
@@ -980,6 +982,19 @@
     } catch(e) {
       listEl.innerHTML = '<div style="color:#f87171;font-size:13px">Error: ' + e.message + '</div>';
     }
+  }
+
+  async function quickToggleMember(uid, currentActivo, nombre) {
+    if (window.currentStaffRole !== 'admin') { showToast('Solo admin puede hacer esto', 'error'); return; }
+    const accion = currentActivo ? 'desactivar' : 'activar';
+    if (!confirm(accion.charAt(0).toUpperCase()+accion.slice(1)+' a ' + nombre + '?')) return;
+    try {
+      await db.collection('usuarios').doc(uid).update({ activo: !currentActivo });
+      const m = (window._allMembers||[]).find(x => x.uid === uid);
+      if (m) m.activo = !currentActivo;
+      filterMembers();
+      showToast(nombre + ' ' + (!currentActivo?'activado':'desactivado'), 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
   }
 
   async function toggleStaffActivo(uid, currentActivo) {
