@@ -321,7 +321,7 @@
     <div class="modal-sheet">
       <div class="modal-handle"></div>
       <div class="modal-title">Editar información</div>
-      <div class="modal-field"><label>Nombre completo</label><input type="text" id="edit-nombre" placeholder="Tu nombre"></div>
+      <div class="modal-field"><label>Nombre completo <span style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace">(solo el staff puede modificarlo)</span></label><input type="text" id="edit-nombre" readonly style="color:#666;cursor:not-allowed;background:rgba(255,255,255,0.03)"></div>
       <div class="modal-field"><label>Nuevo email</label><input type="email" id="edit-email" placeholder="tu@email.com"></div>
       <div class="modal-field"><label>Confirmar nuevo email</label><input type="email" id="edit-confirm-email" placeholder="Repite el email"></div>
       <div style="text-align:right;margin-bottom:12px">
@@ -471,6 +471,8 @@
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+  import { getMessaging, getToken, onMessage }
+    from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
 
   // ── TU CONFIGURACIÓN DE FIREBASE ──
   const firebaseConfig = {
@@ -847,16 +849,38 @@
     }
   };
 
-  // ── AI MESSAGE — máx 1 por día por usuario ──
+  // ── FCM PUSH NOTIFICATIONS ──────────────────────────────────
+  const messaging = getMessaging(app);
+  const VAPID_KEY = 'VAPID_KEY_PLACEHOLDER';
+
+  async function subscribeToPush(uid) {
+    try {
+      if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
+      const reg = await navigator.serviceWorker.ready;
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+      if (token) {
+        const snap = await getDoc(doc(db, 'usuarios', uid));
+        if (snap.data()?.fcmToken !== token) {
+          await updateDoc(doc(db, 'usuarios', uid), { fcmToken: token });
+        }
+      }
+    } catch(e) {
+      console.log('Push subscription skipped:', e.message);
+    }
+  }
+
+  onMessage(messaging, payload => {
+    const { title, body } = payload.notification || {};
+    if (title && body && Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png' });
+    }
+  });
+
+  // ── AI MESSAGE — nuevo en cada sesión ──
   async function generateAIMessage(nombre, metrica, objetivo) {
     const el = document.getElementById('ai-message');
-    try {
-      const cached = JSON.parse(localStorage.getItem('bepwr_ai_msg') || 'null');
-      const today = new Date().toISOString().slice(0,10);
-      if (cached && cached.date === today && cached.uid === auth.currentUser?.uid && cached.msg) {
-        el.innerHTML = cached.msg; return;
-      }
-    } catch(e) {}
     el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
     try {
       const edad = cachedUserData.nacimiento ? Math.floor((new Date() - new Date(cachedUserData.nacimiento)) / (365.25*24*60*60*1000)) : null;
@@ -868,15 +892,25 @@
         genero && genero !== 'prefiero-no-decir' ? `género ${genero}` : null
       ].filter(Boolean).join(', ');
 
-      const prompt = `Eres el coach de IA de bePWR, un studio de fitness especializado en entrenamiento funcional. bePWR se enfoca en movimientos funcionales que mejoran fuerza real, movilidad, coordinación y metabolismo.
-Genera un mensaje motivacional breve y personalizado (máximo 4 oraciones) para ${nombre}${contextoPersona ? ' ('+contextoPersona+')' : ''}.
-Sus métricas: peso ${metrica.peso}kg, músculo esquelético ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificación Inbody ${metrica.calificacion}/100.
-Su objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg a ${objetivo.pesoMeta}kg.
-El mensaje debe:
-1. Destacar un dato específico de sus métricas y lo que significa para su salud.
-2. Dar un consejo concreto de nutrición o hidratación apropiado para su perfil${edad && edad >= 50 ? ' (considerando que a partir de los 50 años la prioridad es preservar masa muscular, movilidad y fuerza funcional más que cardio intenso)' : ''}.
-3. Reforzar por qué el entrenamiento funcional de bePWR es ideal para su objetivo y edad.
-Responde SOLO el mensaje, sin saludos extra ni comillas.`;
+      // Hora del día para saludo
+      const hora = new Date().getHours();
+      const saludo = hora < 12 ? 'buenos días' : hora < 19 ? 'buenas tardes' : 'buenas noches';
+
+      const prompt = `Eres el coach experto de bePWR, un studio de fitness en Querétaro, México, especializado en entrenamiento funcional de alto rendimiento. Hablas con autoridad científica, eres directo, motivador y profesional.
+
+Es de ${saludo} (hora local: ${new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'})}).
+Miembro: ${nombre}${contextoPersona ? ' ('+contextoPersona+')' : ''}.
+Métricas actuales: peso ${metrica.peso}kg, músculo esquelético ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificación InBody ${metrica.calificacion}/100.
+Objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg → ${objetivo.pesoMeta}kg.
+${edad && edad >= 50 ? 'Nota: mayores de 50 — priorizar preservación muscular, movilidad y fuerza funcional sobre cardio intenso.' : ''}
+
+Genera un mensaje Único, fresco y variado (máximo 4 oraciones):
+1. Inicia con el saludo apropiado (${saludo}) usando el nombre del miembro.
+2. Elige UNO de estos enfoques al azar: dato científico sobre ejercicio funcional, consejo de hidratación específico, hábito de sueño y recuperación, consejo nutricional concreto, beneficio de alguna disciplina deportiva complementaria (yoga, natación, ciclismo, etc.), o dato sobre el clima de Querétaro relacionado con el entrenamiento o hidratación.
+3. Conecta ese consejo con al menos uno de sus datos de métricas.
+4. Cierra con una frase motivadora y profesional alineada a su objetivo.
+5. De forma natural, invita a reservar su próxima clase en bePWR, mencionando que lo ideal es entrenar de 2 a 4 sesiones por semana.
+Varía el tono en cada mensaje. Responde SOLO el mensaje en español, sin comillas, sin bullets, sin encabezados.`;
 
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -889,7 +923,7 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
       if (msg) {
         const htmlMsg = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
         el.innerHTML = htmlMsg;
-        try { localStorage.setItem('bepwr_ai_msg', JSON.stringify({date:new Date().toISOString().slice(0,10),uid:auth.currentUser?.uid,msg:htmlMsg})); } catch(e) {}
+
       } else {
         el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
       }
@@ -927,21 +961,14 @@ Responde SOLO el mensaje, sin saludos extra ni comillas.`;
   window.saveEditInfo = async () => {
     const errEl = document.getElementById('edit-error');
     errEl.textContent = '';
-    const nombre = document.getElementById('edit-nombre').value.trim();
+    // nombre es solo lectura, lo maneja el staff
     const passCurrent = document.getElementById('edit-pass-current').value;
     const passNew = document.getElementById('edit-pass-new').value;
     const user = auth.currentUser;
     if (!user) return;
     try {
       // Guardar datos en Firestore
-      await updateDoc(doc(db, 'usuarios', user.uid), { nombre });
-      cachedUserData = { ...cachedUserData, nombre };
-      // Actualizar UI
-      const nombreReal2 = nombre || user.email.split('@')[0];
-      const initials = nombreReal2.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-      document.getElementById('avatar-initials').textContent = initials;
-      document.getElementById('profile-av').textContent = initials;
-      document.getElementById('profile-name-big').textContent = nombreReal2.toUpperCase();
+      // nombre no se edita aqui, solo el staff puede cambiarlo
       if (cachedUserData.alias) {
         document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' · "' + cachedUserData.alias + '"';
       }

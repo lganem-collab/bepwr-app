@@ -141,6 +141,7 @@
     <div class="tab on" id="tab-members" onclick="switchTab('members')">Miembros</div>
     <div class="tab" id="tab-new" onclick="switchTab('new')">+ Nuevo miembro</div>
     <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">👥 Staff</div>
+    <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">📣 Notificaciones</div>
   </div>
   <div class="content">
 
@@ -277,6 +278,40 @@
       <div class="form-error" id="ns-error"></div>
       <button class="btn btn-primary" id="btn-create-staff" onclick="createStaff()">Agregar al staff</button>
     </div>
+    <!-- TAB NOTIFICACIONES -->
+    <div id="tab-content-notify" style="display:none;max-width:600px">
+      <div style="margin-bottom:24px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Notificaciones</div>
+        <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:1px">Envía mensajes push a todos los miembros activos</div>
+      </div>
+      <div style="background:var(--surface);border-radius:12px;padding:24px;border:1px solid var(--border)">
+        <div class="modal-section" style="margin-top:0">Nuevo mensaje</div>
+        <div class="field" style="margin-bottom:16px">
+          <label>Título *</label>
+          <input type="text" id="notif-title" placeholder="ej. ¡Evento especial este sábado!" maxlength="60">
+        </div>
+        <div class="field" style="margin-bottom:16px">
+          <label>Mensaje *</label>
+          <textarea id="notif-body" placeholder="ej. Te esperamos este sábado a las 8am para una clase especial. ¡No faltes!" maxlength="200" rows="3" style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:#fff;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;resize:vertical"></textarea>
+          <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;margin-top:4px"><span id="notif-body-count">0</span>/200 caracteres</div>
+        </div>
+        <div class="field" style="margin-bottom:20px">
+          <label>Destinatarios</label>
+          <select id="notif-target"><option value="all">Todos los miembros activos</option></select>
+        </div>
+        <div id="notif-error" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:12px;font-family:'Space Mono',monospace"></div>
+        <button class="btn btn-primary" id="btn-send-notif" onclick="sendNotification()">📣 Enviar notificación</button>
+      </div>
+      <div style="margin-top:28px">
+        <div class="modal-section">Notificaciones automáticas programadas</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.8;font-family:'Space Mono',monospace">
+          <div>🟢 <b>Lunes 6am</b> — "¡Nueva semana en bePWR! Reserva tus clases"</div>
+          <div>🟢 <b>Miércoles 7pm</b> — "Tarde perfecta para entrenar. Reserva tu clase"</div>
+          <div>🟢 <b>Viernes 6am</b> — "¡Cierra la semana fuerte!"</div>
+          <div>🟢 <b>Domingo 7pm</b> — "Planea tu semana, reserva tus 2-4 sesiones"</div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -372,6 +407,7 @@
           document.getElementById('staff-name').innerHTML = `${staffData.nombre || user.email} <span style="font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1px">${rolBadge}</span>`;
           if (window.currentStaffRole === 'admin') {
             document.getElementById('tab-staff').style.display = 'inline-block';
+            document.getElementById('tab-notify').style.display = 'inline-block';
           }
         } catch(domErr) { console.error('DOM error:', domErr); }
         try {
@@ -420,6 +456,41 @@
   });
 
   function doLogout() { auth.signOut().then(() => window.location.reload()); }
+  // ── NOTIFICACIONES ─────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const body = document.getElementById('notif-body');
+    const count = document.getElementById('notif-body-count');
+    if (body && count) { body.addEventListener('input', () => { count.textContent = body.value.length; }); }
+  });
+
+  async function sendNotification() {
+    if (window.currentStaffRole !== 'admin') { showToast('Solo admin puede enviar notificaciones', 'error'); return; }
+    const title = document.getElementById('notif-title').value.trim();
+    const body = document.getElementById('notif-body').value.trim();
+    const target = document.getElementById('notif-target').value;
+    const errEl = document.getElementById('notif-error');
+    const btn = document.getElementById('btn-send-notif');
+    errEl.textContent = '';
+    if (!title) { errEl.textContent = 'El título es obligatorio'; return; }
+    if (!body) { errEl.textContent = 'El mensaje es obligatorio'; return; }
+    btn.textContent = 'Enviando...'; btn.disabled = true;
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      const res = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+        body: JSON.stringify({ title, body, target, url: 'https://bepwr-app.vercel.app' })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast('✅ Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
+        document.getElementById('notif-title').value = '';
+        document.getElementById('notif-body').value = '';
+        document.getElementById('notif-body-count').textContent = '0';
+      } else { errEl.textContent = data.error || 'Error al enviar'; }
+    } catch(e) { errEl.textContent = 'Error: ' + e.message; }
+    finally { btn.textContent = '📣 Enviar notificación'; btn.disabled = false; }
+  }
 
   function doForgotPass() {
     const email = document.getElementById('adm-email').value.trim();
@@ -861,7 +932,7 @@
   }
 
   function switchTab(tab) {
-    const tabs = ['members','new','staff'];
+    const tabs = ['members','new','staff','notify'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
       const contentEl = document.getElementById('tab-content-'+t);
