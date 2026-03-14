@@ -1,4 +1,4 @@
-const CACHE = 'bepwr-v5';
+const CACHE = 'bepwr-v6';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -16,12 +16,10 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Never cache API calls or Firebase
   if (e.request.url.includes('/api/') || e.request.url.includes('firebase') || e.request.url.includes('firestore')) {
     e.respondWith(fetch(e.request));
     return;
   }
-  // Network first for HTML files — always get fresh version
   if (e.request.url.endsWith('.html') || e.request.url.endsWith('/')) {
     e.respondWith(
       fetch(e.request).then(res => {
@@ -34,5 +32,38 @@ self.addEventListener('fetch', e => {
   }
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
+  );
+});
+
+// ── PUSH NOTIFICATIONS ──────────────────────────────────────────
+self.addEventListener('push', e => {
+  let data = { title: 'bePWR', body: '¡Tienes un mensaje de tu coach!', url: '/' };
+  try { data = { ...data, ...e.data.json() }; } catch(err) {}
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      vibrate: [200, 100, 200],
+      data: { url: data.url || '/' },
+      actions: [
+        { action: 'reservar', title: 'Reservar clase' },
+        { action: 'abrir', title: 'Abrir app' }
+      ]
+    })
+  );
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = e.action === 'reservar'
+    ? 'https://bepwr.com/classes'
+    : (e.notification.data?.url || '/');
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      const existing = list.find(c => c.url.includes('bepwr-app.vercel.app') || c.url.includes('bepwr.com/members'));
+      if (existing) { existing.focus(); existing.navigate(url); }
+      else clients.openWindow(url);
+    })
   );
 });
