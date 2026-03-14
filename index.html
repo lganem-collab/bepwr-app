@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="description" content="Tu progreso, tus métricas, tu poder." />
+  <meta name="description" content="Tu progreso, tus m�tricas, tu poder." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="bePWR" />
@@ -31,6 +31,8 @@
     /* LOGIN */
     #screen-login{position:absolute;inset:0;background:var(--black);display:flex;flex-direction:column;justify-content:center;padding:36px 28px;padding-bottom:calc(36px + var(--safe-bottom));z-index:500;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;transform:translateY(16px)}
     #screen-login.active{opacity:1;pointer-events:all;transform:none}
+    #screen-inactive{position:absolute;inset:0;background:var(--black);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;opacity:0;pointer-events:none;transition:opacity .35s ease}
+    #screen-inactive.active{opacity:1;pointer-events:all}
     .login-logo-img{width:200px;margin:0 auto 8px;display:block}
     .login-tagline{font-size:12px;color:var(--gray);text-align:center;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:48px}
     .field-wrap{margin-bottom:14px}
@@ -180,36 +182,50 @@
 
   <!-- SPLASH -->
   <div id="screen-splash">
-    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
+    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
     <div class="splash-spinner"></div>
   </div>
 
   <!-- LOGIN -->
   <div id="screen-login">
     <div class="login-glow"></div>
-    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
-    <div class="login-tagline">Tu progreso · Tu poder</div>
+    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
+    <div class="login-tagline">Tu progreso � Tu poder</div>
     <div class="field-wrap">
       <label class="field-label">Email</label>
       <input class="field-input" id="inp-email" type="email" placeholder="tu@email.com" autocomplete="email" />
     </div>
     <div class="field-wrap">
-      <label class="field-label">Contraseña</label>
+      <label class="field-label">Contrase�a</label>
       <div style="position:relative">
-        <input class="field-input" id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:48px" />
-        <button onclick="togglePass('inp-pass','eye-login')" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1" id="eye-login">👁</button>
+        <input class="field-input" id="inp-pass" type="password" placeholder="""""""""" autocomplete="current-password" style="padding-right:48px" />
+        <button onclick="togglePass('inp-pass','eye-login')" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1" id="eye-login">=A</button>
       </div>
     </div>
     <button class="login-btn" id="btn-login">Entrar</button>
     <div class="login-error" id="login-error"></div>
-    <div class="login-forgot" id="btn-forgot">¿Olvidaste tu contraseña?</div>
+    <div class="login-forgot" id="btn-forgot">�Olvidaste tu contrase�a?</div>
+  </div>
+
+  <!-- MEMBRESÍA INACTIVA -->
+  <div id="screen-inactive">
+    <div style="text-align:center;max-width:300px">
+      <div style="font-size:52px;margin-bottom:18px">🔒</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRESÍA INACTIVA</div>
+      <div id="inactive-name" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:18px;color:#fff"></div>
+      <div style="font-size:13px;color:#888;line-height:1.75;margin-bottom:28px;font-family:'DM Sans',sans-serif">
+        Tu membresía en bePWR está actualmente pausada. Para volver a acceder a tus métricas, historial y reservas, renueva con nosotros.
+      </div>
+      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">🔓 Renovar membresía</a>
+      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesión</button>
+    </div>
   </div>
 
   <!-- APP -->
   <div id="screen-app">
     <div class="topbar">
       <div style="display:flex;align-items:center">
-        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>®</sup></span></div>
+        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
         <div class="members-badge">MEMBERS</div>
       </div>
       <div class="avatar-btn" id="avatar-initials" onclick="navigate('profile')">?</div>
@@ -228,7 +244,7 @@
           <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
         </div>
 
-        <div class="sec-title">Mis métricas</div>
+        <div class="sec-title">Mis m�tricas</div>
         <div class="metrics-grid" id="metrics-grid">
           <!-- Populated by JS -->
           <div class="m-card wide"><div style="width:100%"><div class="skeleton" style="height:16px;width:40%"></div><div class="skeleton" style="height:12px;width:60%"></div><div class="skeleton" style="height:6px"></div></div></div>
@@ -244,8 +260,8 @@
           <div class="skeleton" style="height:55px"></div>
         </div>
 
-        <div class="sec-title">Acciones rápidas</div>
-        <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank')">→ Reservar una clase</button>
+        <div class="sec-title">Acciones r�pidas</div>
+        <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank')">� Reservar una clase</button>
         <button class="btn-secondary" onclick="navigate('profile')">Ver mi perfil completo</button>
       </div>
 
@@ -254,7 +270,7 @@
         <div class="reserve-hero">
           <div class="reserve-hero-title">AGENDA TU CLASE</div>
           <div class="reserve-hero-sub">Ve los horarios de la semana y reserva tu lugar directamente en bePWR</div>
-          <button class="btn-primary" style="margin-bottom:0;font-size:17px;padding:16px" onclick="window.open('https://bepwr.com/classes','_blank')">Ver clases y reservar →</button>
+          <button class="btn-primary" style="margin-bottom:0;font-size:17px;padding:16px" onclick="window.open('https://bepwr.com/classes','_blank')">Ver clases y reservar �</button>
         </div>
       </div>
 
@@ -268,30 +284,30 @@
         <div class="sec-title">Datos de contacto</div>
         <div class="info-card" id="contact-card">
           <div class="info-row"><div class="info-key">Email</div><div class="info-val" id="prof-email">...</div></div>
-          <div class="info-row"><div class="info-key">Teléfono</div><div class="info-val" id="prof-phone">...</div></div>
+          <div class="info-row"><div class="info-key">Tel�fono</div><div class="info-val" id="prof-phone">...</div></div>
           <div class="info-row"><div class="info-key">Nacimiento</div><div class="info-val" id="prof-dob">...</div></div>
-          <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura">—</div></div>
+          <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura"></div></div>
         </div>
-        <button class="btn-secondary" onclick="openEditModal()">✏️ Editar información</button>
+        <button class="btn-secondary" onclick="openEditModal()"> Editar informaci�n</button>
         <div class="sec-title">Mi objetivo</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
           <div class="info-row"><div class="info-key">Peso inicial</div><div class="info-val" id="prof-peso-ini">...</div></div>
           <div class="info-row"><div class="info-key">Peso meta</div><div class="info-val" id="prof-peso-meta">...</div></div>
         </div>
-        <div class="sec-title">Última valoración</div>
+        <div class="sec-title">�ltima valoraci�n</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Peso</div><div class="info-val" id="val-peso">...</div></div>
-          <div class="info-row"><div class="info-key">Músculo Esquelético</div><div class="info-val" id="val-musculo">...</div></div>
+          <div class="info-row"><div class="info-key">M�sculo Esquel�tico</div><div class="info-val" id="val-musculo">...</div></div>
           <div class="info-row"><div class="info-key">Grasa Corporal</div><div class="info-val" id="val-grasa">...</div></div>
           <div class="info-row"><div class="info-key">IMC</div><div class="info-val" id="val-imc">...</div></div>
           <div class="info-row"><div class="info-key">PGC</div><div class="info-val" id="val-pgc">...</div></div>
           <div class="info-row"><div class="info-key">Grasa Visceral</div><div class="info-val" id="val-grasa-visc">...</div></div>
-          <div class="info-row"><div class="info-key">Calificación Inbody</div><div class="info-val" id="val-calificacion">...</div></div>
+          <div class="info-row"><div class="info-key">Calificaci�n Inbody</div><div class="info-val" id="val-calificacion">...</div></div>
           <div class="info-row"><div class="info-key">Fecha</div><div class="info-val" id="val-fecha">...</div></div>
         </div>
-        <button class="btn-secondary" onclick="openHistorialModal()">📋 Ver historial completo</button>
-        <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+        <button class="btn-secondary" onclick="openHistorialModal()">=� Ver historial completo</button>
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesi�n</button>
       </div>
 
     </div><!-- scroll-area -->
@@ -299,7 +315,7 @@
     <div id="install-banner" class="hidden">
       <div class="install-text"><b>Instala bePWR</b><br>Accede desde tu pantalla de inicio</div>
       <button class="install-btn-el" id="do-install">Instalar</button>
-      <div class="install-close" onclick="this.parentElement.classList.add('hidden')">✕</div>
+      <div class="install-close" onclick="this.parentElement.classList.add('hidden')"></div>
     </div>
 
     <nav class="bottom-nav">
@@ -316,49 +332,49 @@
 
 </div><!-- app -->
 
-  <!-- MODAL EDITAR INFORMACIÓN -->
+  <!-- MODAL EDITAR INFORMACI�N -->
   <div class="modal-overlay" id="modal-edit">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">Editar información</div>
+      <div class="modal-title">Editar informaci�n</div>
       <div class="modal-field"><label>Nombre completo <span style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace">(solo el staff puede modificarlo)</span></label><input type="text" id="edit-nombre" readonly style="color:#666;cursor:not-allowed;background:rgba(255,255,255,0.03)"></div>
       <div class="modal-field"><label>Nuevo email</label><input type="email" id="edit-email" placeholder="tu@email.com"></div>
       <div class="modal-field"><label>Confirmar nuevo email</label><input type="email" id="edit-confirm-email" placeholder="Repite el email"></div>
       <div style="text-align:right;margin-bottom:12px">
         <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar email</button>
       </div>
-      <div class="modal-field"><label>Nuevo teléfono</label><input type="tel" id="edit-tel" placeholder="10 dígitos" maxlength="10"></div>
-      <div class="modal-field"><label>Confirmar teléfono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el teléfono" maxlength="10"></div>
+      <div class="modal-field"><label>Nuevo tel�fono</label><input type="tel" id="edit-tel" placeholder="10 d�gitos" maxlength="10"></div>
+      <div class="modal-field"><label>Confirmar tel�fono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el tel�fono" maxlength="10"></div>
       <div style="text-align:right;margin-bottom:12px">
-        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar teléfono</button>
+        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar tel�fono</button>
       </div>
 
       <hr class="modal-divider">
       <div style="background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:16px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-          <span style="font-size:18px">🔐</span>
-          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contraseña</span>
+          <span style="font-size:18px">=</span>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contrase�a</span>
         </div>
-        <div class="modal-field"><label>Contraseña actual</label>
+        <div class="modal-field"><label>Contrase�a actual</label>
           <div class="pass-input-wrap">
-            <input type="password" id="edit-pass-current" placeholder="••••••••">
-            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">👁</button>
+            <input type="password" id="edit-pass-current" placeholder="""""""""">
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">=A</button>
           </div>
         </div>
-        <div class="modal-field"><label>Nueva contraseña</label>
+        <div class="modal-field"><label>Nueva contrase�a</label>
           <div class="pass-input-wrap">
-            <input type="password" id="edit-pass-new" placeholder="Mínimo 6 caracteres">
-            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">👁</button>
+            <input type="password" id="edit-pass-new" placeholder="M�nimo 6 caracteres">
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">=A</button>
           </div>
         </div>
-        <div class="modal-field"><label>Confirmar nueva contraseña</label>
+        <div class="modal-field"><label>Confirmar nueva contrase�a</label>
           <div class="pass-input-wrap">
-            <input type="password" id="edit-confirm-pass" placeholder="Repite la contraseña">
-            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">👁</button>
+            <input type="password" id="edit-confirm-pass" placeholder="Repite la contrase�a">
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">=A</button>
           </div>
         </div>
         <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
-          Debe tener: mayúscula · minúscula · número · símbolo
+          Debe tener: may�scula � min�scula � n�mero � s�mbolo
         </div>
       </div>
       <div id="edit-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
@@ -377,61 +393,61 @@
     </div>
   </div>
 
-  <!-- MODAL TÉRMINOS Y PRIVACIDAD -->
+  <!-- MODAL T�RMINOS Y PRIVACIDAD -->
   <div class="modal-overlay" id="modal-terminos" style="display:none;z-index:950">
     <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column">
       <div class="modal-handle"></div>
-      <div class="modal-title" style="font-size:18px">Términos y Aviso de Privacidad</div>
-      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">Léelos antes de continuar</div>
+      <div class="modal-title" style="font-size:18px">T�rminos y Aviso de Privacidad</div>
+      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">L�elos antes de continuar</div>
 
       <!-- Scrollable content -->
       <div id="terminos-scroll" style="overflow-y:auto;flex:1;padding-right:4px;font-size:13px;color:#ccc;line-height:1.7">
 
-        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">TÉRMINOS Y CONDICIONES DE USO</div>
+        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">T�RMINOS Y CONDICIONES DE USO</div>
 
-        <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposición de sus miembros la aplicación bePWR (en adelante "la App") sujeta a los siguientes términos:</p>
+        <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposici�n de sus miembros la aplicaci�n bePWR (en adelante "la App") sujeta a los siguientes t�rminos:</p>
 
-        <p><strong>1. ACEPTACIÓN.</strong> Al acceder y usar la App, el usuario acepta plena y expresamente estos Términos. Si no está de acuerdo, debe abstenerse de usar la App.</p>
+        <p><strong>1. ACEPTACI�N.</strong> Al acceder y usar la App, el usuario acepta plena y expresamente estos T�rminos. Si no est� de acuerdo, debe abstenerse de usar la App.</p>
 
         <p><strong>2. USO PERMITIDO.</strong> La App es exclusiva para miembros activos de bePWR. El acceso es personal e intransferible. El usuario se compromete a no compartir sus credenciales con terceros.</p>
 
-        <p><strong>3. INFORMACIÓN DE SALUD.</strong> La información de composición corporal (peso, masa muscular, grasa, IMC, etc.) registrada en la App tiene fines de seguimiento personal. <strong>No constituye diagnóstico médico ni reemplaza la consulta con profesionales de la salud.</strong></p>
+        <p><strong>3. INFORMACI�N DE SALUD.</strong> La informaci�n de composici�n corporal (peso, masa muscular, grasa, IMC, etc.) registrada en la App tiene fines de seguimiento personal. <strong>No constituye diagn�stico m�dico ni reemplaza la consulta con profesionales de la salud.</strong></p>
 
-        <p><strong>4. RECOMENDACIONES DE IA.</strong> Los mensajes generados por inteligencia artificial son orientativos y de carácter motivacional. bePWR no garantiza resultados específicos. Las recomendaciones no sustituyen el criterio de un médico, nutriólogo o entrenador certificado.</p>
+        <p><strong>4. RECOMENDACIONES DE IA.</strong> Los mensajes generados por inteligencia artificial son orientativos y de car�cter motivacional. bePWR no garantiza resultados espec�ficos. Las recomendaciones no sustituyen el criterio de un m�dico, nutri�logo o entrenador certificado.</p>
 
-        <p><strong>5. LIMITACIÓN DE RESPONSABILIDAD.</strong> OPERADORA FIT TERRASOLA no será responsable por: (a) lesiones o daños derivados del ejercicio físico; (b) decisiones tomadas con base en la información de la App; (c) interrupciones del servicio por causas de fuerza mayor o fallas técnicas de terceros; (d) pérdida de datos por causas ajenas a bePWR.</p>
+        <p><strong>5. LIMITACI�N DE RESPONSABILIDAD.</strong> OPERADORA FIT TERRASOLA no ser� responsable por: (a) lesiones o da�os derivados del ejercicio f�sico; (b) decisiones tomadas con base en la informaci�n de la App; (c) interrupciones del servicio por causas de fuerza mayor o fallas t�cnicas de terceros; (d) p�rdida de datos por causas ajenas a bePWR.</p>
 
-        <p><strong>6. PROPIEDAD INTELECTUAL.</strong> El contenido, diseño, marca y software de la App son propiedad exclusiva de OPERADORA FIT TERRASOLA. Queda prohibida su reproducción parcial o total sin autorización escrita.</p>
+        <p><strong>6. PROPIEDAD INTELECTUAL.</strong> El contenido, dise�o, marca y software de la App son propiedad exclusiva de OPERADORA FIT TERRASOLA. Queda prohibida su reproducci�n parcial o total sin autorizaci�n escrita.</p>
 
-        <p><strong>7. MODIFICACIONES.</strong> bePWR se reserva el derecho de modificar estos Términos en cualquier momento. Las modificaciones serán notificadas a través de la App.</p>
+        <p><strong>7. MODIFICACIONES.</strong> bePWR se reserva el derecho de modificar estos T�rminos en cualquier momento. Las modificaciones ser�n notificadas a trav�s de la App.</p>
 
-        <p><strong>8. LEGISLACIÓN APLICABLE.</strong> Estos Términos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Querétaro, Querétaro, renunciando a cualquier otro fuero.</p>
+        <p><strong>8. LEGISLACI�N APLICABLE.</strong> Estos T�rminos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Quer�taro, Quer�taro, renunciando a cualquier otro fuero.</p>
 
         <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin:20px 0 8px">AVISO DE PRIVACIDAD</div>
-        <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</p>
+        <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protecci�n de Datos Personales en Posesi�n de los Particulares (LFPDPPP)</p>
 
-        <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Querétaro, Querétaro, México.</p>
+        <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Quer�taro, Quer�taro, M�xico.</p>
 
-        <p><strong>Datos que recabamos:</strong> Nombre completo, correo electrónico, teléfono, fecha de nacimiento, género, altura y datos de composición corporal (peso, masa muscular, porcentaje de grasa, IMC, grasa visceral y calificación InBody).</p>
+        <p><strong>Datos que recabamos:</strong> Nombre completo, correo electr�nico, tel�fono, fecha de nacimiento, g�nero, altura y datos de composici�n corporal (peso, masa muscular, porcentaje de grasa, IMC, grasa visceral y calificaci�n InBody).</p>
 
-        <p><strong>Finalidades primarias:</strong> (a) Gestionar tu membresía y acceso a la App; (b) Registrar y monitorear tu progreso de composición corporal; (c) Generar mensajes de seguimiento personalizados con apoyo de inteligencia artificial; (d) Contactarte para asuntos relacionados con tu membresía.</p>
+        <p><strong>Finalidades primarias:</strong> (a) Gestionar tu membres�a y acceso a la App; (b) Registrar y monitorear tu progreso de composici�n corporal; (c) Generar mensajes de seguimiento personalizados con apoyo de inteligencia artificial; (d) Contactarte para asuntos relacionados con tu membres�a.</p>
 
-        <p><strong>Finalidades secundarias:</strong> Análisis estadístico interno (datos anonimizados) para mejorar nuestros servicios. Puedes oponerte a estas finalidades enviando un correo a <strong>contacto@bepwr.com</strong>.</p>
+        <p><strong>Finalidades secundarias:</strong> An�lisis estad�stico interno (datos anonimizados) para mejorar nuestros servicios. Puedes oponerte a estas finalidades enviando un correo a <strong>contacto@bepwr.com</strong>.</p>
 
-        <p><strong>Transferencia de datos:</strong> Tus datos no serán transferidos a terceros sin tu consentimiento, salvo obligación legal. Utilizamos servicios de Google Firebase para almacenamiento seguro en la nube, sujetos a sus propias políticas de privacidad.</p>
+        <p><strong>Transferencia de datos:</strong> Tus datos no ser�n transferidos a terceros sin tu consentimiento, salvo obligaci�n legal. Utilizamos servicios de Google Firebase para almacenamiento seguro en la nube, sujetos a sus propias pol�ticas de privacidad.</p>
 
-        <p><strong>Derechos ARCO:</strong> Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos personales. Puedes ejercerlos enviando una solicitud a <strong>contacto@bepwr.com</strong> indicando tu nombre, datos de contacto y descripción del derecho que deseas ejercer. Atenderemos tu solicitud en un plazo máximo de 20 días hábiles.</p>
+        <p><strong>Derechos ARCO:</strong> Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos personales. Puedes ejercerlos enviando una solicitud a <strong>contacto@bepwr.com</strong> indicando tu nombre, datos de contacto y descripci�n del derecho que deseas ejercer. Atenderemos tu solicitud en un plazo m�ximo de 20 d�as h�biles.</p>
 
-        <p><strong>Cambios al aviso:</strong> Cualquier modificación se comunicará a través de la App o al correo registrado en tu cuenta.</p>
+        <p><strong>Cambios al aviso:</strong> Cualquier modificaci�n se comunicar� a trav�s de la App o al correo registrado en tu cuenta.</p>
 
-        <p style="font-size:11px;color:var(--gray)">Fecha de última actualización: Marzo 2026</p>
+        <p style="font-size:11px;color:var(--gray)">Fecha de �ltima actualizaci�n: Marzo 2026</p>
       </div>
 
       <!-- Accept section -->
       <div style="padding-top:16px;border-top:1px solid #2a2a2a;margin-top:12px">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px">
           <input type="checkbox" id="terminos-check" onchange="toggleTerminosBtn()" style="margin-top:3px;accent-color:#FF5C1A;width:18px;height:18px;flex-shrink:0">
-          <span style="font-size:13px;color:#ccc;line-height:1.5">He leído y acepto los Términos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
+          <span style="font-size:13px;color:#ccc;line-height:1.5">He le�do y acepto los T�rminos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
         </label>
         <button class="btn-primary" id="terminos-btn" disabled onclick="aceptarTerminos()" style="opacity:0.4">Aceptar y continuar</button>
       </div>
@@ -442,22 +458,22 @@
   <div class="modal-overlay" id="modal-primer-ingreso" style="display:none;z-index:900">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">Crea tu contraseña</div>
-      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contraseña segura para tu cuenta.</div>
-      <div class="modal-field"><label>Nueva contraseña</label>
+      <div class="modal-title">Crea tu contrase�a</div>
+      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contrase�a segura para tu cuenta.</div>
+      <div class="modal-field"><label>Nueva contrase�a</label>
         <div class="pass-input-wrap">
-          <input type="password" id="primer-pass-new" placeholder="Mínimo 6 caracteres">
-          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-new',this)">👁</button>
+          <input type="password" id="primer-pass-new" placeholder="M�nimo 6 caracteres">
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-new',this)">=A</button>
         </div>
       </div>
-      <div class="modal-field"><label>Confirmar contraseña</label>
+      <div class="modal-field"><label>Confirmar contrase�a</label>
         <div class="pass-input-wrap">
-          <input type="password" id="primer-pass-confirm" placeholder="Repite tu contraseña">
-          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">👁</button>
+          <input type="password" id="primer-pass-confirm" placeholder="Repite tu contrase�a">
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">=A</button>
         </div>
       </div>
       <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:16px">
-        Debe tener: mínimo 6 caracteres · mayúscula · minúscula · número · símbolo (. ! * @ #)
+        Debe tener: m�nimo 6 caracteres � may�scula � min�scula � n�mero � s�mbolo (. ! * @ #)
       </div>
       <div id="primer-pass-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
       <button class="btn-primary" onclick="savePrimerIngreso()">Guardar y entrar</button>
@@ -474,7 +490,7 @@
   import { getMessaging, getToken, onMessage }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
 
-  // ── TU CONFIGURACIÓN DE FIREBASE ──
+  //    TU CONFIGURACI�N DE FIREBASE   
   const firebaseConfig = {
     apiKey: "AIzaSyCB_t4CtXh1G70t9gHuvQkckwdm4U5pv2k",
     authDomain: "bepwr-app.firebaseapp.com",
@@ -498,7 +514,7 @@
     inp.type = inp.type === 'password' ? 'text' : 'password';
   };
 
-  // ── AUTH STATE ──
+  //    AUTH STATE   
   let authReady = false;
   onAuthStateChanged(auth, async user => {
     splash.classList.add('out');
@@ -509,7 +525,7 @@
         if (staffDoc.exists()) {
           await signOut(auth);
           errorEl.style.color = '#f87171';
-          errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administración.';
+          errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administraci�n.';
           appScr.classList.remove('active');
           loginScr.classList.add('active');
           authReady = true;
@@ -525,7 +541,7 @@
       loginScr.classList.remove('active');
       appScr.classList.add('active');
       authReady = true;
-      // Mostrar términos si no han sido aceptados aún
+      // Mostrar t�rminos si no han sido aceptados a�n
       if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
         tModal.style.display = 'flex';
@@ -547,7 +563,7 @@
     }
   });
 
-  // ── LOGIN ──
+  //    LOGIN   
   btnLogin.addEventListener('click', tryLogin);
   document.getElementById('inp-pass').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
   document.getElementById('inp-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('inp-pass').focus(); });
@@ -556,7 +572,7 @@
     const email = document.getElementById('inp-email').value.trim();
     const pass  = document.getElementById('inp-pass').value;
     errorEl.textContent = '';
-    if (!email || !pass) { errorEl.textContent = 'Ingresa tu email y contraseña'; return; }
+    if (!email || !pass) { errorEl.textContent = 'Ingresa tu email y contrase�a'; return; }
     btnLogin.textContent = 'Verificando...';
     btnLogin.disabled = true;
     try {
@@ -564,25 +580,25 @@
     } catch(e) {
       const msgs = {
         'auth/user-not-found': 'No encontramos ese email',
-        'auth/wrong-password': 'Contraseña incorrecta',
-        'auth/invalid-email': 'Email inválido',
-        'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
-        'auth/invalid-credential': 'Email o contraseña incorrectos'
+        'auth/wrong-password': 'Contrase�a incorrecta',
+        'auth/invalid-email': 'Email inv�lido',
+        'auth/too-many-requests': 'Demasiados intentos. Intenta m�s tarde',
+        'auth/invalid-credential': 'Email o contrase�a incorrectos'
       };
-      errorEl.textContent = msgs[e.code] || 'Error al iniciar sesión';
+      errorEl.textContent = msgs[e.code] || 'Error al iniciar sesi�n';
       btnLogin.textContent = 'Entrar';
       btnLogin.disabled = false;
     }
   }
 
-  // ── FORGOT PASSWORD ──
+  //    FORGOT PASSWORD   
   document.getElementById('btn-forgot').addEventListener('click', async () => {
     const email = document.getElementById('inp-email').value.trim();
     if (!email) { errorEl.style.color='#fb923c'; errorEl.textContent = 'Escribe tu email primero'; return; }
     try {
       await sendPasswordResetEmail(auth, email);
       errorEl.style.color = '#4ade80';
-      errorEl.textContent = 'Te enviamos un correo para restablecer tu contraseña';
+      errorEl.textContent = 'Te enviamos un correo para restablecer tu contrase�a';
     } catch(e) {
       errorEl.style.color = '#f87171';
       errorEl.textContent = 'No encontramos ese email';
@@ -590,23 +606,23 @@
     setTimeout(() => { errorEl.style.color='#f87171'; errorEl.textContent=''; }, 4000);
   });
 
-  // ── LOGOUT ──
+  //    LOGOUT   
   window.doLogout = async () => {
     await signOut(auth);
     window.location.reload();
   };
 
-  // ── LOAD USER DATA FROM FIRESTORE ──
+  //    LOAD USER DATA FROM FIRESTORE   
   async function loadUserData(user) {
     try {
       const userRef  = doc(db, 'usuarios', user.uid);
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
-        // Usuario sin datos aún — mostrar nombre del email
+        // Usuario sin datos a�n  mostrar nombre del email
         const nombre = user.email.split('@')[0];
         setGreeting(nombre.toUpperCase(), '');
-        document.getElementById('ai-message').innerHTML = 'Bienvenido a bePWR. Tu perfil está siendo configurado por el staff. 💪';
+        document.getElementById('ai-message').innerHTML = 'Bienvenido a bePWR. Tu perfil est� siendo configurado por el staff. =�';
         renderMetricsEmpty();
         return;
       }
@@ -615,7 +631,7 @@
       if (data.activo === false) {
         await signOut(auth);
         errorEl.style.color = '#f87171';
-        errorEl.textContent = 'Tu membresía está inactiva. Contacta a bePWR para reactivarla.';
+        errorEl.textContent = 'Tu membres�a est� inactiva. Contacta a bePWR para reactivarla.';
         appScr.classList.remove('active');
         loginScr.classList.add('active');
         return;
@@ -631,30 +647,30 @@
       document.getElementById('profile-av').textContent = initials;
       document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
       if (data.alias) {
-        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' · "' + data.alias + '"';
+        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' � "' + data.alias + '"';
       } else {
         document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
       }
       document.getElementById('prof-email').textContent = user.email;
-      document.getElementById('prof-phone').textContent = data.telefono || '—';
-      let edadStr = '—';
+      document.getElementById('prof-phone').textContent = data.telefono || '';
+      let edadStr = '';
       if (data.nacimiento) {
         const hoy = new Date(); const nac = new Date(data.nacimiento);
         let age = hoy.getFullYear() - nac.getFullYear();
         const mm = hoy.getMonth() - nac.getMonth();
         if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) age--;
-        edadStr = age + ' años';
+        edadStr = age + ' a�os';
       }
-      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '—';
-      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '—';
+      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '';
+      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '';
 
       // Objetivo
       const obj = data.objetivo || {};
-      document.getElementById('prof-meta').textContent = obj.meta || '—';
-      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '—';
-      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '—';
+      document.getElementById('prof-meta').textContent = obj.meta || '';
+      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '';
+      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '';
 
-      // Métricas — leer historial
+      // M�tricas  leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');
       const metQ   = query(metRef, orderBy('fecha', 'desc'), limit(7));
       const metSnap = await getDocs(metQ);
@@ -671,12 +687,12 @@
         generateAIMessage(nombre, ultima, obj);
       } else {
         renderMetricsEmpty();
-        document.getElementById('ai-message').innerHTML = '¡Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoración aún no ha sido registrada. Habla con el staff para comenzar. 💪';
+        document.getElementById('ai-message').innerHTML = '�Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci�n a�n no ha sido registrada. Habla con el staff para comenzar. =�';
       }
 
     } catch(err) {
       console.error(err);
-      document.getElementById('ai-message').innerHTML = 'Error cargando datos. Verifica tu conexión.';
+      document.getElementById('ai-message').innerHTML = 'Error cargando datos. Verifica tu conexi�n.';
     }
   }
 
@@ -708,7 +724,7 @@
         <div class="goal-body">
           <div class="m-label">Objetivo</div>
           <div class="goal-title">${obj.meta || 'Meta personal'}</div>
-          <div class="goal-sub">De ${pesoIni} kg → ${pesoMeta} kg</div>
+          <div class="goal-sub">De ${pesoIni} kg � ${pesoMeta} kg</div>
           <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
           <div class="bar-labels"><span>${pesoIni} kg</span><span>${m.peso} actual</span><span>${pesoMeta} kg</span></div>
         </div>
@@ -723,42 +739,42 @@
           <div class="ring-text"><div class="ring-val" style="color:${califColor}">${califPct}</div><div class="ring-lbl">INBODY</div></div>
         </div>
         <div class="goal-body">
-          <div class="m-label">Calificación Inbody</div>
-          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? 'Élite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
+          <div class="m-label">Calificaci�n Inbody</div>
+          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? '�lite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
           <div class="goal-sub">Escala del 1 al 100</div>
           <div class="bar-bg"><div class="bar-fill" style="width:${califPct}%;background:${califColor}"></div></div>
           <div class="bar-labels"><span>0</span><span>${califPct} pts</span><span>100</span></div>
         </div>
       </div>
       <div class="m-card">
-        <div class="m-label">Músculo Esquelético</div>
-        <div class="m-value">${m.musculo || '—'}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medición actual</div>
+        <div class="m-label">M�sculo Esquel�tico</div>
+        <div class="m-value">${m.musculo || ''}<span class="m-unit">kg</span></div>
+        <div class="m-delta green">Medici�n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Corporal</div>
-        <div class="m-value">${m.grasaCorporal || '—'}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medición actual</div>
+        <div class="m-value">${m.grasaCorporal || ''}<span class="m-unit">kg</span></div>
+        <div class="m-delta green">Medici�n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">IMC</div>
-        <div class="m-value">${m.imc || '—'}<span class="m-unit" style="font-size:11px">kg/m²</span></div>
+        <div class="m-value">${m.imc || ''}<span class="m-unit" style="font-size:11px">kg/m�</span></div>
         <div class="m-delta green">${m.imc < 25 ? 'Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
       </div>
       <div class="m-card">
         <div class="m-label">PGC</div>
-        <div class="m-value">${m.pgc || '—'}<span class="m-unit">%</span></div>
-        <div class="m-delta green">Medición actual</div>
+        <div class="m-value">${m.pgc || ''}<span class="m-unit">%</span></div>
+        <div class="m-delta green">Medici�n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Visceral</div>
-        <div class="m-value">${m.grasaVisceral || '—'}</div>
-        <div class="m-delta green">Medición actual</div>
+        <div class="m-value">${m.grasaVisceral || ''}</div>
+        <div class="m-delta green">Medici�n actual</div>
       </div>
       <div class="m-card">
-        <div class="m-label">Calificación Inbody</div>
-        <div class="m-value">${m.calificacion || '—'}<span class="m-unit">/100</span></div>
-        <div class="m-delta green">Medición actual</div>
+        <div class="m-label">Calificaci�n Inbody</div>
+        <div class="m-value">${m.calificacion || ''}<span class="m-unit">/100</span></div>
+        <div class="m-delta green">Medici�n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Peso actual</div>
@@ -771,16 +787,16 @@
     document.getElementById('metrics-grid').innerHTML = `
       <div class="m-card wide" style="justify-content:center;text-align:center;padding:24px">
         <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">
-          Sin métricas registradas aún
+          Sin m�tricas registradas a�n
         </div>
       </div>`;
-    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">Sin historial aún</div>`;
+    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">Sin historial a�n</div>`;
   }
 
   function renderChart(metricas) {
     if (!metricas.length) return;
     const pesos = metricas.map(m => m.peso);
-    const fechas = metricas.map(m => (m.fecha || '').slice(0,3).toUpperCase() || '—');
+    const fechas = metricas.map(m => (m.fecha || '').slice(0,3).toUpperCase() || '');
     const min = Math.min(...pesos), max = Math.max(...pesos);
     const range = max - min || 1;
     const ultima = pesos[pesos.length-1];
@@ -792,7 +808,7 @@
 
     document.getElementById('chart-card').innerHTML = `
       <div class="chart-head">
-        <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">Últimas ${metricas.length} mediciones</div></div>
+        <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">�ltimas ${metricas.length} mediciones</div></div>
         <div class="chart-big">${ultima} <span style="font-size:15px;color:var(--gray)">kg</span></div>
       </div>
       <div class="bars">${barCols}</div>
@@ -801,17 +817,17 @@
 
   function renderProfileMetrics(m) {
     const gc = m.grasaCorporal ?? m.grasaPct;
-    document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : '—';
-    document.getElementById('val-musculo').textContent = m.musculo != null ? m.musculo + ' kg' : '—';
-    document.getElementById('val-grasa').textContent = gc != null ? gc + ' kg' : '—';
-    document.getElementById('val-imc').textContent = m.imc || '—';
-    document.getElementById('val-pgc').textContent = m.pgc != null ? m.pgc + '%' : '—';
-    document.getElementById('val-grasa-visc').textContent = m.grasaVisceral || '—';
-    document.getElementById('val-calificacion').textContent = m.calificacion ? m.calificacion + '/100' : '—';
-    document.getElementById('val-fecha').textContent = m.fecha || '—';
+    document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : '';
+    document.getElementById('val-musculo').textContent = m.musculo != null ? m.musculo + ' kg' : '';
+    document.getElementById('val-grasa').textContent = gc != null ? gc + ' kg' : '';
+    document.getElementById('val-imc').textContent = m.imc || '';
+    document.getElementById('val-pgc').textContent = m.pgc != null ? m.pgc + '%' : '';
+    document.getElementById('val-grasa-visc').textContent = m.grasaVisceral || '';
+    document.getElementById('val-calificacion').textContent = m.calificacion ? m.calificacion + '/100' : '';
+    document.getElementById('val-fecha').textContent = m.fecha || '';
   }
 
-  // ── TÉRMINOS Y AVISO DE PRIVACIDAD ──────────────────────────────
+  //    T�RMINOS Y AVISO DE PRIVACIDAD                               
   window.toggleTerminosBtn = function() {
     const btn = document.getElementById('terminos-btn');
     const checked = document.getElementById('terminos-check').checked;
@@ -830,7 +846,7 @@
         terminosFecha: new Date().toISOString().slice(0,10)
       });
       cachedUserData.terminosAceptados = true;
-      // Cerrar modal términos
+      // Cerrar modal t�rminos
       const tModal = document.getElementById('modal-terminos');
       tModal.classList.remove('active');
       setTimeout(() => { tModal.style.display = 'none'; }, 300);
@@ -849,7 +865,7 @@
     }
   };
 
-  // ── FCM PUSH NOTIFICATIONS ──────────────────────────────────
+  //    FCM PUSH NOTIFICATIONS                                   
   const messaging = getMessaging(app);
   const VAPID_KEY = 'BO7GCvvD-fYQTApeCtt4eWPUuMBAOfMHAtF3B7htcrj8PA1k_19eutw1l4rQTTs-yZwD1lPrCXyqgdn-AJMjSUQ';
 
@@ -878,7 +894,7 @@
     }
   });
 
-  // ── AI MESSAGE — nuevo en cada sesión ──
+  //    AI MESSAGE  nuevo en cada sesi�n   
   async function generateAIMessage(nombre, metrica, objetivo) {
     const el = document.getElementById('ai-message');
     el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
@@ -887,30 +903,30 @@
       const genero = cachedUserData.genero || null;
       const alturaCtx = cachedUserData.altura || null;
       const contextoPersona = [
-        edad ? `tiene ${edad} años` : null,
+        edad ? `tiene ${edad} a�os` : null,
         alturaCtx ? `altura ${alturaCtx}cm` : null,
-        genero && genero !== 'prefiero-no-decir' ? `género ${genero}` : null
+        genero && genero !== 'prefiero-no-decir' ? `g�nero ${genero}` : null
       ].filter(Boolean).join(', ');
 
-      // Hora del día para saludo
+      // Hora del d�a para saludo
       const hora = new Date().getHours();
-      const saludo = hora < 12 ? 'buenos días' : hora < 19 ? 'buenas tardes' : 'buenas noches';
+      const saludo = hora < 12 ? 'buenos d�as' : hora < 19 ? 'buenas tardes' : 'buenas noches';
 
-      const prompt = `Eres el coach experto de bePWR, un studio de fitness en Querétaro, México, especializado en entrenamiento funcional de alto rendimiento. Hablas con autoridad científica, eres directo, motivador y profesional.
+      const prompt = `Eres el coach experto de bePWR, un studio de fitness en Quer�taro, M�xico, especializado en entrenamiento funcional de alto rendimiento. Hablas con autoridad cient�fica, eres directo, motivador y profesional.
 
 Es de ${saludo} (hora local: ${new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'})}).
 Miembro: ${nombre}${contextoPersona ? ' ('+contextoPersona+')' : ''}.
-Métricas actuales: peso ${metrica.peso}kg, músculo esquelético ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificación InBody ${metrica.calificacion}/100.
-Objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg → ${objetivo.pesoMeta}kg.
-${edad && edad >= 50 ? 'Nota: mayores de 50 — priorizar preservación muscular, movilidad y fuerza funcional sobre cardio intenso.' : ''}
+M�tricas actuales: peso ${metrica.peso}kg, m�sculo esquel�tico ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificaci�n InBody ${metrica.calificacion}/100.
+Objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg � ${objetivo.pesoMeta}kg.
+${edad && edad >= 50 ? 'Nota: mayores de 50  priorizar preservaci�n muscular, movilidad y fuerza funcional sobre cardio intenso.' : ''}
 
-Genera un mensaje Único, fresco y variado (máximo 4 oraciones):
+Genera un mensaje �nico, fresco y variado (m�ximo 4 oraciones):
 1. Inicia con el saludo apropiado (${saludo}) usando el nombre del miembro.
-2. Elige UNO de estos enfoques al azar: dato científico sobre ejercicio funcional, consejo de hidratación específico, hábito de sueño y recuperación, consejo nutricional concreto, beneficio de alguna disciplina deportiva complementaria (yoga, natación, ciclismo, etc.), o dato sobre el clima de Querétaro relacionado con el entrenamiento o hidratación.
-3. Conecta ese consejo con al menos uno de sus datos de métricas.
+2. Elige UNO de estos enfoques al azar: dato cient�fico sobre ejercicio funcional, consejo de hidrataci�n espec�fico, h�bito de sue�o y recuperaci�n, consejo nutricional concreto, beneficio de alguna disciplina deportiva complementaria (yoga, nataci�n, ciclismo, etc.), o dato sobre el clima de Quer�taro relacionado con el entrenamiento o hidrataci�n.
+3. Conecta ese consejo con al menos uno de sus datos de m�tricas.
 4. Cierra con una frase motivadora y profesional alineada a su objetivo.
-5. De forma natural, invita a reservar su próxima clase en bePWR, mencionando que lo ideal es entrenar de 2 a 4 sesiones por semana.
-Varía el tono en cada mensaje. Responde SOLO el mensaje en español, sin comillas, sin bullets, sin encabezados.`;
+5. De forma natural, invita a reservar su pr�xima clase en bePWR, mencionando que lo ideal es entrenar de 2 a 4 sesiones por semana.
+Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comillas, sin bullets, sin encabezados.`;
 
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -925,25 +941,25 @@ Varía el tono en cada mensaje. Responde SOLO el mensaje en español, sin comill
         el.innerHTML = htmlMsg;
 
       } else {
-        el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
+        el.innerHTML = '�Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi�n te acerca m�s a tu meta. =�';
       }
     } catch(e) {
       console.error('AI Error:', e);
-      el.innerHTML = '¡Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesión te acerca más a tu meta. 💪';
+      el.innerHTML = '�Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi�n te acerca m�s a tu meta. =�';
     }
   }
 
-  // ── MODAL HELPERS ──
+  //    MODAL HELPERS   
   window.closeModal = (id) => {
     document.getElementById(id).classList.remove('active');
   };
   window.toggleModalPass = (inputId, btn) => {
     const inp = document.getElementById(inputId);
     inp.type = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+    btn.textContent = inp.type === 'password' ? '=A' : '=H';
   };
 
-  // ── MODAL EDITAR INFORMACIÓN ──
+  //    MODAL EDITAR INFORMACI�N   
   let cachedUserData = {};
   window.openEditModal = () => {
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
@@ -970,58 +986,58 @@ Varía el tono en cada mensaje. Responde SOLO el mensaje en español, sin comill
       // Guardar datos en Firestore
       // nombre no se edita aqui, solo el staff puede cambiarlo
       if (cachedUserData.alias) {
-        document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' · "' + cachedUserData.alias + '"';
+        document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' � "' + cachedUserData.alias + '"';
       }
-      // Cambiar contraseña si se llenaron los campos
+      // Cambiar contrase�a si se llenaron los campos
       const passConfirm = document.getElementById('edit-confirm-pass').value;
       if (passCurrent || passNew) {
-        if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual'; return; }
-        if (!passNew) { errEl.textContent = 'Escribe la nueva contraseña'; return; }
+        if (!passCurrent) { errEl.textContent = 'Escribe tu contrase�a actual'; return; }
+        if (!passNew) { errEl.textContent = 'Escribe la nueva contrase�a'; return; }
         const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-        if (!passRegex.test(passNew)) { errEl.textContent = 'La contraseña debe tener mayúscula, minúscula, número y un símbolo'; return; }
-        if (passNew !== passConfirm) { errEl.textContent = 'Las contraseñas no coinciden'; return; }
+        if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase�a debe tener may�scula, min�scula, n�mero y un s�mbolo'; return; }
+        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase�as no coinciden'; return; }
         const cred = EmailAuthProvider.credential(user.email, passCurrent);
         await reauthenticateWithCredential(user, cred);
         await updatePassword(user, passNew);
       }
       errEl.style.color = '#4ade80';
-      errEl.textContent = '¡Cambios guardados!';
+      errEl.textContent = '�Cambios guardados!';
       setTimeout(() => closeModal('modal-edit'), 1200);
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contraseña actual incorrecta';
+        errEl.textContent = 'Contrase�a actual incorrecta';
       } else {
         errEl.textContent = 'Error al guardar: ' + e.message;
       }
     }
   };
 
-  // ── MODAL HISTORIAL ──
+  //    MODAL HISTORIAL   
   let cachedMetricas = [];
   window.openHistorialModal = () => {
     const list = document.getElementById('historial-list');
     if (!cachedMetricas.length) {
-      list.innerHTML = '<div style="text-align:center;color:var(--gray);padding:20px;font-family:Space Mono,monospace;font-size:12px">Sin historial registrado aún</div>';
+      list.innerHTML = '<div style="text-align:center;color:var(--gray);padding:20px;font-family:Space Mono,monospace;font-size:12px">Sin historial registrado a�n</div>';
     } else {
       list.innerHTML = [...cachedMetricas].reverse().map(m => `
         <div class="hist-row" style="flex-direction:column">
-          <div class="hist-date">${m.fecha || '—'}</div>
+          <div class="hist-date">${m.fecha || ''}</div>
           <div class="hist-metrics">
-            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : '—'}</span></div>
-            <div class="hist-metric">Músculo <span>${m.musculo ? m.musculo+' kg' : '—'}</span></div>
-            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : '—'}</span></div>
-            <div class="hist-metric">IMC <span>${m.imc || '—'}</span></div>
-            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : '—'}</span></div>
-            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || '—'}</span></div>
-            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : '—'}</span></div>
+            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : ''}</span></div>
+            <div class="hist-metric">M�sculo <span>${m.musculo ? m.musculo+' kg' : ''}</span></div>
+            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : ''}</span></div>
+            <div class="hist-metric">IMC <span>${m.imc || ''}</span></div>
+            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : ''}</span></div>
+            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || ''}</span></div>
+            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : ''}</span></div>
           </div>
         </div>`).join('');
     }
     document.getElementById('modal-historial').classList.add('active');
   };
 
-  // ── PRIMER INGRESO ──
+  //    PRIMER INGRESO   
   window.savePrimerIngreso = async () => {
     const errEl = document.getElementById('primer-pass-error');
     const passNew = document.getElementById('primer-pass-new').value;
@@ -1029,11 +1045,11 @@ Varía el tono en cada mensaje. Responde SOLO el mensaje en español, sin comill
     errEl.textContent = '';
 
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-    if (!passNew) { errEl.textContent = 'Escribe tu nueva contraseña'; return; }
+    if (!passNew) { errEl.textContent = 'Escribe tu nueva contrase�a'; return; }
     if (!passRegex.test(passNew)) { 
-      errEl.textContent = 'Debe tener mayúscula, minúscula, número y un símbolo'; return; 
+      errEl.textContent = 'Debe tener may�scula, min�scula, n�mero y un s�mbolo'; return; 
     }
-    if (passNew !== passConfirm) { errEl.textContent = 'Las contraseñas no coinciden'; return; }
+    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase�as no coinciden'; return; }
 
     try {
       const user = auth.currentUser;
@@ -1048,7 +1064,7 @@ Varía el tono en cada mensaje. Responde SOLO el mensaje en español, sin comill
     }
   };
 
-  // ── CONFIRMAR EMAIL ──
+  //    CONFIRMAR EMAIL   
   window.confirmEmailChange = async () => {
     const newEmail = document.getElementById('edit-email').value.trim();
     const confirmEmail = document.getElementById('edit-confirm-email').value.trim();
@@ -1056,51 +1072,51 @@ Varía el tono en cada mensaje. Responde SOLO el mensaje en español, sin comill
     errEl.style.color = '#f87171';
     errEl.textContent = '';
     if (!newEmail) { errEl.textContent = 'Escribe el nuevo email'; return; }
-    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inválido'; return; }
+    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inv�lido'; return; }
     if (newEmail !== confirmEmail) { errEl.textContent = 'Los emails no coinciden'; return; }
     if (newEmail === auth.currentUser?.email) { errEl.textContent = 'Es el mismo email actual'; return; }
     const passCurrent = document.getElementById('edit-pass-current').value;
-    if (!passCurrent) { errEl.textContent = 'Escribe tu contraseña actual (sección de abajo) para cambiar el email'; return; }
+    if (!passCurrent) { errEl.textContent = 'Escribe tu contrase�a actual (secci�n de abajo) para cambiar el email'; return; }
     try {
       const cred = EmailAuthProvider.credential(auth.currentUser.email, passCurrent);
       await reauthenticateWithCredential(auth.currentUser, cred);
       await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Se envió verificación a ' + newEmail + '. Confirma para que aplique.';
+      errEl.textContent = 'Se envi� verificaci�n a ' + newEmail + '. Confirma para que aplique.';
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contraseña actual incorrecta';
+        errEl.textContent = 'Contrase�a actual incorrecta';
       } else {
         errEl.textContent = 'Error: ' + e.message;
       }
     }
   };
 
-  // ── CONFIRMAR TELÉFONO ──
+  //    CONFIRMAR TEL�FONO   
   window.confirmTelChange = async () => {
     const newTel = document.getElementById('edit-tel').value.trim();
     const confirmTel = document.getElementById('edit-confirm-tel').value.trim();
     const errEl = document.getElementById('edit-error');
     errEl.style.color = '#f87171';
     errEl.textContent = '';
-    if (!newTel) { errEl.textContent = 'Escribe el nuevo teléfono'; return; }
-    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El teléfono debe tener exactamente 10 dígitos'; return; }
-    if (newTel !== confirmTel) { errEl.textContent = 'Los teléfonos no coinciden'; return; }
+    if (!newTel) { errEl.textContent = 'Escribe el nuevo tel�fono'; return; }
+    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel�fono debe tener exactamente 10 d�gitos'; return; }
+    if (newTel !== confirmTel) { errEl.textContent = 'Los tel�fonos no coinciden'; return; }
     try {
       const user = auth.currentUser;
       await updateDoc(doc(db, 'usuarios', user.uid), { telefono: newTel });
       cachedUserData = { ...cachedUserData, telefono: newTel };
       document.getElementById('prof-phone').textContent = newTel;
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Teléfono actualizado ✓';
+      errEl.textContent = 'Tel�fono actualizado ';
     } catch(e) {
       errEl.style.color = '#f87171';
       errEl.textContent = 'Error: ' + e.message;
     }
   };
 
-  // ── PWA INSTALL ──
+  //    PWA INSTALL   
   let deferredPrompt;
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault(); deferredPrompt = e;
