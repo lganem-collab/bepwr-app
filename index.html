@@ -196,7 +196,7 @@
       <input class="field-input" id="inp-email" type="email" placeholder="tu@email.com" autocomplete="email" />
     </div>
     <div class="field-wrap">
-      <label class="field-label">Contrase\u00F1a</label>
+      <label class="field-label">Contrase&#x00F1;a</label>
       <div style="position:relative">
         <input class="field-input" id="inp-pass" type="password" placeholder="""""""""" autocomplete="current-password" style="padding-right:48px" />
         <button onclick="togglePass('inp-pass','eye-login')" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1" id="eye-login">=A</button>
@@ -204,20 +204,20 @@
     </div>
     <button class="login-btn" id="btn-login">Entrar</button>
     <div class="login-error" id="login-error"></div>
-    <div class="login-forgot" id="btn-forgot">&#xBF;Olvidaste tu contrase\u00F1a?</div>
+    <div class="login-forgot" id="btn-forgot">&#xBF;Olvidaste tu contrase&#x00F1;a?</div>
   </div>
 
-  <!-- MEMBRES\u00CDA INACTIVA -->
+  <!-- MEMBRES&#x00CD;A INACTIVA -->
   <div id="screen-inactive">
     <div style="text-align:center;max-width:300px">
       <div style="font-size:52px;margin-bottom:18px">&#x1F512;</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRES\u00CDA INACTIVA</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRES&#x00CD;A INACTIVA</div>
       <div id="inactive-name" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:18px;color:#fff"></div>
       <div style="font-size:13px;color:#888;line-height:1.75;margin-bottom:28px;font-family:'DM Sans',sans-serif">
-        Tu membres\u00EDa en bePWR est\u00E1 actualmente pausada. Para volver a acceder a tus m\u00E9tricas, historial y reservas, renueva con nosotros.
+        Tu membres&#x00ED;a en bePWR est&#x00E1; actualmente pausada. Para volver a acceder a tus m&#x00E9;tricas, historial y reservas, renueva con nosotros.
       </div>
-      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">&#x1F513; Renovar membres\u00EDa</a>
-      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesi\u00F3n</button>
+      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">&#x1F513; Renovar membres&#x00ED;a</a>
+      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesi&#x00F3;n</button>
     </div>
   </div>
 
@@ -244,7 +244,7 @@
           <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
         </div>
 
-        <div class="sec-title">Mis m\u00E9tricas</div>
+        <div class="sec-title">Mis m&#x00E9;tricas</div>
         <div class="metrics-grid" id="metrics-grid">
           <!-- Populated by JS -->
           <div class="m-card wide"><div style="width:100%"><div class="skeleton" style="height:16px;width:40%"></div><div class="skeleton" style="height:12px;width:60%"></div><div class="skeleton" style="height:6px"></div></div></div>
@@ -260,7 +260,7 @@
           <div class="skeleton" style="height:55px"></div>
         </div>
 
-        <div class="sec-title">Acciones r\u00E1pidas</div>
+        <div class="sec-title">Acciones r&#x00E1;pidas</div>
         <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank')">&#x2192; Reservar una clase</button>
         <button class="btn-secondary" onclick="navigate('profile')">Ver mi perfil completo</button>
       </div>
@@ -284,30 +284,30 @@
         <div class="sec-title">Datos de contacto</div>
         <div class="info-card" id="contact-card">
           <div class="info-row"><div class="info-key">Email</div><div class="info-val" id="prof-email">...</div></div>
-          <div class="info-row"><div class="info-key">Tel\u00E9fono</div><div class="info-val" id="prof-phone">...</div></div>
+          <div class="info-row"><div class="info-key">Tel&#x00E9;fono</div><div class="info-val" id="prof-phone">...</div></div>
           <div class="info-row"><div class="info-key">Nacimiento</div><div class="info-val" id="prof-dob">...</div></div>
-          <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura">\u2014</div></div>
+          <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura">&#x2014;</div></div>
         </div>
-        <button class="btn-secondary" onclick="openEditModal()">\u270F\uFE0F Editar informaci\u00F3n</button>
+        <button class="btn-secondary" onclick="openEditModal()">&#x270F;&#xFE0F; Editar informaci&#x00F3;n</button>
         <div class="sec-title">Mi objetivo</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
           <div class="info-row"><div class="info-key">Peso inicial</div><div class="info-val" id="prof-peso-ini">...</div></div>
           <div class="info-row"><div class="info-key">Peso meta</div><div class="info-val" id="prof-peso-meta">...</div></div>
         </div>
-        <div class="sec-title">\u00DAltima valoraci\u00F3n</div>
+        <div class="sec-title">&#x00DA;ltima valoraci&#x00F3;n</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Peso</div><div class="info-val" id="val-peso">...</div></div>
-          <div class="info-row"><div class="info-key">M\u00FAsculo Esquel\u00E9tico</div><div class="info-val" id="val-musculo">...</div></div>
+          <div class="info-row"><div class="info-key">M&#x00FA;sculo Esquel&#x00E9;tico</div><div class="info-val" id="val-musculo">...</div></div>
           <div class="info-row"><div class="info-key">Grasa Corporal</div><div class="info-val" id="val-grasa">...</div></div>
           <div class="info-row"><div class="info-key">IMC</div><div class="info-val" id="val-imc">...</div></div>
           <div class="info-row"><div class="info-key">PGC</div><div class="info-val" id="val-pgc">...</div></div>
           <div class="info-row"><div class="info-key">Grasa Visceral</div><div class="info-val" id="val-grasa-visc">...</div></div>
-          <div class="info-row"><div class="info-key">Calificaci\u00F3n Inbody</div><div class="info-val" id="val-calificacion">...</div></div>
+          <div class="info-row"><div class="info-key">Calificaci&#x00F3;n Inbody</div><div class="info-val" id="val-calificacion">...</div></div>
           <div class="info-row"><div class="info-key">Fecha</div><div class="info-val" id="val-fecha">...</div></div>
         </div>
         <button class="btn-secondary" onclick="openHistorialModal()">=&#x1F4CB; Ver historial completo</button>
-        <button class="logout-btn" onclick="doLogout()">Cerrar sesi\u00F3n</button>
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesi&#x00F3;n</button>
       </div>
 
     </div><!-- scroll-area -->
@@ -332,49 +332,49 @@
 
 </div><!-- app -->
 
-  <!-- MODAL EDITAR INFORMACI\u00D3N -->
+  <!-- MODAL EDITAR INFORMACI&#x00D3;N -->
   <div class="modal-overlay" id="modal-edit">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">Editar informaci\u00F3n</div>
+      <div class="modal-title">Editar informaci&#x00F3;n</div>
       <div class="modal-field"><label>Nombre completo <span style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace">(solo el staff puede modificarlo)</span></label><input type="text" id="edit-nombre" readonly style="color:#666;cursor:not-allowed;background:rgba(255,255,255,0.03)"></div>
       <div class="modal-field"><label>Nuevo email</label><input type="email" id="edit-email" placeholder="tu@email.com"></div>
       <div class="modal-field"><label>Confirmar nuevo email</label><input type="email" id="edit-confirm-email" placeholder="Repite el email"></div>
       <div style="text-align:right;margin-bottom:12px">
         <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar email</button>
       </div>
-      <div class="modal-field"><label>Nuevo tel\u00E9fono</label><input type="tel" id="edit-tel" placeholder="10 d\u00EDgitos" maxlength="10"></div>
-      <div class="modal-field"><label>Confirmar tel\u00E9fono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el tel\u00E9fono" maxlength="10"></div>
+      <div class="modal-field"><label>Nuevo tel&#x00E9;fono</label><input type="tel" id="edit-tel" placeholder="10 d&#x00ED;gitos" maxlength="10"></div>
+      <div class="modal-field"><label>Confirmar tel&#x00E9;fono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el tel&#x00E9;fono" maxlength="10"></div>
       <div style="text-align:right;margin-bottom:12px">
-        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar tel\u00E9fono</button>
+        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar tel&#x00E9;fono</button>
       </div>
 
       <hr class="modal-divider">
       <div style="background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:16px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span style="font-size:18px">=</span>
-          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contrase\u00F1a</span>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contrase&#x00F1;a</span>
         </div>
-        <div class="modal-field"><label>Contrase\u00F1a actual</label>
+        <div class="modal-field"><label>Contrase&#x00F1;a actual</label>
           <div class="pass-input-wrap">
             <input type="password" id="edit-pass-current" placeholder="""""""""">
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">=A</button>
           </div>
         </div>
-        <div class="modal-field"><label>Nueva contrase\u00F1a</label>
+        <div class="modal-field"><label>Nueva contrase&#x00F1;a</label>
           <div class="pass-input-wrap">
-            <input type="password" id="edit-pass-new" placeholder="M\u00EDnimo 6 caracteres">
+            <input type="password" id="edit-pass-new" placeholder="M&#x00ED;nimo 6 caracteres">
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">=A</button>
           </div>
         </div>
-        <div class="modal-field"><label>Confirmar nueva contrase\u00F1a</label>
+        <div class="modal-field"><label>Confirmar nueva contrase&#x00F1;a</label>
           <div class="pass-input-wrap">
-            <input type="password" id="edit-confirm-pass" placeholder="Repite la contrase\u00F1a">
+            <input type="password" id="edit-confirm-pass" placeholder="Repite la contrase&#x00F1;a">
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">=A</button>
           </div>
         </div>
         <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
-          Debe tener: may\u00FAscula &#xB7; min\u00FAscula &#xB7; n\u00FAmero &#xB7; s\u00EDmbolo
+          Debe tener: may&#x00FA;scula &#xB7; min&#x00FA;scula &#xB7; n&#x00FA;mero &#xB7; s&#x00ED;mbolo
         </div>
       </div>
       <div id="edit-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
@@ -393,61 +393,61 @@
     </div>
   </div>
 
-  <!-- MODAL T\u00C9RMINOS Y PRIVACIDAD -->
+  <!-- MODAL T&#x00C9;RMINOS Y PRIVACIDAD -->
   <div class="modal-overlay" id="modal-terminos" style="display:none;z-index:950">
     <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column">
       <div class="modal-handle"></div>
-      <div class="modal-title" style="font-size:18px">T\u00E9rminos y Aviso de Privacidad</div>
-      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">L\u00E9elos antes de continuar</div>
+      <div class="modal-title" style="font-size:18px">T&#x00E9;rminos y Aviso de Privacidad</div>
+      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">L&#x00E9;elos antes de continuar</div>
 
       <!-- Scrollable content -->
       <div id="terminos-scroll" style="overflow-y:auto;flex:1;padding-right:4px;font-size:13px;color:#ccc;line-height:1.7">
 
-        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">T\u00C9RMINOS Y CONDICIONES DE USO</div>
+        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">T&#x00C9;RMINOS Y CONDICIONES DE USO</div>
 
-        <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposici\u00F3n de sus miembros la aplicaci\u00F3n bePWR (en adelante "la App") sujeta a los siguientes t\u00E9rminos:</p>
+        <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposici&#x00F3;n de sus miembros la aplicaci&#x00F3;n bePWR (en adelante "la App") sujeta a los siguientes t&#x00E9;rminos:</p>
 
-        <p><strong>1. ACEPTACI\u00D3N.</strong> Al acceder y usar la App, el usuario acepta plena y expresamente estos T\u00E9rminos. Si no est\u00E1 de acuerdo, debe abstenerse de usar la App.</p>
+        <p><strong>1. ACEPTACI&#x00D3;N.</strong> Al acceder y usar la App, el usuario acepta plena y expresamente estos T&#x00E9;rminos. Si no est&#x00E1; de acuerdo, debe abstenerse de usar la App.</p>
 
         <p><strong>2. USO PERMITIDO.</strong> La App es exclusiva para miembros activos de bePWR. El acceso es personal e intransferible. El usuario se compromete a no compartir sus credenciales con terceros.</p>
 
-        <p><strong>3. INFORMACI\u00D3N DE SALUD.</strong> La informaci\u00F3n de composici\u00F3n corporal (peso, masa muscular, grasa, IMC, etc.) registrada en la App tiene fines de seguimiento personal. <strong>No constituye diagn\u00F3stico m\u00E9dico ni reemplaza la consulta con profesionales de la salud.</strong></p>
+        <p><strong>3. INFORMACI&#x00D3;N DE SALUD.</strong> La informaci&#x00F3;n de composici&#x00F3;n corporal (peso, masa muscular, grasa, IMC, etc.) registrada en la App tiene fines de seguimiento personal. <strong>No constituye diagn&#x00F3;stico m&#x00E9;dico ni reemplaza la consulta con profesionales de la salud.</strong></p>
 
-        <p><strong>4. RECOMENDACIONES DE IA.</strong> Los mensajes generados por inteligencia artificial son orientativos y de car\u00E1cter motivacional. bePWR no garantiza resultados espec\u00EDficos. Las recomendaciones no sustituyen el criterio de un m\u00E9dico, nutri\u00F3logo o entrenador certificado.</p>
+        <p><strong>4. RECOMENDACIONES DE IA.</strong> Los mensajes generados por inteligencia artificial son orientativos y de car&#x00E1;cter motivacional. bePWR no garantiza resultados espec&#x00ED;ficos. Las recomendaciones no sustituyen el criterio de un m&#x00E9;dico, nutri&#x00F3;logo o entrenador certificado.</p>
 
-        <p><strong>5. LIMITACI\u00D3N DE RESPONSABILIDAD.</strong> OPERADORA FIT TERRASOLA no ser\u00E1 responsable por: (a) lesiones o da\u00F1os derivados del ejercicio f\u00EDsico; (b) decisiones tomadas con base en la informaci\u00F3n de la App; (c) interrupciones del servicio por causas de fuerza mayor o fallas t\u00E9cnicas de terceros; (d) p\u00E9rdida de datos por causas ajenas a bePWR.</p>
+        <p><strong>5. LIMITACI&#x00D3;N DE RESPONSABILIDAD.</strong> OPERADORA FIT TERRASOLA no ser&#x00E1; responsable por: (a) lesiones o da&#x00F1;os derivados del ejercicio f&#x00ED;sico; (b) decisiones tomadas con base en la informaci&#x00F3;n de la App; (c) interrupciones del servicio por causas de fuerza mayor o fallas t&#x00E9;cnicas de terceros; (d) p&#x00E9;rdida de datos por causas ajenas a bePWR.</p>
 
-        <p><strong>6. PROPIEDAD INTELECTUAL.</strong> El contenido, dise\u00F1o, marca y software de la App son propiedad exclusiva de OPERADORA FIT TERRASOLA. Queda prohibida su reproducci\u00F3n parcial o total sin autorizaci\u00F3n escrita.</p>
+        <p><strong>6. PROPIEDAD INTELECTUAL.</strong> El contenido, dise&#x00F1;o, marca y software de la App son propiedad exclusiva de OPERADORA FIT TERRASOLA. Queda prohibida su reproducci&#x00F3;n parcial o total sin autorizaci&#x00F3;n escrita.</p>
 
-        <p><strong>7. MODIFICACIONES.</strong> bePWR se reserva el derecho de modificar estos T\u00E9rminos en cualquier momento. Las modificaciones ser\u00E1n notificadas a trav\u00E9s de la App.</p>
+        <p><strong>7. MODIFICACIONES.</strong> bePWR se reserva el derecho de modificar estos T&#x00E9;rminos en cualquier momento. Las modificaciones ser&#x00E1;n notificadas a trav&#x00E9;s de la App.</p>
 
-        <p><strong>8. LEGISLACI\u00D3N APLICABLE.</strong> Estos T\u00E9rminos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Quer\u00E9taro, Quer\u00E9taro, renunciando a cualquier otro fuero.</p>
+        <p><strong>8. LEGISLACI&#x00D3;N APLICABLE.</strong> Estos T&#x00E9;rminos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Quer&#x00E9;taro, Quer&#x00E9;taro, renunciando a cualquier otro fuero.</p>
 
         <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin:20px 0 8px">AVISO DE PRIVACIDAD</div>
-        <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protecci\u00F3n de Datos Personales en Posesi\u00F3n de los Particulares (LFPDPPP)</p>
+        <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protecci&#x00F3;n de Datos Personales en Posesi&#x00F3;n de los Particulares (LFPDPPP)</p>
 
-        <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Quer\u00E9taro, Quer\u00E9taro, M\u00E9xico.</p>
+        <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Quer&#x00E9;taro, Quer&#x00E9;taro, M&#x00E9;xico.</p>
 
-        <p><strong>Datos que recabamos:</strong> Nombre completo, correo electr\u00F3nico, tel\u00E9fono, fecha de nacimiento, g\u00E9nero, altura y datos de composici\u00F3n corporal (peso, masa muscular, porcentaje de grasa, IMC, grasa visceral y calificaci\u00F3n InBody).</p>
+        <p><strong>Datos que recabamos:</strong> Nombre completo, correo electr&#x00F3;nico, tel&#x00E9;fono, fecha de nacimiento, g&#x00E9;nero, altura y datos de composici&#x00F3;n corporal (peso, masa muscular, porcentaje de grasa, IMC, grasa visceral y calificaci&#x00F3;n InBody).</p>
 
-        <p><strong>Finalidades primarias:</strong> (a) Gestionar tu membres\u00EDa y acceso a la App; (b) Registrar y monitorear tu progreso de composici\u00F3n corporal; (c) Generar mensajes de seguimiento personalizados con apoyo de inteligencia artificial; (d) Contactarte para asuntos relacionados con tu membres\u00EDa.</p>
+        <p><strong>Finalidades primarias:</strong> (a) Gestionar tu membres&#x00ED;a y acceso a la App; (b) Registrar y monitorear tu progreso de composici&#x00F3;n corporal; (c) Generar mensajes de seguimiento personalizados con apoyo de inteligencia artificial; (d) Contactarte para asuntos relacionados con tu membres&#x00ED;a.</p>
 
-        <p><strong>Finalidades secundarias:</strong> An\u00E1lisis estad\u00EDstico interno (datos anonimizados) para mejorar nuestros servicios. Puedes oponerte a estas finalidades enviando un correo a <strong>contacto@bepwr.com</strong>.</p>
+        <p><strong>Finalidades secundarias:</strong> An&#x00E1;lisis estad&#x00ED;stico interno (datos anonimizados) para mejorar nuestros servicios. Puedes oponerte a estas finalidades enviando un correo a <strong>contacto@bepwr.com</strong>.</p>
 
-        <p><strong>Transferencia de datos:</strong> Tus datos no ser\u00E1n transferidos a terceros sin tu consentimiento, salvo obligaci\u00F3n legal. Utilizamos servicios de Google Firebase para almacenamiento seguro en la nube, sujetos a sus propias pol\u00EDticas de privacidad.</p>
+        <p><strong>Transferencia de datos:</strong> Tus datos no ser&#x00E1;n transferidos a terceros sin tu consentimiento, salvo obligaci&#x00F3;n legal. Utilizamos servicios de Google Firebase para almacenamiento seguro en la nube, sujetos a sus propias pol&#x00ED;ticas de privacidad.</p>
 
-        <p><strong>Derechos ARCO:</strong> Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos personales. Puedes ejercerlos enviando una solicitud a <strong>contacto@bepwr.com</strong> indicando tu nombre, datos de contacto y descripci\u00F3n del derecho que deseas ejercer. Atenderemos tu solicitud en un plazo m\u00E1ximo de 20 d\u00EDas h\u00E1biles.</p>
+        <p><strong>Derechos ARCO:</strong> Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos personales. Puedes ejercerlos enviando una solicitud a <strong>contacto@bepwr.com</strong> indicando tu nombre, datos de contacto y descripci&#x00F3;n del derecho que deseas ejercer. Atenderemos tu solicitud en un plazo m&#x00E1;ximo de 20 d&#x00ED;as h&#x00E1;biles.</p>
 
-        <p><strong>Cambios al aviso:</strong> Cualquier modificaci\u00F3n se comunicar\u00E1 a trav\u00E9s de la App o al correo registrado en tu cuenta.</p>
+        <p><strong>Cambios al aviso:</strong> Cualquier modificaci&#x00F3;n se comunicar&#x00E1; a trav&#x00E9;s de la App o al correo registrado en tu cuenta.</p>
 
-        <p style="font-size:11px;color:var(--gray)">Fecha de \u00FAltima actualizaci\u00F3n: Marzo 2026</p>
+        <p style="font-size:11px;color:var(--gray)">Fecha de &#x00FA;ltima actualizaci&#x00F3;n: Marzo 2026</p>
       </div>
 
       <!-- Accept section -->
       <div style="padding-top:16px;border-top:1px solid #2a2a2a;margin-top:12px">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px">
           <input type="checkbox" id="terminos-check" onchange="toggleTerminosBtn()" style="margin-top:3px;accent-color:#FF5C1A;width:18px;height:18px;flex-shrink:0">
-          <span style="font-size:13px;color:#ccc;line-height:1.5">He le\u00EDdo y acepto los T\u00E9rminos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
+          <span style="font-size:13px;color:#ccc;line-height:1.5">He le&#x00ED;do y acepto los T&#x00E9;rminos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
         </label>
         <button class="btn-primary" id="terminos-btn" disabled onclick="aceptarTerminos()" style="opacity:0.4">Aceptar y continuar</button>
       </div>
@@ -458,22 +458,22 @@
   <div class="modal-overlay" id="modal-primer-ingreso" style="display:none;z-index:900">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">Crea tu contrase\u00F1a</div>
-      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contrase\u00F1a segura para tu cuenta.</div>
-      <div class="modal-field"><label>Nueva contrase\u00F1a</label>
+      <div class="modal-title">Crea tu contrase&#x00F1;a</div>
+      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contrase&#x00F1;a segura para tu cuenta.</div>
+      <div class="modal-field"><label>Nueva contrase&#x00F1;a</label>
         <div class="pass-input-wrap">
-          <input type="password" id="primer-pass-new" placeholder="M\u00EDnimo 6 caracteres">
+          <input type="password" id="primer-pass-new" placeholder="M&#x00ED;nimo 6 caracteres">
           <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-new',this)">=A</button>
         </div>
       </div>
-      <div class="modal-field"><label>Confirmar contrase\u00F1a</label>
+      <div class="modal-field"><label>Confirmar contrase&#x00F1;a</label>
         <div class="pass-input-wrap">
-          <input type="password" id="primer-pass-confirm" placeholder="Repite tu contrase\u00F1a">
+          <input type="password" id="primer-pass-confirm" placeholder="Repite tu contrase&#x00F1;a">
           <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">=A</button>
         </div>
       </div>
       <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:16px">
-        Debe tener: m\u00EDnimo 6 caracteres &#xB7; may\u00FAscula &#xB7; min\u00FAscula &#xB7; n\u00FAmero &#xB7; s\u00EDmbolo (. ! * @ #)
+        Debe tener: m&#x00ED;nimo 6 caracteres &#xB7; may&#x00FA;scula &#xB7; min&#x00FA;scula &#xB7; n&#x00FA;mero &#xB7; s&#x00ED;mbolo (. ! * @ #)
       </div>
       <div id="primer-pass-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
       <button class="btn-primary" onclick="savePrimerIngreso()">Guardar y entrar</button>
