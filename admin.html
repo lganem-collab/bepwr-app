@@ -11,6 +11,7 @@
     body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh}
     .screen{display:none}
     .screen.active{display:block}
+    #s-app.active{display:flex!important;flex-direction:column}
     #s-login{align-items:center;justify-content:center;min-height:100vh;padding:24px}
     #s-login.active{display:flex}
     .login-box{width:100%;max-width:400px}
@@ -33,7 +34,7 @@
     .btn-sm{padding:8px 16px;font-size:12px;border-radius:8px;width:auto}
     .btn-success{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
     .btn:disabled{opacity:.4;cursor:not-allowed}
-    #s-app{min-height:100vh;display:flex;flex-direction:column}
+    #s-app{min-height:100vh;display:none;flex-direction:column}
     .topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
     .topbar-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1}
     .topbar-logo .be{color:#ffffff}.topbar-logo .pwr{color:#FF5C1A}.topbar-logo sup{font-size:0.45em;vertical-align:super}
@@ -115,7 +116,7 @@
       <label>Contrasea</label>
       <div style="position:relative">
         <input type="password" id="adm-pass" placeholder="""""""""" style="padding-right:48px" />
-        <button type="button" onclick="var i=document.getElementById('adm-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">=A</button>
+        <button type="button" onclick="var i=document.getElementById('adm-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">&#x1F441;</button>
       </div>
     </div>
     <button class="btn btn-primary" id="adm-login-btn" onclick="doLogin()">Entrar al panel</button>
@@ -237,7 +238,7 @@
         <div class="field"><label>Contrasea inicial *</label>
           <div style="position:relative">
             <input type="password" id="new-pass" placeholder="Mnimo 6 caracteres" style="padding-right:48px" />
-            <button type="button" onclick="var i=document.getElementById('new-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">=A</button>
+            <button type="button" onclick="var i=document.getElementById('new-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">&#x1F441;</button>
           </div>
         </div>
       </div>
@@ -465,8 +466,17 @@
     }
   });
 
-  function show(id){ document.getElementById(id).classList.add('active'); }
-  function hide(id){ document.getElementById(id).classList.remove('active'); }
+  function show(id){
+    const el=document.getElementById(id);
+    el.classList.add('active');
+    if(id==='s-app'){el.style.display='flex';el.style.flexDirection='column';}
+    else el.style.display='flex';
+  }
+  function hide(id){
+    const el=document.getElementById(id);
+    el.classList.remove('active');
+    el.style.display='none';
+  }
 
   // LOGIN
   function doLogin() {
