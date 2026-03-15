@@ -207,17 +207,17 @@
     <div class="login-forgot" id="btn-forgot">&#xBF;Olvidaste tu contrase&#xF1;a?</div>
   </div>
 
-  <!-- MEMBRESÃÂÃÂA INACTIVA -->
+  <!-- MEMBRES&#xCD;A INACTIVA -->
   <div id="screen-inactive">
     <div style="text-align:center;max-width:300px">
-      <div style="font-size:52px;margin-bottom:18px">ÃÂ°ÃÂÃÂÃÂ</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRESÃÂÃÂA INACTIVA</div>
+      <div style="font-size:52px;margin-bottom:18px">&#x1F512;</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRES&#xCD;A INACTIVA</div>
       <div id="inactive-name" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:18px;color:#fff"></div>
       <div style="font-size:13px;color:#888;line-height:1.75;margin-bottom:28px;font-family:'DM Sans',sans-serif">
-        Tu membresÃÂÃÂ­a en bePWR estÃÂÃÂ¡ actualmente pausada. Para volver a acceder a tus mÃÂÃÂ©tricas, historial y reservas, renueva con nosotros.
+        Tu membres&#xED;a en bePWR est&#xE1; actualmente pausada. Para volver a acceder a tus m&#xE9;tricas, historial y reservas, renueva con nosotros.
       </div>
-      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">ÃÂ°ÃÂÃÂÃÂ Renovar membresÃÂÃÂ­a</a>
-      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesiÃÂÃÂ³n</button>
+      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">&#x1F513; Renovar membres&#xED;a</a>
+      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesi&#xF3;n</button>
     </div>
   </div>
 
@@ -288,7 +288,7 @@
           <div class="info-row"><div class="info-key">Nacimiento</div><div class="info-val" id="prof-dob">...</div></div>
           <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura"></div></div>
         </div>
-        <button class="btn-secondary" onclick="openEditModal()"> Editar informaci&#xF3;n</button>
+        <button class="btn-secondary" onclick="openEditModal()">&#x270F;&#xFE0F; Editar informaci&#xF3;n</button>
         <div class="sec-title">Mi objetivo</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
@@ -504,7 +504,7 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  // Mantener sesiÃÂÃÂ³n activa al reabrir la app
+  // Mantener sesi&#xF3;n activa al reabrir la app
   import("https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js")
     .then(m => m.setPersistence(auth, m.browserLocalPersistence))
     .catch(() => {});
@@ -627,7 +627,7 @@
         // Usuario sin datos a&#xFA;n  mostrar nombre del email
         const nombre = user.email.split('@')[0];
         setGreeting(nombre.toUpperCase(), '');
-        document.getElementById('ai-message').innerHTML = 'Bienvenido a bePWR. Tu perfil est&#xE1; siendo configurado por el staff. =&#xFFFD;';
+        document.getElementById('ai-message').innerHTML = 'Bienvenido a bePWR. Tu perfil est&#xE1; siendo configurado por el staff. =';
         renderMetricsEmpty();
         return;
       }
@@ -692,7 +692,7 @@
         generateAIMessage(nombre, ultima, obj);
       } else {
         renderMetricsEmpty();
-        document.getElementById('ai-message').innerHTML = '&#xA1;Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci&#xF3;n a&#xFA;n no ha sido registrada. Habla con el staff para comenzar. =&#xFFFD;';
+        document.getElementById('ai-message').innerHTML = '&#xA1;Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci&#xF3;n a&#xFA;n no ha sido registrada. Habla con el staff para comenzar. =';
       }
 
     } catch(err) {
@@ -946,11 +946,11 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
         el.innerHTML = htmlMsg;
 
       } else {
-        el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
+        el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =';
       }
     } catch(e) {
       console.error('AI Error:', e);
-      el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
+      el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =';
     }
   }
 
