@@ -591,21 +591,7 @@
     ];
     const tema = temas[new Date().getDate() % temas.length];
 
-    const prompt = `Eres un experto en entrenamiento funcional de alto rendimiento y mentor de coaches. Tu misi&#xF3;n es elevar el nivel profesional de los coaches de bePWR en Quer&#xE9;taro, M&#xE9;xico.
-
-Es de ${saludo}. Genera un mensaje educativo del d&#xED;a para los coaches del estudio.
-
-Tema de hoy: ${tema}.
-
-El mensaje debe:
-1. Iniciar con el saludo apropiado (${saludo}) de forma motivadora y profesional.
-2. Desarrollar el tema con profundidad y precisi&#xF3;n cient&#xED;fica en 3-4 p&#xE1;rrafos.
-3. Incluir al menos un dato cient&#xED;fico o estudio relevante y actualizado.
-4. Dar una aplicaci&#xF3;n pr&#xE1;ctica concreta que el coach pueda usar HOY en sus clases de bePWR.
-5. Cerrar con una frase inspiradora sobre la misi&#xF3;n del coach de ejercicio funcional.
-
-Tono: experto, colega de alto nivel, directo y apasionado. NO condescendiente.
-Responde SOLO el mensaje en espa&#xF1;ol, sin comillas, sin t&#xED;tulos, sin bullets.`;
+    const prompt = `Coach bePWR Quer\u00E9taro. ${saludo}. Escribe un mensaje motivador y educativo del d\u00EDa sobre: ${tema}. M\u00E1ximo 3 p\u00E1rrafos. Incluye un dato cient\u00EDfico pr\u00E1ctico. Espa\u00F1ol, directo, sin clich\u00E9s.`;
 
     try {
       const res = await fetch('/api/chat', {
