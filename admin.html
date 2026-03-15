@@ -745,7 +745,7 @@
       const activo = m.activo !== false;
       const dot = activo ? '<span style="display:inline-block;width:8px;height:8px;background:#4ade80;border-radius:50%;margin-right:6px;vertical-align:middle"></span>' : '<span style="display:inline-block;width:8px;height:8px;background:#f87171;border-radius:50%;margin-right:6px;vertical-align:middle"></span>';
       return `<div class="table-row" onclick="openDetail('${m.uid}')" style="${activo?'':'opacity:.7'}">
-        <div class="td"><div class="member-name">${dot}${m.nombre||'Sin nombre'}</div><div class="member-email">${m.email||''}</div></div>
+        <div class="td"><div class="member-name">${dot}${m.nombre||'Sin nombre'}${typeof vigenciaBadge==='function'?vigenciaBadge(m):''}</div><div class="member-email">${m.email||''}</div></div>
         <div class="td gray">${meta}</div>
         <div class="td mono">${peso}</div>
         <div class="td mono">${imc}</div>
