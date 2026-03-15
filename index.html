@@ -504,6 +504,11 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
+  // Mantener sesión activa al reabrir la app
+  import("https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js")
+    .then(m => m.setPersistence(auth, m.browserLocalPersistence))
+    .catch(() => {});
+
   const splash    = document.getElementById('screen-splash');
   const loginScr  = document.getElementById('screen-login');
   const appScr    = document.getElementById('screen-app');
