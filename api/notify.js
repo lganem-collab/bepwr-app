@@ -48,11 +48,13 @@ export default async function handler(req, res) {
     let tokens = [];
 
     if (target === 'all') {
+      // Solo filtrar por activo (evita índice compuesto con fcmToken)
       const snap = await db.collection('usuarios')
         .where('activo', '==', true)
-        .where('fcmToken', '!=', null)
         .get();
-      tokens = snap.docs.map(d => d.data().fcmToken).filter(Boolean);
+      tokens = snap.docs
+        .map(d => d.data().fcmToken)
+        .filter(t => t && typeof t === 'string' && t.length > 10);
     } else if (target === 'uid' && req.body.uid) {
       const doc = await db.collection('usuarios').doc(req.body.uid).get();
       const token = doc.data()?.fcmToken;
@@ -90,6 +92,7 @@ export default async function handler(req, res) {
       totalSent += response.successCount;
       totalFailed += response.failureCount;
 
+      // Recolectar tokens inválidos para limpiar
       response.responses.forEach((r, idx) => {
         if (!r.success && (
           r.error?.code === 'messaging/invalid-registration-token' ||
@@ -100,6 +103,7 @@ export default async function handler(req, res) {
       });
     }
 
+    // Limpiar tokens inválidos de Firestore
     if (invalidTokens.length > 0) {
       const batch = db.batch();
       const staleSnap = await db.collection('usuarios')
