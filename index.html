@@ -577,7 +577,7 @@
     const email = document.getElementById('inp-email').value.trim();
     const pass  = document.getElementById('inp-pass').value;
     errorEl.textContent = '';
-    if (!email || !pass) { errorEl.textContent = 'Ingresa tu email y contrase&#xF1;a'; return; }
+    if (!email || !pass) { errorEl.textContent = 'Ingresa tu email y contrase\u00F1a'; return; }
     btnLogin.textContent = 'Verificando...';
     btnLogin.disabled = true;
     try {
@@ -586,11 +586,11 @@
       const msgs = {
         'auth/user-not-found': 'No encontramos ese email',
         'auth/wrong-password': 'Contrase&#xF1;a incorrecta',
-        'auth/invalid-email': 'Email inv&#xE1;lido',
-        'auth/too-many-requests': 'Demasiados intentos. Intenta m&#xE1;s tarde',
+        'auth/invalid-email': 'Email inv\u00E1lido',
+        'auth/too-many-requests': 'Demasiados intentos. Intenta m\u00E1s tarde',
         'auth/invalid-credential': 'Email o contrase&#xF1;a incorrectos'
       };
-      errorEl.textContent = msgs[e.code] || 'Error al iniciar sesi&#xF3;n';
+      errorEl.textContent = msgs[e.code] || 'Error al iniciar sesi\u00F3n';
       btnLogin.textContent = 'Entrar';
       btnLogin.disabled = false;
     }
@@ -603,7 +603,7 @@
     try {
       await sendPasswordResetEmail(auth, email);
       errorEl.style.color = '#4ade80';
-      errorEl.textContent = 'Te enviamos un correo para restablecer tu contrase&#xF1;a';
+      errorEl.textContent = 'Te enviamos un correo para restablecer tu contrase\u00F1a';
     } catch(e) {
       errorEl.style.color = '#f87171';
       errorEl.textContent = 'No encontramos ese email';
@@ -664,7 +664,7 @@
         let age = hoy.getFullYear() - nac.getFullYear();
         const mm = hoy.getMonth() - nac.getMonth();
         if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) age--;
-        edadStr = age + ' a&#xF1;os';
+        edadStr = age + ' a\u00F1os';
       }
       document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '&#x2014;';
       document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '&#x2014;';
@@ -692,7 +692,7 @@
         generateAIMessage(nombre, ultima, obj);
       } else {
         renderMetricsEmpty();
-        document.getElementById('ai-message').innerHTML = '&#xA1;Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci&#xF3;n a&#xFA;n no ha sido registrada. Habla con el staff para comenzar. =';
+        document.getElementById('ai-message').innerHTML = '\u00A1Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci&#xF3;n a&#xFA;n no ha sido registrada. Habla con el staff para comenzar. =';
       }
 
     } catch(err) {
@@ -946,11 +946,11 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
         el.innerHTML = htmlMsg;
 
       } else {
-        el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =';
+        el.innerHTML = '\u00A1Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =';
       }
     } catch(e) {
       console.error('AI Error:', e);
-      el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =';
+      el.innerHTML = '\u00A1Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =';
     }
   }
 
@@ -997,16 +997,16 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
       const passConfirm = document.getElementById('edit-confirm-pass').value;
       if (passCurrent || passNew) {
         if (!passCurrent) { errEl.textContent = 'Escribe tu contrase&#xF1;a actual'; return; }
-        if (!passNew) { errEl.textContent = 'Escribe la nueva contrase&#xF1;a'; return; }
+        if (!passNew) { errEl.textContent = 'Escribe la nueva contrase\u00F1a'; return; }
         const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
         if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase&#xF1;a debe tener may&#xFA;scula, min&#xFA;scula, n&#xFA;mero y un s&#xED;mbolo'; return; }
-        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase&#xF1;as no coinciden'; return; }
+        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
         const cred = EmailAuthProvider.credential(user.email, passCurrent);
         await reauthenticateWithCredential(user, cred);
         await updatePassword(user, passNew);
       }
       errEl.style.color = '#4ade80';
-      errEl.textContent = '&#xA1;Cambios guardados!';
+      errEl.textContent = '\u00A1Cambios guardados!';
       setTimeout(() => closeModal('modal-edit'), 1200);
     } catch(e) {
       errEl.style.color = '#f87171';
@@ -1050,11 +1050,11 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
     errEl.textContent = '';
 
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-    if (!passNew) { errEl.textContent = 'Escribe tu nueva contrase&#xF1;a'; return; }
+    if (!passNew) { errEl.textContent = 'Escribe tu nueva contrase\u00F1a'; return; }
     if (!passRegex.test(passNew)) { 
       errEl.textContent = 'Debe tener may&#xFA;scula, min&#xFA;scula, n&#xFA;mero y un s&#xED;mbolo'; return; 
     }
-    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase&#xF1;as no coinciden'; return; }
+    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
 
     try {
       const user = auth.currentUser;
@@ -1077,7 +1077,7 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
     errEl.style.color = '#f87171';
     errEl.textContent = '';
     if (!newEmail) { errEl.textContent = 'Escribe el nuevo email'; return; }
-    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inv&#xE1;lido'; return; }
+    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inv\u00E1lido'; return; }
     if (newEmail !== confirmEmail) { errEl.textContent = 'Los emails no coinciden'; return; }
     if (newEmail === auth.currentUser?.email) { errEl.textContent = 'Es el mismo email actual'; return; }
     const passCurrent = document.getElementById('edit-pass-current').value;
@@ -1087,7 +1087,7 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
       await reauthenticateWithCredential(auth.currentUser, cred);
       await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Se envi&#xF3; verificaci&#xF3;n a ' + newEmail + '. Confirma para que aplique.';
+      errEl.textContent = 'Se envi\u00F3 verificaci\u00F3n' a ' + newEmail + '. Confirma para que aplique.';
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
@@ -1106,15 +1106,15 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
     errEl.style.color = '#f87171';
     errEl.textContent = '';
     if (!newTel) { errEl.textContent = 'Escribe el nuevo tel&#xE9;fono'; return; }
-    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel&#xE9;fono debe tener exactamente 10 d&#xED;gitos'; return; }
-    if (newTel !== confirmTel) { errEl.textContent = 'Los tel&#xE9;fonos no coinciden'; return; }
+    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel&#xE9;fono debe tener exactamente 10 d\u00EDgitos'; return; }
+    if (newTel !== confirmTel) { errEl.textContent = 'Los tel\u00E9fonos no coinciden'; return; }
     try {
       const user = auth.currentUser;
       await updateDoc(doc(db, 'usuarios', user.uid), { telefono: newTel });
       cachedUserData = { ...cachedUserData, telefono: newTel };
       document.getElementById('prof-phone').textContent = newTel;
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Tel&#xE9;fono actualizado ';
+      errEl.textContent = 'Tel\u00E9fono actualizado ';
     } catch(e) {
       errEl.style.color = '#f87171';
       errEl.textContent = 'Error: ' + e.message;
