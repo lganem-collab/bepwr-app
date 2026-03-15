@@ -551,7 +551,7 @@
   }
 
   // Mostrar badge de vigencia en la lista
-  function typeof vigenciaBadge === 'function' ? vigenciaBadge(m) : '' {
+  function vigenciaBadge(m) {
     if (!m.vigenciaFecha) return '';
     const hoy = new Date().toISOString().slice(0, 10);
     const dias = Math.ceil((new Date(m.vigenciaFecha) - new Date(hoy)) / (1000*60*60*24));
@@ -616,10 +616,7 @@ Responde SOLO el mensaje en espa&#xF1;ol, sin comillas, sin t&#xED;tulos, sin bu
       const data = await res.json();
       const msg = data.message || '';
       if (msg) {
-        const html = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/
-
-/g, '</p><p style="margin-top:10px">').replace(/
-/g, '<br>');
+        const html = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n\n/g, '</p><p style="margin-top:10px">').replace(/\n/g, '<br>');
         const htmlFinal = '<p>' + html + '</p>';
         el.innerHTML = htmlFinal;
         localStorage.setItem(cacheKey, htmlFinal);
