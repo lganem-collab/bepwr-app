@@ -116,7 +116,7 @@
       <label>Contrasea</label>
       <div style="position:relative">
         <input type="password" id="adm-pass" placeholder="""""""""" style="padding-right:48px" />
-        <button type="button" onclick="var i=document.getElementById('adm-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">\u{1F441}</button>
+        <button type="button" onclick="var i=document.getElementById('adm-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">&#x1F441;</button>
       </div>
     </div>
     <button class="btn btn-primary" id="adm-login-btn" onclick="doLogin()">Entrar al panel</button>
@@ -158,7 +158,7 @@
       <div id="coach-ai-card" style="background:linear-gradient(135deg,#1a0a00,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:18px;margin-bottom:24px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <span style="display:inline-block;width:8px;height:8px;background:#FF5C1A;border-radius:50%;animation:pulse 2s ease-in-out infinite"></span>
-          <span style="font-size:10px;color:#FF5C1A;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase">Coach IA \u00B7 Mensaje del d\u00EDa</span>
+          <span style="font-size:10px;color:#FF5C1A;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase">Coach IA &#xB7; Mensaje del d\u00EDa</span>
         </div>
         <div id="coach-ai-message" style="font-size:14px;color:#e0d5cc;line-height:1.65;font-weight:300">
           <span style="color:var(--gray);font-family:'Space Mono',monospace;font-size:12px">Cargando mensaje...</span>
@@ -238,7 +238,7 @@
         <div class="field"><label>Contrasea inicial *</label>
           <div style="position:relative">
             <input type="password" id="new-pass" placeholder="Mnimo 6 caracteres" style="padding-right:48px" />
-            <button type="button" onclick="var i=document.getElementById('new-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">\u{1F441}</button>
+            <button type="button" onclick="var i=document.getElementById('new-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">&#x1F441;</button>
           </div>
         </div>
       </div>
@@ -1049,7 +1049,7 @@
     errEl.textContent = '';
     if (!nombre||!apellido||!email||!pass||!tel) { errEl.textContent = 'Nombre, apellido, telfono, email y contrasea son obligatorios'; return; }
     if (pass.length < 6) { errEl.textContent = 'La contrasea debe tener al menos 6 caracteres'; return; }
-    if (!peso) { errEl.textContent = 'El peso de valoracin es obligatorio'; return; }
+    if (!peso || isNaN(peso) || peso < 20 || peso > 400) { errEl.textContent = 'El peso de valoracin es obligatorio'; return; }
     const btn = document.getElementById('btn-create-member');
     btn.textContent = 'Creando...'; btn.disabled = true;
     try {
