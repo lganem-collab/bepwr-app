@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="description" content="Tu progreso, tus m�tricas, tu poder." />
+  <meta name="description" content="Tu progreso, tus m&#xE9;tricas, tu poder." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="bePWR" />
@@ -182,21 +182,21 @@
 
   <!-- SPLASH -->
   <div id="screen-splash">
-    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
+    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
     <div class="splash-spinner"></div>
   </div>
 
   <!-- LOGIN -->
   <div id="screen-login">
     <div class="login-glow"></div>
-    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
-    <div class="login-tagline">Tu progreso � Tu poder</div>
+    <div class="logo-html"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
+    <div class="login-tagline">Tu progreso &#xB7; Tu poder</div>
     <div class="field-wrap">
       <label class="field-label">Email</label>
       <input class="field-input" id="inp-email" type="email" placeholder="tu@email.com" autocomplete="email" />
     </div>
     <div class="field-wrap">
-      <label class="field-label">Contrase�a</label>
+      <label class="field-label">Contrase&#xF1;a</label>
       <div style="position:relative">
         <input class="field-input" id="inp-pass" type="password" placeholder="""""""""" autocomplete="current-password" style="padding-right:48px" />
         <button onclick="togglePass('inp-pass','eye-login')" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1" id="eye-login">=A</button>
@@ -204,7 +204,7 @@
     </div>
     <button class="login-btn" id="btn-login">Entrar</button>
     <div class="login-error" id="login-error"></div>
-    <div class="login-forgot" id="btn-forgot">�Olvidaste tu contrase�a?</div>
+    <div class="login-forgot" id="btn-forgot">&#xBF;Olvidaste tu contrase&#xF1;a?</div>
   </div>
 
   <!-- MEMBRESÍA INACTIVA -->
@@ -225,7 +225,7 @@
   <div id="screen-app">
     <div class="topbar">
       <div style="display:flex;align-items:center">
-        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
+        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
         <div class="members-badge">MEMBERS</div>
       </div>
       <div class="avatar-btn" id="avatar-initials" onclick="navigate('profile')">?</div>
@@ -244,7 +244,7 @@
           <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
         </div>
 
-        <div class="sec-title">Mis m�tricas</div>
+        <div class="sec-title">Mis m&#xE9;tricas</div>
         <div class="metrics-grid" id="metrics-grid">
           <!-- Populated by JS -->
           <div class="m-card wide"><div style="width:100%"><div class="skeleton" style="height:16px;width:40%"></div><div class="skeleton" style="height:12px;width:60%"></div><div class="skeleton" style="height:6px"></div></div></div>
@@ -260,7 +260,7 @@
           <div class="skeleton" style="height:55px"></div>
         </div>
 
-        <div class="sec-title">Acciones r�pidas</div>
+        <div class="sec-title">Acciones r&#xE1;pidas</div>
         <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank')">&#x2192; Reservar una clase</button>
         <button class="btn-secondary" onclick="navigate('profile')">Ver mi perfil completo</button>
       </div>
@@ -284,30 +284,30 @@
         <div class="sec-title">Datos de contacto</div>
         <div class="info-card" id="contact-card">
           <div class="info-row"><div class="info-key">Email</div><div class="info-val" id="prof-email">...</div></div>
-          <div class="info-row"><div class="info-key">Tel�fono</div><div class="info-val" id="prof-phone">...</div></div>
+          <div class="info-row"><div class="info-key">Tel&#xE9;fono</div><div class="info-val" id="prof-phone">...</div></div>
           <div class="info-row"><div class="info-key">Nacimiento</div><div class="info-val" id="prof-dob">...</div></div>
           <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura"></div></div>
         </div>
-        <button class="btn-secondary" onclick="openEditModal()"> Editar informaci�n</button>
+        <button class="btn-secondary" onclick="openEditModal()"> Editar informaci&#xF3;n</button>
         <div class="sec-title">Mi objetivo</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
           <div class="info-row"><div class="info-key">Peso inicial</div><div class="info-val" id="prof-peso-ini">...</div></div>
           <div class="info-row"><div class="info-key">Peso meta</div><div class="info-val" id="prof-peso-meta">...</div></div>
         </div>
-        <div class="sec-title">�ltima valoraci�n</div>
+        <div class="sec-title">&#xDA;ltima valoraci&#xF3;n</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Peso</div><div class="info-val" id="val-peso">...</div></div>
-          <div class="info-row"><div class="info-key">M�sculo Esquel�tico</div><div class="info-val" id="val-musculo">...</div></div>
+          <div class="info-row"><div class="info-key">M&#xFA;sculo Esquel&#xE9;tico</div><div class="info-val" id="val-musculo">...</div></div>
           <div class="info-row"><div class="info-key">Grasa Corporal</div><div class="info-val" id="val-grasa">...</div></div>
           <div class="info-row"><div class="info-key">IMC</div><div class="info-val" id="val-imc">...</div></div>
           <div class="info-row"><div class="info-key">PGC</div><div class="info-val" id="val-pgc">...</div></div>
           <div class="info-row"><div class="info-key">Grasa Visceral</div><div class="info-val" id="val-grasa-visc">...</div></div>
-          <div class="info-row"><div class="info-key">Calificaci�n Inbody</div><div class="info-val" id="val-calificacion">...</div></div>
+          <div class="info-row"><div class="info-key">Calificaci&#xF3;n Inbody</div><div class="info-val" id="val-calificacion">...</div></div>
           <div class="info-row"><div class="info-key">Fecha</div><div class="info-val" id="val-fecha">...</div></div>
         </div>
         <button class="btn-secondary" onclick="openHistorialModal()">=&#x1F4CB; Ver historial completo</button>
-        <button class="logout-btn" onclick="doLogout()">Cerrar sesi�n</button>
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesi&#xF3;n</button>
       </div>
 
     </div><!-- scroll-area -->
@@ -332,49 +332,49 @@
 
 </div><!-- app -->
 
-  <!-- MODAL EDITAR INFORMACI�N -->
+  <!-- MODAL EDITAR INFORMACI&#xD3;N -->
   <div class="modal-overlay" id="modal-edit">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">Editar informaci�n</div>
+      <div class="modal-title">Editar informaci&#xF3;n</div>
       <div class="modal-field"><label>Nombre completo <span style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace">(solo el staff puede modificarlo)</span></label><input type="text" id="edit-nombre" readonly style="color:#666;cursor:not-allowed;background:rgba(255,255,255,0.03)"></div>
       <div class="modal-field"><label>Nuevo email</label><input type="email" id="edit-email" placeholder="tu@email.com"></div>
       <div class="modal-field"><label>Confirmar nuevo email</label><input type="email" id="edit-confirm-email" placeholder="Repite el email"></div>
       <div style="text-align:right;margin-bottom:12px">
         <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar email</button>
       </div>
-      <div class="modal-field"><label>Nuevo tel�fono</label><input type="tel" id="edit-tel" placeholder="10 d�gitos" maxlength="10"></div>
-      <div class="modal-field"><label>Confirmar tel�fono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el tel�fono" maxlength="10"></div>
+      <div class="modal-field"><label>Nuevo tel&#xE9;fono</label><input type="tel" id="edit-tel" placeholder="10 d&#xED;gitos" maxlength="10"></div>
+      <div class="modal-field"><label>Confirmar tel&#xE9;fono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el tel&#xE9;fono" maxlength="10"></div>
       <div style="text-align:right;margin-bottom:12px">
-        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar tel�fono</button>
+        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar tel&#xE9;fono</button>
       </div>
 
       <hr class="modal-divider">
       <div style="background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:16px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span style="font-size:18px">=</span>
-          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contrase�a</span>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contrase&#xF1;a</span>
         </div>
-        <div class="modal-field"><label>Contrase�a actual</label>
+        <div class="modal-field"><label>Contrase&#xF1;a actual</label>
           <div class="pass-input-wrap">
             <input type="password" id="edit-pass-current" placeholder="""""""""">
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">=A</button>
           </div>
         </div>
-        <div class="modal-field"><label>Nueva contrase�a</label>
+        <div class="modal-field"><label>Nueva contrase&#xF1;a</label>
           <div class="pass-input-wrap">
-            <input type="password" id="edit-pass-new" placeholder="M�nimo 6 caracteres">
+            <input type="password" id="edit-pass-new" placeholder="M&#xED;nimo 6 caracteres">
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">=A</button>
           </div>
         </div>
-        <div class="modal-field"><label>Confirmar nueva contrase�a</label>
+        <div class="modal-field"><label>Confirmar nueva contrase&#xF1;a</label>
           <div class="pass-input-wrap">
-            <input type="password" id="edit-confirm-pass" placeholder="Repite la contrase�a">
+            <input type="password" id="edit-confirm-pass" placeholder="Repite la contrase&#xF1;a">
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">=A</button>
           </div>
         </div>
         <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
-          Debe tener: may�scula � min�scula � n�mero � s�mbolo
+          Debe tener: may&#xFA;scula &#xFFFD; min&#xFA;scula &#xFFFD; n&#xFA;mero &#xFFFD; s&#xED;mbolo
         </div>
       </div>
       <div id="edit-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
@@ -393,61 +393,61 @@
     </div>
   </div>
 
-  <!-- MODAL T�RMINOS Y PRIVACIDAD -->
+  <!-- MODAL T&#xC9;RMINOS Y PRIVACIDAD -->
   <div class="modal-overlay" id="modal-terminos" style="display:none;z-index:950">
     <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column">
       <div class="modal-handle"></div>
-      <div class="modal-title" style="font-size:18px">T�rminos y Aviso de Privacidad</div>
-      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">L�elos antes de continuar</div>
+      <div class="modal-title" style="font-size:18px">T&#xE9;rminos y Aviso de Privacidad</div>
+      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">L&#xE9;elos antes de continuar</div>
 
       <!-- Scrollable content -->
       <div id="terminos-scroll" style="overflow-y:auto;flex:1;padding-right:4px;font-size:13px;color:#ccc;line-height:1.7">
 
-        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">T�RMINOS Y CONDICIONES DE USO</div>
+        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">T&#xC9;RMINOS Y CONDICIONES DE USO</div>
 
-        <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposici�n de sus miembros la aplicaci�n bePWR (en adelante "la App") sujeta a los siguientes t�rminos:</p>
+        <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposici&#xF3;n de sus miembros la aplicaci&#xF3;n bePWR (en adelante "la App") sujeta a los siguientes t&#xE9;rminos:</p>
 
-        <p><strong>1. ACEPTACI�N.</strong> Al acceder y usar la App, el usuario acepta plena y expresamente estos T�rminos. Si no est� de acuerdo, debe abstenerse de usar la App.</p>
+        <p><strong>1. ACEPTACI&#xD3;N.</strong> Al acceder y usar la App, el usuario acepta plena y expresamente estos T&#xE9;rminos. Si no est&#xE1; de acuerdo, debe abstenerse de usar la App.</p>
 
         <p><strong>2. USO PERMITIDO.</strong> La App es exclusiva para miembros activos de bePWR. El acceso es personal e intransferible. El usuario se compromete a no compartir sus credenciales con terceros.</p>
 
-        <p><strong>3. INFORMACI�N DE SALUD.</strong> La informaci�n de composici�n corporal (peso, masa muscular, grasa, IMC, etc.) registrada en la App tiene fines de seguimiento personal. <strong>No constituye diagn�stico m�dico ni reemplaza la consulta con profesionales de la salud.</strong></p>
+        <p><strong>3. INFORMACI&#xD3;N DE SALUD.</strong> La informaci&#xF3;n de composici&#xF3;n corporal (peso, masa muscular, grasa, IMC, etc.) registrada en la App tiene fines de seguimiento personal. <strong>No constituye diagn&#xF3;stico m&#xE9;dico ni reemplaza la consulta con profesionales de la salud.</strong></p>
 
-        <p><strong>4. RECOMENDACIONES DE IA.</strong> Los mensajes generados por inteligencia artificial son orientativos y de car�cter motivacional. bePWR no garantiza resultados espec�ficos. Las recomendaciones no sustituyen el criterio de un m�dico, nutri�logo o entrenador certificado.</p>
+        <p><strong>4. RECOMENDACIONES DE IA.</strong> Los mensajes generados por inteligencia artificial son orientativos y de car&#xE1;cter motivacional. bePWR no garantiza resultados espec&#xFFFD;ficos. Las recomendaciones no sustituyen el criterio de un m&#xE9;dico, nutri&#xF3;logo o entrenador certificado.</p>
 
-        <p><strong>5. LIMITACI�N DE RESPONSABILIDAD.</strong> OPERADORA FIT TERRASOLA no ser� responsable por: (a) lesiones o da�os derivados del ejercicio f�sico; (b) decisiones tomadas con base en la informaci�n de la App; (c) interrupciones del servicio por causas de fuerza mayor o fallas t�cnicas de terceros; (d) p�rdida de datos por causas ajenas a bePWR.</p>
+        <p><strong>5. LIMITACI&#xD3;N DE RESPONSABILIDAD.</strong> OPERADORA FIT TERRASOLA no ser&#xE1; responsable por: (a) lesiones o da&#xF1;os derivados del ejercicio f&#xED;sico; (b) decisiones tomadas con base en la informaci&#xF3;n de la App; (c) interrupciones del servicio por causas de fuerza mayor o fallas t&#xE9;cnicas de terceros; (d) p&#xE9;rdida de datos por causas ajenas a bePWR.</p>
 
-        <p><strong>6. PROPIEDAD INTELECTUAL.</strong> El contenido, dise�o, marca y software de la App son propiedad exclusiva de OPERADORA FIT TERRASOLA. Queda prohibida su reproducci�n parcial o total sin autorizaci�n escrita.</p>
+        <p><strong>6. PROPIEDAD INTELECTUAL.</strong> El contenido, dise&#xF1;o, marca y software de la App son propiedad exclusiva de OPERADORA FIT TERRASOLA. Queda prohibida su reproducci&#xF3;n parcial o total sin autorizaci&#xF3;n escrita.</p>
 
-        <p><strong>7. MODIFICACIONES.</strong> bePWR se reserva el derecho de modificar estos T�rminos en cualquier momento. Las modificaciones ser�n notificadas a trav�s de la App.</p>
+        <p><strong>7. MODIFICACIONES.</strong> bePWR se reserva el derecho de modificar estos T&#xE9;rminos en cualquier momento. Las modificaciones ser&#xE1;n notificadas a trav&#xE9;s de la App.</p>
 
-        <p><strong>8. LEGISLACI�N APLICABLE.</strong> Estos T�rminos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Quer�taro, Quer�taro, renunciando a cualquier otro fuero.</p>
+        <p><strong>8. LEGISLACI&#xD3;N APLICABLE.</strong> Estos T&#xE9;rminos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Quer&#xE9;taro, Quer&#xE9;taro, renunciando a cualquier otro fuero.</p>
 
         <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin:20px 0 8px">AVISO DE PRIVACIDAD</div>
-        <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protecci�n de Datos Personales en Posesi�n de los Particulares (LFPDPPP)</p>
+        <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protecci&#xF3;n de Datos Personales en Posesi&#xF3;n de los Particulares (LFPDPPP)</p>
 
-        <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Quer�taro, Quer�taro, M�xico.</p>
+        <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Quer&#xE9;taro, Quer&#xE9;taro, M&#xE9;xico.</p>
 
-        <p><strong>Datos que recabamos:</strong> Nombre completo, correo electr�nico, tel�fono, fecha de nacimiento, g�nero, altura y datos de composici�n corporal (peso, masa muscular, porcentaje de grasa, IMC, grasa visceral y calificaci�n InBody).</p>
+        <p><strong>Datos que recabamos:</strong> Nombre completo, correo electr&#xFFFD;nico, tel&#xE9;fono, fecha de nacimiento, g&#xE9;nero, altura y datos de composici&#xF3;n corporal (peso, masa muscular, porcentaje de grasa, IMC, grasa visceral y calificaci&#xF3;n InBody).</p>
 
-        <p><strong>Finalidades primarias:</strong> (a) Gestionar tu membres�a y acceso a la App; (b) Registrar y monitorear tu progreso de composici�n corporal; (c) Generar mensajes de seguimiento personalizados con apoyo de inteligencia artificial; (d) Contactarte para asuntos relacionados con tu membres�a.</p>
+        <p><strong>Finalidades primarias:</strong> (a) Gestionar tu membres&#xED;a y acceso a la App; (b) Registrar y monitorear tu progreso de composici&#xF3;n corporal; (c) Generar mensajes de seguimiento personalizados con apoyo de inteligencia artificial; (d) Contactarte para asuntos relacionados con tu membres&#xED;a.</p>
 
-        <p><strong>Finalidades secundarias:</strong> An�lisis estad�stico interno (datos anonimizados) para mejorar nuestros servicios. Puedes oponerte a estas finalidades enviando un correo a <strong>contacto@bepwr.com</strong>.</p>
+        <p><strong>Finalidades secundarias:</strong> An&#xFFFD;lisis estad&#xFFFD;stico interno (datos anonimizados) para mejorar nuestros servicios. Puedes oponerte a estas finalidades enviando un correo a <strong>contacto@bepwr.com</strong>.</p>
 
-        <p><strong>Transferencia de datos:</strong> Tus datos no ser�n transferidos a terceros sin tu consentimiento, salvo obligaci�n legal. Utilizamos servicios de Google Firebase para almacenamiento seguro en la nube, sujetos a sus propias pol�ticas de privacidad.</p>
+        <p><strong>Transferencia de datos:</strong> Tus datos no ser&#xE1;n transferidos a terceros sin tu consentimiento, salvo obligaci&#xFFFD;n legal. Utilizamos servicios de Google Firebase para almacenamiento seguro en la nube, sujetos a sus propias pol&#xED;ticas de privacidad.</p>
 
-        <p><strong>Derechos ARCO:</strong> Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos personales. Puedes ejercerlos enviando una solicitud a <strong>contacto@bepwr.com</strong> indicando tu nombre, datos de contacto y descripci�n del derecho que deseas ejercer. Atenderemos tu solicitud en un plazo m�ximo de 20 d�as h�biles.</p>
+        <p><strong>Derechos ARCO:</strong> Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos personales. Puedes ejercerlos enviando una solicitud a <strong>contacto@bepwr.com</strong> indicando tu nombre, datos de contacto y descripci&#xF3;n del derecho que deseas ejercer. Atenderemos tu solicitud en un plazo m&#xE1;ximo de 20 d&#xFFFD;as h&#xFFFD;biles.</p>
 
-        <p><strong>Cambios al aviso:</strong> Cualquier modificaci�n se comunicar� a trav�s de la App o al correo registrado en tu cuenta.</p>
+        <p><strong>Cambios al aviso:</strong> Cualquier modificaci&#xFFFD;n se comunicar&#xE1; a trav&#xE9;s de la App o al correo registrado en tu cuenta.</p>
 
-        <p style="font-size:11px;color:var(--gray)">Fecha de �ltima actualizaci�n: Marzo 2026</p>
+        <p style="font-size:11px;color:var(--gray)">Fecha de &#xFA;ltima actualizaci&#xF3;n: Marzo 2026</p>
       </div>
 
       <!-- Accept section -->
       <div style="padding-top:16px;border-top:1px solid #2a2a2a;margin-top:12px">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px">
           <input type="checkbox" id="terminos-check" onchange="toggleTerminosBtn()" style="margin-top:3px;accent-color:#FF5C1A;width:18px;height:18px;flex-shrink:0">
-          <span style="font-size:13px;color:#ccc;line-height:1.5">He le�do y acepto los T�rminos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
+          <span style="font-size:13px;color:#ccc;line-height:1.5">He le&#xFFFD;do y acepto los T&#xE9;rminos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
         </label>
         <button class="btn-primary" id="terminos-btn" disabled onclick="aceptarTerminos()" style="opacity:0.4">Aceptar y continuar</button>
       </div>
@@ -458,22 +458,22 @@
   <div class="modal-overlay" id="modal-primer-ingreso" style="display:none;z-index:900">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">Crea tu contrase�a</div>
-      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contrase�a segura para tu cuenta.</div>
-      <div class="modal-field"><label>Nueva contrase�a</label>
+      <div class="modal-title">Crea tu contrase&#xF1;a</div>
+      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contrase&#xF1;a segura para tu cuenta.</div>
+      <div class="modal-field"><label>Nueva contrase&#xF1;a</label>
         <div class="pass-input-wrap">
-          <input type="password" id="primer-pass-new" placeholder="M�nimo 6 caracteres">
+          <input type="password" id="primer-pass-new" placeholder="M&#xED;nimo 6 caracteres">
           <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-new',this)">=A</button>
         </div>
       </div>
-      <div class="modal-field"><label>Confirmar contrase�a</label>
+      <div class="modal-field"><label>Confirmar contrase&#xF1;a</label>
         <div class="pass-input-wrap">
-          <input type="password" id="primer-pass-confirm" placeholder="Repite tu contrase�a">
+          <input type="password" id="primer-pass-confirm" placeholder="Repite tu contrase&#xF1;a">
           <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">=A</button>
         </div>
       </div>
       <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:16px">
-        Debe tener: m�nimo 6 caracteres � may�scula � min�scula � n�mero � s�mbolo (. ! * @ #)
+        Debe tener: m&#xED;nimo 6 caracteres &#xFFFD; may&#xFA;scula &#xFFFD; min&#xFA;scula &#xFFFD; n&#xFA;mero &#xFFFD; s&#xED;mbolo (. ! * @ #)
       </div>
       <div id="primer-pass-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
       <button class="btn-primary" onclick="savePrimerIngreso()">Guardar y entrar</button>
@@ -490,7 +490,7 @@
   import { getMessaging, getToken, onMessage }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
 
-  //    TU CONFIGURACI�N DE FIREBASE   
+  //    TU CONFIGURACI&#xFFFD;N DE FIREBASE   
   const firebaseConfig = {
     apiKey: "AIzaSyCB_t4CtXh1G70t9gHuvQkckwdm4U5pv2k",
     authDomain: "bepwr-app.firebaseapp.com",
@@ -530,7 +530,7 @@
         if (staffDoc.exists()) {
           await signOut(auth);
           errorEl.style.color = '#f87171';
-          errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administraci�n.';
+          errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administraci&#xF3;n.';
           appScr.classList.remove('active');
           loginScr.classList.add('active');
           authReady = true;
@@ -546,7 +546,7 @@
       loginScr.classList.remove('active');
       appScr.classList.add('active');
       authReady = true;
-      // Mostrar t�rminos si no han sido aceptados a�n
+      // Mostrar t&#xE9;rminos si no han sido aceptados a&#xFA;n
       if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
         tModal.style.display = 'flex';
@@ -577,7 +577,7 @@
     const email = document.getElementById('inp-email').value.trim();
     const pass  = document.getElementById('inp-pass').value;
     errorEl.textContent = '';
-    if (!email || !pass) { errorEl.textContent = 'Ingresa tu email y contrase�a'; return; }
+    if (!email || !pass) { errorEl.textContent = 'Ingresa tu email y contrase&#xF1;a'; return; }
     btnLogin.textContent = 'Verificando...';
     btnLogin.disabled = true;
     try {
@@ -585,12 +585,12 @@
     } catch(e) {
       const msgs = {
         'auth/user-not-found': 'No encontramos ese email',
-        'auth/wrong-password': 'Contrase�a incorrecta',
-        'auth/invalid-email': 'Email inv�lido',
-        'auth/too-many-requests': 'Demasiados intentos. Intenta m�s tarde',
-        'auth/invalid-credential': 'Email o contrase�a incorrectos'
+        'auth/wrong-password': 'Contrase&#xF1;a incorrecta',
+        'auth/invalid-email': 'Email inv&#xE1;lido',
+        'auth/too-many-requests': 'Demasiados intentos. Intenta m&#xE1;s tarde',
+        'auth/invalid-credential': 'Email o contrase&#xF1;a incorrectos'
       };
-      errorEl.textContent = msgs[e.code] || 'Error al iniciar sesi�n';
+      errorEl.textContent = msgs[e.code] || 'Error al iniciar sesi&#xF3;n';
       btnLogin.textContent = 'Entrar';
       btnLogin.disabled = false;
     }
@@ -603,7 +603,7 @@
     try {
       await sendPasswordResetEmail(auth, email);
       errorEl.style.color = '#4ade80';
-      errorEl.textContent = 'Te enviamos un correo para restablecer tu contrase�a';
+      errorEl.textContent = 'Te enviamos un correo para restablecer tu contrase&#xF1;a';
     } catch(e) {
       errorEl.style.color = '#f87171';
       errorEl.textContent = 'No encontramos ese email';
@@ -624,10 +624,10 @@
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
-        // Usuario sin datos a�n  mostrar nombre del email
+        // Usuario sin datos a&#xFA;n  mostrar nombre del email
         const nombre = user.email.split('@')[0];
         setGreeting(nombre.toUpperCase(), '');
-        document.getElementById('ai-message').innerHTML = 'Bienvenido a bePWR. Tu perfil est� siendo configurado por el staff. =�';
+        document.getElementById('ai-message').innerHTML = 'Bienvenido a bePWR. Tu perfil est&#xE1; siendo configurado por el staff. =&#xFFFD;';
         renderMetricsEmpty();
         return;
       }
@@ -636,7 +636,7 @@
       if (data.activo === false) {
         await signOut(auth);
         errorEl.style.color = '#f87171';
-        errorEl.textContent = 'Tu membres�a est� inactiva. Contacta a bePWR para reactivarla.';
+        errorEl.textContent = 'Tu membres&#xED;a est&#xE1; inactiva. Contacta a bePWR para reactivarla.';
         appScr.classList.remove('active');
         loginScr.classList.add('active');
         return;
@@ -652,7 +652,7 @@
       document.getElementById('profile-av').textContent = initials;
       document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
       if (data.alias) {
-        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' � "' + data.alias + '"';
+        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' &#xFFFD; "' + data.alias + '"';
       } else {
         document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
       }
@@ -664,7 +664,7 @@
         let age = hoy.getFullYear() - nac.getFullYear();
         const mm = hoy.getMonth() - nac.getMonth();
         if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) age--;
-        edadStr = age + ' a�os';
+        edadStr = age + ' a&#xF1;os';
       }
       document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '';
       document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '';
@@ -675,7 +675,7 @@
       document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '';
       document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '';
 
-      // M�tricas  leer historial
+      // M&#xE9;tricas  leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');
       const metQ   = query(metRef, orderBy('fecha', 'desc'), limit(7));
       const metSnap = await getDocs(metQ);
@@ -692,12 +692,12 @@
         generateAIMessage(nombre, ultima, obj);
       } else {
         renderMetricsEmpty();
-        document.getElementById('ai-message').innerHTML = '�Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci�n a�n no ha sido registrada. Habla con el staff para comenzar. =�';
+        document.getElementById('ai-message').innerHTML = '&#xFFFD;Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci&#xF3;n a&#xFA;n no ha sido registrada. Habla con el staff para comenzar. =&#xFFFD;';
       }
 
     } catch(err) {
       console.error(err);
-      document.getElementById('ai-message').innerHTML = 'Error cargando datos. Verifica tu conexi�n.';
+      document.getElementById('ai-message').innerHTML = 'Error cargando datos. Verifica tu conexi&#xF3;n.';
     }
   }
 
@@ -729,7 +729,7 @@
         <div class="goal-body">
           <div class="m-label">Objetivo</div>
           <div class="goal-title">${obj.meta || 'Meta personal'}</div>
-          <div class="goal-sub">De ${pesoIni} kg � ${pesoMeta} kg</div>
+          <div class="goal-sub">De ${pesoIni} kg &#xFFFD; ${pesoMeta} kg</div>
           <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
           <div class="bar-labels"><span>${pesoIni} kg</span><span>${m.peso} actual</span><span>${pesoMeta} kg</span></div>
         </div>
@@ -744,42 +744,42 @@
           <div class="ring-text"><div class="ring-val" style="color:${califColor}">${califPct}</div><div class="ring-lbl">INBODY</div></div>
         </div>
         <div class="goal-body">
-          <div class="m-label">Calificaci�n Inbody</div>
-          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? '�lite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
+          <div class="m-label">Calificaci&#xF3;n Inbody</div>
+          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? '&#xFFFD;lite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
           <div class="goal-sub">Escala del 1 al 100</div>
           <div class="bar-bg"><div class="bar-fill" style="width:${califPct}%;background:${califColor}"></div></div>
           <div class="bar-labels"><span>0</span><span>${califPct} pts</span><span>100</span></div>
         </div>
       </div>
       <div class="m-card">
-        <div class="m-label">M�sculo Esquel�tico</div>
+        <div class="m-label">M&#xFA;sculo Esquel&#xE9;tico</div>
         <div class="m-value">${m.musculo || ''}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medici�n actual</div>
+        <div class="m-delta green">Medici&#xFFFD;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Corporal</div>
         <div class="m-value">${m.grasaCorporal || ''}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medici�n actual</div>
+        <div class="m-delta green">Medici&#xFFFD;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">IMC</div>
-        <div class="m-value">${m.imc || ''}<span class="m-unit" style="font-size:11px">kg/m�</span></div>
+        <div class="m-value">${m.imc || ''}<span class="m-unit" style="font-size:11px">kg/m&#xFFFD;</span></div>
         <div class="m-delta green">${m.imc < 25 ? 'Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
       </div>
       <div class="m-card">
         <div class="m-label">PGC</div>
         <div class="m-value">${m.pgc || ''}<span class="m-unit">%</span></div>
-        <div class="m-delta green">Medici�n actual</div>
+        <div class="m-delta green">Medici&#xFFFD;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Visceral</div>
         <div class="m-value">${m.grasaVisceral || ''}</div>
-        <div class="m-delta green">Medici�n actual</div>
+        <div class="m-delta green">Medici&#xFFFD;n actual</div>
       </div>
       <div class="m-card">
-        <div class="m-label">Calificaci�n Inbody</div>
+        <div class="m-label">Calificaci&#xF3;n Inbody</div>
         <div class="m-value">${m.calificacion || ''}<span class="m-unit">/100</span></div>
-        <div class="m-delta green">Medici�n actual</div>
+        <div class="m-delta green">Medici&#xFFFD;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Peso actual</div>
@@ -792,10 +792,10 @@
     document.getElementById('metrics-grid').innerHTML = `
       <div class="m-card wide" style="justify-content:center;text-align:center;padding:24px">
         <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">
-          Sin m�tricas registradas a�n
+          Sin m&#xE9;tricas registradas a&#xFA;n
         </div>
       </div>`;
-    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">Sin historial a�n</div>`;
+    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">Sin historial a&#xFA;n</div>`;
   }
 
   function renderChart(metricas) {
@@ -813,7 +813,7 @@
 
     document.getElementById('chart-card').innerHTML = `
       <div class="chart-head">
-        <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">�ltimas ${metricas.length} mediciones</div></div>
+        <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">&#xFA;ltimas ${metricas.length} mediciones</div></div>
         <div class="chart-big">${ultima} <span style="font-size:15px;color:var(--gray)">kg</span></div>
       </div>
       <div class="bars">${barCols}</div>
@@ -832,7 +832,7 @@
     document.getElementById('val-fecha').textContent = m.fecha || '';
   }
 
-  //    T�RMINOS Y AVISO DE PRIVACIDAD                               
+  //    T&#xC9;RMINOS Y AVISO DE PRIVACIDAD                               
   window.toggleTerminosBtn = function() {
     const btn = document.getElementById('terminos-btn');
     const checked = document.getElementById('terminos-check').checked;
@@ -851,7 +851,7 @@
         terminosFecha: new Date().toISOString().slice(0,10)
       });
       cachedUserData.terminosAceptados = true;
-      // Cerrar modal t�rminos
+      // Cerrar modal t&#xE9;rminos
       const tModal = document.getElementById('modal-terminos');
       tModal.classList.remove('active');
       setTimeout(() => { tModal.style.display = 'none'; }, 300);
@@ -899,7 +899,7 @@
     }
   });
 
-  //    AI MESSAGE  nuevo en cada sesi�n   
+  //    AI MESSAGE  nuevo en cada sesi&#xF3;n   
   async function generateAIMessage(nombre, metrica, objetivo) {
     const el = document.getElementById('ai-message');
     el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
@@ -908,30 +908,30 @@
       const genero = cachedUserData.genero || null;
       const alturaCtx = cachedUserData.altura || null;
       const contextoPersona = [
-        edad ? `tiene ${edad} a�os` : null,
+        edad ? `tiene ${edad} a&#xF1;os` : null,
         alturaCtx ? `altura ${alturaCtx}cm` : null,
-        genero && genero !== 'prefiero-no-decir' ? `g�nero ${genero}` : null
+        genero && genero !== 'prefiero-no-decir' ? `g&#xE9;nero ${genero}` : null
       ].filter(Boolean).join(', ');
 
-      // Hora del d�a para saludo
+      // Hora del d&#xFFFD;a para saludo
       const hora = new Date().getHours();
-      const saludo = hora < 12 ? 'buenos d�as' : hora < 19 ? 'buenas tardes' : 'buenas noches';
+      const saludo = hora < 12 ? 'buenos d&#xFFFD;as' : hora < 19 ? 'buenas tardes' : 'buenas noches';
 
-      const prompt = `Eres el coach experto de bePWR, un studio de fitness en Quer�taro, M�xico, especializado en entrenamiento funcional de alto rendimiento. Hablas con autoridad cient�fica, eres directo, motivador y profesional.
+      const prompt = `Eres el coach experto de bePWR, un studio de fitness en Quer&#xE9;taro, M&#xE9;xico, especializado en entrenamiento funcional de alto rendimiento. Hablas con autoridad cient&#xED;fica, eres directo, motivador y profesional.
 
 Es de ${saludo} (hora local: ${new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'})}).
 Miembro: ${nombre}${contextoPersona ? ' ('+contextoPersona+')' : ''}.
-M�tricas actuales: peso ${metrica.peso}kg, m�sculo esquel�tico ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificaci�n InBody ${metrica.calificacion}/100.
-Objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg � ${objetivo.pesoMeta}kg.
-${edad && edad >= 50 ? 'Nota: mayores de 50  priorizar preservaci�n muscular, movilidad y fuerza funcional sobre cardio intenso.' : ''}
+M&#xE9;tricas actuales: peso ${metrica.peso}kg, m&#xFA;sculo esquel&#xFFFD;tico ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificaci&#xF3;n InBody ${metrica.calificacion}/100.
+Objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg &#xFFFD; ${objetivo.pesoMeta}kg.
+${edad && edad >= 50 ? 'Nota: mayores de 50  priorizar preservaci&#xFFFD;n muscular, movilidad y fuerza funcional sobre cardio intenso.' : ''}
 
-Genera un mensaje �nico, fresco y variado (m�ximo 4 oraciones):
+Genera un mensaje &#xFFFD;nico, fresco y variado (m&#xE1;ximo 4 oraciones):
 1. Inicia con el saludo apropiado (${saludo}) usando el nombre del miembro.
-2. Elige UNO de estos enfoques al azar: dato cient�fico sobre ejercicio funcional, consejo de hidrataci�n espec�fico, h�bito de sue�o y recuperaci�n, consejo nutricional concreto, beneficio de alguna disciplina deportiva complementaria (yoga, nataci�n, ciclismo, etc.), o dato sobre el clima de Quer�taro relacionado con el entrenamiento o hidrataci�n.
-3. Conecta ese consejo con al menos uno de sus datos de m�tricas.
+2. Elige UNO de estos enfoques al azar: dato cient&#xED;fico sobre ejercicio funcional, consejo de hidrataci&#xF3;n espec&#xFFFD;fico, h&#xFFFD;bito de sue&#xFFFD;o y recuperaci&#xFFFD;n, consejo nutricional concreto, beneficio de alguna disciplina deportiva complementaria (yoga, nataci&#xF3;n, ciclismo, etc.), o dato sobre el clima de Quer&#xE9;taro relacionado con el entrenamiento o hidrataci&#xF3;n.
+3. Conecta ese consejo con al menos uno de sus datos de m&#xE9;tricas.
 4. Cierra con una frase motivadora y profesional alineada a su objetivo.
-5. De forma natural, invita a reservar su pr�xima clase en bePWR, mencionando que lo ideal es entrenar de 2 a 4 sesiones por semana.
-Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comillas, sin bullets, sin encabezados.`;
+5. De forma natural, invita a reservar su pr&#xF3;xima clase en bePWR, mencionando que lo ideal es entrenar de 2 a 4 sesiones por semana.
+Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, sin comillas, sin bullets, sin encabezados.`;
 
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -946,11 +946,11 @@ Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comi
         el.innerHTML = htmlMsg;
 
       } else {
-        el.innerHTML = '�Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi�n te acerca m�s a tu meta. =�';
+        el.innerHTML = '&#xFFFD;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
       }
     } catch(e) {
       console.error('AI Error:', e);
-      el.innerHTML = '�Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi�n te acerca m�s a tu meta. =�';
+      el.innerHTML = '&#xFFFD;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
     }
   }
 
@@ -964,7 +964,7 @@ Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comi
     btn.textContent = inp.type === 'password' ? '=A' : '=H';
   };
 
-  //    MODAL EDITAR INFORMACI�N   
+  //    MODAL EDITAR INFORMACI&#xD3;N   
   let cachedUserData = {};
   window.openEditModal = () => {
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
@@ -991,27 +991,27 @@ Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comi
       // Guardar datos en Firestore
       // nombre no se edita aqui, solo el staff puede cambiarlo
       if (cachedUserData.alias) {
-        document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' � "' + cachedUserData.alias + '"';
+        document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' &#xFFFD; "' + cachedUserData.alias + '"';
       }
-      // Cambiar contrase�a si se llenaron los campos
+      // Cambiar contrase&#xF1;a si se llenaron los campos
       const passConfirm = document.getElementById('edit-confirm-pass').value;
       if (passCurrent || passNew) {
-        if (!passCurrent) { errEl.textContent = 'Escribe tu contrase�a actual'; return; }
-        if (!passNew) { errEl.textContent = 'Escribe la nueva contrase�a'; return; }
+        if (!passCurrent) { errEl.textContent = 'Escribe tu contrase&#xF1;a actual'; return; }
+        if (!passNew) { errEl.textContent = 'Escribe la nueva contrase&#xF1;a'; return; }
         const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-        if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase�a debe tener may�scula, min�scula, n�mero y un s�mbolo'; return; }
-        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase�as no coinciden'; return; }
+        if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase&#xF1;a debe tener may&#xFA;scula, min&#xFA;scula, n&#xFA;mero y un s&#xED;mbolo'; return; }
+        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase&#xF1;as no coinciden'; return; }
         const cred = EmailAuthProvider.credential(user.email, passCurrent);
         await reauthenticateWithCredential(user, cred);
         await updatePassword(user, passNew);
       }
       errEl.style.color = '#4ade80';
-      errEl.textContent = '�Cambios guardados!';
+      errEl.textContent = '&#xFFFD;Cambios guardados!';
       setTimeout(() => closeModal('modal-edit'), 1200);
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase�a actual incorrecta';
+        errEl.textContent = 'Contrase&#xF1;a actual incorrecta';
       } else {
         errEl.textContent = 'Error al guardar: ' + e.message;
       }
@@ -1023,14 +1023,14 @@ Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comi
   window.openHistorialModal = () => {
     const list = document.getElementById('historial-list');
     if (!cachedMetricas.length) {
-      list.innerHTML = '<div style="text-align:center;color:var(--gray);padding:20px;font-family:Space Mono,monospace;font-size:12px">Sin historial registrado a�n</div>';
+      list.innerHTML = '<div style="text-align:center;color:var(--gray);padding:20px;font-family:Space Mono,monospace;font-size:12px">Sin historial registrado a&#xFA;n</div>';
     } else {
       list.innerHTML = [...cachedMetricas].reverse().map(m => `
         <div class="hist-row" style="flex-direction:column">
           <div class="hist-date">${m.fecha || ''}</div>
           <div class="hist-metrics">
             <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : ''}</span></div>
-            <div class="hist-metric">M�sculo <span>${m.musculo ? m.musculo+' kg' : ''}</span></div>
+            <div class="hist-metric">M&#xFA;sculo <span>${m.musculo ? m.musculo+' kg' : ''}</span></div>
             <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : ''}</span></div>
             <div class="hist-metric">IMC <span>${m.imc || ''}</span></div>
             <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : ''}</span></div>
@@ -1050,11 +1050,11 @@ Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comi
     errEl.textContent = '';
 
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-    if (!passNew) { errEl.textContent = 'Escribe tu nueva contrase�a'; return; }
+    if (!passNew) { errEl.textContent = 'Escribe tu nueva contrase&#xF1;a'; return; }
     if (!passRegex.test(passNew)) { 
-      errEl.textContent = 'Debe tener may�scula, min�scula, n�mero y un s�mbolo'; return; 
+      errEl.textContent = 'Debe tener may&#xFA;scula, min&#xFA;scula, n&#xFA;mero y un s&#xED;mbolo'; return; 
     }
-    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase�as no coinciden'; return; }
+    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase&#xF1;as no coinciden'; return; }
 
     try {
       const user = auth.currentUser;
@@ -1077,44 +1077,44 @@ Var�a el tono en cada mensaje. Responde SOLO el mensaje en espa�ol, sin comi
     errEl.style.color = '#f87171';
     errEl.textContent = '';
     if (!newEmail) { errEl.textContent = 'Escribe el nuevo email'; return; }
-    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inv�lido'; return; }
+    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inv&#xE1;lido'; return; }
     if (newEmail !== confirmEmail) { errEl.textContent = 'Los emails no coinciden'; return; }
     if (newEmail === auth.currentUser?.email) { errEl.textContent = 'Es el mismo email actual'; return; }
     const passCurrent = document.getElementById('edit-pass-current').value;
-    if (!passCurrent) { errEl.textContent = 'Escribe tu contrase�a actual (secci�n de abajo) para cambiar el email'; return; }
+    if (!passCurrent) { errEl.textContent = 'Escribe tu contrase&#xF1;a actual (secci&#xFFFD;n de abajo) para cambiar el email'; return; }
     try {
       const cred = EmailAuthProvider.credential(auth.currentUser.email, passCurrent);
       await reauthenticateWithCredential(auth.currentUser, cred);
       await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Se envi� verificaci�n a ' + newEmail + '. Confirma para que aplique.';
+      errEl.textContent = 'Se envi&#xFFFD; verificaci&#xF3;n a ' + newEmail + '. Confirma para que aplique.';
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase�a actual incorrecta';
+        errEl.textContent = 'Contrase&#xF1;a actual incorrecta';
       } else {
         errEl.textContent = 'Error: ' + e.message;
       }
     }
   };
 
-  //    CONFIRMAR TEL�FONO   
+  //    CONFIRMAR TEL&#xFFFD;FONO   
   window.confirmTelChange = async () => {
     const newTel = document.getElementById('edit-tel').value.trim();
     const confirmTel = document.getElementById('edit-confirm-tel').value.trim();
     const errEl = document.getElementById('edit-error');
     errEl.style.color = '#f87171';
     errEl.textContent = '';
-    if (!newTel) { errEl.textContent = 'Escribe el nuevo tel�fono'; return; }
-    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel�fono debe tener exactamente 10 d�gitos'; return; }
-    if (newTel !== confirmTel) { errEl.textContent = 'Los tel�fonos no coinciden'; return; }
+    if (!newTel) { errEl.textContent = 'Escribe el nuevo tel&#xE9;fono'; return; }
+    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel&#xE9;fono debe tener exactamente 10 d&#xED;gitos'; return; }
+    if (newTel !== confirmTel) { errEl.textContent = 'Los tel&#xE9;fonos no coinciden'; return; }
     try {
       const user = auth.currentUser;
       await updateDoc(doc(db, 'usuarios', user.uid), { telefono: newTel });
       cachedUserData = { ...cachedUserData, telefono: newTel };
       document.getElementById('prof-phone').textContent = newTel;
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Tel�fono actualizado ';
+      errEl.textContent = 'Tel&#xE9;fono actualizado ';
     } catch(e) {
       errEl.style.color = '#f87171';
       errEl.textContent = 'Error: ' + e.message;
