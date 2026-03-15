@@ -795,7 +795,24 @@
         <div class="field"><label>Email</label><input type="email" id="edit-email-member" value="${m.email||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
         <div class="field"><label>Telfono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
         <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${toDateInput(m.nacimiento||'')}" /></div>
-        <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" value="${toDateInput(m.fechaInicio||'')}" /></div>
+        <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" onchange="calcVigenciaFecha('edit')" value="${toDateInput(m.fechaInicio||'')}" /></div>
+        <div class="field-row">
+        <div class="field">
+          <label>Vigencia</label>
+          <select id="edit-vigencia" onchange="calcVigenciaFecha('edit')">
+            <option value="permanente" ${(!m.vigencia||m.vigencia==='permanente')?'selected':''}>Permanente</option>
+            <option value="anual" ${m.vigencia==='anual'?'selected':''}>Anual (12 meses)</option>
+            <option value="semestral" ${m.vigencia==='semestral'?'selected':''}>Semestral (6 meses)</option>
+            <option value="trimestral" ${m.vigencia==='trimestral'?'selected':''}>Trimestral (3 meses)</option>
+            <option value="mensual" ${m.vigencia==='mensual'?'selected':''}>Mensual (1 mes)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Fecha vencimiento</label>
+          <input type="date" id="edit-vigencia-fecha" value="${m.vigenciaFecha||''}" />
+        </div>
+      </div>
+      <div class="field-row">
         <div class="field"><label>Altura (cm)</label><input type="number" id="edit-altura" value="${m.altura||''}" placeholder="170" min="100" max="230" /></div>
         <div class="field"><label>Gnero</label>
           <select id="edit-genero">
@@ -845,6 +862,8 @@
         altura: Number(document.getElementById('edit-altura').value)||null,
         fechaInicio: document.getElementById('edit-inicio').value,
         activo: activoVal,
+        vigencia: document.getElementById('edit-vigencia')?.value || 'permanente',
+        vigenciaFecha: document.getElementById('edit-vigencia-fecha')?.value || null,
         objetivo: {
           meta: document.getElementById('edit-meta').value,
           pesoInicial: Number(document.getElementById('edit-peso-ini').value)||0,
