@@ -767,6 +767,96 @@
     }).join('');
   }
 
+    function calcVigenciaFecha(prefix) {
+    const v = document.getElementById(prefix+'-vigencia')?.value||'permanente';
+    const ini = document.getElementById(prefix+'-inicio')?.value||'';
+    const el = document.getElementById(prefix+'-vigencia-fecha');
+    if(!el) return;
+    if(v==='permanente'||!ini){el.value='';return;}
+    const months={anual:12,semestral:6,trimestral:3,mensual:1};
+    const m=months[v]||0;
+    if(!m){el.value='';return;}
+    const d=new Date(ini+'T00:00:00');
+    d.setMonth(d.getMonth()+m);
+    el.value=d.toISOString().slice(0,10);
+  }
+  async function checkVigenciaVencimientos(members) {
+    const hoy=new Date().toISOString().slice(0,10);
+    const expired=members.filter(m=>m.activo&&m.vigenciaFecha&&m.vigenciaFecha<=hoy&&m.vigencia&&m.vigencia!=='permanente');
+    if(!expired.length) return false;
+    for(const m of expired){
+      try{await db.collection('usuarios').doc(m.uid).update({activo:false});m.activo=false;}catch(e){}
+    }
+    return true;
+  }
+  function vigenciaBadge(m) {
+    if(!m.vigenciaFecha||!m.vigencia||m.vigencia==='permanente') return '';
+    const hoy=new Date().toISOString().slice(0,10);
+    const dias=Math.ceil((new Date(m.vigenciaFecha)-new Date(hoy))/(864e5));
+    if(dias<0) return '<span style="background:#f87171;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">VENCIDA</span>';
+    if(dias<=7) return '<span style="background:#fb923c;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">VENCE '+dias+'d</span>';
+    if(dias<=30) return '<span style="background:#fbbf24;color:#111;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">'+dias+'d</span>';
+    return '';
+  }
+    async function generateCoachMessage() {
+    const el = document.getElementById('coach-ai-message');
+    if (!el) return;
+    const today = new Date().toISOString().slice(0,10);
+    const cacheKey = 'bepwr_coach_msg_' + today;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached && cached.length > 50 && !cached.includes('=A')) { el.innerHTML = cached; return; }
+    const hora = new Date().getHours();
+    const saludo = hora < 12 ? 'buenos d\u00EDas' : hora < 19 ? 'buenas tardes' : 'buenas noches';
+    const temas = [
+      't\u00E9cnicas de correcci\u00F3n de patrones de movimiento funcional',
+      'programaci\u00F3n de sesiones: periodizaci\u00F3n y progresi\u00F3n de carga',
+      'fisiolog\u00EDa del ejercicio: adaptaciones neuromusculares y recuperaci\u00F3n',
+      'psicolog\u00EDa del coaching: motivaci\u00F3n y comunicaci\u00F3n efectiva',
+      'nutrici\u00F3n deportiva: macros, timing e hidrataci\u00F3n',
+      'movilidad y estabilidad: evaluaci\u00F3n y correcci\u00F3n de limitaciones',
+      'lesiones frecuentes en entrenamiento funcional: prevenci\u00F3n y modificaciones',
+      'herramientas InBody: c\u00F3mo interpretar resultados con el cliente',
+      'variaciones avanzadas: TRX, kettlebell, bandas, peso corporal',
+      'c\u00F3mo dise\u00F1ar clases grupales efectivas',
+      'datos cient\u00EDficos recientes sobre entrenamiento funcional y longevidad',
+      'trabajo con poblaciones especiales: adultos mayores y rehabilitaci\u00F3n'
+    ];
+    const tema = temas[new Date().getDate() % temas.length];
+    const prompt = 'Eres un experto en entrenamiento funcional de alto rendimiento y mentor de coaches de bePWR en Quer\u00E9taro, M\u00E9xico. Es de '+saludo+'. Genera un mensaje educativo del d\u00EDa para los coaches. Tema: '+tema+'. El mensaje debe: (1) iniciar con '+saludo+' de forma motivadora, (2) desarrollar el tema con precisi\u00F3n cient\u00EDfica en 2-3 p\u00E1rrafos, (3) incluir un dato cient\u00EDfico relevante, (4) dar una aplicaci\u00F3n pr\u00E1ctica para hoy. Tono: experto, colega, directo. Responde SOLO el mensaje en espa\u00F1ol, sin comillas.';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, maxTokens: 600 })
+      });
+      const data = await res.json();
+      const msg = data.message || '';
+      if (msg) {
+        const html = '<p>' + msg.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n\n/g,'</p><p style="margin-top:10px">').replace(/\n/g,'<br>') + '</p>';
+        el.innerHTML = html;
+        localStorage.setItem(cacheKey, html);
+      } else {
+        el.innerHTML = '<span style="color:var(--gray);font-size:12px">No se pudo generar el mensaje del d\u00EDa.</span>';
+      }
+    } catch(e) {
+      el.innerHTML = '<span style="color:var(--gray);font-size:12px">Error al cargar el mensaje del d\u00EDa.</span>';
+    }
+  }
+  async function subscribeStaffToPush(uid) {
+    try {
+      if(!('Notification' in window)||!('serviceWorker' in navigator)) return;
+      const perm = await Notification.requestPermission();
+      if(perm !== 'granted') return;
+      const reg = await navigator.serviceWorker.ready;
+      const VAPID='BO7GCvvD-fYQTApeCtt4eWPUuMBAOfMHAtF3B7htcrj8PA1k_19eutw1l4rQTTs-yZwD1lPrCXyqgdn-AJMjSUQ';
+      const messaging = firebase.messaging();
+      const token = await messaging.getToken({vapidKey:VAPID,serviceWorkerRegistration:reg});
+      if(token){
+        const snap = await db.collection('staff').doc(uid).get();
+        if(snap.data()?.fcmToken!==token) await db.collection('staff').doc(uid).update({fcmToken:token});
+      }
+    } catch(e){ console.log('Push staff skip:',e.message); }
+  }
   function filterMembers() {
     const q = document.getElementById('search-input').value.toLowerCase();
     renderMembers((window._allMembers||[]).filter(m =>
