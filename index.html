@@ -207,17 +207,17 @@
     <div class="login-forgot" id="btn-forgot">&#xBF;Olvidaste tu contrase&#xF1;a?</div>
   </div>
 
-  <!-- MEMBRESÍA INACTIVA -->
+  <!-- MEMBRESÃA INACTIVA -->
   <div id="screen-inactive">
     <div style="text-align:center;max-width:300px">
-      <div style="font-size:52px;margin-bottom:18px">🔒</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRESÍA INACTIVA</div>
+      <div style="font-size:52px;margin-bottom:18px">ð</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRESÃA INACTIVA</div>
       <div id="inactive-name" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:18px;color:#fff"></div>
       <div style="font-size:13px;color:#888;line-height:1.75;margin-bottom:28px;font-family:'DM Sans',sans-serif">
-        Tu membresía en bePWR está actualmente pausada. Para volver a acceder a tus métricas, historial y reservas, renueva con nosotros.
+        Tu membresÃ­a en bePWR estÃ¡ actualmente pausada. Para volver a acceder a tus mÃ©tricas, historial y reservas, renueva con nosotros.
       </div>
-      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">🔓 Renovar membresía</a>
-      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesión</button>
+      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">ð Renovar membresÃ­a</a>
+      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesiÃ³n</button>
     </div>
   </div>
 
@@ -504,7 +504,7 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  // Mantener sesión activa al reabrir la app
+  // Mantener sesiÃ³n activa al reabrir la app
   import("https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js")
     .then(m => m.setPersistence(auth, m.browserLocalPersistence))
     .catch(() => {});
