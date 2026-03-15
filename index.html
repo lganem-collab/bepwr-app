@@ -207,17 +207,17 @@
     <div class="login-forgot" id="btn-forgot">&#xBF;Olvidaste tu contrase&#xF1;a?</div>
   </div>
 
-  <!-- MEMBRESÃÂA INACTIVA -->
+  <!-- MEMBRESÃÂÃÂA INACTIVA -->
   <div id="screen-inactive">
     <div style="text-align:center;max-width:300px">
-      <div style="font-size:52px;margin-bottom:18px">Ã°ÂÂÂ</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRESÃÂA INACTIVA</div>
+      <div style="font-size:52px;margin-bottom:18px">ÃÂ°ÃÂÃÂÃÂ</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRESÃÂÃÂA INACTIVA</div>
       <div id="inactive-name" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:18px;color:#fff"></div>
       <div style="font-size:13px;color:#888;line-height:1.75;margin-bottom:28px;font-family:'DM Sans',sans-serif">
-        Tu membresÃÂ­a en bePWR estÃÂ¡ actualmente pausada. Para volver a acceder a tus mÃÂ©tricas, historial y reservas, renueva con nosotros.
+        Tu membresÃÂÃÂ­a en bePWR estÃÂÃÂ¡ actualmente pausada. Para volver a acceder a tus mÃÂÃÂ©tricas, historial y reservas, renueva con nosotros.
       </div>
-      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">Ã°ÂÂÂ Renovar membresÃÂ­a</a>
-      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesiÃÂ³n</button>
+      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">ÃÂ°ÃÂÃÂÃÂ Renovar membresÃÂÃÂ­a</a>
+      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesiÃÂÃÂ³n</button>
     </div>
   </div>
 
@@ -504,7 +504,7 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  // Mantener sesiÃÂ³n activa al reabrir la app
+  // Mantener sesiÃÂÃÂ³n activa al reabrir la app
   import("https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js")
     .then(m => m.setPersistence(auth, m.browserLocalPersistence))
     .catch(() => {});
@@ -692,7 +692,7 @@
         generateAIMessage(nombre, ultima, obj);
       } else {
         renderMetricsEmpty();
-        document.getElementById('ai-message').innerHTML = '&#xFFFD;Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci&#xF3;n a&#xFA;n no ha sido registrada. Habla con el staff para comenzar. =&#xFFFD;';
+        document.getElementById('ai-message').innerHTML = '&#xA1;Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci&#xF3;n a&#xFA;n no ha sido registrada. Habla con el staff para comenzar. =&#xFFFD;';
       }
 
     } catch(err) {
@@ -745,7 +745,7 @@
         </div>
         <div class="goal-body">
           <div class="m-label">Calificaci&#xF3;n Inbody</div>
-          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? '&#xFFFD;lite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
+          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? '&#xC9;lite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
           <div class="goal-sub">Escala del 1 al 100</div>
           <div class="bar-bg"><div class="bar-fill" style="width:${califPct}%;background:${califColor}"></div></div>
           <div class="bar-labels"><span>0</span><span>${califPct} pts</span><span>100</span></div>
@@ -754,32 +754,32 @@
       <div class="m-card">
         <div class="m-label">M&#xFA;sculo Esquel&#xE9;tico</div>
         <div class="m-value">${m.musculo || ''}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medici&#xFFFD;n actual</div>
+        <div class="m-delta green">Medici&#xF3;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Corporal</div>
         <div class="m-value">${m.grasaCorporal || ''}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medici&#xFFFD;n actual</div>
+        <div class="m-delta green">Medici&#xF3;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">IMC</div>
-        <div class="m-value">${m.imc || ''}<span class="m-unit" style="font-size:11px">kg/m&#xFFFD;</span></div>
+        <div class="m-value">${m.imc || ''}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
         <div class="m-delta green">${m.imc < 25 ? 'Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
       </div>
       <div class="m-card">
         <div class="m-label">PGC</div>
         <div class="m-value">${m.pgc || ''}<span class="m-unit">%</span></div>
-        <div class="m-delta green">Medici&#xFFFD;n actual</div>
+        <div class="m-delta green">Medici&#xF3;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Visceral</div>
         <div class="m-value">${m.grasaVisceral || ''}</div>
-        <div class="m-delta green">Medici&#xFFFD;n actual</div>
+        <div class="m-delta green">Medici&#xF3;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Calificaci&#xF3;n Inbody</div>
         <div class="m-value">${m.calificacion || ''}<span class="m-unit">/100</span></div>
-        <div class="m-delta green">Medici&#xFFFD;n actual</div>
+        <div class="m-delta green">Medici&#xF3;n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Peso actual</div>
@@ -915,7 +915,7 @@
 
       // Hora del d&#xED;a para saludo
       const hora = new Date().getHours();
-      const saludo = hora < 12 ? 'buenos d&#xFFFD;as' : hora < 19 ? 'buenas tardes' : 'buenas noches';
+      const saludo = hora < 12 ? 'buenos d&#xED;as' : hora < 19 ? 'buenas tardes' : 'buenas noches';
 
       const prompt = `Eres el coach experto de bePWR, un studio de fitness en Quer&#xE9;taro, M&#xE9;xico, especializado en entrenamiento funcional de alto rendimiento. Hablas con autoridad cient&#xED;fica, eres directo, motivador y profesional.
 
@@ -946,11 +946,11 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
         el.innerHTML = htmlMsg;
 
       } else {
-        el.innerHTML = '&#xFFFD;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
+        el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
       }
     } catch(e) {
       console.error('AI Error:', e);
-      el.innerHTML = '&#xFFFD;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
+      el.innerHTML = '&#xA1;Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi&#xF3;n te acerca m&#xE1;s a tu meta. =&#xFFFD;';
     }
   }
 
@@ -1006,7 +1006,7 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
         await updatePassword(user, passNew);
       }
       errEl.style.color = '#4ade80';
-      errEl.textContent = '&#xFFFD;Cambios guardados!';
+      errEl.textContent = '&#xA1;Cambios guardados!';
       setTimeout(() => closeModal('modal-edit'), 1200);
     } catch(e) {
       errEl.style.color = '#f87171';
@@ -1087,7 +1087,7 @@ Var&#xED;a el tono en cada mensaje. Responde SOLO el mensaje en espa&#xF1;ol, si
       await reauthenticateWithCredential(auth.currentUser, cred);
       await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Se envi&#xFFFD; verificaci&#xF3;n a ' + newEmail + '. Confirma para que aplique.';
+      errEl.textContent = 'Se envi&#xF3; verificaci&#xF3;n a ' + newEmail + '. Confirma para que aplique.';
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
