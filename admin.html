@@ -104,15 +104,15 @@
 <!-- LOGIN -->
 <div id="s-login" class="screen active">
   <div class="login-box">
-    <div class="login-logo"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
-    <div class="login-sub">Panel de Administraci�n</div>
+    <div class="login-logo"><span class="be">be</span><span class="pwr">PWR<sup></sup></span></div>
+    <div class="login-sub">Panel de Administracin</div>
     <div class="login-badge">= Solo Staff</div>
     <div class="field">
       <label>Email del staff</label>
       <input type="email" id="adm-email" placeholder="staff@bepwr.com" />
     </div>
     <div class="field">
-      <label>Contrase�a</label>
+      <label>Contrasea</label>
       <div style="position:relative">
         <input type="password" id="adm-pass" placeholder="""""""""" style="padding-right:48px" />
         <button type="button" onclick="var i=document.getElementById('adm-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">=A</button>
@@ -120,7 +120,7 @@
     </div>
     <button class="btn btn-primary" id="adm-login-btn" onclick="doLogin()">Entrar al panel</button>
     <div class="form-error" id="adm-login-error"></div>
-    <div id="adm-forgot" onclick="doForgotPass()" style="text-align:center;margin-top:18px;font-size:11px;color:#666;cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline">�Olvidaste tu contrase�a?</div>
+    <div id="adm-forgot" onclick="doForgotPass()" style="text-align:center;margin-top:18px;font-size:11px;color:#666;cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline">Olvidaste tu contrasea?</div>
   </div>
 </div>
 
@@ -128,7 +128,7 @@
 <div id="s-app" class="screen">
   <div class="topbar">
       <div style="display:flex;align-items:center">
-        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>�</sup></span></div>
+        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup></sup></span></div>
         <div class="topbar-badge">Staff Panel</div>
       </div>
     <div style="display:flex;align-items:center;gap:16px">
@@ -141,7 +141,7 @@
     <div class="tab on" id="tab-members" onclick="switchTab('members')">Miembros</div>
     <div class="tab" id="tab-new" onclick="switchTab('new')">+ Nuevo miembro</div>
     <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">=e Staff</div>
-    <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">=� Notificaciones</div>
+    <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">= Notificaciones</div>
   </div>
   <div class="content">
 
@@ -149,15 +149,15 @@
     <div id="tab-content-members">
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Total miembros</div><div class="stat-value orange" id="stat-total">0</div></div>
-        <div class="stat-card"><div class="stat-label">Con m�tricas</div><div class="stat-value" id="stat-metrics">0</div></div>
+        <div class="stat-card"><div class="stat-label">Con mtricas</div><div class="stat-value" id="stat-metrics">0</div></div>
         <div class="stat-card"><div class="stat-label">Sin objetivo</div><div class="stat-value" id="stat-noobjective">0</div></div>
-        <div class="stat-card"><div class="stat-label">Este a�o</div><div class="stat-value" id="stat-month">0</div></div>
+        <div class="stat-card"><div class="stat-label">Este ao</div><div class="stat-value" id="stat-month">0</div></div>
       </div>
       <!-- COACH AI CARD -->
       <div id="coach-ai-card" style="background:linear-gradient(135deg,#1a0a00,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:18px;margin-bottom:24px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <span style="display:inline-block;width:8px;height:8px;background:#FF5C1A;border-radius:50%;animation:pulse 2s ease-in-out infinite"></span>
-          <span style="font-size:10px;color:#FF5C1A;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase">Coach IA · Mensaje del día</span>
+          <span style="font-size:10px;color:#FF5C1A;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase">Coach IA &#xB7; Mensaje del d&#xED;a</span>
         </div>
         <div id="coach-ai-message" style="font-size:14px;color:#e0d5cc;line-height:1.65;font-weight:300">
           <span style="color:var(--gray);font-family:'Space Mono',monospace;font-size:12px">Cargando mensaje...</span>
@@ -189,19 +189,39 @@
       </div>
       <div class="modal-section">Datos personales</div>
       <div class="field-row">
-        <div class="field"><label>Nombre(s) *</label><input type="text" id="new-nombre" placeholder="Mar�a" /></div>
-        <div class="field"><label>Apellido(s) *</label><input type="text" id="new-apellido" placeholder="Gonz�lez" /></div>
+        <div class="field"><label>Nombre(s) *</label><input type="text" id="new-nombre" placeholder="Mara" /></div>
+        <div class="field"><label>Apellido(s) *</label><input type="text" id="new-apellido" placeholder="Gonzlez" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Tel�fono *</label><input type="tel" id="new-tel" placeholder="+52 55 0000 0000" /></div>
-        <div class="field"><label>Alias <span style="font-weight:400;color:var(--gray)">(opcional)</span></label><input type="text" id="new-alias" placeholder="C�mo le llaman" /></div>
+        <div class="field"><label>Telfono *</label><input type="tel" id="new-tel" placeholder="+52 55 0000 0000" /></div>
+        <div class="field"><label>Alias <span style="font-weight:400;color:var(--gray)">(opcional)</span></label><input type="text" id="new-alias" placeholder="Cmo le llaman" /></div>
       </div>
       <div class="field-row">
         <div class="field"><label>Fecha de nacimiento</label><input type="date" id="new-dob" /></div>
-        <div class="field"><label>Fecha de inicio *</label><input type="date" id="new-inicio" /></div>
+        <div class="field"><label>Fecha de inicio *</label><input type="date" id="new-inicio" onchange="calcVigenciaFecha('new')" />
+      </div>
+      <!-- VIGENCIA -->
+      <div class="field-row">
+        <div class="field">
+          <label>Vigencia de membres&#xED;a</label>
+          <select id="new-vigencia" onchange="calcVigenciaFecha('new')">
+            <option value="permanente">Permanente (sin vencimiento)</option>
+            <option value="anual">Anual (12 meses)</option>
+            <option value="semestral">Semestral (6 meses)</option>
+            <option value="trimestral">Trimestral (3 meses)</option>
+            <option value="mensual">Mensual (1 mes)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Fecha de vencimiento</label>
+          <input type="date" id="new-vigencia-fecha" />
+          <div style="font-size:10px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace">Se calcula al elegir inicio + vigencia</div>
+        </div>
+      </div>
+      <div class="field-row"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>G�nero</label>
+        <div class="field"><label>Gnero</label>
           <select id="new-genero">
             <option value="prefiero-no-decir">Prefiero no decirlo</option>
             <option value="femenino">Femenino</option>
@@ -214,9 +234,9 @@
       <div class="modal-section">Acceso a la app</div>
       <div class="field-row">
         <div class="field"><label>Email *</label><input type="email" id="new-email" placeholder="maria@email.com" /></div>
-        <div class="field"><label>Contrase�a inicial *</label>
+        <div class="field"><label>Contrasea inicial *</label>
           <div style="position:relative">
-            <input type="password" id="new-pass" placeholder="M�nimo 6 caracteres" style="padding-right:48px" />
+            <input type="password" id="new-pass" placeholder="Mnimo 6 caracteres" style="padding-right:48px" />
             <button type="button" onclick="var i=document.getElementById('new-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">=A</button>
           </div>
         </div>
@@ -227,7 +247,7 @@
           <label>Meta principal</label>
           <select id="new-meta">
             <option value="">Selecciona...</option>
-            <option>P�rdida de grasa</option>
+            <option>Prdida de grasa</option>
             <option>Ganancia muscular</option>
             <option>Mantenimiento</option>
             <option>Mejora cardiovascular</option>
@@ -240,22 +260,22 @@
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="new-peso-meta" placeholder="65" step="0.1" /></div>
         <div class="field"></div>
       </div>
-      <div class="modal-section">Valoraci�n inicial</div>
+      <div class="modal-section">Valoracin inicial</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg) *</label><input type="number" id="new-peso" placeholder="70" step="0.1" /></div>
-        <div class="field"><label>Masa M�sculo Esquel�tico (kg)</label><input type="number" id="new-musculo" placeholder="42" step="0.1" /></div>
+        <div class="field"><label>Masa Msculo Esqueltico (kg)</label><input type="number" id="new-musculo" placeholder="42" step="0.1" /></div>
       </div>
       <div class="field-row">
         <div class="field"><label>Grasa Corporal (kg)</label><input type="number" id="new-grasa-corp" placeholder="18.5" step="0.1" /></div>
-        <div class="field"><label>IMC (kg/m�)</label><input type="number" id="new-imc" placeholder="24.5" step="0.1" /></div>
+        <div class="field"><label>IMC (kg/m)</label><input type="number" id="new-imc" placeholder="24.5" step="0.1" /></div>
       </div>
       <div class="field-row">
         <div class="field"><label>PGC (%)</label><input type="number" id="new-pgc" placeholder="25.0" step="0.1" /></div>
         <div class="field"><label>Grasa Visceral</label><input type="number" id="new-grasa-visc" placeholder="8" step="1" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Calificaci�n Inbody (1-100)</label><input type="number" id="new-calificacion" placeholder="75" min="1" max="100" /></div>
-        <div class="field"><label>Fecha de valoraci�n</label><input type="date" id="new-fecha-val" /></div>
+        <div class="field"><label>Calificacin Inbody (1-100)</label><input type="number" id="new-calificacion" placeholder="75" min="1" max="100" /></div>
+        <div class="field"><label>Fecha de valoracin</label><input type="date" id="new-fecha-val" /></div>
       </div>
       <div class="form-error" id="new-member-error"></div>
       <button class="btn btn-primary" id="btn-create-member" onclick="createMember()" style="margin-top:8px">Crear miembro</button>
@@ -264,17 +284,17 @@
     <!-- STAFF TAB -->
     <div id="tab-content-staff" style="display:none;max-width:600px">
       <div style="margin-bottom:24px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Gesti�n de Staff</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Gestin de Staff</div>
         <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:1px">Agrega, desactiva o cambia el rol de cada persona</div>
       </div>
       <div id="staff-list" style="margin-bottom:28px"></div>
       <div class="modal-section">Agregar nuevo staff</div>
       <div class="field-row">
-        <div class="field"><label>Nombre completo *</label><input type="text" id="ns-nombre" placeholder="Ana L�pez" /></div>
+        <div class="field"><label>Nombre completo *</label><input type="text" id="ns-nombre" placeholder="Ana Lpez" /></div>
         <div class="field"><label>Email *</label><input type="email" id="ns-email" placeholder="ana@bepwr.com" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Tel�fono *</label><input type="tel" id="ns-tel" placeholder="10 d�gitos" maxlength="10" /></div>
+        <div class="field"><label>Telfono *</label><input type="tel" id="ns-tel" placeholder="10 dgitos" maxlength="10" /></div>
         <div class="field"><label>Rol</label>
           <select id="ns-rol">
             <option value="coach">Coach</option>
@@ -283,7 +303,7 @@
         </div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Contrase�a *</label><input type="password" id="ns-pass" placeholder="M�nimo 6 caracteres" /></div>
+        <div class="field"><label>Contrasea *</label><input type="password" id="ns-pass" placeholder="Mnimo 6 caracteres" /></div>
         <div class="field"></div>
       </div>
       <div class="form-error" id="ns-error"></div>
@@ -293,17 +313,17 @@
     <div id="tab-content-notify" style="display:none;max-width:600px">
       <div style="margin-bottom:24px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Notificaciones</div>
-        <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:1px">Env�a mensajes push a todos los miembros activos</div>
+        <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:1px">Enva mensajes push a todos los miembros activos</div>
       </div>
       <div style="background:var(--surface);border-radius:12px;padding:24px;border:1px solid var(--border)">
         <div class="modal-section" style="margin-top:0">Nuevo mensaje</div>
         <div class="field" style="margin-bottom:16px">
-          <label>T�tulo *</label>
-          <input type="text" id="notif-title" placeholder="ej. �Evento especial este s�bado!" maxlength="60">
+          <label>Ttulo *</label>
+          <input type="text" id="notif-title" placeholder="ej. Evento especial este sbado!" maxlength="60">
         </div>
         <div class="field" style="margin-bottom:16px">
           <label>Mensaje *</label>
-          <textarea id="notif-body" placeholder="ej. Te esperamos este s�bado a las 8am para una clase especial. �No faltes!" maxlength="200" rows="3" style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:#fff;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;resize:vertical"></textarea>
+          <textarea id="notif-body" placeholder="ej. Te esperamos este sbado a las 8am para una clase especial. No faltes!" maxlength="200" rows="3" style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:#fff;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;resize:vertical"></textarea>
           <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;margin-top:4px"><span id="notif-body-count">0</span>/200 caracteres</div>
         </div>
         <div class="field" style="margin-bottom:20px">
@@ -311,15 +331,15 @@
           <select id="notif-target"><option value="all">Todos los miembros activos</option></select>
         </div>
         <div id="notif-error" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:12px;font-family:'Space Mono',monospace"></div>
-        <button class="btn btn-primary" id="btn-send-notif" onclick="sendNotification()">=� Enviar notificaci�n</button>
+        <button class="btn btn-primary" id="btn-send-notif" onclick="sendNotification()">= Enviar notificacin</button>
       </div>
       <div style="margin-top:28px">
-        <div class="modal-section">Notificaciones autom�ticas programadas</div>
+        <div class="modal-section">Notificaciones automticas programadas</div>
         <div style="font-size:13px;color:var(--gray);line-height:1.8;font-family:'Space Mono',monospace">
-          <div>=� <b>Lunes 6am</b>  "�Nueva semana en bePWR! Reserva tus clases"</div>
-          <div>=� <b>Mi�rcoles 7pm</b>  "Tarde perfecta para entrenar. Reserva tu clase"</div>
-          <div>=� <b>Viernes 6am</b>  "�Cierra la semana fuerte!"</div>
-          <div>=� <b>Domingo 7pm</b>  "Planea tu semana, reserva tus 2-4 sesiones"</div>
+          <div>= <b>Lunes 6am</b>  "Nueva semana en bePWR! Reserva tus clases"</div>
+          <div>= <b>Mircoles 7pm</b>  "Tarde perfecta para entrenar. Reserva tu clase"</div>
+          <div>= <b>Viernes 6am</b>  "Cierra la semana fuerte!"</div>
+          <div>= <b>Domingo 7pm</b>  "Planea tu semana, reserva tus 2-4 sesiones"</div>
         </div>
       </div>
     </div>
@@ -340,28 +360,28 @@
 <!-- MODAL METRICS -->
 <div class="modal-overlay" id="modal-metrics">
   <div class="modal">
-    <div class="modal-title">Nueva Valoraci�n</div>
+    <div class="modal-title">Nueva Valoracin</div>
     <div class="modal-sub" id="metrics-modal-sub"></div>
     <input type="hidden" id="metrics-uid" />
     <div class="field-row">
       <div class="field"><label>Peso (kg) *</label><input type="number" id="m-peso" placeholder="68.5" step="0.1" /></div>
-      <div class="field"><label>Masa M�sculo Esquel�tico (kg)</label><input type="number" id="m-musculo" placeholder="42" step="0.1" /></div>
+      <div class="field"><label>Masa Msculo Esqueltico (kg)</label><input type="number" id="m-musculo" placeholder="42" step="0.1" /></div>
     </div>
     <div class="field-row">
       <div class="field"><label>Grasa Corporal (kg)</label><input type="number" id="m-grasa-corp" placeholder="18.5" step="0.1" /></div>
-      <div class="field"><label>IMC (kg/m�)</label><input type="number" id="m-imc" placeholder="24.2" step="0.1" /></div>
+      <div class="field"><label>IMC (kg/m)</label><input type="number" id="m-imc" placeholder="24.2" step="0.1" /></div>
     </div>
     <div class="field-row">
       <div class="field"><label>PGC (%)</label><input type="number" id="m-pgc" placeholder="25.0" step="0.1" /></div>
       <div class="field"><label>Grasa Visceral</label><input type="number" id="m-grasa-visc" placeholder="8" step="1" /></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Calificaci�n Inbody (1-100)</label><input type="number" id="m-calificacion" placeholder="75" min="1" max="100" /></div>
+      <div class="field"><label>Calificacin Inbody (1-100)</label><input type="number" id="m-calificacion" placeholder="75" min="1" max="100" /></div>
       <div class="field"><label>Fecha *</label><input type="date" id="m-fecha" /></div>
     </div>
     <div class="form-error" id="metrics-error"></div>
     <div class="modal-footer">
-      <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoraci�n</button>
+      <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoracin</button>
       <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-metrics')">Cancelar</button>
     </div>
   </div>
@@ -369,7 +389,7 @@
 
 <div id="toast"></div>
 
-<!-- Firebase Compat SDK (m�s compatible) -->
+<!-- Firebase Compat SDK (ms compatible) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -392,14 +412,14 @@
   // Admin Maestro  no puede ser desactivado ni degradado
   const MASTER_UID = '1zZIfBnLGqRiPKVRVfHxlt2O3Di2';
 
-  // Segunda instancia para crear usuarios sin afectar la sesi�n del staff
+  // Segunda instancia para crear usuarios sin afectar la sesin del staff
   const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
   const secondaryAuth = secondaryApp.auth();
 
   // ROL ACTUAL DEL STAFF
   window.currentStaffRole = null;
 
-  // AUTH STATE  con verificaci�n de lista blanca
+  // AUTH STATE  con verificacin de lista blanca
   auth.onAuthStateChanged(async user => {
     if (user) {
       try {
@@ -429,7 +449,7 @@
         } catch(loadErr) { console.error('loadMembers error:', loadErr); }
       } catch(e) {
         console.error('Auth error:', e.code, e.message, e);
-        // Solo redirigir al login si es error de autenticaci�n/permisos
+        // Solo redirigir al login si es error de autenticacin/permisos
         if (e.code && (e.code.startsWith('auth/') || e.code.startsWith('permission'))) {
           await auth.signOut();
           show('s-login'); hide('s-app');
@@ -457,11 +477,11 @@
     if (!email || !pass) { errEl.textContent = 'Completa los campos'; return; }
     const btn = document.getElementById('adm-login-btn');
     btn.textContent = 'Verificando...'; btn.disabled = true;
-    // SESSION persistence: cada pesta�a es independiente, no afecta la sesi�n del miembro
+    // SESSION persistence: cada pestaa es independiente, no afecta la sesin del miembro
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
       .then(() => auth.signInWithEmailAndPassword(email, pass))
       .catch(e => {
-        errEl.textContent = 'Email o contrase�a incorrectos';
+        errEl.textContent = 'Email o contrasea incorrectos';
         btn.textContent = 'Entrar al panel'; btn.disabled = false;
       });
   }
@@ -485,7 +505,7 @@
     const errEl = document.getElementById('notif-error');
     const btn = document.getElementById('btn-send-notif');
     errEl.textContent = '';
-    if (!title) { errEl.textContent = 'El t�tulo es obligatorio'; return; }
+    if (!title) { errEl.textContent = 'El ttulo es obligatorio'; return; }
     if (!body) { errEl.textContent = 'El mensaje es obligatorio'; return; }
     btn.textContent = 'Enviando...'; btn.disabled = true;
     try {
@@ -503,7 +523,7 @@
         document.getElementById('notif-body-count').textContent = '0';
       } else { errEl.textContent = data.error || 'Error al enviar'; }
     } catch(e) { errEl.textContent = 'Error: ' + e.message; }
-    finally { btn.textContent = '=� Enviar notificaci�n'; btn.disabled = false; }
+    finally { btn.textContent = '= Enviar notificacin'; btn.disabled = false; }
   }
 
   function doForgotPass() {
@@ -518,7 +538,7 @@
     auth.sendPasswordResetEmail(email)
       .then(() => {
         errEl.style.color = '#4ade80';
-        errEl.textContent = 'Te enviamos un correo para restablecer tu contrase�a';
+        errEl.textContent = 'Te enviamos un correo para restablecer tu contrasea';
         setTimeout(() => { errEl.style.color = '#f87171'; errEl.textContent = ''; }, 5000);
       })
       .catch(() => {
@@ -581,14 +601,14 @@
       // Load valoraciones registered by this staff
       const metSnap = await db.collectionGroup('metricas').where('registradoPor', '==', uid).orderBy('fecha','desc').limit(20).get();
       if (metSnap.empty) {
-        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas a�n';
+        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas an';
       } else {
         document.getElementById('sp-historial').innerHTML = metSnap.docs.map(d => {
           const m = d.data();
           return `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px">
             <span style="color:var(--orange)">${m.fecha||''}</span>
             <span style="color:#888;margin-left:8px">${m.miembroNombre||'Miembro'}</span>
-            <span style="margin-left:8px">Peso: ${m.peso||''} kg � Inbody: ${m.calificacion||''}</span>
+            <span style="margin-left:8px">Peso: ${m.peso||''} kg  Inbody: ${m.calificacion||''}</span>
           </div>`;
         }).join('');
       }
@@ -610,11 +630,11 @@
     const tel = document.getElementById('sp-edit-tel').value.trim();
     const rol = document.getElementById('sp-edit-rol').value;
     if (!nombre) { errEl.textContent = 'El nombre es requerido'; return; }
-    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel�fono debe tener exactamente 10 d�gitos'; return; }
+    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El telfono debe tener exactamente 10 dgitos'; return; }
     try {
       await db.collection('staff').doc(currentStaffProfileUID).update({ nombre, telefono: tel, rol });
       errEl.style.color = '#4ade80';
-      errEl.textContent = '�Datos actualizados!';
+      errEl.textContent = 'Datos actualizados!';
       document.getElementById('sp-nombre').textContent = nombre;
       document.getElementById('sp-tel').textContent = tel;
       setTimeout(() => loadStaffList(), 1000);
@@ -629,28 +649,28 @@
     const confirm = document.getElementById('sp-confirm').value;
     errEl.textContent = '';
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-    if (!current) { errEl.textContent = 'Escribe tu contrase�a actual'; return; }
-    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrase�a no cumple los requisitos'; return; }
-    if (newPass !== confirm) { errEl.textContent = 'Las contrase�as no coinciden'; return; }
+    if (!current) { errEl.textContent = 'Escribe tu contrasea actual'; return; }
+    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrasea no cumple los requisitos'; return; }
+    if (newPass !== confirm) { errEl.textContent = 'Las contraseas no coinciden'; return; }
     try {
       const user = auth.currentUser;
       const cred = firebase.auth.EmailAuthProvider.credential(user.email, current);
       await user.reauthenticateWithCredential(cred);
       await user.updatePassword(newPass);
       errEl.style.color = '#4ade80';
-      errEl.textContent = '�Contrase�a actualizada!';
+      errEl.textContent = 'Contrasea actualizada!';
       setTimeout(closeChangePass, 1500);
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase�a actual incorrecta';
+        errEl.textContent = 'Contrasea actual incorrecta';
       } else {
         errEl.textContent = 'Error: ' + e.message;
       }
     }
   }
 
-  // DATE HELPER: YYYY-MM � "Mar 2026"
+  // DATE HELPER: YYYY-MM  "Mar 2026"
   function fmtMonth(val) {
     if (!val) return '';
     if (val.includes('-')) {
@@ -698,6 +718,7 @@
         } catch(e) {}
         window._allMembers.push({ uid: d.id, ...data, ultimaMetrica });
       }
+      await checkVigenciaVencimientos(window._allMembers);
       updateStats();
       renderMembers(window._allMembers);
     } catch(e) {
@@ -730,7 +751,7 @@
         <div class="td mono">${imc}</div>
         <div class="td gray">${m.fechaInicio||''}</div>
         <div class="td actions" onclick="event.stopPropagation()">
-          <button class="btn btn-sm btn-success" onclick="openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ M�tricas</button>
+          <button class="btn btn-sm btn-success" onclick="openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Mtricas</button>
         </div>
       </div>`;
     }).join('');
@@ -748,12 +769,12 @@
     const m = (window._allMembers||[]).find(x => x.uid === uid);
     if (!m) return;
     const initials = (m.nombre||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-    let histHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--gray);font-family:\'Space Mono\',monospace">Sin m�tricas registradas</div>';
+    let histHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--gray);font-family:\'Space Mono\',monospace">Sin mtricas registradas</div>';
     try {
       const mSnap = await db.collection('usuarios').doc(uid).collection('metricas').orderBy('fecha','desc').get();
       if (!mSnap.empty) {
         histHTML = `<div class="metrics-history">
-          <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>M�sculo</div><div>Grasa Corp.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
+          <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>Msculo</div><div>Grasa Corp.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
           ${mSnap.docs.map(d => {
             const x = d.data();
             const gc=x.grasaCorporal??x.grasaPct;return `<div class="mh-row"><div class="mh-date">${x.fecha||''}</div><div class="mh-val">${x.peso!=null?x.peso+' kg':''}</div><div class="mh-val">${x.musculo!=null?x.musculo+' kg':''}</div><div class="mh-val">${gc!=null?gc+' kg':''}</div><div class="mh-val">${x.imc||''}</div><div class="mh-val">${x.pgc!=null?x.pgc+'%':''}</div><div class="mh-val">${x.grasaVisceral||''}</div><div class="mh-val">${x.calificacion||''}</div></div>`;
@@ -765,18 +786,18 @@
     document.getElementById('modal-detail-content').innerHTML = `
       <div class="detail-header">
         <div class="detail-avatar">${initials}</div>
-        <div><div class="detail-name">${m.nombre||'Sin nombre'}</div><div class="detail-since">${m.fechaInicio ? 'Miembro desde '+m.fechaInicio : 'bePWR'}${m.altura?' � '+m.altura+' cm':''}</div></div>
+        <div><div class="detail-name">${m.nombre||'Sin nombre'}</div><div class="detail-since">${m.fechaInicio ? 'Miembro desde '+m.fechaInicio : 'bePWR'}${m.altura?'  '+m.altura+' cm':''}</div></div>
       </div>
       <div class="modal-section">Contacto</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div class="field"><label>Nombre completo</label><input type="text" id="edit-nombre" value="${m.nombre||''}" /></div>
-        <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${m.alias||''}" placeholder="C�mo le llaman" /></div>
+        <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${m.alias||''}" placeholder="Cmo le llaman" /></div>
         <div class="field"><label>Email</label><input type="email" id="edit-email-member" value="${m.email||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
-        <div class="field"><label>Tel�fono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
+        <div class="field"><label>Telfono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
         <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${toDateInput(m.nacimiento||'')}" /></div>
         <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" value="${toDateInput(m.fechaInicio||'')}" /></div>
         <div class="field"><label>Altura (cm)</label><input type="number" id="edit-altura" value="${m.altura||''}" placeholder="170" min="100" max="230" /></div>
-        <div class="field"><label>G�nero</label>
+        <div class="field"><label>Gnero</label>
           <select id="edit-genero">
             <option value="prefiero-no-decir" ${(!m.genero||m.genero==='prefiero-no-decir')?'selected':''}>Prefiero no decirlo</option>
             <option value="femenino" ${m.genero==='femenino'?'selected':''}>Femenino</option>
@@ -796,7 +817,7 @@
         <div class="field"><label>Meta</label>
           <select id="edit-meta">
             <option value="">Selecciona...</option>
-            ${['P�rdida de grasa','Ganancia muscular','Mantenimiento','Mejora cardiovascular','Rendimiento deportivo'].map(o=>`<option ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
+            ${['Prdida de grasa','Ganancia muscular','Mantenimiento','Mejora cardiovascular','Rendimiento deportivo'].map(o=>`<option ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
           </select>
         </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
@@ -807,7 +828,7 @@
       </button>
       <div class="modal-section">Historial de valoraciones</div>
       ${histHTML}
-      <button class="btn btn-success btn-sm" style="margin-top:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoraci�n</button>
+      <button class="btn btn-success btn-sm" style="margin-top:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoracin</button>
     `;
     document.getElementById('modal-detail').classList.add('open');
   }
@@ -876,7 +897,7 @@
         registradoPor: auth.currentUser?.uid || null,
         miembroNombre
       });
-      showToast('Valoraci�n guardada ', 'success');
+      showToast('Valoracin guardada ', 'success');
       closeModal('modal-metrics');
       loadMembers();
     } catch(e) {
@@ -907,9 +928,9 @@
     const fechaVal= fmtDate(document.getElementById('new-fecha-val').value.trim());
     const errEl   = document.getElementById('new-member-error');
     errEl.textContent = '';
-    if (!nombre||!apellido||!email||!pass||!tel) { errEl.textContent = 'Nombre, apellido, tel�fono, email y contrase�a son obligatorios'; return; }
-    if (pass.length < 6) { errEl.textContent = 'La contrase�a debe tener al menos 6 caracteres'; return; }
-    if (!peso) { errEl.textContent = 'El peso de valoraci�n es obligatorio'; return; }
+    if (!nombre||!apellido||!email||!pass||!tel) { errEl.textContent = 'Nombre, apellido, telfono, email y contrasea son obligatorios'; return; }
+    if (pass.length < 6) { errEl.textContent = 'La contrasea debe tener al menos 6 caracteres'; return; }
+    if (!peso) { errEl.textContent = 'El peso de valoracin es obligatorio'; return; }
     const btn = document.getElementById('btn-create-member');
     btn.textContent = 'Creando...'; btn.disabled = true;
     try {
@@ -917,7 +938,9 @@
       await secondaryAuth.signOut();
       const uid  = cred.user.uid;
       await db.collection('usuarios').doc(uid).set({
-        nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero, altura: Number(document.getElementById('new-altura').value)||null, primerIngreso: true,
+        nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero, altura: Number(document.getElementById('new-altura').value)||null, primerIngreso: true, activo: true,
+        vigencia: document.getElementById('new-vigencia')?.value || 'permanente',
+        vigenciaFecha: document.getElementById('new-vigencia-fecha')?.value || null,
         objetivo:{ meta, pesoInicial:isNaN(peso)?0:peso, pesoMeta }
       });
       await db.collection('usuarios').doc(uid).collection('metricas').add({
@@ -941,7 +964,7 @@
       switchTab('members');
       loadMembers();
     } catch(e) {
-      const msgs = {'auth/email-already-in-use':'Ese email ya est� registrado','auth/invalid-email':'Email inv�lido','auth/weak-password':'Contrase�a muy d�bil'};
+      const msgs = {'auth/email-already-in-use':'Ese email ya est registrado','auth/invalid-email':'Email invlido','auth/weak-password':'Contrasea muy dbil'};
       errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
     }
     btn.textContent = 'Crear miembro'; btn.disabled = false;
@@ -962,13 +985,13 @@
     }
   }
 
-  //    GESTI�N DE STAFF   
+  //    GESTIN DE STAFF   
   async function loadStaffList() {
     const listEl = document.getElementById('staff-list');
     listEl.innerHTML = '<div style="color:var(--gray);font-size:13px">Cargando...</div>';
     try {
       const snap = await db.collection('staff').get();
-      if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado a�n</div>'; return; }
+      if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado an</div>'; return; }
       listEl.innerHTML = snap.docs.map(d => {
         const s = d.data();
         const activo = s.activo !== false;
@@ -978,7 +1001,7 @@
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1a1a1a">
           <div>
             <div style="font-weight:600;font-size:15px">${s.nombre||s.email} ${isMaster ? '<span style="font-size:10px;color:var(--orange);font-family:Space Mono,monospace"> MAESTRO</span>' : ''}</div>
-            <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">${s.email} � <span style="color:${s.rol==='admin'?'var(--orange)':'#888'}">${s.rol||'coach'}</span></div>
+            <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">${s.email}  <span style="color:${s.rol==='admin'?'var(--orange)':'#888'}">${s.rol||'coach'}</span></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <button class="btn btn-sm" style="background:#222;color:#ccc;border:1px solid #333" onclick="openStaffProfile('${d.id}')">Ver</button>
@@ -1040,9 +1063,9 @@
     errEl.textContent = '';
     if (!nombre || !email || !tel || !pass) { errEl.textContent = 'Completa todos los campos'; return; }
     if (rol === 'admin' && window.currentStaffRole !== 'admin') { errEl.textContent = 'Solo un admin puede crear otro admin'; return; }
-    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel�fono debe tener exactamente 10 d�gitos'; return; }
-    if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email inv�lido'; return; }
-    if (pass.length < 6) { errEl.textContent = 'La contrase�a debe tener al menos 6 caracteres'; return; }
+    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El telfono debe tener exactamente 10 dgitos'; return; }
+    if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email invlido'; return; }
+    if (pass.length < 6) { errEl.textContent = 'La contrasea debe tener al menos 6 caracteres'; return; }
     const btn = document.getElementById('btn-create-staff');
     btn.textContent = 'Creando...'; btn.disabled = true;
     try {
@@ -1055,7 +1078,7 @@
       ['ns-nombre','ns-email','ns-tel','ns-pass'].forEach(id => document.getElementById(id).value = '');
       loadStaffList();
     } catch(e) {
-      const msgs = {'auth/email-already-in-use':'Ese email ya est� registrado','auth/invalid-email':'Email inv�lido','auth/weak-password':'Contrase�a muy d�bil'};
+      const msgs = {'auth/email-already-in-use':'Ese email ya est registrado','auth/invalid-email':'Email invlido','auth/weak-password':'Contrasea muy dbil'};
       errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
     }
     btn.textContent = 'Agregar al staff'; btn.disabled = false;
@@ -1094,7 +1117,7 @@
           <div id="sp-email" style="font-size:13px"></div>
         </div>
         <div style="background:#1a1a1a;border-radius:10px;padding:10px 12px">
-          <div style="font-size:10px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:3px">TEL�FONO</div>
+          <div style="font-size:10px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:3px">TELFONO</div>
           <div id="sp-tel" style="font-size:13px"></div>
         </div>
         <div style="background:#1a1a1a;border-radius:10px;padding:10px 12px">
@@ -1110,7 +1133,7 @@
     <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:20px;margin-bottom:16px">
       <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Editar datos</div>
       <div class="field" style="margin-bottom:10px"><label>Nombre completo</label><input type="text" id="sp-edit-nombre" placeholder="Nombre"></div>
-      <div class="field" style="margin-bottom:10px"><label>Tel�fono</label><input type="tel" id="sp-edit-tel" placeholder="10 d�gitos" maxlength="10"></div>
+      <div class="field" style="margin-bottom:10px"><label>Telfono</label><input type="tel" id="sp-edit-tel" placeholder="10 dgitos" maxlength="10"></div>
       <div class="field" style="margin-bottom:14px"><label>Rol</label>
         <select id="sp-edit-rol" style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:10px 12px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif">
           <option value="coach">Coach</option>
@@ -1127,15 +1150,15 @@
   </div>
 </div>
 
-<!-- MODAL CAMBIO CONTRASE�A STAFF -->
+<!-- MODAL CAMBIO CONTRASEA STAFF -->
 <div id="modal-pass-staff" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:960;align-items:center;justify-content:center">
   <div style="background:#111;border-radius:20px;padding:28px 24px;width:90%;max-width:360px;border:1px solid #2a2a2a">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:18px">Cambiar contrase�a</div>
-    <div class="field" style="margin-bottom:12px"><label>Contrase�a actual</label><input type="password" id="sp-current" placeholder=""""""""""></div>
-    <div class="field" style="margin-bottom:12px"><label>Nueva contrase�a</label><input type="password" id="sp-new" placeholder="M�nimo 6 caracteres"></div>
-    <div class="field" style="margin-bottom:16px"><label>Confirmar nueva</label><input type="password" id="sp-confirm" placeholder="Repite la contrase�a"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:18px">Cambiar contrasea</div>
+    <div class="field" style="margin-bottom:12px"><label>Contrasea actual</label><input type="password" id="sp-current" placeholder=""""""""""></div>
+    <div class="field" style="margin-bottom:12px"><label>Nueva contrasea</label><input type="password" id="sp-new" placeholder="Mnimo 6 caracteres"></div>
+    <div class="field" style="margin-bottom:16px"><label>Confirmar nueva</label><input type="password" id="sp-confirm" placeholder="Repite la contrasea"></div>
     <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:14px">
-      Debe tener: may�scula � min�scula � n�mero � s�mbolo
+      Debe tener: mayscula  minscula  nmero  smbolo
     </div>
     <div id="sp-error" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:12px"></div>
     <div style="display:flex;gap:10px">
