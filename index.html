@@ -355,6 +355,8 @@
           <option value="Bajar grasa / bajar de peso">&#x1F525; Bajar grasa / bajar de peso</option>
           <option value="Ganar m&#xFA;sculo / recomposici&#xF3;n">&#x1F4AA; Ganar m&#xFA;sculo / recomposici&#xF3;n</option>
           <option value="Salud metab&#xF3;lica / salud general">&#x1F49A; Salud metab&#xF3;lica / salud general</option>
+          <option value="Rendimiento funcional">&#x26A1; Rendimiento funcional</option>
+          <option value="Est&#xE9;tica / composici&#xF3;n equilibrada">&#x2728; Est&#xE9;tica / composici&#xF3;n equilibrada</option>
         </select>
         <div style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;margin-top:6px;letter-spacing:1px">Este cambio actualiza c&#xF3;mo medimos tu progreso</div>
       </div>
@@ -721,10 +723,34 @@
     document.getElementById('greeting-name').innerHTML = primerNombre + '<br>' + (nombre.split(' ')[1] || '');
   }
 
+  // PROGRESO POR OBJETIVO: cada uno usa metricas ponderadas (0-100)
+  // Bajar grasa: PGC 40%+GV 30%+InBody 30%
+  // Ganar musculo: MM 40%+PGC 30%+InBody 30%
+  // Salud metabolica: PGC 30%+GV 30%+IMC 20%+InBody 20%
+  // Rendimiento: MM 50%+PGC 20%+InBody 30%
+  // Estetica: MM 30%+PGC 30%+IMC 20%+InBody 20%
+  function calcProgreso(meta,m,obj){
+    const cl=v=>(isNaN(v)||!isFinite(v))?null:Math.max(0,Math.min(100,v));
+    const wavg=pairs=>{const ok=pairs.filter(([v])=>v!==null);if(!ok.length)return null;const tw=ok.reduce((s,[,w])=>s+w,0);return Math.round(ok.reduce((s,[v,w])=>s+v*(w/tw),0));};
+    const pgcP=(obj.pgcInicial!=null&&obj.pgcMeta!=null&&m.pgc!=null&&obj.pgcInicial!==obj.pgcMeta)?cl(((obj.pgcInicial-m.pgc)/(obj.pgcInicial-obj.pgcMeta))*100):null;
+    const gvP=(obj.gvInicial!=null&&obj.gvMeta!=null&&m.grasaVisceral!=null&&obj.gvInicial!==obj.gvMeta)?cl(((obj.gvInicial-m.grasaVisceral)/(obj.gvInicial-obj.gvMeta))*100):null;
+    const mmP=(obj.mmInicial!=null&&obj.mmMeta!=null&&m.musculo!=null&&obj.mmInicial!==obj.mmMeta)?cl(((m.musculo-obj.mmInicial)/(obj.mmMeta-obj.mmInicial))*100):null;
+    const ibP=(obj.inbodyInicial!=null&&obj.inbodyMeta!=null&&m.calificacion!=null&&obj.inbodyInicial!==obj.inbodyMeta)?cl(((m.calificacion-obj.inbodyInicial)/(obj.inbodyMeta-obj.inbodyInicial))*100):null;
+    const imcP=(obj.imcInicial!=null&&obj.imcMeta!=null&&m.imc!=null&&Math.abs(obj.imcInicial-obj.imcMeta)>0)?cl(((Math.abs(obj.imcInicial-obj.imcMeta)-Math.abs(m.imc-obj.imcMeta))/Math.abs(obj.imcInicial-obj.imcMeta))*100):null;
+    const mt=(meta||''). toLowerCase();
+    if(mt.includes('grasa')||mt.includes('peso')) return wavg([[pgcP,0.4],[gvP,0.3],[ibP,0.3]]);
+    if(mt.includes('m\u00FAsculo')||mt.includes('recomposici')) return wavg([[mmP,0.4],[pgcP,0.3],[ibP,0.3]]);
+    if(mt.includes('salud')||mt.includes('metab')) return wavg([[pgcP,0.3],[gvP,0.3],[imcP,0.2],[ibP,0.2]]);
+    if(mt.includes('rendimiento')||mt.includes('funcional')) return wavg([[mmP,0.5],[pgcP,0.2],[ibP,0.3]]);
+    if(mt.includes('est\u00E9tica')||mt.includes('composici')) return wavg([[mmP,0.3],[pgcP,0.3],[imcP,0.2],[ibP,0.2]]);
+    return null;
+  }
+
   function renderMetrics(m, obj) {
     const pesoIni  = obj.pesoInicial || m.peso;
     const pesoMeta = obj.pesoMeta || m.peso;
-    const pct = Math.round(Math.max(0, Math.min(100, ((pesoIni - m.peso) / (pesoIni - pesoMeta)) * 100))) || 0;
+    const pct = calcProgreso(obj.meta,m,obj) ??
+      Math.round(Math.max(0, Math.min(100, ((pesoIni - m.peso) / (pesoIni - pesoMeta)) * 100))) || 0;
     const circum = 2 * Math.PI * 34;
 
     const califPct = m.calificacion || 0;
@@ -936,7 +962,7 @@
 
       const prompt = `Eres el coach de bePWR Quer\u00E9taro. Es de ${saludo}, ${nombre.split(' ')[0]}.
 Datos: peso ${metrica.peso}kg, m\u00FAsculo ${metrica.musculo}kg, PGC ${metrica.pgc}%, GV ${metrica.grasaVisceral}, InBody ${metrica.calificacion}/100. Objetivo: ${objetivo.meta}.
-Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2) consejo pr\u00E1ctico para hoy, 3) motivaci\u00F3n breve. Si tiene clase, men\u00E7i\u00F3nala de forma natural. Espa\u00F1ol. Sin comillas ni bullets.`
+Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2) consejo pr\u00E1ctico para hoy, 3) motivaci\u00F3n. Si tiene clase, men\u00E7i\u00F3nala de forma natural. Espa\u00F1ol. Sin comillas ni bullets.`
 
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -971,10 +997,8 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
   let cachedUserData = {};
   window.openEditModal = () => {
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
-    const _ms = document.getElementById('edit-meta');
-    if (_ms && cachedUserData.objetivo?.meta) {
-      for (const o of _ms.options) o.selected = o.value === cachedUserData.objetivo.meta;
-    }
+    const _ms=document.getElementById('edit-meta');
+    if(_ms&&cachedUserData.objetivo?.meta){for(const o of _ms.options)o.selected=o.value===cachedUserData.objetivo.meta;}
     document.getElementById('edit-email').value = auth.currentUser?.email || '';
     document.getElementById('edit-tel').value = cachedUserData.telefono || '';
     document.getElementById('edit-pass-current').value = '';
@@ -990,15 +1014,13 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
     const errEl = document.getElementById('edit-error');
     errEl.textContent = '';
     // nombre es solo lectura, lo maneja el staff
-    const _nm = document.getElementById('edit-meta')?.value;
-    if (_nm && _nm !== (cachedUserData.objetivo?.meta || '')) {
-      await db.collection('usuarios').doc(user.uid).update({ 'objetivo.meta': _nm });
-      if (!cachedUserData.objetivo) cachedUserData.objetivo = {};
-      cachedUserData.objetivo.meta = _nm;
-      const _ep = document.getElementById('prof-meta');
-      if (_ep) _ep.textContent = _nm;
-      const _gt = document.querySelector('.goal-title');
-      if (_gt) _gt.textContent = _nm;
+    const _nm=document.getElementById('edit-meta')?.value;
+    if(_nm&&_nm!==(cachedUserData.objetivo?.meta||'')){
+      await db.collection('usuarios').doc(user.uid).update({'objetivo.meta':_nm});
+      if(!cachedUserData.objetivo)cachedUserData.objetivo={};
+      cachedUserData.objetivo.meta=_nm;
+      const _ep=document.getElementById('prof-meta');if(_ep)_ep.textContent=_nm;
+      const _gt=document.querySelector('.goal-title');if(_gt)_gt.textContent=_nm;
     }
     const passCurrent = document.getElementById('edit-pass-current').value;
     const passNew = document.getElementById('edit-pass-new').value;
