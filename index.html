@@ -530,7 +530,7 @@
         if (staffDoc.exists()) {
           await signOut(auth);
           errorEl.style.color = '#f87171';
-          errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administraci&#xF3;n.';
+          errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administraci\u00F3n.';
           appScr.classList.remove('active');
           loginScr.classList.add('active');
           authReady = true;
@@ -994,11 +994,11 @@ Espa\u00F1ol. Sin comillas. Sin bullets. Sin encabezados.`
       // Cambiar contrase&#xF1;a si se llenaron los campos
       const passConfirm = document.getElementById('edit-confirm-pass').value;
       if (passCurrent || passNew) {
-        if (!passCurrent) { errEl.textContent = 'Escribe tu contrase&#xF1;a actual'; return; }
+        if (!passCurrent) { errEl.textContent = 'Escribe tu contrase\u00F1a actual'; return; }
         if (!passNew) { errEl.textContent = 'Escribe la nueva contrase\u00F1a'; return; }
         const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-        if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase&#xF1;a debe tener may&#xFA;scula, min&#xFA;scula, n&#xFA;mero y un s&#xED;mbolo'; return; }
-        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase&#xF1;as no coinciden'; return; }
+        if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase\u00F1a debe tener may\u00FAscula, min\u00FAscula, n\u00FAmero y un s\u00EDmbolo'; return; }
+        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
         const cred = EmailAuthProvider.credential(user.email, passCurrent);
         await reauthenticateWithCredential(user, cred);
         await updatePassword(user, passNew);
@@ -1009,7 +1009,7 @@ Espa\u00F1ol. Sin comillas. Sin bullets. Sin encabezados.`
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase&#xF1;a actual incorrecta';
+        errEl.textContent = 'Contrase\u00F1a actual incorrecta';
       } else {
         errEl.textContent = 'Error al guardar: ' + e.message;
       }
@@ -1050,9 +1050,9 @@ Espa\u00F1ol. Sin comillas. Sin bullets. Sin encabezados.`
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
     if (!passNew) { errEl.textContent = 'Escribe tu nueva contrase\u00F1a'; return; }
     if (!passRegex.test(passNew)) { 
-      errEl.textContent = 'Debe tener may&#xFA;scula, min&#xFA;scula, n&#xFA;mero y un s&#xED;mbolo'; return; 
+      errEl.textContent = 'Debe tener may\u00FAscula, min\u00FAscula, n\u00FAmero y un s\u00EDmbolo'; return; 
     }
-    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase&#xF1;as no coinciden'; return; }
+    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
 
     try {
       const user = auth.currentUser;
@@ -1079,17 +1079,17 @@ Espa\u00F1ol. Sin comillas. Sin bullets. Sin encabezados.`
     if (newEmail !== confirmEmail) { errEl.textContent = 'Los emails no coinciden'; return; }
     if (newEmail === auth.currentUser?.email) { errEl.textContent = 'Es el mismo email actual'; return; }
     const passCurrent = document.getElementById('edit-pass-current').value;
-    if (!passCurrent) { errEl.textContent = 'Escribe tu contrase&#xF1;a actual (secci&#xF3;n de abajo) para cambiar el email'; return; }
+    if (!passCurrent) { errEl.textContent = 'Escribe tu contrase\u00F1a actual (secci\u00F3n de abajo) para cambiar el email'; return; }
     try {
       const cred = EmailAuthProvider.credential(auth.currentUser.email, passCurrent);
       await reauthenticateWithCredential(auth.currentUser, cred);
       await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Se envi&#xF3; verificaci\u00F3n a ' + newEmail + '. Confirma para que aplique.';
+      errEl.textContent = 'Se envi\u00F3 verificaci\u00F3n a ' + newEmail + '. Confirma para que aplique.';
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase&#xF1;a actual incorrecta';
+        errEl.textContent = 'Contrase\u00F1a actual incorrecta';
       } else {
         errEl.textContent = 'Error: ' + e.message;
       }
@@ -1103,8 +1103,8 @@ Espa\u00F1ol. Sin comillas. Sin bullets. Sin encabezados.`
     const errEl = document.getElementById('edit-error');
     errEl.style.color = '#f87171';
     errEl.textContent = '';
-    if (!newTel) { errEl.textContent = 'Escribe el nuevo tel&#xE9;fono'; return; }
-    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel&#xE9;fono debe tener exactamente 10 d&#xED;gitos'; return; }
+    if (!newTel) { errEl.textContent = 'Escribe el nuevo tel\u00E9fono'; return; }
+    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
     if (newTel !== confirmTel) { errEl.textContent = 'Los tel\u00E9fonos no coinciden'; return; }
     try {
       const user = auth.currentUser;
@@ -1112,7 +1112,7 @@ Espa\u00F1ol. Sin comillas. Sin bullets. Sin encabezados.`
       cachedUserData = { ...cachedUserData, telefono: newTel };
       document.getElementById('prof-phone').textContent = newTel;
       errEl.style.color = '#4ade80';
-      errEl.textContent = 'Tel\u00E9fono actualizado &#x2713;';
+      errEl.textContent = 'Tel\u00E9fono actualizado \u2713';
     } catch(e) {
       errEl.style.color = '#f87171';
       errEl.textContent = 'Error: ' + e.message;

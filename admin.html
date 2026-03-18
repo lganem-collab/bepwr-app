@@ -675,7 +675,7 @@
     } catch(e) {
       errEl.textContent = 'Error de conexi\u00F3n: ' + e.message;
     } finally {
-      btn.textContent = '&#x1F4E3; Enviar notificaci\u00F3n'; btn.disabled = false;
+      btn.textContent = '\u{1F4E3} Enviar notificaci\u00F3n'; btn.disabled = false;
     }
   }
 
@@ -783,11 +783,11 @@
     const tel = document.getElementById('sp-edit-tel').value.trim();
     const rol = document.getElementById('sp-edit-rol').value;
     if (!nombre) { errEl.textContent = 'El nombre es requerido'; return; }
-    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel&#xE9;fono debe tener exactamente 10 d\u00EDgitos'; return; }
+    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
     try {
       await db.collection('staff').doc(currentStaffProfileUID).update({ nombre, telefono: tel, rol });
       errEl.style.color = '#4ade80';
-      errEl.textContent = '&#xA1;Datos actualizados!';
+      errEl.textContent = '\u00A1Datos actualizados!';
       document.getElementById('sp-nombre').textContent = nombre;
       document.getElementById('sp-tel').textContent = tel;
       setTimeout(() => loadStaffList(), 1000);
@@ -803,7 +803,7 @@
     errEl.textContent = '';
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
     if (!current) { errEl.textContent = 'Escribe tu contrase\u00F1a actual'; return; }
-    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrase&#xF1;a no cumple los requisitos'; return; }
+    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrase\u00F1a no cumple los requisitos'; return; }
     if (newPass !== confirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
     try {
       const user = auth.currentUser;
@@ -811,7 +811,7 @@
       await user.reauthenticateWithCredential(cred);
       await user.updatePassword(newPass);
       errEl.style.color = '#4ade80';
-      errEl.textContent = '&#xA1;Contrase\u00F1a actualizada!';
+      errEl.textContent = '\u00A1Contrase\u00F1a actualizada!';
       setTimeout(closeChangePass, 1500);
     } catch(e) {
       errEl.style.color = '#f87171';
@@ -1117,10 +1117,10 @@
     const fechaVal= fmtDate(document.getElementById('new-fecha-val').value.trim());
     const errEl   = document.getElementById('new-member-error');
     errEl.textContent = '';
-    if (!nombre||!apellido||!email||!pass||!tel) { errEl.textContent = 'Nombre, apellido, tel&#xE9;fono, email y contrase&#xF1;a son obligatorios'; return; }
+    if (!nombre||!apellido||!email||!pass||!tel) { errEl.textContent = 'Nombre, apellido, tel\u00E9fono, email y contrase\u00F1a son obligatorios'; return; }
     if (pass.length < 6) { errEl.textContent = 'La contrase\u00F1a debe tener al menos 6 caracteres'; return; }
     if (!peso || isNaN(peso)) { errEl.textContent = 'El peso es obligatorio'; return; }
-    if (peso < 20 || peso > 400) { errEl.textContent = 'Peso inv&#xE1;lido (debe ser 20-400 kg)'; return; }
+    if (peso < 20 || peso > 400) { errEl.textContent = 'Peso inv\u00E1lido (debe ser 20-400 kg)'; return; }
     const vigencia = document.getElementById('new-vigencia').value || 'permanente';
     const vigenciaFecha = document.getElementById('new-vigencia-fecha').value || null;
     const btn = document.getElementById('btn-create-member');
@@ -1258,8 +1258,8 @@
     errEl.textContent = '';
     if (!nombre || !email || !tel || !pass) { errEl.textContent = 'Completa todos los campos'; return; }
     if (rol === 'admin' && window.currentStaffRole !== 'admin') { errEl.textContent = 'Solo un admin puede crear otro admin'; return; }
-    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel&#xE9;fono debe tener exactamente 10 d\u00EDgitos'; return; }
-    if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email inv&#xE1;lido'; return; }
+    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
+    if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email inv\u00E1lido'; return; }
     if (pass.length < 6) { errEl.textContent = 'La contrase\u00F1a debe tener al menos 6 caracteres'; return; }
     const btn = document.getElementById('btn-create-staff');
     btn.textContent = 'Creando...'; btn.disabled = true;
