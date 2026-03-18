@@ -247,11 +247,11 @@
           <label>Meta principal</label>
           <select id="new-meta">
             <option value="">Selecciona...</option>
-            <option>P&#xE9;rdida de grasa</option>
-            <option>Ganancia muscular</option>
-            <option>Mantenimiento</option>
-            <option>Mejora cardiovascular</option>
-            <option>Rendimiento deportivo</option>
+            <option value="Bajar grasa / bajar de peso">&#x1F525; Bajar grasa / bajar de peso</option>
+            <option value="Ganar m&#xFA;sculo / recomposici&#xF3;n">&#x1F4AA; Ganar m&#xFA;sculo / recomposici&#xF3;n</option>
+            <option value="Salud metab&#xF3;lica / salud general">&#x1F49A; Salud metab&#xF3;lica / salud general</option>
+            <option value="Rendimiento funcional">&#x26A1; Rendimiento funcional</option>
+            <option value="Est&#xE9;tica / composici&#xF3;n equilibrada">&#x2728; Est&#xE9;tica / composici&#xF3;n equilibrada</option>
           </select>
         </div>
 
@@ -1004,11 +1004,37 @@
         <div class="field"><label>Meta</label>
           <select id="edit-meta">
             <option value="">Selecciona...</option>
-            ${['P&#xE9;rdida de grasa','Ganancia muscular','Mantenimiento','Mejora cardiovascular','Rendimiento deportivo'].map(o=>`<option ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
+            ${['Bajar grasa / bajar de peso,Ganar m\u00FAsculo / recomposici\u00F3n,Salud metab\u00F3lica / salud general,Rendimiento funcional,Est\u00E9tica / composici\u00F3n equilibrada'].join(',').split(',').map(o=>`<option value="${o}" ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
           </select>
         </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="edit-peso-meta" value="${m.objetivo?.pesoMeta||''}" step="0.1" /></div>
+      </div>
+      <div class="modal-section" style="font-size:9px">M&#xE9;tricas iniciales y metas para c&#xE1;lculo de progreso</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="field"><label>PGC inicial (%)</label><input type="number" id="edit-pgc-ini" value="${m.objetivo?.pgcInicial||''}" step="0.1" placeholder="28" /></div>
+        <div class="field"><label>PGC actual (%)</label><input type="number" value="${m.ultimaMetrica?.pgc||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
+        <div class="field"><label>PGC meta (%)</label><input type="number" id="edit-pgc-meta" value="${m.objetivo?.pgcMeta||''}" step="0.1" placeholder="22" /></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="field"><label>Grasa Visc. inicial</label><input type="number" id="edit-gv-ini" value="${m.objetivo?.gvInicial||''}" step="1" placeholder="10" /></div>
+        <div class="field"><label>G.Visc. actual</label><input type="number" value="${m.ultimaMetrica?.grasaVisceral||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
+        <div class="field"><label>G.Visc. meta</label><input type="number" id="edit-gv-meta" value="${m.objetivo?.gvMeta||''}" step="1" placeholder="7" /></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="field"><label>M&#xFA;sc. Esquel. inicial (kg)</label><input type="number" id="edit-mm-ini" value="${m.objetivo?.mmInicial||''}" step="0.1" placeholder="42" /></div>
+        <div class="field"><label>M&#xFA;sc. actual (kg)</label><input type="number" value="${m.ultimaMetrica?.musculo||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
+        <div class="field"><label>M&#xFA;sc. meta (kg)</label><input type="number" id="edit-mm-meta" value="${m.objetivo?.mmMeta||''}" step="0.1" placeholder="46" /></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="field"><label>InBody inicial</label><input type="number" id="edit-ib-ini" value="${m.objetivo?.inbodyInicial||''}" step="1" placeholder="72" /></div>
+        <div class="field"><label>InBody actual</label><input type="number" value="${m.ultimaMetrica?.calificacion||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
+        <div class="field"><label>InBody meta</label><input type="number" id="edit-ib-meta" value="${m.objetivo?.inbodyMeta||''}" step="1" placeholder="80" /></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+        <div class="field"><label>IMC inicial</label><input type="number" id="edit-imc-ini" value="${m.objetivo?.imcInicial||''}" step="0.1" placeholder="26.5" /></div>
+        <div class="field"><label>IMC actual</label><input type="number" value="${m.ultimaMetrica?.imc||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
+        <div class="field"><label>IMC meta</label><input type="number" id="edit-imc-meta" value="${m.objetivo?.imcMeta||''}" step="0.1" placeholder="24" /></div>
       </div>
       <button class="btn btn-primary btn-sm" style="margin-bottom:20px" onclick="saveMemberEdit('${uid}')" ${window.currentStaffRole !== 'admin' ? 'disabled title="Solo admin puede editar datos"' : ''}>
         ${window.currentStaffRole !== 'admin' ? '&#x1F512; Editar datos (solo admin)' : 'Guardar cambios'}
@@ -1035,9 +1061,19 @@
         vigencia: document.getElementById('edit-vigencia').value || 'permanente',
         vigenciaFecha: document.getElementById('edit-vigencia-fecha').value || null,
         objetivo: {
-          meta: document.getElementById('edit-meta').value,
-          pesoInicial: Number(document.getElementById('edit-peso-ini').value)||0,
-          pesoMeta: Number(document.getElementById('edit-peso-meta').value)||0,
+          meta:         document.getElementById('edit-meta').value,
+          pesoInicial:  Number(document.getElementById('edit-peso-ini').value)||0,
+          pesoMeta:     Number(document.getElementById('edit-peso-meta').value)||0,
+          pgcInicial:   Number(document.getElementById('edit-pgc-ini').value)||null,
+          pgcMeta:      Number(document.getElementById('edit-pgc-meta').value)||null,
+          gvInicial:    Number(document.getElementById('edit-gv-ini').value)||null,
+          gvMeta:       Number(document.getElementById('edit-gv-meta').value)||null,
+          mmInicial:    Number(document.getElementById('edit-mm-ini').value)||null,
+          mmMeta:       Number(document.getElementById('edit-mm-meta').value)||null,
+          inbodyInicial:Number(document.getElementById('edit-ib-ini').value)||null,
+          inbodyMeta:   Number(document.getElementById('edit-ib-meta').value)||null,
+          imcInicial:   Number(document.getElementById('edit-imc-ini').value)||null,
+          imcMeta:      Number(document.getElementById('edit-imc-meta').value)||null,
         }
       });
       showToast('Cambios guardados &#x2713;', 'success');
