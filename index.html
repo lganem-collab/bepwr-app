@@ -494,7 +494,7 @@
 <!-- FIREBASE SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, browserLocalPersistence, setPersistence }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
@@ -515,10 +515,8 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  // Mantener sesi\u00F3n activa (no cerrar al reabrir la app)
-  import("https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js").then(m => {
-    m.setPersistence(auth, m.browserLocalPersistence).catch(() => {});
-  });
+  // Sesi\u00F3n persistente: se mantiene aunque cierren la app en el celular
+  setPersistence(auth, browserLocalPersistence).catch(() => {});
 
   const splash    = document.getElementById('screen-splash');
   const loginScr  = document.getElementById('screen-login');
@@ -842,25 +840,43 @@
   function renderChart(metricas) {
     if (!metricas.length) return;
     const pesos = metricas.map(m => m.peso);
-    const fechas = metricas.map(m => (m.fecha || '').slice(0,3).toUpperCase() || '&#x2014;');
+    const fechas = metricas.map(m => {
+      const d = m.fecha || '';
+      return d.length >= 10 ? d.slice(8,10) : d.slice(0,3).toUpperCase() || '-';
+    });
+    const ultima = pesos[pesos.length-1];
     const min = Math.min(...pesos), max = Math.max(...pesos);
     const range = max - min || 1;
-    const ultima = pesos[pesos.length-1];
-
-    const barCols = pesos.map((p, i) =>
-      `<div class="bar-col ${i===pesos.length-1?'lit':''}" style="height:${20 + ((p - min)/range)*70}%"></div>`
-    ).join('');
-    const mos = fechas.map(f => `<div class="mo">${f}</div>`).join('');
-
+    const n = pesos.length;
+    const W = 320, H = 60, PAD = 8;
+    const pts = pesos.map((p, i) => [
+      PAD + (i / Math.max(n-1,1)) * (W - PAD*2),
+      H - PAD - ((p - min) / range) * (H - PAD*2)
+    ]);
+    const polyline = pts.map(([x,y]) => x+','+y).join(' ');
+    const [lx, ly] = pts[pts.length-1];
+    const areaPath = 'M'+pts.map(([x,y])=>x+' '+y).join(' L')
+      +' L'+lx+' '+(H-PAD)+' L'+PAD+' '+(H-PAD)+' Z';
     document.getElementById('chart-card').innerHTML = `
       <div class="chart-head">
-        <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">&#xDA;ltimas ${metricas.length} mediciones</div></div>
+        <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">&#xDA;ltimas ${n} mediciones</div></div>
         <div class="chart-big">${ultima} <span style="font-size:15px;color:var(--gray)">kg</span></div>
       </div>
-      <div class="bars">${barCols}</div>
-      <div class="months">${mos}</div>`;
+      <div class="line-chart-wrap">
+        <svg class="line-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
+             style="width:100%;height:${H}px;display:block">
+          <defs><linearGradient id="lcgrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FF5C1A" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#FF5C1A" stop-opacity="0.03"/>
+          </linearGradient></defs>
+          <path d="${areaPath}" fill="url(#lcgrad)"/>
+          <polyline points="${polyline}" fill="none" stroke="#FF5C1A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+          ${pts.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i===n-1?4:2.5}" fill="${i===n-1?'#FF5C1A':'#cc4a14'}" stroke="#0a0a0a" stroke-width="1.5"/>`).join('')}
+          ${pts.map(([x,y],i)=>`<text x="${x}" y="${y-7}" text-anchor="middle" font-size="8" fill="${i===n-1?'#FF5C1A':'#666'}" font-family="Space Mono,monospace">${pesos[i]}</text>`).join('')}
+        </svg>
+      </div>
+      <div class="lc-labels">${fechas.map(f=>`<div class="lc-lbl">${f}</div>`).join('')}</div>`;
   }
-
   function renderProfileMetrics(m) {
     const gc = m.grasaCorporal ?? m.grasaPct;
     document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : '&#x2014;';
