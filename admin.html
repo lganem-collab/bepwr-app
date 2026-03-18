@@ -449,7 +449,7 @@
         } catch(domErr) { console.error('DOM error:', domErr); }
         try {
           loadMembers();
-      generateCoachMessage();
+      generateCoachMessage().catch(()=>{});
       subscribeStaffToPush(user.uid);
         } catch(loadErr) { console.error('loadMembers error:', loadErr); }
       } catch(e) {
@@ -597,7 +597,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, maxTokens: 600 })
+        body: JSON.stringify({ prompt, maxTokens: 200 })
       });
       const data = await res.json();
       const msg = data.message || '';

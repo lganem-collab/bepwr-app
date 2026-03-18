@@ -925,23 +925,13 @@
         genero && genero !== 'prefiero-no-decir' ? `g&#xE9;nero ${genero}` : null
       ].filter(Boolean).join(', ');
 
-      const prompt = `Eres el coach experto de bePWR, un studio de fitness en Quer&#xE9;taro, M&#xE9;xico, especializado en entrenamiento funcional de alto rendimiento. Hablas con autoridad cient&#xED;fica, eres directo, motivador y profesional.
-
-Es de ${saludo} (hora local: ${new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'})}).
-Miembro: ${nombre}${contextoPersona ? ' ('+contextoPersona+')' : ''}.
-M&#xE9;tricas actuales: peso ${metrica.peso}kg, m&#xFA;sculo esquel&#xE9;tico ${metrica.musculo}kg, grasa corporal ${metrica.grasaCorporal}kg, IMC ${metrica.imc}, PGC ${metrica.pgc}%, grasa visceral ${metrica.grasaVisceral}, calificaci&#xF3;n InBody ${metrica.calificacion}/100.
-Objetivo: ${objetivo.meta}, de ${objetivo.pesoInicial}kg &#x2192; ${objetivo.pesoMeta}kg.
-${edad && edad >= 50 ? 'Nota: mayores de 50 &#x2014; priorizar preservaci&#xF3;n muscular, movilidad y fuerza funcional sobre cardio intenso.' : ''}
-
-Genera un mensaje &#xDA;NICO, fresco y variado (m&#xE1;ximo 4 oraciones) que cumpla EXACTAMENTE con los siguientes criterios:
-1. Inicia con el saludo apropiado (${saludo}) usando el nombre del miembro.
-2. Elige UNO de estos enfoques al azar para hacer el mensaje variado cada vez que se abre la app: dato cient&#xED;fico sobre ejercicio funcional, consejo de hidrataci&#xF3;n espec&#xED;fico, h&#xE1;bito de sue&#xF1;o y recuperaci&#xF3;n, consejo nutricional concreto, beneficio de alguna disciplina deportiva complementaria (yoga, nataci&#xF3;n, ciclismo, etc.), o dato sobre el clima de Quer&#xE9;taro relacionado con el entrenamiento o hidrataci&#xF3;n.
-3. Conecta ese consejo con al menos uno de sus datos de m&#xE9;tricas de forma espec&#xED;fica y relevante.
-4. Cierra con una frase motivadora y profesional alineada a su objetivo.
-
-5. De forma natural, integra una invitaci&#xF3;n a reservar su pr&#xF3;xima clase en bePWR, mencionando que lo ideal es entrenar de 2 a 4 sesiones de ejercicio funcional por semana para resultados &#xF3;ptimos.
-Vari&#xE1; el tono, el tema y el dato cient&#xED;fico o consejo en cada mensaje &#x2014; nunca repitas la misma estructura dos veces seguidas.
-Responde SOLO el mensaje en espa&#xF1;ol, sin comillas, sin bullets, sin encabezados.`;
+      const prompt = `Eres el coach de bePWR Quer\u00E9taro. Es de ${saludo}, ${nombre.split(' ')[0]}.
+Datos: peso ${metrica.peso}kg, m\u00FAscul esqul\u00E9tico ${metrica.musculo}kg, PGC ${metrica.pgc}%, GV ${metrica.grasaVisceral}, InBody ${metrica.calificacion}/100. Objetivo: ${objetivo.meta}.
+Escribe un mensaje \u00FAnico (m\u00E1x 3 oraciones):
+1. Un dato cient\u00EDfico \u00FAtil relacionado con sus m\u00E9tricas o su objetivo.
+2. Un consejo concreto y pr\u00E1ctico para hoy.
+3. Motivaci\u00F3n breve. Si tiene clase pendiente, men\u00E7i\u00F3nala de forma natural, no como llamado a la acci\u00F3n.
+Espa\u00F1ol. Sin comillas. Sin bullets. Sin encabezados.`
 
       const res = await fetch('/api/chat', {
         method: 'POST',
