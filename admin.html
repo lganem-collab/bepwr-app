@@ -31,7 +31,7 @@
     .btn:active{transform:scale(.98);opacity:.85}
     .btn-primary{background:var(--orange);color:white;width:100%}
     .btn-secondary{background:transparent;color:var(--white);border:1px solid var(--border)}
-    .btn-sm{padding:8px 16px;font-size:12px;border-radius:8px;width:auto}
+    .btn-sm{padding:8px 16px;font-size:12px;border-radius:8px;width:auto;white-space:nowrap}
     .btn-success{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
     .btn:disabled{opacity:.4;cursor:not-allowed}
     #s-app{min-height:100vh;display:none;flex-direction:column}
@@ -55,9 +55,9 @@
     .search-input:focus{border-color:var(--orange)}
     .search-input::placeholder{color:#333}
     .members-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-    .table-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:12px 20px;border-bottom:1px solid var(--border);background:#141414}
+    .table-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 160px;padding:12px 20px;border-bottom:1px solid var(--border);background:#141414}
     .th{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace}
-    .table-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
+    .table-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 160px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
     .table-row:last-child{border-bottom:none}
     .table-row:hover{background:#1e1e1e}
     .td{font-size:14px}
@@ -65,7 +65,7 @@
     .td.mono{font-family:Space Mono,monospace;font-size:12px}
     .member-name{font-weight:600}
     .member-email{font-size:12px;color:var(--gray);margin-top:2px}
-    .actions{display:flex;gap:8px}
+    .actions{display:flex;gap:6px;flex-wrap:nowrap;align-items:center}
     .empty-state{text-align:center;padding:48px;color:var(--gray);font-family:Space Mono,monospace;font-size:12px;letter-spacing:1px}
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
     .modal-overlay.open{opacity:1;pointer-events:all}
