@@ -503,7 +503,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc }
+  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
   import { getMessaging, getToken, onMessage }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
@@ -871,13 +871,13 @@
     document.getElementById('val-fecha').textContent = m.fecha || '&#x2014;';
   }
 
-  // NOTIFICACIONES
+  // NOTIFICACIONES (modular Firestore API)
   async function loadNotifications(uid) {
     const listEl=document.getElementById('notif-list');
     if(!listEl)return;
     try{
       const cutoff=new Date();cutoff.setMonth(cutoff.getMonth()-1);const cutISO=cutoff.toISOString();
-      const snap=await db.collection('usuarios').doc(uid).collection('notificaciones').orderBy('fecha','desc').get();
+      const snap=await getDocs(query(collection(db,'usuarios',uid,'notificaciones'),orderBy('fecha','desc')));
       snap.docs.filter(d=>(d.data().fecha||'')<cutISO).forEach(d=>d.ref.delete().catch(()=>{}));
       const fresh=snap.docs.filter(d=>(d.data().fecha||'')>=cutISO);
       const unread=fresh.filter(d=>!d.data().leida).length;
@@ -888,24 +888,30 @@
         const n=d.data(),unr=!n.leida;
         const fecha=n.fecha?new Date(n.fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
         const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        return '<div id="nid-'+d.id+'" onclick="window.markRead(\''+uid+'\',\''+d.id+'\')" style="background:'+(unr?'rgba(255,92,26,.08)':'var(--card)')+';border:1px solid '+(unr?'rgba(255,92,26,.3)':'var(--border)')+';border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer">'+'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'+'<div style="font-size:14px;font-weight:'+(unr?700:400)+';color:'+(unr?'var(--white)':'#aaa')+'">'+esc(n.titulo)+'</div>'+'<div style="font-size:10px;color:var(--gray);white-space:nowrap;margin-left:8px">'+fecha+'</div>'+'</div><div style="font-size:13px;color:#aaa;line-height:1.5">'+esc(n.cuerpo)+'</div></div>';
+        return '<div id="nid-'+d.id+'" onclick="window.markRead(\''+uid+'\',\''+d.id+'\')" style="background:'+(unr?'rgba(255,92,26,.08)':'var(--card)')+';border:1px solid '+(unr?'rgba(255,92,26,.3)':'var(--border)')+';border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+          +'<div style="font-size:14px;font-weight:'+(unr?700:400)+';color:'+(unr?'var(--white)':'#aaa')+'">'+esc(n.titulo)+'</div>'
+          +'<div style="font-size:10px;color:var(--gray);white-space:nowrap;margin-left:8px">'+fecha+'</div>'
+          +'</div><div style="font-size:13px;color:#aaa;line-height:1.5">'+esc(n.cuerpo)+'</div></div>';
       }).join('');
-    }catch(e){listEl.innerHTML='<div style="color:#f87171;font-size:12px;padding:16px">'+(e.code||e.message)+'</div>';}
+    }catch(e){
+      listEl.innerHTML='<div style="color:#f87171;font-size:12px;padding:16px">'+(e.code||e.message)+'</div>';
+    }
   }
 
   async function markRead(uid,notifId){
     try{
-      await db.collection('usuarios').doc(uid).collection('notificaciones').doc(notifId).update({leida:true});
+      await updateDoc(doc(db,'usuarios',uid,'notificaciones',notifId),{leida:true});
       const el=document.getElementById('nid-'+notifId);if(el){el.style.background='var(--card)';el.style.borderColor='var(--border)';}
       const badge=document.getElementById('notif-badge');
       if(badge&&badge.style.display!=='none'){const n=Math.max(0,parseInt(badge.textContent)-1);badge.textContent=n;if(!n)badge.style.display='none';}
     }catch(e){}
   }
 
-  function startNotifListener(uid){
-    const colRef=db.collection('usuarios').doc(uid).collection('notificaciones');
+  async function startNotifListener(uid){
+    const colRef=collection(db,'usuarios',uid,'notificaciones');
     let firstLoad=true;
-    colRef.onSnapshot(snap=>{
+    onSnapshot(colRef,snap=>{
       if(firstLoad){firstLoad=false;return;}
       const added=snap.docChanges().filter(ch=>ch.type==='added'&&!ch.doc.data().leida);
       if(!added.length)return;
@@ -1066,7 +1072,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
     errEl.textContent = '';
     // nombre es solo lectura
     const _nm=document.getElementById('edit-meta')?.value;
-    if(_nm&&_nm!==(cachedUserData.objetivo?.meta||'')){await db.collection('usuarios').doc(user.uid).update({'objetivo.meta':_nm});if(!cachedUserData.objetivo)cachedUserData.objetivo={};cachedUserData.objetivo.meta=_nm;const _ep=document.getElementById('prof-meta');if(_ep)_ep.textContent=_nm;}
+    if(_nm&&_nm!==(cachedUserData.objetivo?.meta||'')){await updateDoc(doc(db,'usuarios',user.uid),{'objetivo.meta':_nm});if(!cachedUserData.objetivo)cachedUserData.objetivo={};cachedUserData.objetivo.meta=_nm;const _ep=document.getElementById('prof-meta');if(_ep)_ep.textContent=_nm;}
     const passCurrent = document.getElementById('edit-pass-current').value;
     const passNew = document.getElementById('edit-pass-new').value;
     const user = auth.currentUser;
