@@ -234,12 +234,7 @@
       <div class="modal-section">Acceso a la app</div>
       <div class="field-row">
         <div class="field"><label>Email *</label><input type="email" id="new-email" placeholder="maria@email.com" /></div>
-        <div class="field"><label>Contrase&#xF1;a inicial *</label>
-          <div style="position:relative">
-            <input type="password" id="new-pass" placeholder="M&#xED;nimo 6 caracteres" style="padding-right:48px" />
-            <button type="button" onclick="var i=document.getElementById('new-pass');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1">&#x1F441;</button>
-          </div>
-        </div>
+        
       </div>
       <div class="modal-section">Objetivo</div>
       <div class="field-row">
@@ -1130,11 +1125,16 @@
     }
   }
 
+  function genTempPassword(){
+    const w=["Fit","Run","Box","Gym","Pro","Max"],s=["!","@","#","$","%"];
+    return w[w.length*Math.random()|0]+((Math.random()*900+100)|0)+s[s.length*Math.random()|0];
+  }
+
   async function createMember() {
     const nombre   = document.getElementById('new-nombre').value.trim();
     const apellido = document.getElementById('new-apellido').value.trim();
     const email    = document.getElementById('new-email').value.trim();
-    const pass     = document.getElementById('new-pass').value.trim();
+    const pass     = genTempPassword();
     const tel      = document.getElementById('new-tel').value.trim();
     const alias    = document.getElementById('new-alias').value.trim() || null;
     const nombreCompleto = apellido ? nombre + ' ' + apellido : nombre;
@@ -1153,8 +1153,7 @@
     const fechaVal= fmtDate(document.getElementById('new-fecha-val').value.trim());
     const errEl   = document.getElementById('new-member-error');
     errEl.textContent = '';
-    if (!nombre||!apellido||!email||!pass||!tel) { errEl.textContent = 'Nombre, apellido, tel\u00E9fono, email y contrase\u00F1a son obligatorios'; return; }
-    if (pass.length < 6) { errEl.textContent = 'La contrase\u00F1a debe tener al menos 6 caracteres'; return; }
+    if (!nombre||!apellido||!email||!tel) { errEl.textContent = 'Nombre, apellido, tel\u00E9fono, email y contrase\u00F1a son obligatorios'; return; }
     if (!peso || isNaN(peso)) { errEl.textContent = 'El peso es obligatorio'; return; }
     if (peso < 20 || peso > 400) { errEl.textContent = 'Peso inv\u00E1lido (debe ser 20-400 kg)'; return; }
     const vigencia = document.getElementById('new-vigencia').value || 'permanente';
@@ -1183,9 +1182,10 @@
         registradoPor: auth.currentUser?.uid || null,
         miembroNombre: nombreCompleto
       });
-      showToast('&#x2713; ' + nombreCompleto + ' creado correctamente', 'success');
+      fetch('/api/send-welcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,nombre:nombreCompleto,password:pass})}).catch(e=>console.warn(e));
+      showToast('&#x2713; ' + nombreCompleto + ' creado. Email enviado.', 'success');
       document.getElementById('new-genero').value = 'prefiero-no-decir';
-      ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-pass',
+      ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email',
        'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val','new-altura']
         .forEach(id => document.getElementById(id).value = '');
       document.getElementById('new-meta').value = '';
@@ -1296,7 +1296,6 @@
     if (rol === 'admin' && window.currentStaffRole !== 'admin') { errEl.textContent = 'Solo un admin puede crear otro admin'; return; }
     if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
     if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email inv\u00E1lido'; return; }
-    if (pass.length < 6) { errEl.textContent = 'La contrase\u00F1a debe tener al menos 6 caracteres'; return; }
     const btn = document.getElementById('btn-create-staff');
     btn.textContent = 'Creando...'; btn.disabled = true;
     try {
