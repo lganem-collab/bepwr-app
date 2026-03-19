@@ -866,8 +866,7 @@
     const MESES = ['Ene','Feb','Mzo','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const fechas = metricas.map(m => {
       const d = String(m.fecha || '');
-      console.log('fecha raw:', JSON.stringify(d));
-      const MNAMES = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
+      const MNAMES = {ene:0,feb:1,mar:2,mzo:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11,enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
       let day = '', mon = '';
       if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
         // YYYY-MM-DD
