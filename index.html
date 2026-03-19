@@ -1021,9 +1021,11 @@
       if (token) {
         console.log('FCM token obtained:', token.substring(0,20)+'...');
         window._fcmToken = token;
-        const snap = await getDoc(doc(db, 'usuarios', uid));
+        // Use compat API (same as rest of app)
+        const snap = await db.collection('usuarios').doc(uid).get();
         if (snap.data()?.fcmToken !== token) {
-          await updateDoc(doc(db, 'usuarios', uid), { fcmToken: token });
+          await db.collection('usuarios').doc(uid).update({ fcmToken: token });
+          console.log('FCM token saved to Firestore');
         }
       }
     } catch(e) {
