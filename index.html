@@ -921,7 +921,7 @@
         const n=d.data(), unr=!n.leida;
         const fecha=n.fecha?new Date(n.fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
         const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        return '<div id="nid-'+d.id+'" onclick="markRead(''+uid+'',''+d.id+'')" '
+        return '<div id="nid-'+d.id+'" onclick="markRead(\u0027'+uid+'\u0027,\u0027'+d.id+'\u0027)" '
           +'style="background:'+(unr?'rgba(255,92,26,.08)':'var(--card)')
           +';border:1px solid '+(unr?'rgba(255,92,26,.3)':'var(--border)')
           +';border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer">'
