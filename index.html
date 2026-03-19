@@ -1091,6 +1091,10 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
 
   // &#x2500;&#x2500; MODAL EDITAR INFORMACI&#xD3;N &#x2500;&#x2500;
   let cachedUserData = {};
+  // Exponer funciones de notificaciones al scope global
+  window.loadNotifications = loadNotifications;
+  window.markRead = markRead;
+
   window.openEditModal = () => {
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
     const _ms=document.getElementById('edit-meta');
