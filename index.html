@@ -224,7 +224,7 @@
   <!-- APP -->
   <div id="screen-app">
     <!-- Banner de aviso en tiempo real -->
-    <div id="notif-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;display:none;align-items:center;gap:10px" onclick="if(event.target.textContent==='\u00D7'){this.style.display='none';}else{navigate('notif');}">
+    <div id="notif-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;align-items:center;gap:10px;transition:all .3s ease" onclick="navigate('notif')">
       <span style="font-size:18px">&#x1F514;</span>
       <span id="notif-banner-text">Tienes un mensaje nuevo</span>
       <span style="margin-left:auto;font-size:20px;opacity:.7">&times;</span>
@@ -1168,7 +1168,9 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
       const bannerText = document.getElementById('notif-banner-text');
       if (banner && bannerText) {
         bannerText.textContent = n.titulo || 'Tienes un mensaje nuevo';
+        banner.style.cssText = banner.style.cssText.replace('display:none','display:flex');
         banner.style.display = 'flex';
+        banner.style.animation = 'slideDown .3s ease';
         // Auto-ocultar tras 5 segundos
         clearTimeout(window._bannerTimer);
         window._bannerTimer = setTimeout(() => { banner.style.display = 'none'; }, 5000);
