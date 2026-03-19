@@ -559,6 +559,7 @@
       authReady = true;
       // Suscribir push notifications
       subscribeToPush(user.uid);
+      loadNotifications(user.uid);
       // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
       if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
@@ -892,6 +893,69 @@
     document.getElementById('val-fecha').textContent = m.fecha || '&#x2014;';
   }
 
+  // \u2500\u2500 NOTIFICACIONES GUARDADAS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  // Carga desde Firestore, muestra badge rojo, borra automaticamente al mes
+  async function loadNotifications(uid) {
+    const listEl = document.getElementById('notif-list');
+    if (!listEl) return;
+    try {
+      const cutoff = new Date();
+      cutoff.setMonth(cutoff.getMonth()-1);
+      const cutoffISO = cutoff.toISOString();
+      const snap = await getDocs(query(
+        collection(db,'usuarios',uid,'notificaciones'), orderBy('fecha','desc')
+      ));
+      // Borrar las de mas de un mes
+      snap.docs.filter(d=>(d.data().fecha||'')<cutoffISO)
+               .forEach(d=>d.ref.delete().catch(()=>{}));
+      const fresh = snap.docs.filter(d=>(d.data().fecha||'')>=cutoffISO);
+      const unread = fresh.filter(d=>!d.data().leida).length;
+      // Badge
+      const badge = document.getElementById('notif-badge');
+      if (badge) { badge.textContent = unread>9?'9+':unread; badge.style.display=unread?'flex':'none'; }
+      if (!fresh.length) {
+        listEl.innerHTML='<div style="text-align:center;padding:40px 16px;color:var(--gray);font-size:13px;font-family:'Space Mono',monospace">Sin notificaciones</div>';
+        return;
+      }
+      listEl.innerHTML = fresh.map(d=>{
+        const n=d.data(), unr=!n.leida;
+        const fecha=n.fecha?new Date(n.fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+        const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return '<div id="nid-'+d.id+'" onclick="markRead(''+uid+'',''+d.id+'')" '
+          +'style="background:'+(unr?'rgba(255,92,26,.08)':'var(--card)')
+          +';border:1px solid '+(unr?'rgba(255,92,26,.3)':'var(--border)')
+          +';border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+          +'<div style="font-size:14px;font-weight:'+(unr?700:400)+';color:'+(unr?'var(--white)':'#aaa')+'">'
+          +(unr?'<span style="display:inline-block;width:8px;height:8px;background:#FF5C1A;border-radius:50%;margin-right:8px;vertical-align:middle"></span>':'')
+          +esc(n.titulo)+'</div>'
+          +'<div style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;white-space:nowrap;margin-left:8px">'+fecha+'</div>'
+          +'</div><div style="font-size:13px;color:#aaa;line-height:1.5">'+esc(n.cuerpo)+'</div></div>';
+      }).join('');
+    } catch(e) {
+      listEl.innerHTML='<div style="color:#f87171;font-size:12px;padding:16px">Error cargando notificaciones</div>';
+    }
+  }
+
+  async function markRead(uid,notifId) {
+    try {
+      await updateDoc(doc(db,'usuarios',uid,'notificaciones',notifId),{leida:true});
+      const el=document.getElementById('nid-'+notifId);
+      if (el) {
+        el.style.background='var(--card)'; el.style.borderColor='var(--border)';
+        const title=el.querySelector('div>div:first-child');
+        if(title){title.style.fontWeight='400';title.style.color='#aaa';}
+        const dot=el.querySelector('span[style*="border-radius:50%"]');
+        if(dot)dot.remove();
+      }
+      const badge=document.getElementById('notif-badge');
+      if(badge&&badge.style.display!=='none'){
+        const n=Math.max(0,parseInt(badge.textContent)-1);
+        badge.textContent=n; if(!n)badge.style.display='none';
+      }
+    } catch(e){}
+  }
+
   // &#x2500;&#x2500; FCM PUSH NOTIFICATIONS &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
   const messaging = getMessaging(app);
   const VAPID_KEY = 'BO7GCvvD-fYQTApeCtt4eWPUuMBAOfMHAtF3B7htcrj8PA1k_19eutw1l4rQTTs-yZwD1lPrCXyqgdn-AJMjSUQ';
@@ -1211,6 +1275,7 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
       history.pushState({ view: id }, '', '');
     }
     currentView = id;
+    if(id==='notif'&&window._currentUid)loadNotifications(window._currentUid);
   }
 
   window.addEventListener('popstate', (e) => {

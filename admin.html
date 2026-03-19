@@ -638,6 +638,21 @@
     }
   });
 
+  // Guarda la notificaci\u00F3n en Firestore de cada miembro destinatario
+  async function saveNotificationsFirestore(title, body, target) {
+    const fecha = new Date().toISOString();
+    const notifData = { titulo: title, cuerpo: body, fecha, leida: false };
+    const members = window._allMembers || [];
+    const targets = target === 'all'
+      ? members.filter(m => m.activo !== false)
+      : members.filter(m => m.uid === target);
+    await Promise.all(targets.map(m =>
+      db.collection('usuarios').doc(m.uid)
+        .collection('notificaciones').add(notifData)
+        .catch(() => {})
+    ));
+  }
+
   async function sendNotification() {
     if (window.currentStaffRole !== 'admin') { showToast('Solo admin puede enviar notificaciones', 'error'); return; }
     const title = document.getElementById('notif-title').value.trim();
@@ -664,6 +679,8 @@
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
+        // Guardar notificaci\u00F3n en Firestore para cada miembro destinatario
+        saveNotificationsFirestore(title, body, target).catch(()=>{});
       } else {
         errEl.textContent = data.error || ('Enviado a ' + (data.sent||0) + ' miembros');
       }
