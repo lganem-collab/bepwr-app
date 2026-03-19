@@ -1021,11 +1021,11 @@
       if (token) {
         console.log('FCM token obtained:', token.substring(0,20)+'...');
         window._fcmToken = token;
-        // Modular Firestore API
-        const userRef = doc(db, 'usuarios', uid);
-        const snap = await getDoc(userRef);
+        // Compat Firestore API
+        const userRef = db.collection('usuarios').doc(uid);
+        const snap = await userRef.get();
         if (snap.data()?.fcmToken !== token) {
-          await updateDoc(userRef, { fcmToken: token });
+          await userRef.update({ fcmToken: token });
           console.log('FCM token saved to Firestore');
         }
       }
