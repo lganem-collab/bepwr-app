@@ -886,13 +886,13 @@
         const n=d.data(),unr=!n.leida;
         const fecha=n.fecha?new Date(n.fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
         const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        return '<div id="nid-'+d.id+'" onclick="window.markRead(\''+uid+'\',\''+d.id+'\')" '
-          +'style="background:'+(unr?'rgba(255,92,26,.08)':'var(--card)')+';border:1px solid '+(unr?'rgba(255,92,26,.3)':'var(--border)')+';border-radius:16px;padding:16px;margin-bottom:12px">'
+        return '<div id="nid-'+d.id+'" style="background:'+(unr?'rgba(255,92,26,.08)':'var(--card)')+';border:1px solid '+(unr?'rgba(255,92,26,.3)':'var(--border)')+';border-radius:16px;padding:16px;margin-bottom:12px">'
           +(unr?'<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span style="width:8px;height:8px;background:#FF5C1A;border-radius:50%;display:inline-block;flex-shrink:0"></span><span style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:1px">NUEVO</span></div>':'')
           +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
-          +'<div style="font-size:15px;font-weight:700;color:var(--white);line-height:1.3">'+esc(n.titulo)+'</div>'
-          +'<div style="font-size:10px;color:var(--gray);white-space:nowrap;margin-left:12px;margin-top:2px;font-family:Space Mono,monospace">'+fecha+'</div>'
+          +'<div style="font-size:15px;font-weight:700;color:var(--white);line-height:1.3;flex:1" onclick="window.markRead(\''+uid+'\',\''+d.id+'\')">'+esc(n.titulo)+'</div>'
+          +'<button onclick="window.deleteNotif(\''+uid+'\',\''+d.id+'\')" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:0 0 0 12px;line-height:1;flex-shrink:0" title="Borrar">&#x00D7;</button>'
           +'</div>'
+          +'<div style="font-size:10px;color:var(--gray);font-family:Space Mono,monospace;margin-bottom:10px">'+fecha+'</div>'
           +'<div style="font-size:14px;color:#ccc;line-height:1.6;border-top:1px solid var(--border);padding-top:10px">'+esc(n.cuerpo)+'</div>'
           +'</div>';
       }).join('');
@@ -908,6 +908,18 @@
       const badge=document.getElementById('notif-badge');
       if(badge&&badge.style.display!=='none'){const n=Math.max(0,parseInt(badge.textContent)-1);badge.textContent=n;if(!n)badge.style.display='none';}
     }catch(e){}
+  }
+
+  async function deleteNotif(uid,notifId){
+    try{
+      const {deleteDoc,doc:_doc}=await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js');
+      await deleteDoc(_doc(db,'usuarios',uid,'notificaciones',notifId));
+      const el=document.getElementById('nid-'+notifId);
+      if(el){el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(()=>el.remove(),300);}
+      // Update badge
+      const badge=document.getElementById('notif-badge');
+      if(badge&&badge.style.display!=='none'){const n=Math.max(0,parseInt(badge.textContent)-1);badge.textContent=n;if(!n)badge.style.display='none';}
+    }catch(e){console.error('deleteNotif:',e.message);}
   }
 
   function startNotifListener(uid){
@@ -1058,6 +1070,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   let cachedUserData = {};
   window.loadNotifications=loadNotifications;
   window.markRead=markRead;
+  window.deleteNotif=deleteNotif;
   window.startNotifListener=startNotifListener;
 
   window.openEditModal = () => {

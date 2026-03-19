@@ -308,7 +308,7 @@
     <!-- TAB NOTIFICACIONES -->
     <div id="tab-content-notify" style="display:none;max-width:600px">
       <div style="margin-bottom:24px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Avisos</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Env&#xED;o de Avisos</div>
         <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:Space Mono,monospace;letter-spacing:1px">Los mensajes se guardan en la secci&#xF3;n de Avisos de cada miembro</div>
       </div>
 
@@ -729,8 +729,7 @@
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
-        // Guardar notificaci\u00F3n en Firestore para cada miembro destinatario
-        saveNotificationsFirestore(title, body, target).catch(()=>{});
+        // Firestore guardado por notify.js via Admin SDK
       } else {
         errEl.textContent = data.error || ('Enviado a ' + (data.sent||0) + ' miembros');
       }
