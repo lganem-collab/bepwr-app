@@ -55,9 +55,9 @@
     .search-input:focus{border-color:var(--orange)}
     .search-input::placeholder{color:#333}
     .members-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-    .table-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 160px;padding:12px 20px;border-bottom:1px solid var(--border);background:#141414}
+    .table-head{display:grid;grid-template-columns:2fr 1.2fr 0.8fr 0.6fr 0.9fr 180px;padding:12px 20px;border-bottom:1px solid var(--border);background:#141414}
     .th{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace}
-    .table-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 160px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
+    .table-row{display:grid;grid-template-columns:2fr 1.2fr 0.8fr 0.6fr 0.9fr 180px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
     .table-row:last-child{border-bottom:none}
     .table-row:hover{background:#1e1e1e}
     .td{font-size:14px}
@@ -93,7 +93,7 @@
     .form-error{font-size:12px;color:var(--red);margin-top:10px;font-family:Space Mono,monospace;min-height:16px;text-align:center}
     @media(max-width:768px){
       .stats-row{grid-template-columns:1fr 1fr}
-      .table-head,.table-row{grid-template-columns:2fr 1fr 80px}
+      .table-head,.table-row{grid-template-columns:2fr 1fr 130px}
       .th:nth-child(n+3):not(:last-child),.table-row .td:nth-child(n+3):not(:last-child){display:none}
       .content{padding:16px}
       .tabs,.topbar{padding:0 16px}
@@ -325,8 +325,17 @@
         </div>
         <div class="field" style="margin-bottom:20px">
           <label>Destinatarios</label>
-          <select id="notif-target">
+          <select id="notif-target" onchange="updateNotifTargetUI()">
             <option value="all">Todos los miembros activos</option>
+            <option value="objetivo:Bajar grasa / bajar de peso">Por objetivo: Bajar grasa / bajar de peso</option>
+            <option value="objetivo:Ganar m\u00FAsculo / recomposici\u00F3n">Por objetivo: Ganar m\u00FAsculo / recomposici\u00F3n</option>
+            <option value="objetivo:Salud metab\u00F3lica / salud general">Por objetivo: Salud metab\u00F3lica / salud general</option>
+            <option value="objetivo:Rendimiento funcional">Por objetivo: Rendimiento funcional</option>
+            <option value="objetivo:Est\u00E9tica / composici\u00F3n equilibrada">Por objetivo: Est\u00E9tica / composici\u00F3n equilibrada</option>
+            <option value="individual">Env\u00EDo individual (selecciona miembro)</option>
+          </select>
+          <select id="notif-member" style="display:none;margin-top:8px;width:100%;background:#141414;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--white);font-family:'DM Sans',sans-serif">
+            <option value="">Selecciona un miembro...</option>
           </select>
         </div>
         <div id="notif-error" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:12px;font-family:Space Mono,monospace"></div>
@@ -643,14 +652,35 @@
     const fecha = new Date().toISOString();
     const notifData = { titulo: title, cuerpo: body, fecha, leida: false };
     const members = window._allMembers || [];
-    const targets = target === 'all'
-      ? members.filter(m => m.activo !== false)
-      : members.filter(m => m.uid === target);
+    let targets;
+    if (target === 'individual') {
+      const uid = document.getElementById('notif-member')?.value;
+      targets = members.filter(m => m.uid === uid);
+    } else if (target.startsWith('objetivo:')) {
+      const obj = target.replace('objetivo:','');
+      targets = members.filter(m => m.activo !== false && m.objetivo?.meta === obj);
+    } else {
+      targets = members.filter(m => m.activo !== false);
+    }
     await Promise.all(targets.map(m =>
       db.collection('usuarios').doc(m.uid)
         .collection('notificaciones').add(notifData)
         .catch(() => {})
     ));
+  }
+
+  function updateNotifTargetUI() {
+    const val = document.getElementById('notif-target').value;
+    const memberSel = document.getElementById('notif-member');
+    if (val === 'individual') {
+      memberSel.style.display = 'block';
+      // Populate member list
+      const members = (window._allMembers||[]).filter(m=>m.activo!==false);
+      memberSel.innerHTML = '<option value="">Selecciona un miembro...</option>'
+        + members.map(m=>`<option value="${m.uid}">${m.nombre||m.email}</option>`).join('');
+    } else {
+      memberSel.style.display = 'none';
+    }
   }
 
   async function sendNotification() {
@@ -668,14 +698,25 @@
     btn.textContent = 'Enviando...'; btn.disabled = true;
     try {
       const idToken = await auth.currentUser.getIdToken();
+      let fetchBody = { title, body, url: 'https://bepwr-app.vercel.app' };
+      if (target === 'individual') {
+        const uid = document.getElementById('notif-member')?.value;
+        if (!uid) { errEl.textContent = 'Selecciona un miembro'; btn.disabled=false; btn.textContent='Enviar'; return; }
+        fetchBody.target = 'uid'; fetchBody.uid = uid;
+      } else if (target.startsWith('objetivo:')) {
+        fetchBody.target = 'objetivo';
+        fetchBody.objetivo = target.replace('objetivo:','');
+      } else {
+        fetchBody.target = 'all';
+      }
       const res = await fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-        body: JSON.stringify({ title, body, target, url: 'https://bepwr-app.vercel.app' })
+        body: JSON.stringify(fetchBody)
       });
       const data = await res.json();
       if (res.ok) {
-        showToast(`&#x2705; Enviado a ${data.sent} miembro${data.sent !== 1 ? 's' : ''}`, 'success');
+        showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
