@@ -223,6 +223,12 @@
 
   <!-- APP -->
   <div id="screen-app">
+    <!-- Banner de aviso en tiempo real -->
+    <div id="notif-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;display:none;align-items:center;gap:10px" onclick="if(event.target.textContent==='\u00D7'){this.style.display='none';}else{navigate('notif');}">
+      <span style="font-size:18px">&#x1F514;</span>
+      <span id="notif-banner-text">Tienes un mensaje nuevo</span>
+      <span style="margin-left:auto;font-size:20px;opacity:.7">&times;</span>
+    </div>
     <div class="topbar">
       <div style="display:flex;align-items:center">
         <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
@@ -509,7 +515,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc }
+  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
   import { getMessaging, getToken, onMessage }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
@@ -573,6 +579,10 @@
       // Suscribir push notifications
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
+      if(window.listenNotifications)window.listenNotifications(user.uid);
+      if (!window._notifUnsubscribe) {
+        window._notifUnsubscribe = startNotifListener(user.uid);
+      }
       // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
       if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
@@ -1143,7 +1153,34 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
   let cachedUserData = {};
   // Exponer funciones de notificaciones al scope global
   window.loadNotifications = loadNotifications;
+
+  // Escucha notificaciones nuevas en tiempo real y muestra banner
+  function startNotifListener(uid) {
+    const colRef = collection(db, 'usuarios', uid, 'notificaciones');
+    let firstLoad = true;
+    return onSnapshot(colRef, snap => {
+      if (firstLoad) { firstLoad = false; return; } // Ignorar carga inicial
+      const newDocs = snap.docChanges().filter(ch => ch.type === 'added' && !ch.doc.data().leida);
+      if (!newDocs.length) return;
+      const n = newDocs[0].doc.data();
+      // Mostrar banner
+      const banner = document.getElementById('notif-banner');
+      const bannerText = document.getElementById('notif-banner-text');
+      if (banner && bannerText) {
+        bannerText.textContent = n.titulo || 'Tienes un mensaje nuevo';
+        banner.style.display = 'flex';
+        // Auto-ocultar tras 5 segundos
+        clearTimeout(window._bannerTimer);
+        window._bannerTimer = setTimeout(() => { banner.style.display = 'none'; }, 5000);
+      }
+      // Actualizar badge
+      loadNotifications(uid);
+    });
+  }
+  window.startNotifListener = startNotifListener;
   window.markRead = markRead;
+  window.listenNotifications = startNotifListener;
+  window._fsModules = { onSnapshot, collection, query, orderBy, limit };
 
   window.openEditModal = () => {
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
