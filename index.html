@@ -860,9 +860,9 @@
     const fechas = metricas.map(m => {
       const d = m.fecha || '';
       if (d.length >= 10) {
-        const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        const MESES=['En','Fe','Ma','Ab','My','Jn','Jl','Ag','Sp','Oc','Nv','Di'];
         const mes = MESES[parseInt(d.slice(5,7),10)-1] || '';
-        return d.slice(8,10)+'/'+(mes||d.slice(5,7));
+        return d.slice(8,10)+mes;
       }
       return d.slice(0,3).toUpperCase() || '-';
     });
