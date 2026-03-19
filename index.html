@@ -908,7 +908,7 @@
     }catch(e){}
   }
 
-  async function startNotifListener(uid){
+  function startNotifListener(uid){
     const colRef=collection(db,'usuarios',uid,'notificaciones');
     let firstLoad=true;
     onSnapshot(colRef,snap=>{
