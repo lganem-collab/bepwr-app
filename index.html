@@ -734,7 +734,8 @@
   function renderMetrics(m, obj) {
     const pesoIni  = obj.pesoInicial || m.peso;
     const pesoMeta = obj.pesoMeta || m.peso;
-    const pct = calcProgreso(obj.meta,m,obj) ?? Math.round(Math.max(0, Math.min(100, ((pesoIni - m.peso) / (pesoIni - pesoMeta)) * 100))) || 0;
+    const _prog = calcProgreso(obj.meta,m,obj);
+    const pct = _prog !== null && _prog !== undefined ? _prog : (Math.round(Math.max(0, Math.min(100, ((pesoIni - m.peso) / (pesoIni - pesoMeta)) * 100))) || 0);
     const circum = 2 * Math.PI * 34;
 
     const califPct = m.calificacion || 0;
