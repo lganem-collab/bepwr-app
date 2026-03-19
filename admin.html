@@ -1199,8 +1199,10 @@
         registradoPor: auth.currentUser?.uid || null,
         miembroNombre: nombreCompleto
       });
-      fetch('/api/send-welcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,nombre:nombreCompleto,password:pass})}).catch(e=>console.warn(e));
-      showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado.', 'success');
+      fetch('/api/send-welcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,nombre:nombreCompleto,password:pass})})
+        .then(r=>r.json()).then(d=>console.log('email result:',d))
+        .catch(e=>console.error('email error:',e.message));
+      showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
       document.getElementById('new-genero').value = 'prefiero-no-decir';
       ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email',
        'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val','new-altura']
