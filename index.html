@@ -1051,6 +1051,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   let cachedUserData = {};
   window.loadNotifications=loadNotifications;
   window.markRead=markRead;
+  window.startNotifListener=startNotifListener;
 
   window.openEditModal = () => {
     document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
@@ -1246,7 +1247,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
       history.pushState({ view: id }, '', '');
     }
     currentView = id;
-    if(id==='notif'&&window._currentUid)loadNotifications(window._currentUid);
+    if(id==='notif'&&window._currentUid&&window.loadNotifications)window.loadNotifications(window._currentUid);
   }
 
   window.addEventListener('popstate', (e) => {
