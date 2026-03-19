@@ -47,28 +47,33 @@ export default async function handler(req, res) {
     // Obtener tokens FCM de Firestore
     let tokens = [];
 
+    let targetUids = [];
     if (target === 'all') {
       // Get all users — filter activo in JS to avoid missing field issues
       const snap = await db.collection('usuarios').get();
-      tokens = snap.docs
-        .filter(d => d.data().activo !== false)
+      const activeDocs = snap.docs.filter(d => d.data().activo !== false);
+      targetUids = activeDocs.map(d => d.id);
+      tokens = activeDocs
         .map(d => d.data().fcmToken)
         .filter(t => t && typeof t === 'string' && t.length > 10);
     } else if (target === 'objetivo' && req.body.objetivo) {
       // Filtrar por objetivo principal
       const snap = await db.collection('usuarios').get();
-      tokens = snap.docs
-        .filter(d => d.data().activo !== false && d.data().objetivo?.meta === req.body.objetivo)
+      const objDocs = snap.docs.filter(d => d.data().activo !== false && d.data().objetivo?.meta === req.body.objetivo);
+      targetUids = objDocs.map(d => d.id);
+      tokens = objDocs
         .map(d => d.data().fcmToken)
         .filter(t => t && typeof t === 'string' && t.length > 10);
     } else if (target === 'uid' && req.body.uid) {
       const doc = await db.collection('usuarios').doc(req.body.uid).get();
       const token = doc.data()?.fcmToken;
       if (token) tokens = [token];
+      targetUids = [req.body.uid];
     }
 
+    console.log(`notify: target=${target}, tokens found=${tokens.length}`);
     if (tokens.length === 0) {
-      return res.status(200).json({ sent: 0, message: 'No hay tokens registrados' });
+      return res.status(200).json({ sent: 0, tokensFound: 0, message: 'No hay tokens registrados. Verifica que los miembros hayan aceptado notificaciones.' });
     }
 
     // Enviar en lotes de 500 (límite FCM)
@@ -117,6 +122,19 @@ export default async function handler(req, res) {
         .get();
       staleSnap.docs.forEach(d => batch.update(d.ref, { fcmToken: null }));
       await batch.commit();
+    }
+
+    // Guardar aviso en Firestore para cada destinatario (Admin SDK bypasea reglas)
+    if (targetUids.length > 0) {
+      const fecha = new Date().toISOString();
+      await Promise.all(targetUids.map(uid =>
+        db.collection('usuarios').doc(uid).collection('notificaciones').add({
+          titulo: title,
+          cuerpo: body,
+          fecha,
+          leida: false
+        }).catch(e => console.warn('notif save error:', e.message))
+      ));
     }
 
     return res.status(200).json({ sent: totalSent, failed: totalFailed });
