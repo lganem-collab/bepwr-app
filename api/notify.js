@@ -48,11 +48,13 @@ export default async function handler(req, res) {
     let tokens = [];
 
     if (target === 'all') {
-      // Solo filtrar por activo (evita índice compuesto con fcmToken)
-      const snap = await db.collection('usuarios')
-        .where('activo', '==', true)
-        .get();
+      const snap = await db.collection('usuarios').where('activo', '==', true).get();
+      tokens = snap.docs.map(d => d.data().fcmToken).filter(t => t && typeof t === 'string' && t.length > 10);
+    } else if (target === 'objetivo' && req.body.objetivo) {
+      // Filtrar por objetivo principal
+      const snap = await db.collection('usuarios').where('activo', '==', true).get();
       tokens = snap.docs
+        .filter(d => d.data().objetivo?.meta === req.body.objetivo)
         .map(d => d.data().fcmToken)
         .filter(t => t && typeof t === 'string' && t.length > 10);
     } else if (target === 'uid' && req.body.uid) {
