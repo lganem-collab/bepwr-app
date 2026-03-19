@@ -862,40 +862,45 @@
     const range  = max - min || 1;
     const n = pesos.length;
 
-    // Date labels: "02/Mar"
+    // Parse date robustly regardless of format stored in Firestore
     const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const fechas = metricas.map(m => {
-      const d = m.fecha || '';
-      if (d.length >= 10) return d.slice(8,10)+'/'+MESES[parseInt(d.slice(5,7),10)-1];
-      return d.slice(0,5) || '-';
+      const d = String(m.fecha || '');
+      let day = '', mon = '';
+      if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
+        // Format: YYYY-MM-DD
+        day = d.slice(8,10);
+        mon = MESES[parseInt(d.slice(5,7),10)-1] || '';
+      } else if (/^\d{2}\/\d{2}\/\d{4}/.test(d)) {
+        // Format: DD/MM/YYYY
+        day = d.slice(0,2);
+        mon = MESES[parseInt(d.slice(3,5),10)-1] || '';
+      } else {
+        // Fallback: show first 5 chars
+        return d.slice(0,5) || '-';
+      }
+      return mon ? day+'/'+mon : day;
     });
 
-    // SVG dimensions \u2014 leave bottom padding for labels
     const W=300, H=80, PT=10, PL=8, PR=8, PB=28;
     const chartH = H - PT - PB;
-
     const pts = pesos.map((p,i) => [
       PL + (i / Math.max(n-1,1)) * (W - PL - PR),
       PT + (1 - (p - min) / range) * chartH
     ]);
-
-    const polyline = pts.map(([x,y]) => x+','+y).join(' ');
     const [lx,ly] = pts[pts.length-1];
+    const polyline = pts.map(([x,y]) => x+','+y).join(' ');
     const areaPath = 'M'+pts.map(([x,y])=>x+' '+y).join(' L')
       +' L'+lx+' '+(PT+chartH)+' L'+PL+' '+(PT+chartH)+' Z';
 
-    const dots  = pts.map(([x,y],i) =>
+    const dots = pts.map(([x,y],i) =>
       `<circle cx="${x}" cy="${y}" r="${i===n-1?4:2.5}" fill="${i===n-1?'#FF5C1A':'#cc4a14'}" stroke="#0a0a0a" stroke-width="1.5"/>`
     ).join('');
-
-    const vals  = pts.map(([x,y],i) =>
+    const vals = pts.map(([x,y],i) =>
       `<text x="${x}" y="${y-6}" text-anchor="middle" font-size="7" fill="${i===n-1?'#FF5C1A':'#666'}" font-family="monospace">${pesos[i]}</text>`
     ).join('');
-
-    // Date labels at bottom \u2014 every label, rotate if too many
-    const lblY = H - 6;
     const lbls = pts.map(([x],i) =>
-      `<text x="${x}" y="${lblY}" text-anchor="middle" font-size="7.5" fill="#888" font-family="monospace">${fechas[i]}</text>`
+      `<text x="${x}" y="${H-4}" text-anchor="middle" font-size="7.5" fill="#888" font-family="monospace">${fechas[i]}</text>`
     ).join('');
 
     document.getElementById('chart-card').innerHTML = `
