@@ -1152,230 +1152,47 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
   // &#x2500;&#x2500; MODAL EDITAR INFORMACI&#xD3;N &#x2500;&#x2500;
   let cachedUserData = {};
   // Exponer funciones de notificaciones al scope global
+  window.openEditModal = openEditModal;
+  window.saveEditInfo = saveEditInfo;
+  window.confirmEmailChange = confirmEmailChange;
+  window.confirmTelChange = confirmTelChange;
+  window.openHistorialModal = openHistorialModal;
+  window.toggleModalPass = toggleModalPass;
+  window.togglePass = togglePass;
+  window.doLogout = doLogout;
+  window.closeModal = closeModal;
+  window.savePrimerIngreso = savePrimerIngreso;
   window.loadNotifications = loadNotifications;
+  window.markRead = markRead;
 
   // Escucha notificaciones nuevas en tiempo real y muestra banner
   function startNotifListener(uid) {
-    const colRef = collection(db, 'usuarios', uid, 'notificaciones');
-    let firstLoad = true;
-    return onSnapshot(colRef, snap => {
-      if (firstLoad) { firstLoad = false; return; } // Ignorar carga inicial
-      const newDocs = snap.docChanges().filter(ch => ch.type === 'added' && !ch.doc.data().leida);
-      if (!newDocs.length) return;
-      const n = newDocs[0].doc.data();
-      // Mostrar banner
-      const banner = document.getElementById('notif-banner');
-      const bannerText = document.getElementById('notif-banner-text');
-      if (banner && bannerText) {
+    // Use dynamic import to ensure Firestore modules are available
+    import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js').then(fs => {
+      const colRef = fs.collection(db, 'usuarios', uid, 'notificaciones');
+      let firstLoad = true;
+      fs.onSnapshot(colRef, snap => {
+        if (firstLoad) { firstLoad = false; return; }
+        const added = snap.docChanges().filter(ch => ch.type === 'added' && !ch.doc.data().leida);
+        if (!added.length) return;
+        const n = added[0].doc.data();
+        const banner = document.getElementById('notif-banner');
+        const bannerText = document.getElementById('notif-banner-text');
+        if (!banner || !bannerText) return;
         bannerText.textContent = n.titulo || 'Tienes un mensaje nuevo';
-        banner.removeAttribute('style');
         banner.style.cssText = 'display:flex;position:fixed;top:0;left:0;right:0;z-index:9999;'
           +'background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;'
           +'font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;'
           +'box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;align-items:center;gap:10px;'
           +'animation:slideDown .3s ease';
-        // Auto-ocultar tras 5 segundos
         clearTimeout(window._bannerTimer);
-        window._bannerTimer = setTimeout(() => { banner.style.display = 'none'; }, 5000);
-      }
-      // Actualizar badge
-      loadNotifications(uid);
-    });
+        window._bannerTimer = setTimeout(() => { banner.style.display = 'none'; }, 6000);
+        // Reload badge
+        if (typeof loadNotifications === 'function') loadNotifications(uid);
+      });
+    }).catch(e => console.warn('startNotifListener error:', e.message));
   }
-  window.startNotifListener = startNotifListener;
-  window.markRead = markRead;
-  window.listenNotifications = startNotifListener;
-  window._fsModules = { onSnapshot, collection, query, orderBy, limit };
 
-  window.openEditModal = () => {
-    document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
-    const _ms=document.getElementById('edit-meta');
-    if(_ms&&cachedUserData.objetivo?.meta){for(const o of _ms.options)o.selected=o.value===cachedUserData.objetivo.meta;}
-    document.getElementById('edit-email').value = auth.currentUser?.email || '';
-    document.getElementById('edit-tel').value = cachedUserData.telefono || '';
-    document.getElementById('edit-pass-current').value = '';
-    document.getElementById('edit-pass-new').value = '';
-    document.getElementById('edit-confirm-pass').value = '';
-    document.getElementById('edit-confirm-email').value = '';
-    document.getElementById('edit-confirm-tel').value = '';
-    document.getElementById('edit-error').textContent = '';
-    history.pushState({ modal: 'edit' }, '', '');
-    document.getElementById('modal-edit').classList.add('active');
-  };
-  window.saveEditInfo = async () => {
-    const errEl = document.getElementById('edit-error');
-    errEl.textContent = '';
-    // nombre es solo lectura, lo maneja el staff
-    const _nm=document.getElementById('edit-meta')?.value;
-    if(_nm&&_nm!==(cachedUserData.objetivo?.meta||'')){
-      await db.collection('usuarios').doc(user.uid).update({'objetivo.meta':_nm});
-      if(!cachedUserData.objetivo)cachedUserData.objetivo={};
-      cachedUserData.objetivo.meta=_nm;
-      const _ep=document.getElementById('prof-meta');if(_ep)_ep.textContent=_nm;
-      const _gt=document.querySelector('.goal-title');if(_gt)_gt.textContent=_nm;
-    }
-    const passCurrent = document.getElementById('edit-pass-current').value;
-    const passNew = document.getElementById('edit-pass-new').value;
-    const user = auth.currentUser;
-    if (!user) return;
-    try {
-      // Guardar datos en Firestore
-      // nombre no se edita aqu\u00ED, solo el staff puede cambiarlo
-      if (cachedUserData.alias) {
-        document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' &#xB7; "' + cachedUserData.alias + '"';
-      }
-      // Cambiar contrase\u00F1a si se llenaron los campos
-      const passConfirm = document.getElementById('edit-confirm-pass').value;
-      if (passCurrent || passNew) {
-        if (!passCurrent) { errEl.textContent = 'Escribe tu contrase\u00F1a actual'; return; }
-        if (!passNew) { errEl.textContent = 'Escribe la nueva contrase\u00F1a'; return; }
-        const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-        if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase\u00F1a debe tener may\u00FAscula, min\u00FAscula, n\u00FAmero y un s\u00EDmbolo'; return; }
-        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
-        const cred = EmailAuthProvider.credential(user.email, passCurrent);
-        await reauthenticateWithCredential(user, cred);
-        await updatePassword(user, passNew);
-      }
-      errEl.style.color = '#4ade80';
-      errEl.textContent = '\u00A1Cambios guardados!';
-      setTimeout(() => closeModal('modal-edit'), 1200);
-    } catch(e) {
-      errEl.style.color = '#f87171';
-      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase\u00F1a actual incorrecta';
-      } else {
-        errEl.textContent = 'Error al guardar: ' + e.message;
-      }
-    }
-  };
-
-  // &#x2500;&#x2500; MODAL HISTORIAL &#x2500;&#x2500;
-  let cachedMetricas = [];
-  window.openHistorialModal = () => {
-    const list = document.getElementById('historial-list');
-    if (!cachedMetricas.length) {
-      list.innerHTML = '<div style="text-align:center;color:var(--gray);padding:20px;font-family:Space Mono,monospace;font-size:12px">Sin historial registrado a\u00FAn</div>';
-    } else {
-      list.innerHTML = [...cachedMetricas].reverse().map(m => `
-        <div class="hist-row" style="flex-direction:column">
-          <div class="hist-date">${m.fecha || '&#x2014;'}</div>
-          <div class="hist-metrics">
-            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : '&#x2014;'}</span></div>
-            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : '&#x2014;'}</span></div>
-            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : '&#x2014;'}</span></div>
-            <div class="hist-metric">IMC <span>${m.imc || '&#x2014;'}</span></div>
-            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : '&#x2014;'}</span></div>
-            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || '&#x2014;'}</span></div>
-            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : '&#x2014;'}</span></div>
-          </div>
-        </div>`).join('');
-    }
-    document.getElementById('modal-historial').classList.add('active');
-  };
-
-  // &#x2500;&#x2500; PRIMER INGRESO &#x2500;&#x2500;
-  window.savePrimerIngreso = async () => {
-    const errEl = document.getElementById('primer-pass-error');
-    const passNew = document.getElementById('primer-pass-new').value;
-    const passConfirm = document.getElementById('primer-pass-confirm').value;
-    errEl.textContent = '';
-
-    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-    if (!passNew) { errEl.textContent = 'Escribe tu nueva contrase\u00F1a'; return; }
-    if (!passRegex.test(passNew)) { 
-      errEl.textContent = 'Debe tener may\u00FAscula, min\u00FAscula, n\u00FAmero y un s\u00EDmbolo'; return; 
-    }
-    if (passNew !== passConfirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
-
-    try {
-      const user = auth.currentUser;
-      await updatePassword(user, passNew);
-      await updateDoc(doc(db, 'usuarios', user.uid), { primerIngreso: false });
-      cachedUserData.primerIngreso = false;
-      const primerModal = document.getElementById('modal-primer-ingreso');
-      primerModal.classList.remove('active');
-      setTimeout(() => primerModal.style.display = 'none', 300);
-    } catch(e) {
-      errEl.textContent = 'Error al guardar: ' + e.message;
-    }
-  };
-
-  // &#x2500;&#x2500; CONFIRMAR EMAIL &#x2500;&#x2500;
-  window.confirmEmailChange = async () => {
-    const newEmail = document.getElementById('edit-email').value.trim();
-    const confirmEmail = document.getElementById('edit-confirm-email').value.trim();
-    const errEl = document.getElementById('edit-error');
-    errEl.style.color = '#f87171';
-    errEl.textContent = '';
-    if (!newEmail) { errEl.textContent = 'Escribe el nuevo email'; return; }
-    if (!newEmail.includes('@') || !newEmail.includes('.')) { errEl.textContent = 'Email inv\u00E1lido'; return; }
-    if (newEmail !== confirmEmail) { errEl.textContent = 'Los emails no coinciden'; return; }
-    if (newEmail === auth.currentUser?.email) { errEl.textContent = 'Es el mismo email actual'; return; }
-    const passCurrent = document.getElementById('edit-pass-current').value;
-    if (!passCurrent) { errEl.textContent = 'Escribe tu contrase\u00F1a actual (secci\u00F3n de abajo) para cambiar el email'; return; }
-    try {
-      const cred = EmailAuthProvider.credential(auth.currentUser.email, passCurrent);
-      await reauthenticateWithCredential(auth.currentUser, cred);
-      await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
-      errEl.style.color = '#4ade80';
-      errEl.textContent = 'Se envi\u00F3 verificaci\u00F3n a ' + newEmail + '. Confirma para que aplique.';
-    } catch(e) {
-      errEl.style.color = '#f87171';
-      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase\u00F1a actual incorrecta';
-      } else {
-        errEl.textContent = 'Error: ' + e.message;
-      }
-    }
-  };
-
-  // &#x2500;&#x2500; CONFIRMAR TEL&#xC9;FONO &#x2500;&#x2500;
-  window.confirmTelChange = async () => {
-    const newTel = document.getElementById('edit-tel').value.trim();
-    const confirmTel = document.getElementById('edit-confirm-tel').value.trim();
-    const errEl = document.getElementById('edit-error');
-    errEl.style.color = '#f87171';
-    errEl.textContent = '';
-    if (!newTel) { errEl.textContent = 'Escribe el nuevo tel\u00E9fono'; return; }
-    if (!/^\d{10}$/.test(newTel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
-    if (newTel !== confirmTel) { errEl.textContent = 'Los tel\u00E9fonos no coinciden'; return; }
-    try {
-      const user = auth.currentUser;
-      await updateDoc(doc(db, 'usuarios', user.uid), { telefono: newTel });
-      cachedUserData = { ...cachedUserData, telefono: newTel };
-      document.getElementById('prof-phone').textContent = newTel;
-      errEl.style.color = '#4ade80';
-      errEl.textContent = 'Tel\u00E9fono actualizado \u2713';
-    } catch(e) {
-      errEl.style.color = '#f87171';
-      errEl.textContent = 'Error: ' + e.message;
-    }
-  };
-
-  // &#x2500;&#x2500; PWA INSTALL &#x2500;&#x2500;
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault(); deferredPrompt = e;
-    document.getElementById('install-banner').classList.remove('hidden');
-  });
-  document.getElementById('do-install').addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    document.getElementById('install-banner').classList.add('hidden');
-  });
-  window.addEventListener('appinstalled', () => document.getElementById('install-banner').classList.add('hidden'));
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
-    navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
-  }
-</script>
-
-<script>
-  // Navigation (global)
-  const views = ['home','profile','notif'];
-  let currentView = 'home';
 
   function navigate(id, pushState = true) {
     views.forEach(v => {
