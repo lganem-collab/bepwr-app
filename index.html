@@ -1016,7 +1016,13 @@
       if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') return;
-      const reg = await navigator.serviceWorker.ready;
+      // Registrar firebase-messaging-sw.js para que FCM funcione en background
+      let reg;
+      try {
+        reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      } catch(e) {
+        reg = await navigator.serviceWorker.ready;
+      }
       const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
       if (token) {
         console.log('FCM token obtained:', token.substring(0,20)+'...');
@@ -1318,7 +1324,10 @@ Escribe 3 oraciones: 1) dato cient\u00EDfico \u00FAtil para sus m\u00E9tricas, 2
     document.getElementById('install-banner').classList.add('hidden');
   });
   window.addEventListener('appinstalled', () => document.getElementById('install-banner').classList.add('hidden'));
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
+  }
 </script>
 
 <script>
