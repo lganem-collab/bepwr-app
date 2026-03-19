@@ -16,7 +16,7 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--black:#0a0a0a;--card:#181818;--border:#2a2a2a;--orange:#FF5C1A;--white:#f5f5f5;--gray:#666;--safe-bottom:env(safe-area-inset-bottom,0px)}
-    html,body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;height:100%;overflow:hidden}
+    html,body{background:var(--black);color:var(--white);font-family:DM Sans,sans-serif;height:100%;overflow:hidden}
     #app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--black)}
 
     /* SPLASH */
@@ -34,17 +34,17 @@
     #screen-inactive{position:absolute;inset:0;background:var(--black);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;opacity:0;pointer-events:none;transition:opacity .35s ease}
     #screen-inactive.active{opacity:1;pointer-events:all}
     .login-logo-img{width:200px;margin:0 auto 8px;display:block}
-    .login-tagline{font-size:12px;color:var(--gray);text-align:center;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:48px}
+    .login-tagline{font-size:12px;color:var(--gray);text-align:center;font-family:Space Mono,monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:48px}
     .field-wrap{margin-bottom:14px}
-    .field-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:7px;display:block}
-    .field-input{width:100%;background:#141414;border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+    .field-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace;margin-bottom:7px;display:block}
+    .field-input{width:100%;background:#141414;border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;color:var(--white);font-family:DM Sans,sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
     .field-input:focus{border-color:var(--orange)}
     .field-input::placeholder{color:#333}
-    .login-btn{width:100%;padding:18px;background:var(--orange);color:white;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;transition:opacity .2s,transform .1s}
+    .login-btn{width:100%;padding:18px;background:var(--orange);color:white;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;margin-top:10px;transition:opacity .2s,transform .1s}
     .login-btn:active{opacity:.85;transform:scale(.98)}
     .login-btn:disabled{opacity:.5;cursor:not-allowed}
-    .login-error{font-size:12px;color:#f87171;text-align:center;margin-top:12px;font-family:'Space Mono',monospace;letter-spacing:.5px;min-height:16px}
-    .login-forgot{font-size:12px;color:var(--gray);text-align:center;margin-top:16px;cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline}
+    .login-error{font-size:12px;color:#f87171;text-align:center;margin-top:12px;font-family:Space Mono,monospace;letter-spacing:.5px;min-height:16px}
+    .login-forgot{font-size:12px;color:var(--gray);text-align:center;margin-top:16px;cursor:pointer;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline}
     .login-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:280px;height:280px;background:radial-gradient(circle,rgba(255,92,26,.1),transparent 70%);pointer-events:none}
 
     /* APP */
@@ -53,7 +53,7 @@
     .topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 24px 10px;padding-top:calc(18px + env(safe-area-inset-top,0px));background:var(--black);flex-shrink:0;z-index:50}
     .topbar-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1}
     .topbar-logo .be{color:#ffffff}.topbar-logo .pwr{color:#FF5C1A}.topbar-logo sup{font-size:0.45em;vertical-align:super}
-    .members-badge{font-size:10px;color:#FF5C1A;font-family:'Space Mono',monospace;letter-spacing:3px;text-transform:uppercase;margin-left:10px;font-weight:400}
+    .members-badge{font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:3px;text-transform:uppercase;margin-left:10px;font-weight:400}
     .avatar-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;border:2px solid #333;cursor:pointer}
     .scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 22px;padding-bottom:calc(80px + var(--safe-bottom))}
     .scroll-area::-webkit-scrollbar{display:none}
@@ -63,8 +63,8 @@
 
     /* HOME */
     .greeting{margin:10px 0 24px}
-    .greeting-sub{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:2.5px;font-family:'Space Mono',monospace;margin-bottom:4px}
-    .greeting-name{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;line-height:1}
+    .greeting-sub{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:2.5px;font-family:Space Mono,monospace;margin-bottom:4px}
+    .greeting-name{font-family:Bebas Neue,sans-serif;font-size:40px;letter-spacing:2px;line-height:1}
     .ai-card{background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.35);border-radius:20px;padding:18px;margin-bottom:26px;position:relative;overflow:hidden}
     /* MODALES */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:800;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
@@ -72,94 +72,94 @@
     .modal-sheet{background:#111;border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:24px 20px 40px;transform:translateY(40px);transition:transform .3s}
     .modal-overlay.active .modal-sheet{transform:none}
     .modal-handle{width:40px;height:4px;background:#333;border-radius:2px;margin:0 auto 20px}
-    .modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:20px}
+    .modal-title{font-family:Bebas Neue,sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:20px}
     .modal-field{margin-bottom:16px}
-    .modal-field label{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px}
-    .modal-field input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;box-sizing:border-box}
+    .modal-field label{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:Space Mono,monospace;text-transform:uppercase;display:block;margin-bottom:6px}
+    .modal-field input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:DM Sans,sans-serif;box-sizing:border-box}
     .modal-field input:focus{outline:none;border-color:var(--orange)}
     .modal-field input[type="date"]{background:#f0f0f0;color:#111;border-color:#ccc;color-scheme:light}
     .modal-field input[type="date"]::-webkit-calendar-picker-indicator{filter:none;cursor:pointer}
     .modal-field input[type="date"]:focus{border-color:var(--orange)}
     .modal-divider{border:none;border-top:1px solid #222;margin:20px 0}
-    .modal-section-title{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;margin-bottom:14px}
+    .modal-section-title{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:Space Mono,monospace;text-transform:uppercase;margin-bottom:14px}
     .hist-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1a1a1a;font-size:14px}
     .hist-row:last-child{border-bottom:none}
-    .hist-date{color:var(--gray);font-family:'Space Mono',monospace;font-size:11px}
+    .hist-date{color:var(--gray);font-family:Space Mono,monospace;font-size:11px}
     .hist-metrics{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin-top:6px;font-size:13px}
     .hist-metric{color:#ccc}.hist-metric span{color:#fff;font-weight:600}
     .pass-input-wrap{position:relative}
     .pass-input-wrap input{padding-right:44px}
     .pass-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);cursor:pointer;font-size:16px;padding:4px}
-    .ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.3);border-radius:20px;padding:4px 12px;font-size:10px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:11px}
+    .ai-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,92,26,.12);border:1px solid rgba(255,92,26,.3);border-radius:20px;padding:4px 12px;font-size:10px;color:var(--orange);font-family:Space Mono,monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:11px}
     .ai-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 2s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
     .ai-message{font-size:14px;line-height:1.65;color:#e0d5cc;font-weight:300}
     .ai-message b{color:var(--orange);font-weight:600}
-    .ai-loading{font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px}
-    .sec-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:13px}
+    .ai-loading{font-size:13px;color:var(--gray);font-family:Space Mono,monospace;letter-spacing:1px}
+    .sec-title{font-family:Space Mono,monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:13px}
     .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px}
     .m-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 14px}
     .m-card.wide{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:18px}
-    .m-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:8px}
-    .m-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1}
+    .m-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:Space Mono,monospace;margin-bottom:8px}
+    .m-value{font-family:Bebas Neue,sans-serif;font-size:36px;letter-spacing:1px;line-height:1}
     .m-unit{font-size:13px;color:var(--gray);margin-left:3px}
     .m-delta{font-size:11px;margin-top:6px;font-weight:500}
     .green{color:#4ade80}.red{color:#f87171}
     .ring-wrap{position:relative;flex-shrink:0}
     .ring-wrap svg{transform:rotate(-90deg);display:block}
     .ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .ring-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);line-height:1}
-    .ring-lbl{font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace}
+    .ring-val{font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--orange);line-height:1}
+    .ring-lbl{font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-family:Space Mono,monospace}
     .goal-body{flex:1}
     .goal-title{font-size:15px;font-weight:600;margin-bottom:3px}
     .goal-sub{font-size:12px;color:var(--gray);margin-bottom:12px;line-height:1.4}
     .bar-bg{height:5px;background:var(--border);border-radius:99px;overflow:hidden}
     .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--orange),#ff8c00);transition:width .6s ease}
-    .bar-labels{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace}
+    .bar-labels{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--gray);font-family:Space Mono,monospace}
     .chart-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:26px}
     .chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
     .chart-ttl{font-size:15px;font-weight:600}
     .chart-sub2{font-size:11px;color:var(--gray);margin-top:2px}
-    .chart-big{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--orange);letter-spacing:1px}
+    .chart-big{font-family:Bebas Neue,sans-serif;font-size:30px;color:var(--orange);letter-spacing:1px}
     .bars{display:flex;align-items:flex-end;gap:5px;height:55px}
     .bar-col{flex:1;border-radius:3px 3px 0 0;background:var(--border)}
     .bar-col.lit{background:linear-gradient(to top,var(--orange),#ff8c00)}
     .months{display:flex;gap:5px;margin-top:7px}
-    .mo{flex:1;text-align:center;font-size:9px;color:var(--gray);font-family:'Space Mono',monospace}
-    .btn-primary{width:100%;padding:17px;background:var(--orange);color:white;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .1s}
+    .mo{flex:1;text-align:center;font-size:9px;color:var(--gray);font-family:Space Mono,monospace}
+    .btn-primary{width:100%;padding:17px;background:var(--orange);color:white;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:DM Sans,sans-serif;transition:opacity .2s,transform .1s}
     .btn-primary:active{opacity:.85;transform:scale(.98)}
-    .btn-secondary{width:100%;padding:17px;background:transparent;color:var(--white);border:1px solid var(--border);border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:26px}
+    .btn-secondary{width:100%;padding:17px;background:transparent;color:var(--white);border:1px solid var(--border);border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;margin-bottom:26px}
     .btn-secondary:active{opacity:.7}
 
     /* RESERVE */
     .reserve-hero{background:linear-gradient(135deg,#1a0a00,#200e00);border:1px solid rgba(255,92,26,.2);border-radius:20px;padding:26px 20px;text-align:center;margin:10px 0 24px}
-    .reserve-hero-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;margin-bottom:8px}
+    .reserve-hero-title{font-family:Bebas Neue,sans-serif;font-size:34px;letter-spacing:3px;margin-bottom:8px}
     .reserve-hero-sub{font-size:13px;color:var(--gray);line-height:1.5;margin-bottom:18px}
     .class-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px 16px;margin-bottom:9px;display:flex;align-items:center;gap:14px;cursor:pointer}
     .class-card:active{opacity:.75}
-    .cls-time{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:1px;min-width:48px;text-align:center}
-    .cls-ampm{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray);text-align:center;letter-spacing:1px}
+    .cls-time{font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--orange);letter-spacing:1px;min-width:48px;text-align:center}
+    .cls-ampm{font-family:Space Mono,monospace;font-size:9px;color:var(--gray);text-align:center;letter-spacing:1px}
     .cls-div{width:1px;height:32px;background:var(--border)}
     .cls-name{font-size:14px;font-weight:600;margin-bottom:2px}
     .cls-info{font-size:11px;color:var(--gray)}
-    .cls-spots{margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;text-align:right;letter-spacing:.5px;text-transform:uppercase}
+    .cls-spots{margin-left:auto;font-family:Space Mono,monospace;font-size:10px;text-align:right;letter-spacing:.5px;text-transform:uppercase}
 
     /* PROFILE */
     .profile-head{display:flex;flex-direction:column;align-items:center;padding:16px 0 26px;gap:10px}
-    .profile-av{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:30px;border:3px solid var(--orange);box-shadow:0 0 28px rgba(255,92,26,.3)}
-    .profile-name-big{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px}
-    .profile-since{font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase}
+    .profile-av{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#FF5C1A,#ff8c00);display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:30px;border:3px solid var(--orange);box-shadow:0 0 28px rgba(255,92,26,.3)}
+    .profile-name-big{font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:2px}
+    .profile-since{font-size:11px;color:var(--gray);font-family:Space Mono,monospace;letter-spacing:1.5px;text-transform:uppercase}
     .info-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px}
     .info-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
     .info-row:last-child{border-bottom:none}
-    .info-key{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace}
+    .info-key{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-family:Space Mono,monospace}
     .info-val{font-size:13px;font-weight:500}
-    .logout-btn{width:100%;padding:17px;background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.25);border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:26px}
+    .logout-btn{width:100%;padding:17px;background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.25);border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;margin-bottom:26px}
     .logout-btn:active{opacity:.7}
 
     /* BOTTOM NAV */
     .bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(12,12,12,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:10px 0;padding-bottom:calc(10px + var(--safe-bottom));z-index:100}
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#444;transition:color .2s;font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:4px 0;user-select:none}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#444;transition:color .2s;font-size:9px;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;padding:4px 0;user-select:none}
     .nav-item.on{color:var(--orange)}
     .nav-item svg{width:22px;height:22px}
 
@@ -173,7 +173,7 @@
     @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
     .install-text{flex:1;font-size:13px;line-height:1.4}
     .install-text b{color:var(--orange)}
-    .install-btn-el{background:var(--orange);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif}
+    .install-btn-el{background:var(--orange);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:DM Sans,sans-serif}
     .install-close{color:var(--gray);cursor:pointer;font-size:18px;line-height:1;padding:4px}
   </style>
 </head>
@@ -211,13 +211,13 @@
   <div id="screen-inactive">
     <div style="text-align:center;max-width:300px">
       <div style="font-size:52px;margin-bottom:18px">&#x1F512;</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRES&#xCD;A INACTIVA</div>
-      <div id="inactive-name" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:18px;color:#fff"></div>
-      <div style="font-size:13px;color:#888;line-height:1.75;margin-bottom:28px;font-family:'DM Sans',sans-serif">
+      <div style="font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:3px;color:#FF5C1A;margin-bottom:6px">MEMBRES&#xCD;A INACTIVA</div>
+      <div id="inactive-name" style="font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:18px;color:#fff"></div>
+      <div style="font-size:13px;color:#888;line-height:1.75;margin-bottom:28px;font-family:DM Sans,sans-serif">
         Tu membres&#xED;a en bePWR est&#xE1; actualmente pausada. Para volver a acceder a tus m&#xE9;tricas, historial y reservas, renueva con nosotros.
       </div>
-      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">&#x1F513; Renovar membres&#xED;a</a>
-      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesi&#xF3;n</button>
+      <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:DM Sans,sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">&#x1F513; Renovar membres&#xED;a</a>
+      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:DM Sans,sans-serif">Cerrar sesi&#xF3;n</button>
     </div>
   </div>
 
@@ -337,34 +337,34 @@
     <div class="modal-sheet">
       <div class="modal-handle"></div>
       <div class="modal-title">Editar informaci&#xF3;n</div>
-      <div class="modal-field"><label>Nombre completo <span style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace">(solo el staff puede modificarlo)</span></label><input type="text" id="edit-nombre" readonly style="color:#666;cursor:not-allowed;background:rgba(255,255,255,0.03)"></div>
+      <div class="modal-field"><label>Nombre completo <span style="font-size:10px;color:var(--gray);font-family:Space Mono,monospace">(solo el staff puede modificarlo)</span></label><input type="text" id="edit-nombre" readonly style="color:#666;cursor:not-allowed;background:rgba(255,255,255,0.03)"></div>
       <div class="modal-field"><label>Nuevo email</label><input type="email" id="edit-email" placeholder="tu@email.com"></div>
       <div class="modal-field"><label>Confirmar nuevo email</label><input type="email" id="edit-confirm-email" placeholder="Repite el email"></div>
       <div style="text-align:right;margin-bottom:12px">
-        <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar email</button>
+        <button onclick="confirmEmailChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:DM Sans,sans-serif">Cambiar email</button>
       </div>
       <div class="modal-field"><label>Nuevo tel&#xE9;fono</label><input type="tel" id="edit-tel" placeholder="10 d&#xED;gitos" maxlength="10"></div>
       <div class="modal-field"><label>Confirmar tel&#xE9;fono</label><input type="tel" id="edit-confirm-tel" placeholder="Repite el tel&#xE9;fono" maxlength="10"></div>
       <div style="text-align:right;margin-bottom:12px">
-        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar tel&#xE9;fono</button>
+        <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:DM Sans,sans-serif">Cambiar tel&#xE9;fono</button>
       </div>
 
       <div class="modal-field" style="margin-bottom:20px">
-        <label style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Mi objetivo principal</label>
-        <select id="edit-meta" style="width:100%;background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;margin-top:8px">
+        <label style="font-family:Space Mono,monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Mi objetivo principal</label>
+        <select id="edit-meta" style="width:100%;background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--white);font-family:DM Sans,sans-serif;outline:none;-webkit-appearance:none;margin-top:8px">
           <option value="Bajar grasa / bajar de peso">&#x1F525; Bajar grasa / bajar de peso</option>
           <option value="Ganar m&#xFA;sculo / recomposici&#xF3;n">&#x1F4AA; Ganar m&#xFA;sculo / recomposici&#xF3;n</option>
           <option value="Salud metab&#xF3;lica / salud general">&#x1F49A; Salud metab&#xF3;lica / salud general</option>
           <option value="Rendimiento funcional">&#x26A1; Rendimiento funcional</option>
           <option value="Est&#xE9;tica / composici&#xF3;n equilibrada">&#x2728; Est&#xE9;tica / composici&#xF3;n equilibrada</option>
         </select>
-        <div style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;margin-top:6px;letter-spacing:1px">Este cambio actualiza c&#xF3;mo medimos tu progreso</div>
+        <div style="font-size:10px;color:var(--gray);font-family:Space Mono,monospace;margin-top:6px;letter-spacing:1px">Este cambio actualiza c&#xF3;mo medimos tu progreso</div>
       </div>
       <hr class="modal-divider">
       <div style="background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:16px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span style="font-size:18px">&#x1F510;</span>
-          <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contrase&#xF1;a</span>
+          <span style="font-family:Space Mono,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Cambiar contrase&#xF1;a</span>
         </div>
         <div class="modal-field"><label>Contrase&#xF1;a actual</label>
           <div class="pass-input-wrap">
@@ -384,7 +384,7 @@
             <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">&#x1F441;</button>
           </div>
         </div>
-        <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
+        <div style="font-size:11px;color:var(--gray);font-family:Space Mono,monospace;line-height:1.6">
           Debe tener: may&#xFA;scula &#xB7; min&#xFA;scula &#xB7; n&#xFA;mero &#xB7; s&#xED;mbolo
         </div>
       </div>
@@ -409,12 +409,12 @@
     <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column">
       <div class="modal-handle"></div>
       <div class="modal-title" style="font-size:18px">T&#xE9;rminos y Aviso de Privacidad</div>
-      <div style="font-size:12px;color:var(--gray);font-family:'Space Mono',monospace;margin-bottom:16px">L&#xE9;elos antes de continuar</div>
+      <div style="font-size:12px;color:var(--gray);font-family:Space Mono,monospace;margin-bottom:16px">L&#xE9;elos antes de continuar</div>
 
       <!-- Scrollable content -->
       <div id="terminos-scroll" style="overflow-y:auto;flex:1;padding-right:4px;font-size:13px;color:#ccc;line-height:1.7">
 
-        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">T&#xC9;RMINOS Y CONDICIONES DE USO</div>
+        <div style="color:#FF5C1A;font-family:Space Mono,monospace;font-size:11px;letter-spacing:1px;margin-bottom:8px">T&#xC9;RMINOS Y CONDICIONES DE USO</div>
 
         <p><strong>OPERADORA FIT TERRASOLA S.A. de C.V.</strong> (en adelante "bePWR") pone a disposici&#xF3;n de sus miembros la aplicaci&#xF3;n bePWR (en adelante "la App") sujeta a los siguientes t&#xE9;rminos:</p>
 
@@ -434,7 +434,7 @@
 
         <p><strong>8. LEGISLACI&#xD3;N APLICABLE.</strong> Estos T&#xE9;rminos se rigen por las leyes vigentes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de la ciudad de Quer&#xE9;taro, Quer&#xE9;taro, renunciando a cualquier otro fuero.</p>
 
-        <div style="color:#FF5C1A;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin:20px 0 8px">AVISO DE PRIVACIDAD</div>
+        <div style="color:#FF5C1A;font-family:Space Mono,monospace;font-size:11px;letter-spacing:1px;margin:20px 0 8px">AVISO DE PRIVACIDAD</div>
         <p style="font-size:11px;color:var(--gray)">Conforme a la Ley Federal de Protecci&#xF3;n de Datos Personales en Posesi&#xF3;n de los Particulares (LFPDPPP)</p>
 
         <p><strong>Responsable:</strong> OPERADORA FIT TERRASOLA S.A. de C.V., con domicilio en Quer&#xE9;taro, Quer&#xE9;taro, M&#xE9;xico.</p>
@@ -470,7 +470,7 @@
     <div class="modal-sheet">
       <div class="modal-handle"></div>
       <div class="modal-title">Crea tu contrase&#xF1;a</div>
-      <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contrase&#xF1;a segura para tu cuenta.</div>
+      <div style="font-size:13px;color:var(--gray);font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:20px">Es tu primer ingreso. Elige una contrase&#xF1;a segura para tu cuenta.</div>
       <div class="modal-field"><label>Nueva contrase&#xF1;a</label>
         <div class="pass-input-wrap">
           <input type="password" id="primer-pass-new" placeholder="M&#xED;nimo 6 caracteres">
@@ -483,7 +483,7 @@
           <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">&#x1F441;</button>
         </div>
       </div>
-      <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:16px">
+      <div style="font-size:11px;color:var(--gray);font-family:Space Mono,monospace;line-height:1.6;margin-bottom:16px">
         Debe tener: m&#xED;nimo 6 caracteres &#xB7; may&#xFA;scula &#xB7; min&#xFA;scula &#xB7; n&#xFA;mero &#xB7; s&#xED;mbolo (. ! * @ #)
       </div>
       <div id="primer-pass-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
@@ -834,11 +834,11 @@
   function renderMetricsEmpty() {
     document.getElementById('metrics-grid').innerHTML = `
       <div class="m-card wide" style="justify-content:center;text-align:center;padding:24px">
-        <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">
+        <div style="font-size:13px;color:var(--gray);font-family:Space Mono,monospace;letter-spacing:1px">
           Sin m\u00E9tricas registradas a\u00FAn
         </div>
       </div>`;
-    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">Sin historial a\u00FAn</div>`;
+    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:Space Mono,monospace">Sin historial a\u00FAn</div>`;
   }
 
   function renderChart(metricas) {
@@ -929,7 +929,7 @@
           +'<div style="font-size:14px;font-weight:'+(unr?700:400)+';color:'+(unr?'var(--white)':'#aaa')+'">'
           +(unr?'<span style="display:inline-block;width:8px;height:8px;background:#FF5C1A;border-radius:50%;margin-right:8px;vertical-align:middle"></span>':'')
           +esc(n.titulo)+'</div>'
-          +'<div style="font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;white-space:nowrap;margin-left:8px">'+fecha+'</div>'
+          +'<div style="font-size:10px;color:var(--gray);font-family:Space Mono,monospace;white-space:nowrap;margin-left:8px">'+fecha+'</div>'
           +'</div><div style="font-size:13px;color:#aaa;line-height:1.5">'+esc(n.cuerpo)+'</div></div>';
       }).join('');
     } catch(e) {
