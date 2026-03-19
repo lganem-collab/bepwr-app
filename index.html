@@ -863,7 +863,7 @@
     const n = pesos.length;
 
     // Parse date robustly regardless of format stored in Firestore
-    const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const MESES = ['Ene','Feb','Mzo','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const fechas = metricas.map(m => {
       const d = String(m.fecha || '');
       let day = '', mon = '';
