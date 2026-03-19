@@ -946,7 +946,8 @@
           +'</div><div style="font-size:13px;color:#aaa;line-height:1.5">'+esc(n.cuerpo)+'</div></div>';
       }).join('');
     } catch(e) {
-      listEl.innerHTML='<div style="color:#f87171;font-size:12px;padding:16px">Error cargando notificaciones</div>';
+      console.error('loadNotifications error:', e.code, e.message);
+      listEl.innerHTML='<div style="color:#f87171;font-size:12px;padding:16px">'+(e.code||e.message||'Error')+'</div>';
     }
   }
 
