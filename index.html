@@ -503,7 +503,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot }
+  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot, deleteDoc }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
   import { getMessaging, getToken, onMessage }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
@@ -912,8 +912,7 @@
 
   async function deleteNotif(uid,notifId){
     try{
-      const {deleteDoc,doc:_doc}=await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js');
-      await deleteDoc(_doc(db,'usuarios',uid,'notificaciones',notifId));
+      await deleteDoc(doc(db,'usuarios',uid,'notificaciones',notifId));
       const el=document.getElementById('nid-'+notifId);
       if(el){el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(()=>el.remove(),300);}
       // Update badge
