@@ -866,18 +866,31 @@
     const MESES = ['Ene','Feb','Mzo','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const fechas = metricas.map(m => {
       const d = String(m.fecha || '');
+      console.log('fecha raw:', JSON.stringify(d));
+      const MNAMES = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
       let day = '', mon = '';
       if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
-        // Format: YYYY-MM-DD
+        // YYYY-MM-DD
         day = d.slice(8,10);
         mon = MESES[parseInt(d.slice(5,7),10)-1] || '';
       } else if (/^\d{2}\/\d{2}\/\d{4}/.test(d)) {
-        // Format: DD/MM/YYYY
+        // DD/MM/YYYY
         day = d.slice(0,2);
         mon = MESES[parseInt(d.slice(3,5),10)-1] || '';
+      } else if (/^\d{1,2}\s+\w+/.test(d)) {
+        // "14 marzo" o "14 Marzo"
+        const parts = d.split(/\s+/);
+        day = parts[0].padStart(2,'0');
+        const k = (parts[1]||'').toLowerCase().replace(/[^a-z]/g,'');
+        const idx = MNAMES[k];
+        mon = idx !== undefined ? MESES[idx] : '';
+      } else if (/^\d{1,2}\/\d{1,2}/.test(d)) {
+        // D/M o DD/MM
+        const parts = d.split('/');
+        day = parts[0].padStart(2,'0');
+        mon = MESES[parseInt(parts[1],10)-1] || '';
       } else {
-        // Fallback: show first 5 chars
-        return d.slice(0,5) || '-';
+        return d.slice(0,8) || '-';
       }
       return mon ? day+'/'+mon : day;
     });
