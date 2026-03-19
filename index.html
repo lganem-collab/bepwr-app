@@ -856,49 +856,64 @@
 
   function renderChart(metricas) {
     if (!metricas.length) return;
-    const pesos = metricas.map(m => m.peso);
-    const fechas = metricas.map(m => {
-      const d = m.fecha || '';
-      if (d.length >= 10) {
-        const MESES=['En','Fe','Ma','Ab','My','Jn','Jl','Ag','Sp','Oc','Nv','Di'];
-        const mes = MESES[parseInt(d.slice(5,7),10)-1] || '';
-        return d.slice(8,10)+mes;
-      }
-      return d.slice(0,3).toUpperCase() || '-';
-    });
+    const pesos  = metricas.map(m => m.peso);
     const ultima = pesos[pesos.length-1];
     const min = Math.min(...pesos), max = Math.max(...pesos);
-    const range = max - min || 1;
+    const range  = max - min || 1;
     const n = pesos.length;
-    const W = 320, H = 60, PAD = 8;
-    const pts = pesos.map((p, i) => [
-      PAD + (i / Math.max(n-1,1)) * (W - PAD*2),
-      H - PAD - ((p - min) / range) * (H - PAD*2)
+
+    // Date labels: "02/Mar"
+    const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const fechas = metricas.map(m => {
+      const d = m.fecha || '';
+      if (d.length >= 10) return d.slice(8,10)+'/'+MESES[parseInt(d.slice(5,7),10)-1];
+      return d.slice(0,5) || '-';
+    });
+
+    // SVG dimensions \u2014 leave bottom padding for labels
+    const W=300, H=80, PT=10, PL=8, PR=8, PB=28;
+    const chartH = H - PT - PB;
+
+    const pts = pesos.map((p,i) => [
+      PL + (i / Math.max(n-1,1)) * (W - PL - PR),
+      PT + (1 - (p - min) / range) * chartH
     ]);
+
     const polyline = pts.map(([x,y]) => x+','+y).join(' ');
-    const [lx, ly] = pts[pts.length-1];
+    const [lx,ly] = pts[pts.length-1];
     const areaPath = 'M'+pts.map(([x,y])=>x+' '+y).join(' L')
-      +' L'+lx+' '+(H-PAD)+' L'+PAD+' '+(H-PAD)+' Z';
+      +' L'+lx+' '+(PT+chartH)+' L'+PL+' '+(PT+chartH)+' Z';
+
+    const dots  = pts.map(([x,y],i) =>
+      `<circle cx="${x}" cy="${y}" r="${i===n-1?4:2.5}" fill="${i===n-1?'#FF5C1A':'#cc4a14'}" stroke="#0a0a0a" stroke-width="1.5"/>`
+    ).join('');
+
+    const vals  = pts.map(([x,y],i) =>
+      `<text x="${x}" y="${y-6}" text-anchor="middle" font-size="7" fill="${i===n-1?'#FF5C1A':'#666'}" font-family="monospace">${pesos[i]}</text>`
+    ).join('');
+
+    // Date labels at bottom \u2014 every label, rotate if too many
+    const lblY = H - 6;
+    const lbls = pts.map(([x],i) =>
+      `<text x="${x}" y="${lblY}" text-anchor="middle" font-size="7.5" fill="#888" font-family="monospace">${fechas[i]}</text>`
+    ).join('');
+
     document.getElementById('chart-card').innerHTML = `
       <div class="chart-head">
         <div><div class="chart-ttl">Peso corporal</div><div class="chart-sub2">&#xDA;ltimas ${n} mediciones</div></div>
         <div class="chart-big">${ultima} <span style="font-size:15px;color:var(--gray)">kg</span></div>
       </div>
-      <div class="line-chart-wrap">
-        <svg class="line-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
-             style="width:100%;height:${H}px;display:block">
-          <defs><linearGradient id="lcgrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#FF5C1A" stop-opacity="0.25"/>
-            <stop offset="100%" stop-color="#FF5C1A" stop-opacity="0.03"/>
-          </linearGradient></defs>
-          <path d="${areaPath}" fill="url(#lcgrad)"/>
-          <polyline points="${polyline}" fill="none" stroke="#FF5C1A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-          ${pts.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i===n-1?4:2.5}" fill="${i===n-1?'#FF5C1A':'#cc4a14'}" stroke="#0a0a0a" stroke-width="1.5"/>`).join('')}
-          ${pts.map(([x,y],i)=>`<text x="${x}" y="${y-7}" text-anchor="middle" font-size="8" fill="${i===n-1?'#FF5C1A':'#666'}" font-family="Space Mono,monospace">${pesos[i]}</text>`).join('')}
-        </svg>
-      </div>
-      <div class="lc-labels">${fechas.map(f=>`<div class="lc-lbl">${f}</div>`).join('')}</div>`;
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;overflow:visible">
+        <defs><linearGradient id="lcgrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FF5C1A" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#FF5C1A" stop-opacity="0.03"/>
+        </linearGradient></defs>
+        <path d="${areaPath}" fill="url(#lcgrad)"/>
+        <polyline points="${polyline}" fill="none" stroke="#FF5C1A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        ${dots}${vals}${lbls}
+      </svg>`;
   }
+
   function renderProfileMetrics(m) {
     const gc = m.grasaCorporal ?? m.grasaPct;
     document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : '&#x2014;';
