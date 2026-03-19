@@ -876,10 +876,8 @@
     const listEl=document.getElementById('notif-list');
     if(!listEl)return;
     try{
-      const cutoff=new Date();cutoff.setMonth(cutoff.getMonth()-1);const cutISO=cutoff.toISOString();
       const snap=await getDocs(query(collection(db,'usuarios',uid,'notificaciones'),orderBy('fecha','desc')));
-      snap.docs.filter(d=>(d.data().fecha||'')<cutISO).forEach(d=>d.ref.delete().catch(()=>{}));
-      const fresh=snap.docs.filter(d=>(d.data().fecha||'')>=cutISO);
+      const fresh=snap.docs;
       const unread=fresh.filter(d=>!d.data().leida).length;
       const badge=document.getElementById('notif-badge');
       if(badge){badge.textContent=unread>9?'9+':unread;badge.style.display=unread?'flex':'none';}
