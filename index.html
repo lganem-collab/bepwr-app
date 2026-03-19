@@ -914,7 +914,7 @@
       const badge = document.getElementById('notif-badge');
       if (badge) { badge.textContent = unread>9?'9+':unread; badge.style.display=unread?'flex':'none'; }
       if (!fresh.length) {
-        listEl.innerHTML='<div style="text-align:center;padding:40px 16px;color:var(--gray);font-size:13px;font-family:'Space Mono',monospace">Sin notificaciones</div>';
+        listEl.innerHTML='<div style="text-align:center;padding:40px 16px;color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin notificaciones</div>';
         return;
       }
       listEl.innerHTML = fresh.map(d=>{
