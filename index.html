@@ -1019,13 +1019,16 @@
       const reg = await navigator.serviceWorker.ready;
       const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
       if (token) {
+        console.log('FCM token obtained:', token.substring(0,20)+'...');
+        window._fcmToken = token;
         const snap = await getDoc(doc(db, 'usuarios', uid));
         if (snap.data()?.fcmToken !== token) {
           await updateDoc(doc(db, 'usuarios', uid), { fcmToken: token });
         }
       }
     } catch(e) {
-      console.log('Push subscription skipped:', e.message);
+      console.error('Push subscription error:', e.code, e.message);
+      window._pushError = e.code + ': ' + e.message;
     }
   }
 
