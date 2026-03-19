@@ -1,4 +1,4 @@
-const CACHE = 'bepwr-v6';
+const CACHE = 'bepwr-v7';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -35,9 +35,9 @@ self.addEventListener('fetch', e => {
   );
 });
 
-// ── PUSH NOTIFICATIONS ──────────────────────────────────────────
+// -- PUSH NOTIFICATIONS --
 self.addEventListener('push', e => {
-  let data = { title: 'bePWR', body: '¡Tienes un mensaje de tu coach!', url: '/' };
+  let data = { title: 'bePWR', body: 'Tienes un mensaje nuevo', url: '/' };
   try { data = { ...data, ...e.data.json() }; } catch(err) {}
   e.waitUntil(
     self.registration.showNotification(data.title, {
@@ -47,7 +47,6 @@ self.addEventListener('push', e => {
       vibrate: [200, 100, 200],
       data: { url: data.url || '/' },
       actions: [
-        { action: 'reservar', title: 'Reservar clase' },
         { action: 'abrir', title: 'Abrir app' }
       ]
     })
@@ -56,12 +55,10 @@ self.addEventListener('push', e => {
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const url = e.action === 'reservar'
-    ? 'https://bepwr.com/classes'
-    : (e.notification.data?.url || '/');
+  const url = e.notification.data?.url || '/';
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      const existing = list.find(c => c.url.includes('bepwr-app.vercel.app') || c.url.includes('bepwr.com/members'));
+      const existing = list.find(c => c.url.includes('bepwr-app.vercel.app'));
       if (existing) { existing.focus(); existing.navigate(url); }
       else clients.openWindow(url);
     })
