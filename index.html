@@ -919,8 +919,13 @@
       if(!banner||!bt)return;
       bt.textContent=n.titulo||'Tienes un aviso nuevo';
       banner.style.cssText='display:flex;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;align-items:center;gap:10px;animation:slideDown .3s ease';
+      // Add padding to scroll area so nav stays visible
+      const sa=document.querySelector('.scroll-area');if(sa)sa.style.paddingTop='52px';
       clearTimeout(window._bannerTimer);
-      window._bannerTimer=setTimeout(()=>{banner.style.display='none';},6000);
+      window._bannerTimer=setTimeout(()=>{
+        banner.style.display='none';
+        const sa2=document.querySelector('.scroll-area');if(sa2)sa2.style.paddingTop='';
+      },6000);
       loadNotifications(uid);
     });
   }
