@@ -515,11 +515,10 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  // Sesi\u00F3n persistente: se mantiene aunque cierren la app en el celular
-  // Importamos s\u00F3lo lo necesario para la persistencia
-  import('https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js')
-    .then(m => m.setPersistence(auth, m.indexedDbLocalPersistence || m.browserLocalPersistence))
-    .catch(() => {});
+  // Mantener sesi&#xF3;n activa (no cerrar al reabrir la app)
+  import("https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js").then(m => {
+    m.setPersistence(auth, m.browserLocalPersistence).catch(() => {});
+  });
 
   const splash    = document.getElementById('screen-splash');
   const loginScr  = document.getElementById('screen-login');
