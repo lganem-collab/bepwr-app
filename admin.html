@@ -655,22 +655,27 @@
   async function saveNotificationsFirestore(title, body, target) {
     const fecha = new Date().toISOString();
     const notifData = { titulo: title, cuerpo: body, fecha, leida: false };
-    const members = window._allMembers || [];
-    let targets;
-    if (target === 'individual') {
-      const uid = document.getElementById('notif-member')?.value;
-      targets = members.filter(m => m.uid === uid);
-    } else if (target.startsWith('objetivo:')) {
-      const obj = target.replace('objetivo:','');
-      targets = members.filter(m => m.activo !== false && m.objetivo?.meta === obj);
-    } else {
-      targets = members.filter(m => m.activo !== false);
-    }
-    await Promise.all(targets.map(m =>
-      db.collection('usuarios').doc(m.uid)
-        .collection('notificaciones').add(notifData)
-        .catch(() => {})
-    ));
+    try {
+      // Leer directo de Firestore en lugar de depender de _allMembers
+      const snap = await db.collection('usuarios').get();
+      const all = snap.docs.filter(d => d.data().activo !== false);
+      let targets = [];
+      if (target === 'individual') {
+        const uid = document.getElementById('notif-member')?.value;
+        targets = all.filter(d => d.id === uid);
+      } else if (target.startsWith('objetivo:')) {
+        const obj = target.replace('objetivo:','');
+        targets = all.filter(d => d.data().objetivo?.meta === obj);
+      } else {
+        targets = all;
+      }
+      await Promise.all(targets.map(d =>
+        db.collection('usuarios').doc(d.id)
+          .collection('notificaciones').add(notifData)
+          .catch(() => {})
+      ));
+      console.log('Notifs saved to Firestore:', targets.length);
+    } catch(e) { console.error('saveNotificationsFirestore:', e.message); }
   }
 
   function updateNotifTargetUI() {
