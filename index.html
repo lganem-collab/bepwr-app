@@ -859,7 +859,12 @@
     const pesos = metricas.map(m => m.peso);
     const fechas = metricas.map(m => {
       const d = m.fecha || '';
-      return d.length >= 10 ? d.slice(8,10) : d.slice(0,3).toUpperCase() || '-';
+      if (d.length >= 10) {
+        const dt = new Date(d+'T12:00:00');
+        const mes = dt.toLocaleDateString('es-MX',{month:'short'}).replace('.','');
+        return d.slice(8,10)+'/'+mes.charAt(0).toUpperCase()+mes.slice(1,3);
+      }
+      return d.slice(0,3).toUpperCase() || '-';
     });
     const ultima = pesos[pesos.length-1];
     const min = Math.min(...pesos), max = Math.max(...pesos);
