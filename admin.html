@@ -326,13 +326,17 @@
         <div class="field" style="margin-bottom:20px">
           <label>Destinatarios</label>
           <select id="notif-target" onchange="updateNotifTargetUI()">
-            <option value="all">Todos los miembros activos</option>
-            <option value="objetivo:Bajar grasa / bajar de peso">Por objetivo: Bajar grasa / bajar de peso</option>
-            <option value="objetivo:Ganar m\u00FAsculo / recomposici\u00F3n">Por objetivo: Ganar m\u00FAsculo / recomposici\u00F3n</option>
-            <option value="objetivo:Salud metab\u00F3lica / salud general">Por objetivo: Salud metab\u00F3lica / salud general</option>
-            <option value="objetivo:Rendimiento funcional">Por objetivo: Rendimiento funcional</option>
-            <option value="objetivo:Est\u00E9tica / composici\u00F3n equilibrada">Por objetivo: Est\u00E9tica / composici\u00F3n equilibrada</option>
-            <option value="individual">Env\u00EDo individual (selecciona miembro)</option>
+            <optgroup label="General">
+              <option value="all">Todos los miembros activos</option>
+              <option value="individual">Env\u00EDo individual</option>
+            </optgroup>
+            <optgroup label="Por objetivo principal">
+              <option value="objetivo:Bajar grasa / bajar de peso">&#x1F525; Bajar grasa / bajar de peso</option>
+              <option value="objetivo:Ganar m\u00FAsculo / recomposici\u00F3n">&#x1F4AA; Ganar m\u00FAsculo / recomposici\u00F3n</option>
+              <option value="objetivo:Salud metab\u00F3lica / salud general">&#x1F49A; Salud metab\u00F3lica / salud general</option>
+              <option value="objetivo:Rendimiento funcional">&#x26A1; Rendimiento funcional</option>
+              <option value="objetivo:Est\u00E9tica / composici\u00F3n equilibrada">&#x2728; Est\u00E9tica / composici\u00F3n equilibrada</option>
+            </optgroup>
           </select>
           <select id="notif-member" style="display:none;margin-top:8px;width:100%;background:#141414;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--white);font-family:'DM Sans',sans-serif">
             <option value="">Selecciona un miembro...</option>
