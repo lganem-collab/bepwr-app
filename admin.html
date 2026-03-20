@@ -1218,7 +1218,8 @@
     document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoraci\u00F3n';
     window._editingMetricId = metricId;
     document.getElementById('modal-metrics').style.display = 'flex';
-    setTimeout(() => document.getElementById('modal-metrics').classList.add('active'), 10);
+    document.getElementById('modal-metrics').style.zIndex = '600';
+    setTimeout(() => document.getElementById('modal-metrics').classList.add('open'), 10);
   }
 
   async function saveMetrics() {
