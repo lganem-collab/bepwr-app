@@ -1199,6 +1199,24 @@
   }
 
   // Edit past metric (admin only)
+  function showConfirm(msg) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+      overlay.innerHTML = `
+        <div style='background:#1a1a1a;border:1px solid #FF5C1A;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center'>
+          <div style='font-size:15px;color:#fff;line-height:1.6;margin-bottom:24px'>${msg}</div>
+          <div style='display:flex;gap:12px'>
+            <button id='confirm-cancel' style='flex:1;background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:14px;padding:12px;border-radius:10px;cursor:pointer'>Cancelar</button>
+            <button id='confirm-ok' style='flex:1;background:#FF5C1A;border:none;color:#fff;font-size:14px;font-weight:700;padding:12px;border-radius:10px;cursor:pointer'>Aceptar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.querySelector('#confirm-ok').onclick = () => { document.body.removeChild(overlay); resolve(true); };
+      overlay.querySelector('#confirm-cancel').onclick = () => { document.body.removeChild(overlay); resolve(false); };
+    });
+  }
+
   async function editMetrica(uid, metricId) {
     if (window.currentStaffRole !== 'admin') return;
     const snap = await db.collection('usuarios').doc(uid).collection('metricas').doc(metricId).get();
@@ -1247,6 +1265,12 @@
         fecha, registradoPor: auth.currentUser?.uid || null, miembroNombre
       };
       if (window._editingMetricId) {
+        // Confirm before editing past metric
+        const fechaEdit = document.getElementById('m-fecha')?.value || 'esta fecha';
+        const confirmed = await showConfirm(
+          '\u00BFConfirmas que deseas modificar las m\u00E9tricas de ' + fechaEdit + '?'
+        );
+        if (!confirmed) return;
         await db.collection('usuarios').doc(uid).collection('metricas').doc(window._editingMetricId).update(metricData);
         window._editingMetricId = null;
         document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\u00F3n';
