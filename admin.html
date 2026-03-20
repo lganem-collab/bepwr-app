@@ -948,11 +948,19 @@
 
   function updateStats() {
     const m = window._allMembers || [];
-    document.getElementById('stat-total').textContent = m.length;
-    document.getElementById('stat-metrics').textContent = m.filter(x => x.ultimaMetrica).length;
-    document.getElementById('stat-noobjective').textContent = m.filter(x => !x.objetivo?.meta).length;
+    const activos = m.filter(x => x.activo !== false);
+    // Members tab counter
+    const elTotal = document.getElementById('stat-total');
+    if(elTotal) elTotal.textContent = activos.length;
+    // Home tab counters
+    const elHT = document.getElementById('stat-home-total');
+    if(elHT) elHT.textContent = m.length;
+    const elHA = document.getElementById('stat-home-activos');
+    if(elHA) elHA.textContent = activos.length;
+    // Legacy counters (may not exist anymore)
+    const elM = document.getElementById('stat-metrics'); if(elM) elM.textContent = m.filter(x => x.ultimaMetrica).length;
     const yr = new Date().getFullYear().toString();
-    document.getElementById('stat-month').textContent = m.filter(x => x.fechaInicio && x.fechaInicio.includes(yr)).length;
+    const elMo = document.getElementById('stat-month'); if(elMo) elMo.textContent = m.filter(x => x.fechaInicio && x.fechaInicio.includes(yr)).length;
   }
 
   function renderMembers(members) {
