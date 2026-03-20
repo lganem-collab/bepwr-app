@@ -141,7 +141,6 @@
   <div class="tabs">
     <div class="tab on" id="tab-home" onclick="switchTab('home')">Inicio</div>
     <div class="tab" id="tab-members" onclick="switchTab('members')">Miembros</div>
-    <div class="tab" id="tab-new" onclick="switchTab('new')">+ Nuevo miembro</div>
     <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">&#x1F465; Staff</div>
     <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">&#x1F4E3; Env&#xED;o de Avisos</div>
   </div>
@@ -162,18 +161,18 @@
           <span style="color:var(--gray);font-family:Space Mono,monospace;font-size:12px">Cargando mensaje...</span>
         </div>
       </div>
-      <div class="stats-row" style="cursor:pointer" onclick="switchTab('members')">
-        <div class="stat-card"><div class="stat-label">Total miembros</div><div class="stat-value orange" id="stat-home-total">0</div></div>
-        <div class="stat-card"><div class="stat-label">Activos</div><div class="stat-value" id="stat-home-activos">0</div></div>
-        <div class="stat-card"><div class="stat-label">Con m&#xE9;tricas</div><div class="stat-value" id="stat-home-metrics">0</div></div>
-        <div class="stat-card"><div class="stat-label">Este a&#xF1;o</div><div class="stat-value" id="stat-home-month">0</div></div>
+      <div style="display:flex;gap:16px;margin-top:8px">
+        <div class="stat-card" onclick="showAllMembers()" style="cursor:pointer;flex:1"><div class="stat-label">Total miembros</div><div class="stat-value orange" id="stat-home-total">0</div></div>
+        <div class="stat-card" onclick="showActiveMembers()" style="cursor:pointer;flex:1"><div class="stat-label">Miembros activos</div><div class="stat-value" id="stat-home-activos">0</div></div>
       </div>
     </div>
 
     <!-- MEMBERS TAB -->
     <div id="tab-content-members">
-      <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px"><span style="font-size:28px;font-weight:700;color:#FF5C1A" id="stat-total">0</span><span style="font-size:14px;color:var(--gray)">miembros activos</span></div>
-</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><span style="font-size:28px;font-weight:700;color:#FF5C1A" id="stat-total">0</span> <span style="font-size:14px;color:var(--gray)">miembros activos</span></div>
+        <button onclick="switchTab('new')" style="background:#FF5C1A;border:none;color:#fff;font-size:13px;font-weight:700;padding:10px 18px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace">+ Nuevo miembro</button>
+      </div>
 
       <div style="margin-bottom:16px">
         <input id="search-input" oninput="filterMembers()"
@@ -184,7 +183,7 @@
     </div>
 
     <!-- NEW MEMBER TAB -->
-    <div id="tab-content-new" style="display:none;max-width:600px">
+    <div id="tab-content-new" style="display:none;max-width:600px;margin:0 auto">
       <div style="margin-bottom:24px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Nuevo Miembro</div>
         <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:Space Mono,monospace;letter-spacing:1px">Crea el acceso y perfil del miembro</div>
@@ -278,7 +277,7 @@
     </div>
 
     <!-- STAFF TAB -->
-    <div id="tab-content-staff" style="display:none;max-width:600px">
+    <div id="tab-content-staff" style="display:none;max-width:600px;margin:0 auto">
       <div style="margin-bottom:24px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Gesti&#xF3;n de Staff</div>
         <div style="font-size:13px;color:var(--gray);margin-top:4px;font-family:Space Mono,monospace;letter-spacing:1px">Agrega, desactiva o cambia el rol de cada persona</div>
@@ -990,6 +989,20 @@
     if (dias <= 7) return '<span style="background:#fb923c;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">VENCE ' + dias + 'd</span>';
     if (dias <= 30) return '<span style="background:#fbbf24;color:#111;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">' + dias + 'd</span>';
     return '';
+  }
+
+  function showAllMembers() {
+    switchTab('members');
+    document.getElementById('search-input').value = '';
+    filterMembers();
+  }
+
+  function showActiveMembers() {
+    switchTab('members');
+    // Filter to show only active members
+    const list = document.getElementById('members-list');
+    const all = window._allMembers || [];
+    renderMembers(all.filter(m => m.activo !== false));
   }
 
   function filterMembers() {
