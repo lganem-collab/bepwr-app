@@ -457,6 +457,7 @@
         } catch(domErr) { console.error('DOM error:', domErr); }
         try {
           loadMembers();
+          switchTab('home');
       generateCoachMessage().catch(()=>{});
       subscribeStaffToPush(user.uid);
         } catch(loadErr) { console.error('loadMembers error:', loadErr); }
@@ -953,29 +954,26 @@
   function renderMembers(members) {
     const list = document.getElementById('members-list');
     if (!members.length) { list.innerHTML = '<div class="empty-state">No se encontraron miembros</div>'; return; }
-    list.innerHTML = members.map(m => {
-      const meta = m.objetivo?.meta || '&#x2014;';
-      const peso = m.ultimaMetrica?.peso ? m.ultimaMetrica.peso + ' kg' : '&#x2014;';
-      const imc  = m.ultimaMetrica?.imc || '&#x2014;';
+    // Sort alphabetically by apellido then nombre
+    const sorted = [...members].sort((a,b)=>{
+      const getAp = m => { const parts=(m.nombre||'').trim().split(' '); return parts.length>1?parts.slice(1).join(' ').toLowerCase():parts[0].toLowerCase(); };
+      return getAp(a).localeCompare(getAp(b),'es');
+    });
+    list.innerHTML = sorted.map(m => {
       const activo = m.activo !== false;
-      const estadoDot = activo
-        ? '<span style="display:inline-block;width:8px;height:8px;background:#4ade80;border-radius:50%;margin-right:6px;flex-shrink:0"></span>'
-        : '<span style="display:inline-block;width:8px;height:8px;background:#f87171;border-radius:50%;margin-right:6px;flex-shrink:0"></span>';
-      const nombreStyle = activo ? '' : 'text-decoration:line-through;opacity:.5;';
+      const dot = activo
+        ? '<span style="display:inline-block;width:8px;height:8px;background:#4ade80;border-radius:50%;margin-right:8px;flex-shrink:0"></span>'
+        : '<span style="display:inline-block;width:8px;height:8px;background:#f87171;border-radius:50%;margin-right:8px;flex-shrink:0"></span>';
       const vBadge = typeof vigenciaBadge === 'function' ? vigenciaBadge(m) : '';
-      return `<div class="table-row" onclick="openDetail('${m.uid}')" style="${activo?'':'opacity:.75'}">
-        <div class="td"><div class="member-name" style="${nombreStyle}display:flex;align-items:center;flex-wrap:wrap;gap:4px">${estadoDot}${m.nombre||'Sin nombre'}${vBadge}</div><div class="member-email">${m.email||''}</div></div>
-        <div class="td gray">${meta}</div>
-        <div class="td mono">${peso}</div>
-        <div class="td mono">${imc}</div>
-        <div class="td gray">${m.fechaInicio||'&#x2014;'}</div>
-        <div class="td actions" onclick="event.stopPropagation()">
-          <button class="btn btn-sm btn-success" onclick="openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ M\u00E9tricas</button>
-          <button class="btn btn-sm ${activo?'btn-danger':'btn-success'}" style="margin-left:6px" onclick="quickToggleMember('${m.uid}',${activo},'${(m.nombre||'').replace(/'/g,"\\'")}')">
-            ${activo?'Desactivar':'Activar'}
-          </button>
+      // Display apellido first
+      const parts = (m.nombre||'Sin nombre').trim().split(' ');
+      const displayName = parts.length>1 ? parts.slice(1).join(' ')+', '+parts[0] : parts[0];
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;${activo?'':'opacity:.6'}" onclick="openDetail('${m.uid}')">
+        <div style="display:flex;align-items:center;flex:1;min-width:0">${dot}<div><div style="font-size:14px;font-weight:600;color:${activo?'var(--white)':'#888'}">${displayName}${vBadge}</div><div style="font-size:12px;color:var(--gray);margin-top:2px">${m.email||''}</div></div></div>
+        <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
+          <button onclick="event.stopPropagation();openDetail('${m.uid}')" style="background:#FF5C1A;border:none;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace">Ver</button>
         </div>
-      </div>`;
+        </div>`;
     }).join('');
   }
 
@@ -1267,7 +1265,7 @@
   }
 
   function switchTab(tab) {
-    const tabs = ['members','new','staff','notify'];
+    const tabs = ['home','members','new','staff','notify'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
       const contentEl = document.getElementById('tab-content-'+t);
@@ -1275,6 +1273,10 @@
       if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
     });
     if (tab === 'staff') loadStaffList();
+    if (tab === 'home') {
+      const dateEl = document.getElementById('home-date');
+      if(dateEl) dateEl.textContent = new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    }
     if (tab === 'new') {
       const adminOpt = document.getElementById('ns-rol-admin');
       if (adminOpt) adminOpt.style.display = window.currentStaffRole === 'admin' ? '' : 'none';
@@ -1288,7 +1290,11 @@
     try {
       const snap = await db.collection('staff').get();
       if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado a\u00FAn</div>'; return; }
-      listEl.innerHTML = snap.docs.map(d => {
+      const staffDocs = [...snap.docs].sort((a,b)=>{
+        const getAp = d => { const parts=(d.data().nombre||'').trim().split(' '); return parts.length>1?parts.slice(1).join(' ').toLowerCase():parts[0].toLowerCase(); };
+        return getAp(a).localeCompare(getAp(b),'es');
+      });
+      listEl.innerHTML = staffDocs.map(d => {
         const s = d.data();
         const activo = s.activo !== false;
         const isMaster = d.id === MASTER_UID;
@@ -1353,7 +1359,9 @@
   }
 
   async function createStaff() {
-    const nombre = document.getElementById('ns-nombre').value.trim();
+    const nombreVal = document.getElementById('ns-nombre').value.trim();
+    const apellidoVal = document.getElementById('ns-apellido')?.value.trim() || '';
+    const nombre = apellidoVal ? nombreVal + ' ' + apellidoVal : nombreVal;
     const email  = document.getElementById('ns-email').value.trim();
     const tel    = document.getElementById('ns-tel').value.trim();
     const pass   = document.getElementById('ns-pass').value;

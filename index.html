@@ -680,8 +680,8 @@
         document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
       }
       document.getElementById('prof-email').textContent = user.email;
-      document.getElementById('prof-phone').textContent = data.telefono || 'Sin datos';
-      let edadStr = 'Sin datos';
+      document.getElementById('prof-phone').textContent = data.telefono || '&#x2014;';
+      let edadStr = '&#x2014;';
       if (data.nacimiento) {
         const hoy = new Date(); const nac = new Date(data.nacimiento);
         let age = hoy.getFullYear() - nac.getFullYear();
@@ -689,14 +689,14 @@
         if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) age--;
         edadStr = age + ' a\u00F1os';
       }
-      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : 'Sin datos';
-      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : 'Sin datos';
+      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '&#x2014;';
+      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '&#x2014;';
 
       // Objetivo
       const obj = data.objetivo || {};
-      document.getElementById('prof-meta').textContent = obj.meta || 'Sin datos';
-      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : 'Sin datos';
-      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : 'Sin datos';
+      document.getElementById('prof-meta').textContent = obj.meta || '&#x2014;';
+      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '&#x2014;';
+      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '&#x2014;';
 
       // M\u00E9tricas Sin datos leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');
@@ -779,32 +779,32 @@
       </div>
       <div class="m-card">
         <div class="m-label">M\u00FAsculo Esquel\u00E9tico</div>
-        <div class="m-value">${m.musculo || 'Sin datos'}<span class="m-unit">kg</span></div>
+        <div class="m-value">${m.musculo || '&#x2014;'}<span class="m-unit">kg</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Corporal</div>
-        <div class="m-value">${m.grasaCorporal || 'Sin datos'}<span class="m-unit">kg</span></div>
+        <div class="m-value">${m.grasaCorporal || '&#x2014;'}<span class="m-unit">kg</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">IMC</div>
-        <div class="m-value">${m.imc || 'Sin datos'}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
+        <div class="m-value">${m.imc || '&#x2014;'}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
         <div class="m-delta green">${m.imc < 25 ? 'Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
       </div>
       <div class="m-card">
         <div class="m-label">PGC</div>
-        <div class="m-value">${m.pgc || 'Sin datos'}<span class="m-unit">%</span></div>
+        <div class="m-value">${m.pgc || '&#x2014;'}<span class="m-unit">%</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Visceral</div>
-        <div class="m-value">${m.grasaVisceral || 'Sin datos'}</div>
+        <div class="m-value">${m.grasaVisceral || '&#x2014;'}</div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Calificaci\u00F3n Inbody</div>
-        <div class="m-value">${m.calificacion || 'Sin datos'}<span class="m-unit">/100</span></div>
+        <div class="m-value">${m.calificacion || '&#x2014;'}<span class="m-unit">/100</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
@@ -861,14 +861,14 @@
 
   function renderProfileMetrics(m) {
     const gc = m.grasaCorporal ?? m.grasaPct;
-    document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : 'Sin datos';
-    document.getElementById('val-musculo').textContent = m.musculo != null ? m.musculo + ' kg' : 'Sin datos';
-    document.getElementById('val-grasa').textContent = gc != null ? gc + ' kg' : 'Sin datos';
-    document.getElementById('val-imc').textContent = m.imc || 'Sin datos';
-    document.getElementById('val-pgc').textContent = m.pgc != null ? m.pgc + '%' : 'Sin datos';
-    document.getElementById('val-grasa-visc').textContent = m.grasaVisceral || 'Sin datos';
-    document.getElementById('val-calificacion').textContent = m.calificacion ? m.calificacion + '/100' : 'Sin datos';
-    document.getElementById('val-fecha').textContent = m.fecha || 'Sin datos';
+    document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : 'Sin Datos';
+    document.getElementById('val-musculo').textContent = m.musculo != null ? m.musculo + ' kg' : 'Sin Datos';
+    document.getElementById('val-grasa').textContent = gc != null ? gc + ' kg' : 'Sin Datos';
+    document.getElementById('val-imc').textContent = m.imc || 'Sin Datos';
+    document.getElementById('val-pgc').textContent = m.pgc != null ? m.pgc + '%' : 'Sin Datos';
+    document.getElementById('val-grasa-visc').textContent = m.grasaVisceral || 'Sin Datos';
+    document.getElementById('val-calificacion').textContent = m.calificacion ? m.calificacion + '/100' : 'Sin Datos';
+    document.getElementById('val-fecha').textContent = m.fecha || 'Sin Datos';
   }
 
   // NOTIFICACIONES (modular Firestore API)
@@ -1137,15 +1137,15 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
     } else {
       list.innerHTML = [...cachedMetricas].reverse().map(m => `
         <div class="hist-row" style="flex-direction:column">
-          <div class="hist-date">${m.fecha || 'Sin datos'}</div>
+          <div class="hist-date">${m.fecha || '&#x2014;'}</div>
           <div class="hist-metrics">
-            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">IMC <span>${m.imc || 'Sin datos'}</span></div>
-            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
-            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
-            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
+            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">IMC <span>${m.imc || '&#x2014;'}</span></div>
+            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : '&#x2014;'}</span></div>
+            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || '&#x2014;'}</span></div>
+            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : '&#x2014;'}</span></div>
           </div>
         </div>`).join('');
     }
