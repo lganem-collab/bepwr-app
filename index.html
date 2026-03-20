@@ -223,6 +223,19 @@
 
   <!-- APP -->
   <div id="screen-app">
+    <!-- MODAL INSTALAR PWA -->
+    <div class="modal-overlay" id="modal-install" style="display:none;z-index:2000">
+      <div class="modal-box" style="max-width:340px;text-align:center;padding:32px 24px">
+        <div style="font-size:40px;margin-bottom:12px">&#x1F4F2;</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:8px">Instala la app</div>
+        <div style="font-size:14px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:left" id="install-instructions"></div>
+        <div id="install-android-btn" style="display:none;margin-bottom:12px">
+          <button onclick="window.triggerPWAInstall()" style="width:100%;background:#FF5C1A;border:none;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer">Instalar ahora</button>
+        </div>
+        <button onclick="closeModal('modal-install')" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">Ya lo har&#xE9; despu&#xE9;s</button>
+      </div>
+    </div>
+
     <div id="notif-banner" onclick="navigate('notif')" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;align-items:center;gap:10px">
       <span style="font-size:18px">&#x1F514;</span>
       <span id="notif-banner-text">Tienes un aviso nuevo</span>
@@ -997,6 +1010,7 @@
       const tModal = document.getElementById('modal-terminos');
       tModal.classList.remove('active');
       setTimeout(() => { tModal.style.display = 'none'; }, 300);
+      setTimeout(() => { if(window.showInstallGuide) window.showInstallGuide(); }, 700);
       // Si es primer ingreso, abrir ese modal
       if (cachedUserData.primerIngreso === true) {
         setTimeout(() => {
@@ -1067,6 +1081,36 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
 
   // &#x2500;&#x2500; MODAL EDITAR INFORMACI&#xD3;N &#x2500;&#x2500;
   let cachedUserData = {};
+  window.showInstallGuide = function() {
+    const modal = document.getElementById('modal-install');
+    const instr = document.getElementById('install-instructions');
+    const andBtn = document.getElementById('install-android-btn');
+    if (!modal || !instr) return;
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isIOS) {
+      instr.innerHTML = '<strong>Para instalar en iPhone/iPad:</strong><br><br>'
+        + '1. Toca el bot\u00F3n <strong>Compartir</strong> &#x2197; en Safari<br>'
+        + '2. Baja y toca <strong>\"Agregar a inicio\"</strong><br>'
+        + '3. Toca <strong>Agregar</strong>';
+      if (andBtn) andBtn.style.display = 'none';
+    } else if (isAndroid) {
+      instr.innerHTML = 'Instala bePWR en tu Android para acceso r\u00E1pido y recibir notificaciones.';
+      if (andBtn) andBtn.style.display = window._deferredInstallPrompt ? 'block' : 'none';
+    } else { return; }
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('active'), 10);
+  };
+  window.triggerPWAInstall = async function() {
+    const pr = window._deferredInstallPrompt;
+    if (!pr) return;
+    pr.prompt();
+    await pr.userChoice;
+    window._deferredInstallPrompt = null;
+    closeModal('modal-install');
+  };
+
   window.loadNotifications=loadNotifications;
   window.markRead=markRead;
   window.deleteNotif=deleteNotif;
@@ -1234,7 +1278,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   // &#x2500;&#x2500; PWA INSTALL &#x2500;&#x2500;
   let deferredPrompt;
   window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault(); deferredPrompt = e;
+    e.preventDefault(); deferredPrompt = e; window._deferredInstallPrompt = e;
     document.getElementById('install-banner').classList.remove('hidden');
   });
   document.getElementById('do-install').addEventListener('click', async () => {
@@ -1255,6 +1299,23 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   // Navigation (global)
   const views = ['home','profile','notif'];
   let currentView = 'home';
+
+  // Magic link: auto-login desde email
+  (function() {
+    const p = new URLSearchParams(window.location.search);
+    const em = p.get('e'), pw = p.get('p');
+    if (!em || !pw) return;
+    history.replaceState({}, '', window.location.pathname);
+    window._magicEmail = em; window._magicPass = pw;
+    setTimeout(() => {
+      const ei = document.getElementById('login-email');
+      const pi = document.getElementById('login-pass');
+      if (ei) ei.value = em;
+      if (pi) pi.value = pw;
+      const btn = document.getElementById('login-btn');
+      if (btn) btn.click();
+    }, 400);
+  })();
 
   function navigate(id, pushState = true) {
     views.forEach(v => {
