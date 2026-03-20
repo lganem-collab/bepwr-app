@@ -1275,8 +1275,8 @@
         'cambio_estado':'&#x1F504; Cambio de estado','alta_staff':'&#x1F9D1; Alta de staff',
         'baja_staff':'&#x1F6AB; Baja staff','envio_aviso':'&#x1F4E3; Env\u00EDo de aviso'};
       window._bitaDocs = docs.map(d => d.data());
-      listEl.innerHTML = docs.map((d,i) => {
-        const x=d.data();
+      listEl.innerHTML = window._bitaDocs.map((x,i) => {
+        // x already set from _bitaDocs map
         const fecha=x.fecha?new Date(x.fecha).toLocaleString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):''
         const label=LBL[x.accion]||x.accion;
         return '<div style="border-bottom:1px solid var(--border);padding:14px 0;cursor:pointer" onclick="openBitaDetail('+i+')'+'">'
@@ -1641,6 +1641,80 @@
   document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
   });
+
+  // ── Bitácora detail modal ──────────────────────────────────────────
+  window.openBitaDetail = function(idx) {
+    const docs = window._bitaDocs;
+    if (!docs || !docs[idx]) return;
+    const x = docs[idx];
+    const fecha = x.fecha ? new Date(x.fecha).toLocaleString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const LABELS = {alta_miembro:'Alta de miembro',nueva_valoracion:'Nueva valoraci\u00F3n',
+      edicion_metrica:'Edici\u00F3n de m\u00E9trica',modificacion_miembro:'Modificaci\u00F3n miembro',
+      cambio_estado:'Cambio de estado',alta_staff:'Alta de staff',baja_staff:'Baja staff',envio_aviso:'Env\u00EDo de aviso'};
+    document.getElementById('bita-detail-title').textContent = LABELS[x.accion] || x.accion;
+    document.getElementById('bita-detail-body').innerHTML =
+      '<div style="display:grid;gap:14px">'
+      +'<div style="background:#111;border-radius:12px;padding:16px">'
+      +'<div style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;margin-bottom:8px">DETALLE</div>'
+      +'<div style="font-size:14px;color:#fff;line-height:1.6">'+(x.detalle||'\u2014')+'</div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+      +'<div style="background:#111;border-radius:12px;padding:14px">'
+      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">STAFF</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.staffNombre||x.staffEmail||'\u2014')+'</div>'
+      +'</div>'
+      +'<div style="background:#111;border-radius:12px;padding:14px">'
+      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">MIEMBRO</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.miembroNombre||'\u2014')+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div style="background:#111;border-radius:12px;padding:14px">'
+      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">FECHA Y HORA</div>'
+      +'<div style="font-size:13px;color:#ccc">'+fecha+'</div>'
+      +'</div>'
+      +'</div>';
+    const modal = document.getElementById('modal-bita-detail');
+    modal.style.zIndex = '700';
+    modal.style.display = 'flex';
+    setTimeout(function(){ modal.classList.add('open'); }, 10);
+  };
+
+  // ── Enviar aviso directo desde detalle miembro ─────────────────────
+  window.sendAvisoMiembro = function(uid, nombre) {
+    closeModal('modal-detail');
+    switchTab('notify');
+    const memberSel = document.getElementById('notif-member-uid');
+    if (memberSel) { memberSel.value = uid; }
+    const titleEl = document.getElementById('notif-title');
+    if (titleEl) titleEl.focus();
+    showToast('Redactando aviso para ' + nombre, 'info');
+  };
+
+  // ── Store detailUid when opening member detail ─────────────────────
+  const _origOpenDetail = window.openDetail;
+  if (_origOpenDetail && !window._openDetailPatched) {
+    window._openDetailPatched = true;
+    window.openDetail = function(uid) {
+      window._detailUid = uid;
+      const m = (window._allMembers||[]).find(x=>x.uid===uid);
+      window._detailNombre = m ? m.nombre : '';
+      _origOpenDetail(uid);
+      // Inject Enviar aviso button after modal opens
+      setTimeout(function(){
+        const modal = document.getElementById('modal-detail');
+        if (!modal || modal.querySelector('.btn-enviar-aviso')) return;
+        const saveBtn = modal.querySelector('button[onclick*="saveMemberEdit"]');
+        if (!saveBtn) return;
+        const btn = document.createElement('button');
+        btn.className = 'btn-enviar-aviso';
+        btn.style.cssText = 'width:100%;background:rgba(255,92,26,.15);border:1px solid rgba(255,92,26,.4);color:#FF5C1A;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer;margin-top:10px;display:block';
+        btn.innerHTML = '&#x1F4E3; Enviar aviso directo';
+        btn.onclick = function(){ window.sendAvisoMiembro(window._detailUid, window._detailNombre); };
+        saveBtn.insertAdjacentElement('afterend', btn);
+      }, 400);
+    };
+  }
+
 </script>
 <!-- MODAL PERFIL STAFF -->
 <div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
@@ -1716,26 +1790,7 @@
 </div>
 
 
-<script>
-(function(){
-  var obs = new MutationObserver(function(){
-    var modal = document.getElementById('modal-detail');
-    if (!modal || !modal.classList.contains('open')) return;
-    if (modal.querySelector('.btn-enviar-aviso')) return;
-    var saveBtn = modal.querySelector('button[onclick*="saveMemberEdit"]');
-    if (!saveBtn) return;
-    var btn = document.createElement('button');
-    btn.className = 'btn-enviar-aviso';
-    btn.style.cssText = 'width:100%;background:rgba(255,92,26,.15);border:1px solid rgba(255,92,26,.4);color:#FF5C1A;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer;margin-top:8px;display:block';
-    btn.innerHTML = '&#x1F4E3; Enviar aviso directo';
-    btn.onclick = function(){
-      if(typeof sendAvisoMiembro === 'function') sendAvisoMiembro(window._detailUid, window._detailNombre);
-    };
-    saveBtn.parentNode.insertBefore(btn, saveBtn.nextSibling);
-  });
-  obs.observe(document.body, {attributes:true, subtree:true, attributeFilter:['class']});
-})();
-</script>
+
 
   <!-- MODAL BITACORA DETALLE -->
   <div class="modal-overlay" id="modal-bita-detail" style="display:none;z-index:700">
@@ -1747,41 +1802,6 @@
       </div>
     </div>
   </div>
-  <script>
-  window.openBitaDetail = function(idx) {
-    const d = window._bitaDocs && window._bitaDocs[idx];
-    if (!d) return;
-    const x = d;
-    const fecha = x.fecha ? new Date(x.fecha).toLocaleString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-    const LABELS = {'alta_miembro':'Alta de miembro','nueva_valoracion':'Nueva valoracion','edicion_metrica':'Edicion de metrica',
-      'modificacion_miembro':'Modificacion de miembro','cambio_estado':'Cambio de estado','alta_staff':'Alta de staff',
-      'baja_staff':'Baja de staff','envio_aviso':'Envio de aviso'};
-    document.getElementById('bita-detail-title').textContent = LABELS[x.accion] || x.accion;
-    document.getElementById('bita-detail-body').innerHTML =
-      '<div style="display:grid;gap:14px">'
-      +'<div style="background:#111;border-radius:12px;padding:14px">'
-      +'<div style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;margin-bottom:6px">DETALLE</div>'
-      +'<div style="font-size:14px;color:#fff">'+(x.detalle||'')+'</div>'
-      +'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
-      +'<div style="background:#111;border-radius:12px;padding:14px">'
-      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:4px">STAFF</div>'
-      +'<div style="font-size:13px;color:#ccc">'+(x.staffNombre||x.staffEmail||'')+'</div>'
-      +'</div>'
-      +'<div style="background:#111;border-radius:12px;padding:14px">'
-      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:4px">MIEMBRO</div>'
-      +'<div style="font-size:13px;color:#ccc">'+(x.miembroNombre||'—')+'</div>'
-      +'</div>'
-      +'</div>'
-      +'<div style="background:#111;border-radius:12px;padding:14px">'
-      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:4px">FECHA Y HORA</div>'
-      +'<div style="font-size:13px;color:#ccc">'+fecha+'</div>'
-      +'</div>'
-      +'</div>';
-    var modal = document.getElementById('modal-bita-detail');
-    modal.style.display = 'flex';
-    setTimeout(function(){ modal.classList.add('open'); }, 10);
-  };
-  </script>
+  
 </body>
 </html>
