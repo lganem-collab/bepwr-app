@@ -1,7 +1,7 @@
 {
   "name": "bePWR",
   "short_name": "bePWR",
-  "description": "Tu progreso, tus métricas, tu poder.",
+  "description": "Tu progreso, tus m\u00e9tricas, tu poder.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
@@ -12,13 +12,25 @@
       "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
