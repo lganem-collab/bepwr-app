@@ -1461,6 +1461,10 @@
     });
     if (tab === 'staff') loadStaffList();
     if (tab === 'bitacora') loadBitacora();
+    if (auth?.currentUser?.uid === MASTER_UID) {
+      const _bt = document.getElementById('tab-bitacora');
+      if (_bt) _bt.style.display = 'inline-block';
+    }
     if (tab === 'home') {
       const dateEl=document.getElementById('home-date');
       if(dateEl) dateEl.textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
