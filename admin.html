@@ -233,7 +233,9 @@
       </div>
       <div class="modal-section">Acceso a la app</div>
       <div class="field-row">
-        <div class="field"><label>Email *</label><input type="email" id="new-email" placeholder="maria@email.com" /></div>
+        <div class="field"><label>Email *</label><input type="email" id="new-email" placeholder="maria@email.com" oninput="checkEmailMatch()" /></div>
+        <div class="field"><label>Confirmar email *</label><input type="email" id="new-email-confirm" placeholder="maria@email.com" oninput="checkEmailMatch()" /></div>
+        <div id="email-match-msg" style="font-size:12px;margin-top:-8px;margin-bottom:4px;font-family:Space Mono,monospace"></div>
         
       </div>
       <div class="modal-section">Objetivo</div>
@@ -1013,6 +1015,20 @@
     renderMembers(all.filter(m => m.activo !== false));
   }
 
+  function checkEmailMatch() {
+    const e1 = document.getElementById('new-email')?.value.trim();
+    const e2 = document.getElementById('new-email-confirm')?.value.trim();
+    const msg = document.getElementById('email-match-msg');
+    if (!msg || !e2) return;
+    if (e1 === e2) {
+      msg.textContent = '\u2713 Emails coinciden';
+      msg.style.color = '#4ade80';
+    } else {
+      msg.textContent = 'Los emails no coinciden';
+      msg.style.color = '#f87171';
+    }
+  }
+
   function filterMembers() {
     const q = document.getElementById('search-input').value.toLowerCase();
     renderMembers((window._allMembers||[]).filter(m =>
@@ -1243,6 +1259,8 @@
     const fechaVal= fmtDate(document.getElementById('new-fecha-val').value.trim());
     const errEl   = document.getElementById('new-member-error');
     errEl.textContent = '';
+    const emailConfirm = document.getElementById('new-email-confirm')?.value.trim();
+    if (email !== emailConfirm) { errEl.textContent = 'Los emails no coinciden'; return; }
     if (!nombre||!apellido||!email||!tel) { errEl.textContent = 'Nombre, apellido, tel\u00E9fono, email y contrase\u00F1a son obligatorios'; return; }
     if (!peso || isNaN(peso)) { errEl.textContent = 'El peso es obligatorio'; return; }
     if (peso < 20 || peso > 400) { errEl.textContent = 'Peso inv\u00E1lido (debe ser 20-400 kg)'; return; }
