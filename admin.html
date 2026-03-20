@@ -1280,6 +1280,22 @@
     } catch(e) { listEl.innerHTML='<div style="color:#f87171;font-size:13px;padding:16px">'+e.message+'</div>'; }
   }
 
+  function sendAvisoMiembro(uid, nombre) {
+    // Pre-fill notification form and switch to notify tab
+    switchTab("notify");
+    const targetSel = document.getElementById("notif-target");
+    const memberSel = document.getElementById("notif-member");
+    if (targetSel) targetSel.value = "individual";
+    if (typeof updateNotifTargetUI === "function") updateNotifTargetUI();
+    // Find and select this member in the dropdown
+    if (memberSel) {
+      for (const opt of memberSel.options) {
+        if (opt.value === uid) { opt.selected = true; break; }
+      }
+    }
+    closeModal("modal-detail");
+  }
+
   function showConfirm(msg) {
     return new Promise(resolve => {
       const overlay = document.createElement('div');
