@@ -1274,6 +1274,12 @@
         await db.collection('usuarios').doc(uid).collection('metricas').doc(window._editingMetricId).update(metricData);
         window._editingMetricId = null;
         document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\u00F3n';
+        // Close metrics modal and refresh the detail panel
+        closeModal('modal-metrics');
+        showToast('Valoraci\u00F3n actualizada \u2713', 'success');
+        loadMembers();
+        setTimeout(() => openDetail(uid), 600);
+        return;
       } else {
         await db.collection('usuarios').doc(uid).collection('metricas').add(metricData);
       }
