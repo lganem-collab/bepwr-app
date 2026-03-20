@@ -1182,6 +1182,8 @@
 
   async function saveMemberEdit(uid) {
     try {
+      // Capture original values for diff
+      const _mOrig = (window._allMembers||[]).find(x=>x.uid===uid)||{};
       const activoVal = document.getElementById('edit-activo')?.value === 'false' ? false : true;
       await db.collection('usuarios').doc(uid).update({
         nombre: document.getElementById('edit-nombre').value,
@@ -1211,7 +1213,14 @@
         }
       });
       showToast('Cambios guardados \u2713', 'success');
-      logBitacora('modificacion_miembro', 'Modificaci\u00F3n de datos', (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||uid);
+      const _mDiffs = [];
+      const _newNombre = document.getElementById('edit-nombre')?.value||'';
+      const _newPeso = document.getElementById('edit-peso-actual')?.value||'';
+      if (_mOrig.nombre && _newNombre && _mOrig.nombre !== _newNombre) _mDiffs.push('Nombre: '+_mOrig.nombre+' \u2192 '+_newNombre);
+      const _actNew = document.getElementById('edit-activo')?.value;
+      if (_mOrig.activo !== undefined && _actNew !== undefined && String(_mOrig.activo) !== _actNew) _mDiffs.push('Estado: '+(_mOrig.activo?'Activo':'Inactivo')+' \u2192 '+(_actNew==='false'?'Inactivo':'Activo'));
+      const _mNombreFinal = _newNombre || _mOrig.nombre || uid;
+      logBitacora('modificacion_miembro', 'Modificaci\u00F3n'+(_mDiffs.length?' | '+_mDiffs.join(', '):''), _mNombreFinal);
       closeModal('modal-detail');
       loadMembers();
     } catch(e) {
@@ -1333,6 +1342,7 @@
     // Change title and save action
     document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoraci\u00F3n';
     window._editingMetricId = metricId;
+    window._editingMetricOrig = x; // store original for diff
     document.getElementById('modal-metrics').style.display = 'flex';
     document.getElementById('modal-metrics').style.zIndex = '600';
     setTimeout(() => document.getElementById('modal-metrics').classList.add('open'), 10);
@@ -1372,7 +1382,21 @@
         await db.collection('usuarios').doc(uid).collection('metricas').doc(window._editingMetricId).update(metricData);
         window._editingMetricId = null;
         document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\u00F3n';
-        logBitacora('edicion_metrica', 'Edici\u00F3n m\u00E9trica del ' + (document.getElementById('m-fecha')?.value||''), (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||'');
+        const _orig = window._editingMetricOrig || {};
+        const _fields = [
+          {k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\u00FAsc',u:'kg'},
+          {k:'grasaCorporal',l:'Grasa Corp',u:'kg'},{k:'imc',l:'IMC',u:''},
+          {k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},
+          {k:'calificacion',l:'Calif',u:''}
+        ];
+        const _diffs = _fields.filter(f => {
+          const ov = _orig[f.k]; const nv = metricData[f.k];
+          return ov != null && nv != null && ov !== nv;
+        }).map(f => f.l+': '+_orig[f.k]+f.u+' \u2192 '+metricData[f.k]+f.u);
+        const _fecha = document.getElementById('m-fecha')?.value||'';
+        const _mNombre = (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||'';
+        const _detalle = 'Edici\u00F3n m\u00E9trica del '+_fecha+(_diffs.length?' | '+_diffs.join(', '):'');
+        logBitacora('edicion_metrica', _detalle, _mNombre);
         // Close metrics modal and refresh the detail panel
         closeModal('modal-metrics');
         showToast('Valoraci\u00F3n actualizada \u2713', 'success');
