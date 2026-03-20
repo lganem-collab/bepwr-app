@@ -1,4 +1,4 @@
-const CACHE = 'bepwr-v7';
+const CACHE = 'bepwr-v8';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -51,6 +51,11 @@ self.addEventListener('push', e => {
       ]
     })
   );
+});
+
+// Force activate when told to skip waiting
+self.addEventListener('message', e => {
+  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('notificationclick', e => {
