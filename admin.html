@@ -1070,7 +1070,7 @@
   }
 
   // OPEN DETAIL
-  async function openDetail(uid) {
+  async function openDetail(uid) { window._detailUid = uid; var _m=(window._allMembers||[]).find(x=>x.uid===uid); window._detailNombre=_m?_m.nombre:'';
     const m = (window._allMembers||[]).find(x => x.uid === uid);
     if (!m) return;
     const initials = (m.nombre||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
@@ -1690,5 +1690,26 @@
   </div>
 </div>
 
+
+<script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var modal = document.getElementById('modal-detail');
+    if (!modal || !modal.classList.contains('open')) return;
+    if (modal.querySelector('.btn-enviar-aviso')) return;
+    var saveBtn = modal.querySelector('button[onclick*="saveMemberEdit"]');
+    if (!saveBtn) return;
+    var btn = document.createElement('button');
+    btn.className = 'btn-enviar-aviso';
+    btn.style.cssText = 'width:100%;background:rgba(255,92,26,.15);border:1px solid rgba(255,92,26,.4);color:#FF5C1A;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer;margin-top:8px;display:block';
+    btn.innerHTML = '&#x1F4E3; Enviar aviso directo';
+    btn.onclick = function(){
+      if(typeof sendAvisoMiembro === 'function') sendAvisoMiembro(window._detailUid, window._detailNombre);
+    };
+    saveBtn.parentNode.insertBefore(btn, saveBtn.nextSibling);
+  });
+  obs.observe(document.body, {attributes:true, subtree:true, attributeFilter:['class']});
+})();
+</script>
 </body>
 </html>
