@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
           <!-- CTA -->
           <div style="text-align:center">
-            <a href="https://bepwr-app.vercel.app"
+            <a href="https://bepwr-app.vercel.app/?e=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}"
                style="display:inline-block;background:#FF5C1A;color:white;text-decoration:none;padding:16px 40px;border-radius:14px;font-size:15px;font-weight:700">
               Entrar a bePWR &#x2192;
             </a>
