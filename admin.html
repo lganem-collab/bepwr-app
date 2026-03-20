@@ -171,7 +171,10 @@
     <div id="tab-content-members">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div><span style="font-size:28px;font-weight:700;color:#FF5C1A" id="stat-total">0</span> <span style="font-size:14px;color:var(--gray)">miembros activos</span></div>
-        <button onclick="switchTab('new')" style="background:#FF5C1A;border:none;color:#fff;font-size:13px;font-weight:700;padding:10px 18px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace">+ Nuevo miembro</button>
+        <div style="display:flex;gap:8px">
+          <button onclick="loadMembers()" title="Actualizar lista" style="background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:16px;padding:8px 12px;border-radius:10px;cursor:pointer">&#x21BB;</button>
+          <button onclick="switchTab('new')" style="background:#FF5C1A;border:none;color:#fff;font-size:13px;font-weight:700;padding:10px 18px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace">+ Nuevo miembro</button>
+        </div>
       </div>
 
       <div style="margin-bottom:16px">
@@ -1049,7 +1052,7 @@
           <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>M\u00FAsculo</div><div>Grasa Corp.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
           ${mSnap.docs.map(d => {
             const x = d.data();
-            const gc=x.grasaCorporal??x.grasaPct;return `<div class="mh-row"><div class="mh-date">${x.fecha||'&#x2014;'}</div><div class="mh-val">${x.peso!=null?x.peso+' kg':'&#x2014;'}</div><div class="mh-val">${x.musculo!=null?x.musculo+' kg':'&#x2014;'}</div><div class="mh-val">${gc!=null?gc+' kg':'&#x2014;'}</div><div class="mh-val">${x.imc||'&#x2014;'}</div><div class="mh-val">${x.pgc!=null?x.pgc+'%':'&#x2014;'}</div><div class="mh-val">${x.grasaVisceral||'&#x2014;'}</div><div class="mh-val">${x.calificacion||'&#x2014;'}</div></div>`;
+            const gc=x.grasaCorporal??x.grasaPct;return `<div class="mh-row"><div class="mh-date">${x.fecha||'&#x2014;'}</div><div class="mh-val">${x.peso!=null?x.peso+' kg':'&#x2014;'}</div><div class="mh-val">${x.musculo!=null?x.musculo+' kg':'&#x2014;'}</div><div class="mh-val">${gc!=null?gc+' kg':'&#x2014;'}</div><div class="mh-val">${x.imc||'&#x2014;'}</div><div class="mh-val">${x.pgc!=null?x.pgc+'%':'&#x2014;'}</div><div class="mh-val">${x.grasaVisceral||'&#x2014;'}</div><div class="mh-val">${x.calificacion||'&#x2014;'}</div>${window.currentStaffRole==='admin'?`<div class=\"mh-val\"><button onclick=\"editMetrica('${uid}','${d.id}')\" style=\"background:none;border:1px solid #444;color:#aaa;font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer\">&#x270F;</button></div>`:''}</div>`;
           }).join('')}
         </div>`;
       }
@@ -1195,6 +1198,29 @@
     document.getElementById('modal-metrics').classList.add('open');
   }
 
+  // Edit past metric (admin only)
+  async function editMetrica(uid, metricId) {
+    if (window.currentStaffRole !== 'admin') return;
+    const snap = await db.collection('usuarios').doc(uid).collection('metricas').doc(metricId).get();
+    if (!snap.exists) return;
+    const x = snap.data();
+    // Re-use the existing metric modal pre-filled
+    document.getElementById('metrics-uid').value = uid;
+    document.getElementById('m-peso').value = x.peso || '';
+    document.getElementById('m-musculo').value = x.musculo || '';
+    document.getElementById('m-grasa-corp').value = x.grasaCorporal ?? x.grasaPct ?? '';
+    document.getElementById('m-imc').value = x.imc || '';
+    document.getElementById('m-pgc').value = x.pgc || '';
+    document.getElementById('m-grasa-visc').value = x.grasaVisceral || '';
+    document.getElementById('m-calific').value = x.calificacion || '';
+    document.getElementById('m-fecha').value = x.fecha || '';
+    // Change title and save action
+    document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoraci\u00F3n';
+    window._editingMetricId = metricId;
+    document.getElementById('modal-metrics').style.display = 'flex';
+    setTimeout(() => document.getElementById('modal-metrics').classList.add('active'), 10);
+  }
+
   async function saveMetrics() {
     const uid   = document.getElementById('metrics-uid').value;
     const peso       = parseFloat(document.getElementById('m-peso').value);
@@ -1211,18 +1237,21 @@
     try {
       const miembroDoc = await db.collection('usuarios').doc(uid).get();
       const miembroNombre = miembroDoc.exists ? (miembroDoc.data().nombre || '') : '';
-      await db.collection('usuarios').doc(uid).collection('metricas').add({
-        peso,
-        musculo: isNaN(musculo)?null:musculo,
+      const metricData = {
+        peso, musculo: isNaN(musculo)?null:musculo,
         grasaCorporal: isNaN(grasaCorp)?null:grasaCorp,
-        imc: isNaN(imc)?null:imc,
-        pgc: isNaN(pgc)?null:pgc,
+        imc: isNaN(imc)?null:imc, pgc: isNaN(pgc)?null:pgc,
         grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
         calificacion: isNaN(calific)?null:calific,
-        fecha,
-        registradoPor: auth.currentUser?.uid || null,
-        miembroNombre
-      });
+        fecha, registradoPor: auth.currentUser?.uid || null, miembroNombre
+      };
+      if (window._editingMetricId) {
+        await db.collection('usuarios').doc(uid).collection('metricas').doc(window._editingMetricId).update(metricData);
+        window._editingMetricId = null;
+        document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\u00F3n';
+      } else {
+        await db.collection('usuarios').doc(uid).collection('metricas').add(metricData);
+      }
       showToast('Valoraci\u00F3n guardada \u2713', 'success');
       closeModal('modal-metrics');
       loadMembers();
