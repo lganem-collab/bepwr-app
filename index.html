@@ -2,6 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <script>
+  // Clean magic link params IMMEDIATELY so PWA install works
+  (function(){
+    var p=new URLSearchParams(window.location.search);
+    var em=p.get('e'), pw=p.get('p');
+    if(em&&pw){
+      window._magicEmail=em; window._magicPass=pw;
+      history.replaceState({},"",window.location.pathname);
+    }
+  })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
   <meta name="description" content="Tu progreso, tus m&#xE9;tricas, tu poder." />
@@ -1300,13 +1311,10 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   const views = ['home','profile','notif'];
   let currentView = 'home';
 
-  // Magic link: auto-login desde email
+  // Magic link: auto-login from email (params already cleaned in <head>)
   (function() {
-    const p = new URLSearchParams(window.location.search);
-    const em = p.get('e'), pw = p.get('p');
+    const em = window._magicEmail, pw = window._magicPass;
     if (!em || !pw) return;
-    history.replaceState({}, '', window.location.pathname);
-    window._magicEmail = em; window._magicPass = pw;
     setTimeout(() => {
       const ei = document.getElementById('login-email');
       const pi = document.getElementById('login-pass');
