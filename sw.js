@@ -46,16 +46,9 @@ self.addEventListener('push', e => {
       badge: '/icons/icon-192.png',
       vibrate: [200, 100, 200],
       data: { url: data.url || '/' },
-      actions: [
-        { action: 'abrir', title: 'Abrir app' }
-      ]
+      actions: [{ action: 'abrir', title: 'Abrir app' }]
     })
   );
-});
-
-// Force activate when told to skip waiting
-self.addEventListener('message', e => {
-  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('notificationclick', e => {

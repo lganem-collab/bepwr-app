@@ -1301,17 +1301,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   });
   window.addEventListener('appinstalled', () => document.getElementById('install-banner').classList.add('hidden'));
   if('serviceWorker'in navigator){
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-      // Force update if waiting
-      if (reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
-      reg.addEventListener('updatefound', () => {
-        const nw = reg.installing;
-        nw.addEventListener('statechange', () => {
-          if (nw.state==='installed' && navigator.serviceWorker.controller)
-            window.location.reload();
-        });
-      });
-    }).catch(()=>{});
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
     navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
   }
 </script>
