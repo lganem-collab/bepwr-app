@@ -139,47 +139,48 @@
     </div>
   </div>
   <div class="tabs">
-    <div class="tab on" id="tab-members" onclick="switchTab('members')">Miembros</div>
+    <div class="tab on" id="tab-home" onclick="switchTab('home')">Inicio</div>
+    <div class="tab" id="tab-members" onclick="switchTab('members')">Miembros</div>
     <div class="tab" id="tab-new" onclick="switchTab('new')">+ Nuevo miembro</div>
     <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">&#x1F465; Staff</div>
     <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">&#x1F4E3; Env&#xED;o de Avisos</div>
   </div>
   <div class="content">
 
-    <!-- MEMBERS TAB -->
-    <div id="tab-content-members">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Total miembros</div><div class="stat-value orange" id="stat-total">0</div></div>
-        <div class="stat-card"><div class="stat-label">Con m&#xE9;tricas</div><div class="stat-value" id="stat-metrics">0</div></div>
-        <div class="stat-card"><div class="stat-label">Sin objetivo</div><div class="stat-value" id="stat-noobjective">0</div></div>
-        <div class="stat-card"><div class="stat-label">Este a&#xF1;o</div><div class="stat-value" id="stat-month">0</div></div>
+    <!-- HOME TAB -->
+    <div id="tab-content-home" style="display:none">
+      <div style="margin-bottom:20px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Panel bePWR</div>
+        <div id="home-date" style="font-size:13px;color:var(--gray);margin-top:4px;font-family:Space Mono,monospace;letter-spacing:1px"></div>
       </div>
-      <!-- COACH AI CARD -->
-      <div id="coach-ai-card" style="background:linear-gradient(135deg,#1a0a00,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:18px;margin-bottom:24px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,#1a0a00,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:20px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
           <span style="display:inline-block;width:8px;height:8px;background:#FF5C1A;border-radius:50%;animation:pulse 2s ease-in-out infinite"></span>
-          <span style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;text-transform:uppercase">Coach IA &#xB7; Mensaje del d&#xED;a</span>
+          <span style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;text-transform:uppercase">IA Coach &#xB7; Mensaje del d&#xED;a</span>
         </div>
-        <div id="coach-ai-message" style="font-size:15px;color:#e0d5cc;line-height:1.65;font-weight:300">
+        <div id="home-ai-message" style="font-size:15px;color:#e0d5cc;line-height:1.65;font-weight:300">
           <span style="color:var(--gray);font-family:Space Mono,monospace;font-size:12px">Cargando mensaje...</span>
         </div>
       </div>
+      <div class="stats-row" style="cursor:pointer" onclick="switchTab('members')">
+        <div class="stat-card"><div class="stat-label">Total miembros</div><div class="stat-value orange" id="stat-home-total">0</div></div>
+        <div class="stat-card"><div class="stat-label">Activos</div><div class="stat-value" id="stat-home-activos">0</div></div>
+        <div class="stat-card"><div class="stat-label">Con m&#xE9;tricas</div><div class="stat-value" id="stat-home-metrics">0</div></div>
+        <div class="stat-card"><div class="stat-label">Este a&#xF1;o</div><div class="stat-value" id="stat-home-month">0</div></div>
+      </div>
+    </div>
 
-      <div class="section-header">
-        <div class="section-title">Lista de miembros</div>
-        <input class="search-input" id="search-input" placeholder="Buscar por nombre..." oninput="filterMembers()" />
+    <!-- MEMBERS TAB -->
+    <div id="tab-content-members">
+      <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px"><span style="font-size:28px;font-weight:700;color:#FF5C1A" id="stat-total">0</span><span style="font-size:14px;color:var(--gray)">miembros activos</span></div>
+</div>
+
+      <div style="margin-bottom:16px">
+        <input id="search-input" oninput="filterMembers()"
+          placeholder="&#x1F50D; Buscar por nombre, apellido o email..."
+          style="width:100%;box-sizing:border-box;font-size:15px;padding:14px 16px;border:2px solid #FF5C1A;border-radius:12px;background:#181818;color:#fff;outline:none"/>
       </div>
-      <div class="members-table">
-        <div class="table-head">
-          <div class="th">Miembro</div>
-          <div class="th">Objetivo</div>
-          <div class="th">Peso actual</div>
-          <div class="th">IMC</div>
-          <div class="th">Desde</div>
-          <div class="th">Acciones</div>
-        </div>
-        <div id="members-list"><div class="empty-state">Cargando miembros...</div></div>
-      </div>
+      <div id="members-list"><div class="empty-state">Cargando miembros...</div></div>
     </div>
 
     <!-- NEW MEMBER TAB -->
@@ -285,8 +286,12 @@
       <div id="staff-list" style="margin-bottom:28px"></div>
       <div class="modal-section">Agregar nuevo staff</div>
       <div class="field-row">
-        <div class="field"><label>Nombre completo *</label><input type="text" id="ns-nombre" placeholder="Ana L&#xF3;pez" /></div>
+        <div class="field"><label>Nombre(s) *</label><input type="text" id="ns-nombre" placeholder="Ana" /></div>
+        <div class="field"><label>Apellido(s) *</label><input type="text" id="ns-apellido" placeholder="L&#xF3;pez" /></div>
+      </div>
+      <div class="field-row">
         <div class="field"><label>Email *</label><input type="email" id="ns-email" placeholder="ana@bepwr.com" /></div>
+        <div class="field"></div>
       </div>
       <div class="field-row">
         <div class="field"><label>Tel&#xE9;fono *</label><input type="tel" id="ns-tel" placeholder="10 d&#xED;gitos" maxlength="10" /></div>
@@ -572,7 +577,7 @@
   }
 
   async function generateCoachMessage() {
-    const el = document.getElementById('coach-ai-message');
+    const el = document.getElementById('home-ai-message') || document.getElementById('coach-ai-message');
     if (!el) return;
 
     // Cache: 1 mensaje por d\u00EDa por coach
@@ -1273,6 +1278,11 @@
       if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
     });
     if (tab === 'staff') loadStaffList();
+    if (tab === 'home') {
+      const dateEl=document.getElementById('home-date');
+      if(dateEl) dateEl.textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      generateCoachMessage().catch(()=>{});
+    }
     if (tab === 'home') {
       const dateEl = document.getElementById('home-date');
       if(dateEl) dateEl.textContent = new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
