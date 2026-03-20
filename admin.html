@@ -143,6 +143,7 @@
     <div class="tab" id="tab-members" onclick="switchTab('members')">Miembros</div>
     <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">&#x1F465; Staff</div>
     <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">&#x1F4E3; Env&#xED;o de Avisos</div>
+    <div class="tab" id="tab-bitacora" onclick="switchTab('bitacora')" style="display:none">&#x1F4CB; Bit&#xE1;cora</div>
   </div>
   <div class="content">
 
@@ -314,6 +315,33 @@
       <button class="btn btn-primary" id="btn-create-staff" onclick="createStaff()">Agregar al staff</button>
     </div>
 
+    <!-- TAB BITACORA -->
+    <div id="tab-content-bitacora" style="display:none">
+      <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Bit&#xE1;cora</div>
+        <button onclick="loadBitacora()" title="Actualizar" style="background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:16px;padding:8px 12px;border-radius:10px;cursor:pointer">&#x21BB;</button>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+        <select id="bita-filter-staff" onchange="loadBitacora()" style="flex:1;min-width:160px;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;outline:none">
+          <option value="">Todos los staff</option>
+        </select>
+        <select id="bita-filter-accion" onchange="loadBitacora()" style="flex:1;min-width:160px;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;outline:none">
+          <option value="">Todas las acciones</option>
+          <option value="alta_miembro">Alta de miembro</option>
+          <option value="nueva_valoracion">Nueva valoraci&#xF3;n</option>
+          <option value="edicion_metrica">Edici&#xF3;n de m&#xE9;trica</option>
+          <option value="modificacion_miembro">Modificaci&#xF3;n de miembro</option>
+          <option value="cambio_estado">Activar/Desactivar miembro</option>
+          <option value="alta_staff">Alta de staff</option>
+          <option value="baja_staff">Baja de staff</option>
+          <option value="envio_aviso">Env&#xED;o de aviso</option>
+        </select>
+      </div>
+      <div id="bitacora-list">
+        <div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Cargando...</div>
+      </div>
+    </div>
+
     <!-- TAB NOTIFICACIONES -->
     <div id="tab-content-notify" style="display:none;max-width:600px">
       <div style="margin-bottom:24px">
@@ -462,6 +490,7 @@
           if (window.currentStaffRole === 'admin') {
             document.getElementById('tab-staff').style.display = 'inline-block';
             document.getElementById('tab-notify').style.display = 'inline-block';
+            if (uid === MASTER_UID) document.getElementById('tab-bitacora').style.display = 'inline-block';
           }
         } catch(domErr) { console.error('DOM error:', domErr); }
         try {
@@ -736,6 +765,7 @@
       const data = await res.json();
       if (res.ok) {
         showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
+        logBitacora('envio_aviso', 'Aviso: \"' + title + '\" (' + data.sent + ' enviados)', '');
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
@@ -1181,6 +1211,7 @@
         }
       });
       showToast('Cambios guardados \u2713', 'success');
+      logBitacora('modificacion_miembro', 'Modificaci\u00F3n de datos', (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||uid);
       closeModal('modal-detail');
       loadMembers();
     } catch(e) {
@@ -1199,6 +1230,56 @@
   }
 
   // Edit past metric (admin only)
+  async function logBitacora(accion, detalle, miembroNombre) {
+    try {
+      if (!auth.currentUser) return;
+      await db.collection('bitacora').add({
+        accion, detalle, miembroNombre: miembroNombre || '',
+        staffUid: auth.currentUser.uid,
+        staffNombre: window._staffNombre || auth.currentUser.email,
+        staffEmail: auth.currentUser.email,
+        fecha: new Date().toISOString()
+      });
+    } catch(e) { console.warn('logBitacora:', e.message); }
+  }
+
+  async function loadBitacora() {
+    const listEl = document.getElementById('bitacora-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Cargando...</div>';
+    try {
+      const fs = document.getElementById('bita-filter-staff')?.value || '';
+      const fa = document.getElementById('bita-filter-accion')?.value || '';
+      const q = fa
+        ? db.collection('bitacora').where('accion','==',fa).orderBy('fecha','desc').limit(200)
+        : db.collection('bitacora').orderBy('fecha','desc').limit(200);
+      const snap = await q.get();
+      const sel = document.getElementById('bita-filter-staff');
+      if (sel && sel.options.length <= 1) {
+        [...new Set(snap.docs.map(d=>d.data().staffNombre).filter(Boolean))]
+          .forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+      }
+      const docs = fs ? snap.docs.filter(d=>d.data().staffNombre===fs) : snap.docs;
+      if (!docs.length) { listEl.innerHTML='<div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Sin registros</div>'; return; }
+      const LBL = {'alta_miembro':'&#x1F7E2; Alta de miembro','nueva_valoracion':'&#x1F4CA; Nueva valoraci\u00F3n',
+        'edicion_metrica':'&#x270F;&#xFE0F; Edici\u00F3n de m\u00E9trica','modificacion_miembro':'&#x1F4DD; Modificaci\u00F3n miembro',
+        'cambio_estado':'&#x1F504; Cambio de estado','alta_staff':'&#x1F9D1; Alta de staff',
+        'baja_staff':'&#x1F6AB; Baja staff','envio_aviso':'&#x1F4E3; Env\u00EDo de aviso'};
+      listEl.innerHTML = docs.map(d => {
+        const x=d.data();
+        const fecha=x.fecha?new Date(x.fecha).toLocaleString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):''
+        const label=LBL[x.accion]||x.accion;
+        return '<div style="border-bottom:1px solid var(--border);padding:14px 0">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+          +'<div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">'+label+'</div>'
+          +'<div style="font-size:13px;color:#ccc;margin-bottom:4px">'+(x.detalle||'')+'</div>'
+          +'<div style="font-size:11px;color:var(--gray);font-family:Space Mono,monospace">'+(x.staffNombre||x.staffEmail||'')+'</div></div>'
+          +'<div style="font-size:11px;color:var(--gray);font-family:Space Mono,monospace;white-space:nowrap">'+fecha+'</div>'
+          +'</div></div>';
+      }).join('');
+    } catch(e) { listEl.innerHTML='<div style="color:#f87171;font-size:13px;padding:16px">'+e.message+'</div>'; }
+  }
+
   function showConfirm(msg) {
     return new Promise(resolve => {
       const overlay = document.createElement('div');
@@ -1274,6 +1355,7 @@
         await db.collection('usuarios').doc(uid).collection('metricas').doc(window._editingMetricId).update(metricData);
         window._editingMetricId = null;
         document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\u00F3n';
+        logBitacora('edicion_metrica', 'Edici\u00F3n m\u00E9trica del ' + (document.getElementById('m-fecha')?.value||''), (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||'');
         // Close metrics modal and refresh the detail panel
         closeModal('modal-metrics');
         showToast('Valoraci\u00F3n actualizada \u2713', 'success');
@@ -1284,6 +1366,7 @@
         await db.collection('usuarios').doc(uid).collection('metricas').add(metricData);
       }
       showToast('Valoraci\u00F3n guardada \u2713', 'success');
+      logBitacora('nueva_valoracion', 'Valoraci\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
       closeModal('modal-metrics');
       loadMembers();
     } catch(e) {
@@ -1369,7 +1452,7 @@
   }
 
   function switchTab(tab) {
-    const tabs = ['home','members','new','staff','notify'];
+    const tabs = ['home','members','new','staff','notify','bitacora'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
       const contentEl = document.getElementById('tab-content-'+t);
@@ -1377,6 +1460,7 @@
       if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
     });
     if (tab === 'staff') loadStaffList();
+    if (tab === 'bitacora') loadBitacora();
     if (tab === 'home') {
       const dateEl=document.getElementById('home-date');
       if(dateEl) dateEl.textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -1438,6 +1522,7 @@
     if (!confirm(`\u00BF${action.charAt(0).toUpperCase()+action.slice(1)} a ${nombre}?`)) return;
     try {
       await db.collection('usuarios').doc(uid).update({ activo: !currentActivo });
+      logBitacora('cambio_estado', (!currentActivo?'Activaci\u00F3n':'Desactivaci\u00F3n') + ': ' + ((window._allMembers||[]).find(x=>x.uid===uid)?.nombre||uid), '');
       // Update local cache
       const m = (window._allMembers||[]).find(x => x.uid === uid);
       if (m) m.activo = !currentActivo;
@@ -1490,6 +1575,7 @@
         nombre, email, telefono: tel, rol, activo: true, primerIngreso: true, fechaAlta: new Date().toISOString().slice(0,10)
       });
       showToast('\u2713 ' + nombre + ' agregado al staff', 'success');
+      logBitacora('alta_staff', 'Alta staff: ' + nombre + ' | ' + rol + ' | ' + email, nombre);
       ['ns-nombre','ns-email','ns-tel','ns-pass'].forEach(id => document.getElementById(id).value = '');
       loadStaffList();
     } catch(e) {
