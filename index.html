@@ -266,8 +266,16 @@
       <!-- HOME VIEW -->
       <div class="view active" id="view-home">
         <div class="greeting">
-          <div class="greeting-sub">Bienvenida de vuelta</div>
-          <div class="greeting-name" id="greeting-name">...</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+              <div class="greeting-sub">Bienvenida de vuelta</div>
+              <div class="greeting-name" id="greeting-name">...</div>
+            </div>
+            <button onclick="window.location.reload()" title="Actualizar"
+              style="background:none;border:1.5px solid #FF5C1A;color:#FF5C1A;font-size:16px;
+              width:36px;height:36px;border-radius:10px;cursor:pointer;flex-shrink:0;
+              display:flex;align-items:center;justify-content:center">&#x21BB;</button>
+          </div>
         </div>
 
         <div class="ai-card">
