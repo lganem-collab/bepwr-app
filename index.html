@@ -1135,6 +1135,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   window.loadNotifications=loadNotifications;
   window.markRead=markRead;
   window.deleteNotif=deleteNotif;
+  window.generateAIMessage=generateAIMessage;
   window.startNotifListener=startNotifListener;
 
   window.openEditModal = () => {
@@ -1353,7 +1354,12 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
       if (typeof renderChart === 'function') renderChart(uid);
       if (typeof loadNotifications === 'function') loadNotifications(uid);
       // Reload AI message
-      if (typeof generateAIMessage === 'function') generateAIMessage(uid);
+      // Reload AI message
+      const aiEl = document.getElementById('ai-message');
+      if (aiEl && window.generateAIMessage) {
+        aiEl.innerHTML = '<span class="ai-loading">Generando mensaje...</span>';
+        window.generateAIMessage(uid);
+      }
     } catch(e) { console.warn('refresh:', e.message); }
     setTimeout(()=>{ if(btn){ btn.style.opacity='1'; btn.style.transform='none'; btn.style.transition='none'; }}, 700);
   };
