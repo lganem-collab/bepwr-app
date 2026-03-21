@@ -1320,7 +1320,30 @@
     }
   }
 
-  window.openBitaDetail = function(idx) {
+  // showConfirm helper
+  function showConfirm(msg) {
+    return new Promise(function(resolve) {
+      var ov = document.createElement('div');
+      ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:8000;display:flex;align-items:center;justify-content:center;padding:24px';
+      var box = document.createElement('div');
+      box.style.cssText = 'background:#1a1a1a;border:1px solid #FF5C1A;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center';
+      var txt = document.createElement('div');
+      txt.style.cssText = 'font-size:15px;color:#fff;line-height:1.6;margin-bottom:24px';
+      txt.textContent = msg;
+      var row = document.createElement('div'); row.style.cssText='display:flex;gap:12px';
+      var bc = document.createElement('button'); bc.textContent='Cancelar';
+      bc.style.cssText='flex:1;background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:14px;padding:12px;border-radius:10px;cursor:pointer';
+      bc.onclick = function(){ document.body.removeChild(ov); resolve(false); };
+      var bk = document.createElement('button'); bk.textContent='Aceptar';
+      bk.style.cssText='flex:1;background:#FF5C1A;border:none;color:#fff;font-size:14px;font-weight:700;padding:12px;border-radius:10px;cursor:pointer';
+      bk.onclick = function(){ document.body.removeChild(ov); resolve(true); };
+      row.appendChild(bc); row.appendChild(bk);
+      box.appendChild(txt); box.appendChild(row);
+      ov.appendChild(box); document.body.appendChild(ov);
+    });
+  }
+
+    window.openBitaDetail = function(idx) {
     var docs = window._bitaDocs;
     if (!docs || !docs[idx]) return;
     var x = docs[idx];
@@ -1485,7 +1508,13 @@
         const _fecha = document.getElementById('m-fecha')?.value||'';
         const _mNombre = (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||'';
         const _detalle = 'Edici\u00F3n m\u00E9trica del '+_fecha+(_diffs.length?' | '+_diffs.join(', '):'');
-        logBitacora('edicion_metrica', _detalle, _mNombre);
+        var _origVals = window._editingMetricOrig || {};
+        var _diffFields = [{k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\u00FAsc',u:'kg'},{k:'grasaCorporal',l:'Grasa',u:'kg'},{k:'imc',l:'IMC',u:''},{k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},{k:'calificacion',l:'Calif',u:''}];
+        var _diffList = _diffFields.filter(function(f){ var ov=_origVals[f.k],nv=metricData[f.k]; return ov!=null&&nv!=null&&String(ov)!==String(nv); }).map(function(f){ return f.l+': '+_origVals[f.k]+f.u+' \u2192 '+metricData[f.k]+f.u; });
+        var _editFechaVal = (document.getElementById('m-fecha')||{}).value||'';
+        var _editMiembro = ((window._allMembers||[]).find(function(x){return x.uid===uid;})||{}).nombre||'';
+        var _editDetalle = 'Edici\u00F3n m\u00E9trica del '+_editFechaVal+(_diffList.length?' | '+_diffList.join(', '):'');
+        logBitacora('edicion_metrica', _editDetalle, _editMiembro);
         // Close metrics modal and refresh the detail panel
         closeModal('modal-metrics');
         showToast('Valoraci\u00F3n actualizada \u2713', 'success');
