@@ -271,7 +271,7 @@
               <div class="greeting-sub">Bienvenida de vuelta</div>
               <div class="greeting-name" id="greeting-name">...</div>
             </div>
-            <button onclick="window.location.reload()" title="Actualizar"
+            <button id="refresh-btn" onclick="window.doRefresh()" title="Actualizar"
               style="background:none;border:1.5px solid #FF5C1A;color:#FF5C1A;font-size:16px;
               width:36px;height:36px;border-radius:10px;cursor:pointer;flex-shrink:0;
               display:flex;align-items:center;justify-content:center">&#x21BB;</button>
@@ -1133,6 +1133,19 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   window.loadNotifications=loadNotifications;
   window.markRead=markRead;
   window.deleteNotif=deleteNotif;
+  window.loadUserData=loadUserData;
+  window.generateAIMessage=generateAIMessage;
+  window.doRefresh = async function() {
+    const btn = document.getElementById("refresh-btn");
+    if(btn){ btn.style.opacity="0.4"; }
+    try {
+      const u = auth.currentUser;
+      if(!u) return;
+      await window.loadUserData(u);
+      if(window.loadNotifications) window.loadNotifications(u.uid);
+    } catch(e){ console.warn("refresh:",e.message); }
+    if(btn){ btn.style.opacity="1"; }
+  };
   window.startNotifListener=startNotifListener;
 
   window.openEditModal = () => {
