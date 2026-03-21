@@ -266,7 +266,8 @@
       <!-- HOME VIEW -->
       <div class="view active" id="view-home">
         <div class="greeting">
-          <div style="display:flex;align-items:center;justify-content:space-between"><div><div class="greeting-sub">Bienvenida de vuelta</div><div class="greeting-name" id="greeting-name">...</div></div><button onclick="window.refreshApp()" id="refresh-btn" title="Actualizar" style="background:none;border:1.5px solid #FF5C1A;color:#FF5C1A;font-size:16px;width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#x21BB;</button></div>
+          <div class="greeting-sub">Bienvenida de vuelta</div>
+          <div class="greeting-name" id="greeting-name">...</div>
         </div>
 
         <div class="ai-card">
@@ -577,6 +578,8 @@
       } catch(e) {}
 
       try {
+        window._currentUid = user.uid;
+        window._currentUser = user;
         await loadUserData(user);
       } catch(e) {
         console.error('loadUserData error:', e);
@@ -1324,6 +1327,25 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
     }, 400);
   })();
 
+  // Refresh: recarga datos y re-renderiza vista activa
+  window.refreshApp = async function() {
+    const btn = document.getElementById('refresh-btn');
+    if (btn) { btn.style.opacity='0.4'; btn.style.transform='rotate(360deg)'; btn.style.transition='transform .6s'; }
+    try {
+      const user = window._currentUser;
+      if (!user) { window.location.reload(); return; }
+      await loadUserData(user);
+      // Re-trigger current view
+      const view = window._activeView || 'home';
+      if (view === 'notif' && window.loadNotifications) {
+        await window.loadNotifications(user.uid);
+      } else if (view === 'profile') {
+        navigate('profile', false);
+      }
+    } catch(e) { window.location.reload(); }
+    setTimeout(() => { if(btn){ btn.style.opacity='1'; btn.style.transform=''; } }, 700);
+  };
+
   function navigate(id, pushState = true) {
     views.forEach(v => {
       document.getElementById('view-'+v).classList.toggle('active', v===id);
@@ -1335,6 +1357,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
     }
     currentView = id;
     if(id==='notif'&&window._currentUid&&window.loadNotifications)window.loadNotifications(window._currentUid);
+    window._activeView = id;
   }
 
   window.addEventListener('popstate', (e) => {
@@ -1350,38 +1373,6 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
 
   // Set initial state
   history.replaceState({ view: 'home' }, '', '');
-</script>
-
-<script>
-window.refreshApp = async function() {
-  const btn = document.querySelector('[onclick="window.refreshApp()"]');
-  if (btn) { btn.style.transform='rotate(360deg)'; btn.style.transition='transform .5s'; }
-  try {
-    const uid = window._currentUid;
-    if (!uid || typeof loadUserData !== 'function') { window.location.reload(); return; }
-    await loadUserData(uid);
-    setTimeout(() => { if(btn) btn.style.transform=''; }, 500);
-  } catch(e) { window.location.reload(); }
-};
-</script>
-
-<script>
-(function(){
-  const orig = window.refreshApp;
-  window.refreshApp = async function() {
-    const btn = document.getElementById('refresh-btn');
-    const timeEl = document.getElementById('last-update-time');
-    if (btn) { btn.style.opacity='0.4'; }
-    try {
-      const uid = window._currentUid;
-      if (!uid || typeof loadUserData !== 'function') { window.location.reload(); return; }
-      await loadUserData(uid);
-      const now = new Date();
-      if (timeEl) timeEl.textContent = 'Actualizado ' + now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
-    } catch(e) { window.location.reload(); }
-    if (btn) { btn.style.opacity='1'; }
-  };
-})();
 </script>
 </body>
 </html>
