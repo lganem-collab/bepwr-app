@@ -345,6 +345,9 @@
           <button onclick="confirmDeleteBitacora()" style="background:none;border:1px solid #f87171;color:#f87171;font-size:12px;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace">&#x1F5D1; Borrar bit&#xE1;cora</button>
         </div>
       </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+        <button onclick="window.initDeleteBitacora()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;font-size:12px;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace">&#x1F5D1; Borrar bit&#xE1;cora</button>
+      </div>
       <div id="bitacora-list">
         <div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Cargando...</div>
       </div>
@@ -1267,31 +1270,31 @@
     try {
       const fs = document.getElementById('bita-filter-staff')?.value || '';
       const fa = document.getElementById('bita-filter-accion')?.value || '';
-      const q = fa
+      const fd = document.getElementById('bita-filter-desde')?.value || '';
+      const fh = document.getElementById('bita-filter-hasta')?.value || '';
+      let q = fa
         ? db.collection('bitacora').where('accion','==',fa).orderBy('fecha','desc').limit(200)
         : db.collection('bitacora').orderBy('fecha','desc').limit(200);
       const snap = await q.get();
       const sel = document.getElementById('bita-filter-staff');
       if (sel && sel.options.length <= 1) {
         [...new Set(snap.docs.map(d=>d.data().staffNombre).filter(Boolean))]
-          .forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+          .forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
       }
-      const fDesde = document.getElementById('bita-filter-desde')?.value||'';
-      const fHasta = document.getElementById('bita-filter-hasta')?.value||'';
-      let docs = fs ? snap.docs.filter(d=>d.data().staffNombre===fs) : [...snap.docs];
-      if (fDesde) docs = docs.filter(d=>(d.data().fecha||'')>=fDesde);
-      if (fHasta) docs = docs.filter(d=>(d.data().fecha||'')<=fHasta+'T23:59:59');
+      let docs = snap.docs.map(d=>d.data());
+      if (fs) docs = docs.filter(x=>x.staffNombre===fs);
+      if (fd) docs = docs.filter(x=>x.fecha && x.fecha >= fd);
+      if (fh) docs = docs.filter(x=>x.fecha && x.fecha <= fh+'T23:59:59');
+      window._bitaDocs = docs;
       if (!docs.length) { listEl.innerHTML='<div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Sin registros</div>'; return; }
-      const LBL = {'alta_miembro':'&#x1F7E2; Alta de miembro','nueva_valoracion':'&#x1F4CA; Nueva valoraci\u00F3n',
-        'edicion_metrica':'&#x270F;&#xFE0F; Edici\u00F3n de m\u00E9trica','modificacion_miembro':'&#x1F4DD; Modificaci\u00F3n miembro',
-        'cambio_estado':'&#x1F504; Cambio de estado','alta_staff':'&#x1F9D1; Alta de staff',
-        'baja_staff':'&#x1F6AB; Baja staff','envio_aviso':'&#x1F4E3; Env\u00EDo de aviso'};
-      window._bitaDocs = docs.map(d => d.data());
-      listEl.innerHTML = window._bitaDocs.map((x,i) => {
-        // x already set from _bitaDocs map
-        const fecha=x.fecha?new Date(x.fecha).toLocaleString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):''
-        const label=LBL[x.accion]||x.accion;
-        return '<div style="border-bottom:1px solid var(--border);padding:14px 0;cursor:pointer" onclick="openBitaDetail('+i+')'+'">'
+      const LBL = {alta_miembro:'&#x1F7E2; Alta de miembro',nueva_valoracion:'&#x1F4CA; Nueva valoraci\u00F3n',
+        edicion_metrica:'&#x270F;&#xFE0F; Edici\u00F3n de m\u00E9trica',modificacion_miembro:'&#x1F4DD; Modificaci\u00F3n miembro',
+        cambio_estado:'&#x1F504; Cambio de estado',alta_staff:'&#x1F9D1; Alta de staff',
+        baja_staff:'&#x1F6AB; Baja staff',envio_aviso:'&#x1F4E3; Env\u00EDo de aviso'};
+      listEl.innerHTML = docs.map((x,i)=>{
+        const fecha = x.fecha ? new Date(x.fecha).toLocaleString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+        const label = LBL[x.accion]||x.accion;
+        return '<div onclick="window.openBitaDetail('+i+')" style="border-bottom:1px solid var(--border);padding:14px 0;cursor:pointer">'
           +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
           +'<div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">'+label+'</div>'
           +'<div style="font-size:13px;color:#ccc;margin-bottom:4px">'+(x.detalle||'')+'</div>'
@@ -1301,41 +1304,6 @@
       }).join('');
     } catch(e) { listEl.innerHTML='<div style="color:#f87171;font-size:13px;padding:16px">'+e.message+'</div>'; }
   }
-
-  function sendAvisoMiembro(uid, nombre) {
-    // Pre-fill notification form and switch to notify tab
-    switchTab("notify");
-    const targetSel = document.getElementById("notif-target");
-    const memberSel = document.getElementById("notif-member");
-    if (targetSel) targetSel.value = "individual";
-    if (typeof updateNotifTargetUI === "function") updateNotifTargetUI();
-    // Find and select this member in the dropdown
-    if (memberSel) {
-      for (const opt of memberSel.options) {
-        if (opt.value === uid) { opt.selected = true; break; }
-      }
-    }
-    closeModal("modal-detail");
-  }
-
-  function showConfirm(msg) {
-    return new Promise(resolve => {
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
-      overlay.innerHTML = `
-        <div style='background:#1a1a1a;border:1px solid #FF5C1A;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center'>
-          <div style='font-size:15px;color:#fff;line-height:1.6;margin-bottom:24px'>${msg}</div>
-          <div style='display:flex;gap:12px'>
-            <button id='confirm-cancel' style='flex:1;background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:14px;padding:12px;border-radius:10px;cursor:pointer'>Cancelar</button>
-            <button id='confirm-ok' style='flex:1;background:#FF5C1A;border:none;color:#fff;font-size:14px;font-weight:700;padding:12px;border-radius:10px;cursor:pointer'>Aceptar</button>
-          </div>
-        </div>`;
-      document.body.appendChild(overlay);
-      overlay.querySelector('#confirm-ok').onclick = () => { document.body.removeChild(overlay); resolve(true); };
-      overlay.querySelector('#confirm-cancel').onclick = () => { document.body.removeChild(overlay); resolve(false); };
-    });
-  }
-
   async function editMetrica(uid, metricId) {
     if (window.currentStaffRole !== 'admin') return;
     const snap = await db.collection('usuarios').doc(uid).collection('metricas').doc(metricId).get();
@@ -1855,6 +1823,113 @@
       },500);
     };
   }
+
+
+  // ── Bitácora: detail modal ─────────────────────────────────────────
+  window.openBitaDetail = function(idx) {
+    const docs = window._bitaDocs;
+    if (!docs || !docs[idx]) return;
+    const x = docs[idx];
+    const fecha = x.fecha ? new Date(x.fecha).toLocaleString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const LABELS = {alta_miembro:'Alta de miembro',nueva_valoracion:'Nueva valoraci\u00F3n',
+      edicion_metrica:'Edici\u00F3n de m\u00E9trica',modificacion_miembro:'Modificaci\u00F3n miembro',
+      cambio_estado:'Cambio de estado',alta_staff:'Alta de staff',baja_staff:'Baja staff',envio_aviso:'Env\u00EDo de aviso'};
+    const title = document.getElementById('bita-detail-title');
+    const body  = document.getElementById('bita-detail-body');
+    if (!title || !body) return;
+    title.textContent = LABELS[x.accion] || x.accion;
+    body.innerHTML =
+      '<div style="display:grid;gap:14px">'
+      +'<div style="background:#111;border-radius:12px;padding:16px">'
+      +'<div style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;margin-bottom:8px">DETALLE</div>'
+      +'<div style="font-size:14px;color:#fff;line-height:1.6">'+(x.detalle||'\u2014')+'</div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+      +'<div style="background:#111;border-radius:12px;padding:14px">'
+      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">STAFF</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.staffNombre||x.staffEmail||'\u2014')+'</div>'
+      +'</div>'
+      +'<div style="background:#111;border-radius:12px;padding:14px">'
+      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">MIEMBRO</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.miembroNombre||'\u2014')+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div style="background:#111;border-radius:12px;padding:14px">'
+      +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">FECHA Y HORA</div>'
+      +'<div style="font-size:13px;color:#ccc">'+fecha+'</div>'
+      +'</div>'
+      +'</div>';
+    const modal = document.getElementById('modal-bita-detail');
+    if (!modal) return;
+    modal.style.zIndex = '700';
+    modal.style.display = 'flex';
+    setTimeout(function(){ modal.classList.add('open'); }, 10);
+  };
+
+  // ── Bitácora: clear filters ─────────────────────────────────────────
+  window.clearBitaFilters = function() {
+    ['bita-filter-staff','bita-filter-accion','bita-filter-desde','bita-filter-hasta']
+      .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    loadBitacora();
+  };
+
+  // ── Bitácora: delete with email confirmation ────────────────────────
+  window.initDeleteBitacora = async function() {
+    const confirmed = await showConfirm('Se enviar\u00E1 un c\u00F3digo de confirmaci\u00F3n a tu email. \u00BFDeseas continuar?');
+    if (!confirmed) return;
+    // Generate 6-digit code and send via email
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    window._deleteBitaCode = code;
+    // Send code via /api/notify or Resend
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      await fetch('/api/send-delete-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+        body: JSON.stringify({ code })
+      });
+      // Show code input modal
+      const overlay = document.createElement('div');
+      overlay.id = 'modal-delete-bita';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+      overlay.innerHTML = '<div style="background:#1a1a1a;border:1px solid #f87171;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center">'
+        +'<div style="font-size:15px;color:#fff;margin-bottom:8px;font-weight:600">C\u00F3digo de confirmaci\u00F3n</div>'
+        +'<div style="font-size:13px;color:#aaa;margin-bottom:20px">Ingresa el c\u00F3digo enviado a tu email</div>'
+        +'<input id="delete-bita-code-input" type="text" maxlength="6" placeholder="000000" '
+        +'style="width:100%;background:#111;border:1px solid #444;color:#fff;font-size:24px;text-align:center;padding:12px;border-radius:10px;margin-bottom:16px;font-family:Space Mono,monospace;box-sizing:border-box"/>'
+        +'<div id="delete-bita-error" style="color:#f87171;font-size:12px;margin-bottom:12px;min-height:16px"></div>'
+        +'<div style="display:flex;gap:12px">'
+        +'<button onclick="document.body.removeChild(document.getElementById('modal-delete-bita'))" style="flex:1;background:#2a2a2a;border:1px solid #444;color:#aaa;padding:12px;border-radius:10px;cursor:pointer">Cancelar</button>'
+        +'<button onclick="window.confirmDeleteBitacora()" style="flex:1;background:#f87171;border:none;color:#fff;font-weight:700;padding:12px;border-radius:10px;cursor:pointer">Borrar</button>'
+        +'</div></div>';
+      document.body.appendChild(overlay);
+    } catch(e) {
+      showToast('Error enviando c\u00F3digo: ' + e.message, 'error');
+    }
+  };
+
+  window.confirmDeleteBitacora = async function() {
+    const input = document.getElementById('delete-bita-code-input')?.value?.trim();
+    const errEl = document.getElementById('delete-bita-error');
+    if (input !== window._deleteBitaCode) {
+      if (errEl) errEl.textContent = 'C\u00F3digo incorrecto';
+      return;
+    }
+    // Delete all bitacora documents
+    try {
+      const snap = await db.collection('bitacora').limit(500).get();
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      window._deleteBitaCode = null;
+      const overlay = document.getElementById('modal-delete-bita');
+      if (overlay) document.body.removeChild(overlay);
+      showToast('Bit\u00E1cora borrada', 'success');
+      loadBitacora();
+    } catch(e) {
+      if (errEl) errEl.textContent = 'Error: ' + e.message;
+    }
+  };
 
 </script>
 <!-- MODAL PERFIL STAFF -->
