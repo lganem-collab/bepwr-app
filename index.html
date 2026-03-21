@@ -266,7 +266,8 @@
       <!-- HOME VIEW -->
       <div class="view active" id="view-home">
         <div class="greeting">
-          <div style="display:flex;align-items:center;justify-content:space-between"><div><div class="greeting-sub">Bienvenida de vuelta</div><div class="greeting-name" id="greeting-name">...</div></div><button onclick="window.refreshApp()" id="refresh-btn" title="Actualizar" style="background:none;border:1.5px solid #FF5C1A;color:#FF5C1A;font-size:16px;width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#x21BB;</button></div>
+          <div class="greeting-sub">Bienvenida de vuelta</div>
+          <div class="greeting-name" id="greeting-name">...</div>
         </div>
 
         <div class="ai-card">
@@ -1350,38 +1351,6 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
 
   // Set initial state
   history.replaceState({ view: 'home' }, '', '');
-</script>
-
-<script>
-window.refreshApp = async function() {
-  const btn = document.querySelector('[onclick="window.refreshApp()"]');
-  if (btn) { btn.style.transform='rotate(360deg)'; btn.style.transition='transform .5s'; }
-  try {
-    const uid = window._currentUid;
-    if (!uid || typeof loadUserData !== 'function') { window.location.reload(); return; }
-    await loadUserData(uid);
-    setTimeout(() => { if(btn) btn.style.transform=''; }, 500);
-  } catch(e) { window.location.reload(); }
-};
-</script>
-
-<script>
-(function(){
-  const orig = window.refreshApp;
-  window.refreshApp = async function() {
-    const btn = document.getElementById('refresh-btn');
-    const timeEl = document.getElementById('last-update-time');
-    if (btn) { btn.style.opacity='0.4'; }
-    try {
-      const uid = window._currentUid;
-      if (!uid || typeof loadUserData !== 'function') { window.location.reload(); return; }
-      await loadUserData(uid);
-      const now = new Date();
-      if (timeEl) timeEl.textContent = 'Actualizado ' + now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
-    } catch(e) { window.location.reload(); }
-    if (btn) { btn.style.opacity='1'; }
-  };
-})();
 </script>
 </body>
 </html>
