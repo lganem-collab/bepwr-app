@@ -1276,7 +1276,11 @@
         [...new Set(snap.docs.map(d=>d.data().staffNombre).filter(Boolean))]
           .forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
       }
-      const docs = fs ? snap.docs.filter(d=>d.data().staffNombre===fs) : snap.docs;
+      const fDesde = document.getElementById('bita-filter-desde')?.value||'';
+      const fHasta = document.getElementById('bita-filter-hasta')?.value||'';
+      let docs = fs ? snap.docs.filter(d=>d.data().staffNombre===fs) : [...snap.docs];
+      if (fDesde) docs = docs.filter(d=>(d.data().fecha||'')>=fDesde);
+      if (fHasta) docs = docs.filter(d=>(d.data().fecha||'')<=fHasta+'T23:59:59');
       if (!docs.length) { listEl.innerHTML='<div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Sin registros</div>'; return; }
       const LBL = {'alta_miembro':'&#x1F7E2; Alta de miembro','nueva_valoracion':'&#x1F4CA; Nueva valoraci\u00F3n',
         'edicion_metrica':'&#x270F;&#xFE0F; Edici\u00F3n de m\u00E9trica','modificacion_miembro':'&#x1F4DD; Modificaci\u00F3n miembro',
