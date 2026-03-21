@@ -1399,9 +1399,10 @@
     window._delCode = code;
     try {
       var tok = await auth.currentUser.getIdToken();
+      var userEmail = auth.currentUser ? auth.currentUser.email : '';
       var resp = await fetch('/api/send-delete-code', {
         method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
-        body: JSON.stringify({code: code})
+        body: JSON.stringify({code: code, email: userEmail})
       });
       if (!resp.ok) throw new Error('Error al enviar c\u00F3digo');
       var ov = document.createElement('div');
