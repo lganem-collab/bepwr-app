@@ -1135,7 +1135,11 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   window.loadNotifications=loadNotifications;
   window.markRead=markRead;
   window.deleteNotif=deleteNotif;
-  window.generateAIMessage=generateAIMessage;
+  // Wrap generateAIMessage to capture last args for refresh
+  window.generateAIMessage = function(...args) {
+    window._lastAIArgs = args;
+    return generateAIMessage(...args);
+  };
   window.startNotifListener=startNotifListener;
 
   window.openEditModal = () => {
@@ -1331,37 +1335,34 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
       const pi = document.getElementById('login-pass');
       if (ei) ei.value = em;
       if (pi) pi.value = pw;
-      const btn = document.getElementById('login-btn');
-      if (btn) btn.click();
-    }, 400);
-  })();
-
-  // Refresh: recarga datos y re-renderiza vista activa
-  window.refreshApp = async function() {
+      const btn = docum  window.refreshApp = async function() {
     const btn = document.getElementById('refresh-btn');
-    if (btn) { btn.style.opacity='0.4'; btn.style.transform='rotate(360deg)'; btn.style.transition='transform .6s'; }
+    if (btn) { btn.style.opacity='0.5'; btn.style.transform='rotate(360deg)'; btn.style.transition='transform .7s'; }
     try {
       const uid = window._currentUid;
-      if (!uid) { window.location.reload(); return; }
+      if (!uid) return;
+      // Re-fetch user data from Firestore
       const fs = await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js');
       const userSnap = await fs.getDoc(fs.doc(db,'usuarios',uid));
       if (!userSnap.exists()) return;
       const data = userSnap.data();
-      const mSnap = await fs.getDocs(fs.query(fs.collection(db,'usuarios',uid,'metricas'),fs.orderBy('fecha','desc'),fs.limit(1)));
+      const mSnap = await fs.getDocs(fs.query(
+        fs.collection(db,'usuarios',uid,'metricas'),
+        fs.orderBy('fecha','desc'),fs.limit(1)
+      ));
       const m = mSnap.empty ? null : mSnap.docs[0].data();
-      if (typeof renderMetrics === 'function' && m) renderMetrics(m, data.objetivo||{});
-      if (typeof renderProfileMetrics === 'function' && m) renderProfileMetrics(m);
-      if (typeof renderChart === 'function') renderChart(uid);
-      if (typeof loadNotifications === 'function') loadNotifications(uid);
-      // Reload AI message
-      // Reload AI message
-      const aiEl = document.getElementById('ai-message');
-      if (aiEl && window.generateAIMessage) {
-        aiEl.innerHTML = '<span class="ai-loading">Generando mensaje...</span>';
-        window.generateAIMessage(uid);
+      // Re-render content areas
+      if (m) { renderMetrics(m, data.objetivo||{}); renderProfileMetrics(m); renderChart(uid); }
+      // Reload AI message using captured args or rebuild them
+      if (window._lastAIArgs && window._lastAIArgs.length > 0) {
+        const aiEl = document.getElementById('ai-message');
+        if (aiEl) aiEl.innerHTML = '<span class="ai-loading">Generando mensaje...</span>';
+        generateAIMessage(...window._lastAIArgs);
       }
+      // Reload notifications
+      loadNotifications(uid);
     } catch(e) { console.warn('refresh:', e.message); }
-    setTimeout(()=>{ if(btn){ btn.style.opacity='1'; btn.style.transform='none'; btn.style.transition='none'; }}, 700);
+    setTimeout(()=>{ if(btn){ btn.style.opacity='1'; btn.style.transform='none'; btn.style.transition='none'; }}, 800);
   };
 
   function navigate(id, pushState = true) {
