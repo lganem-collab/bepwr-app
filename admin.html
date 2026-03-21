@@ -1226,14 +1226,19 @@
         }
       });
       showToast('Cambios guardados \u2713', 'success');
-      const _mDiffs = [];
-      const _newNombre = document.getElementById('edit-nombre')?.value||'';
-      const _newPeso = document.getElementById('edit-peso-actual')?.value||'';
-      if (_mOrig.nombre && _newNombre && _mOrig.nombre !== _newNombre) _mDiffs.push('Nombre: '+_mOrig.nombre+' \u2192 '+_newNombre);
-      const _actNew = document.getElementById('edit-activo')?.value;
-      if (_mOrig.activo !== undefined && _actNew !== undefined && String(_mOrig.activo) !== _actNew) _mDiffs.push('Estado: '+(_mOrig.activo?'Activo':'Inactivo')+' \u2192 '+(_actNew==='false'?'Inactivo':'Activo'));
-      const _mNombreFinal = _newNombre || _mOrig.nombre || uid;
-      logBitacora('modificacion_miembro', 'Modificaci\u00F3n'+(_mDiffs.length?' | '+_mDiffs.join(', '):''), _mNombreFinal);
+      var _mDiffs = [];
+      var _newNombre2 = (document.getElementById('edit-nombre')||{}).value||'';
+      var _vigNew = (document.getElementById('edit-vigencia')||{}).value||'';
+      var _vigFechaNew = (document.getElementById('edit-vigencia-fecha')||{}).value||'';
+      var _objNew = (document.getElementById('edit-meta')||{}).value||'';
+      var _actNewVal = (document.getElementById('edit-activo')||{}).value;
+      if (_mOrig.nombre && _newNombre2 && _mOrig.nombre !== _newNombre2) _mDiffs.push('Nombre: '+_mOrig.nombre+' \u2192 '+_newNombre2);
+      if (_actNewVal !== undefined && String(_mOrig.activo||'true') !== String(_actNewVal)) _mDiffs.push('Estado: '+(_mOrig.activo!==false?'Activo':'Inactivo')+' \u2192 '+(_actNewVal==='false'?'Inactivo':'Activo'));
+      if (_vigNew && _mOrig.vigencia !== _vigNew) _mDiffs.push('Vigencia: '+(_mOrig.vigencia||'sin definir')+' \u2192 '+_vigNew);
+      if (_vigFechaNew && _mOrig.vigenciaFecha !== _vigFechaNew) _mDiffs.push('Fecha vigencia: '+(_mOrig.vigenciaFecha||'-')+' \u2192 '+_vigFechaNew);
+      if (_objNew && (_mOrig.objetivo||{}).meta !== _objNew) _mDiffs.push('Objetivo: '+((_mOrig.objetivo||{}).meta||'-')+' \u2192 '+_objNew);
+      var _mNombreFinal2 = _newNombre2 || _mOrig.nombre || uid;
+      logBitacora('modificacion_miembro', 'Modificaci\u00F3n de '+_mNombreFinal2+(_mDiffs.length?' | '+_mDiffs.join(', '):''), _mNombreFinal2);
       closeModal('modal-detail');
       loadMembers();
     } catch(e) {
@@ -1596,6 +1601,7 @@
         .then(r=>r.json()).then(d=>console.log('email result:',d))
         .catch(e=>console.error('email error:',e.message));
       showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
+       logBitacora('alta_miembro', 'Alta de miembro: ' + nombreCompleto + ' | ' + email, nombreCompleto);
       document.getElementById('new-genero').value = 'prefiero-no-decir';
       ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email',
        'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val','new-altura']
