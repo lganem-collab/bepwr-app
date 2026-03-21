@@ -266,16 +266,7 @@
       <!-- HOME VIEW -->
       <div class="view active" id="view-home">
         <div class="greeting">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div>
-              <div class="greeting-sub">Bienvenida de vuelta</div>
-              <div class="greeting-name" id="greeting-name">...</div>
-            </div>
-            <button id="refresh-btn" onclick="window.refreshApp()" title="Actualizar"
-              style="background:none;border:1.5px solid #FF5C1A;color:#FF5C1A;font-size:16px;
-              width:36px;height:36px;border-radius:10px;cursor:pointer;flex-shrink:0;
-              display:flex;align-items:center;justify-content:center">&#x21BB;</button>
-          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><div><div class="greeting-sub">Bienvenida de vuelta</div><div class="greeting-name" id="greeting-name">...</div></div><button onclick="window.refreshApp()" id="refresh-btn" title="Actualizar" style="background:none;border:1.5px solid #FF5C1A;color:#FF5C1A;font-size:16px;width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#x21BB;</button></div>
         </div>
 
         <div class="ai-card">
@@ -586,8 +577,6 @@
       } catch(e) {}
 
       try {
-        window._currentUid = user.uid;
-        window._currentUser = user;
         await loadUserData(user);
       } catch(e) {
         console.error('loadUserData error:', e);
@@ -1135,11 +1124,6 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
   window.loadNotifications=loadNotifications;
   window.markRead=markRead;
   window.deleteNotif=deleteNotif;
-  // Wrap generateAIMessage to capture last args for refresh
-  window.generateAIMessage = function(...args) {
-    window._lastAIArgs = args;
-    return generateAIMessage(...args);
-  };
   window.startNotifListener=startNotifListener;
 
   window.openEditModal = () => {
@@ -1335,33 +1319,10 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
       const pi = document.getElementById('login-pass');
       if (ei) ei.value = em;
       if (pi) pi.value = pw;
-      const btn = docum  window.refreshApp = async function() {
-    const btn = document.getElementById('refresh-btn');
-    if (btn) { btn.style.opacity='0.4'; btn.style.transform='rotate(360deg)'; btn.style.transition='transform .6s'; }
-    try {
-      const uid = window._currentUid;
-      if (!uid) { window.location.reload(); return; }
-      const fs = await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js');
-      const userSnap = await fs.getDoc(fs.doc(db,'usuarios',uid));
-      if (!userSnap.exists()) return;
-      const data = userSnap.data();
-      const mSnap = await fs.getDocs(fs.query(fs.collection(db,'usuarios',uid,'metricas'),fs.orderBy('fecha','desc'),fs.limit(1)));
-      const m = mSnap.empty ? null : mSnap.docs[0].data();
-      if (typeof renderMetrics === 'function' && m) renderMetrics(m, data.objetivo||{});
-      if (typeof renderProfileMetrics === 'function' && m) renderProfileMetrics(m);
-      if (typeof renderChart === 'function') renderChart(uid);
-      if (typeof loadNotifications === 'function') loadNotifications(uid);
-      // Reload AI message safely
-      const aiEl = document.getElementById('ai-message');
-      if (aiEl) {
-        aiEl.innerHTML = '<span class="ai-loading">Generando mensaje...</span>';
-        fetch('/api/chat', {method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({uid, prompt:'Genera un mensaje motivacional corto para este miembro de fitness'})
-        }).then(r=>r.json()).then(d=>{ if(d.reply && aiEl) aiEl.innerHTML = d.reply; }).catch(()=>{});
-      }
-    } catch(e) { console.warn('refresh:', e.message); }
-    setTimeout(()=>{ if(btn){ btn.style.opacity='1'; btn.style.transform='none'; btn.style.transition='none'; }}, 700);
-  };
+      const btn = document.getElementById('login-btn');
+      if (btn) btn.click();
+    }, 400);
+  })();
 
   function navigate(id, pushState = true) {
     views.forEach(v => {
@@ -1374,7 +1335,6 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
     }
     currentView = id;
     if(id==='notif'&&window._currentUid&&window.loadNotifications)window.loadNotifications(window._currentUid);
-    window._activeView = id;
   }
 
   window.addEventListener('popstate', (e) => {
@@ -1390,6 +1350,38 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
 
   // Set initial state
   history.replaceState({ view: 'home' }, '', '');
+</script>
+
+<script>
+window.refreshApp = async function() {
+  const btn = document.querySelector('[onclick="window.refreshApp()"]');
+  if (btn) { btn.style.transform='rotate(360deg)'; btn.style.transition='transform .5s'; }
+  try {
+    const uid = window._currentUid;
+    if (!uid || typeof loadUserData !== 'function') { window.location.reload(); return; }
+    await loadUserData(uid);
+    setTimeout(() => { if(btn) btn.style.transform=''; }, 500);
+  } catch(e) { window.location.reload(); }
+};
+</script>
+
+<script>
+(function(){
+  const orig = window.refreshApp;
+  window.refreshApp = async function() {
+    const btn = document.getElementById('refresh-btn');
+    const timeEl = document.getElementById('last-update-time');
+    if (btn) { btn.style.opacity='0.4'; }
+    try {
+      const uid = window._currentUid;
+      if (!uid || typeof loadUserData !== 'function') { window.location.reload(); return; }
+      await loadUserData(uid);
+      const now = new Date();
+      if (timeEl) timeEl.textContent = 'Actualizado ' + now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+    } catch(e) { window.location.reload(); }
+    if (btn) { btn.style.opacity='1'; }
+  };
+})();
 </script>
 </body>
 </html>
