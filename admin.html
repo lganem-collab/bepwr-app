@@ -321,21 +321,29 @@
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px">Bit&#xE1;cora</div>
         <button onclick="loadBitacora()" title="Actualizar" style="background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:16px;padding:8px 12px;border-radius:10px;cursor:pointer">&#x21BB;</button>
       </div>
-      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-        <select id="bita-filter-staff" onchange="loadBitacora()" style="flex:1;min-width:160px;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;outline:none">
-          <option value="">Todos los staff</option>
-        </select>
-        <select id="bita-filter-accion" onchange="loadBitacora()" style="flex:1;min-width:160px;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;outline:none">
-          <option value="">Todas las acciones</option>
-          <option value="alta_miembro">Alta de miembro</option>
-          <option value="nueva_valoracion">Nueva valoraci&#xF3;n</option>
-          <option value="edicion_metrica">Edici&#xF3;n de m&#xE9;trica</option>
-          <option value="modificacion_miembro">Modificaci&#xF3;n de miembro</option>
-          <option value="cambio_estado">Activar/Desactivar miembro</option>
-          <option value="alta_staff">Alta de staff</option>
-          <option value="baja_staff">Baja de staff</option>
-          <option value="envio_aviso">Env&#xED;o de aviso</option>
-        </select>
+      <div style="display:grid;gap:10px;margin-bottom:20px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <select id="bita-filter-staff" onchange="loadBitacora()" style="flex:1;min-width:140px;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none"><option value="">Todos los staff</option></select>
+          <select id="bita-filter-accion" onchange="loadBitacora()" style="flex:1;min-width:140px;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none">
+            <option value="">Todas las acciones</option>
+            <option value="alta_miembro">Alta de miembro</option>
+            <option value="nueva_valoracion">Nueva valoraci&#xF3;n</option>
+            <option value="edicion_metrica">Edici&#xF3;n de m&#xE9;trica</option>
+            <option value="modificacion_miembro">Modificaci&#xF3;n de miembro</option>
+            <option value="cambio_estado">Activar/Desactivar</option>
+            <option value="alta_staff">Alta de staff</option>
+            <option value="baja_staff">Baja de staff</option>
+            <option value="envio_aviso">Env&#xED;o de aviso</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div style="flex:1;min-width:130px"><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;margin-bottom:4px">DESDE</div><input type="date" id="bita-filter-desde" onchange="loadBitacora()" style="width:100%;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box"/></div>
+          <div style="flex:1;min-width:130px"><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;margin-bottom:4px">HASTA</div><input type="date" id="bita-filter-hasta" onchange="loadBitacora()" style="width:100%;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box"/></div>
+          <button onclick="clearBitaFilters()" style="background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:12px;padding:10px 14px;border-radius:10px;cursor:pointer">Limpiar</button>
+        </div>
+        <div style="display:flex;justify-content:flex-end">
+          <button onclick="confirmDeleteBitacora()" style="background:none;border:1px solid #f87171;color:#f87171;font-size:12px;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace">&#x1F5D1; Borrar bit&#xE1;cora</button>
+        </div>
       </div>
       <div id="bitacora-list">
         <div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Cargando...</div>
@@ -1715,6 +1723,135 @@
     };
   }
 
+
+
+  // ═══ openBitaDetail ═══════════════════════════════════════════════
+  window.openBitaDetail = function(idx) {
+    const d = (window._bitaDocs||[])[idx];
+    if (!d) return;
+    const fecha = d.fecha ? new Date(d.fecha).toLocaleString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const LABELS = {alta_miembro:'Alta de miembro',nueva_valoracion:'Nueva valoración',
+      edicion_metrica:'Edición de métrica',modificacion_miembro:'Modificación miembro',
+      cambio_estado:'Cambio de estado',alta_staff:'Alta de staff',baja_staff:'Baja staff',envio_aviso:'Envío de aviso'};
+    document.getElementById('bita-detail-title').textContent = LABELS[d.accion]||d.accion;
+    document.getElementById('bita-detail-body').innerHTML =
+      '<div style="display:grid;gap:14px">'
+      +'<div style="background:#111;border-radius:12px;padding:16px"><div style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;margin-bottom:8px">DETALLE</div>'
+      +'<div style="font-size:14px;color:#fff;line-height:1.6">'+(d.detalle||'—')+'</div></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+      +'<div style="background:#111;border-radius:12px;padding:14px"><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;margin-bottom:6px">STAFF</div><div style="font-size:13px;color:#ccc">'+(d.staffNombre||d.staffEmail||'—')+'</div></div>'
+      +'<div style="background:#111;border-radius:12px;padding:14px"><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;margin-bottom:6px">MIEMBRO</div><div style="font-size:13px;color:#ccc">'+(d.miembroNombre||'—')+'</div></div>'
+      +'</div>'
+      +'<div style="background:#111;border-radius:12px;padding:14px"><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;margin-bottom:6px">FECHA Y HORA</div><div style="font-size:13px;color:#ccc">'+fecha+'</div></div>'
+      +'</div>';
+    const mo = document.getElementById('modal-bita-detail');
+    mo.style.zIndex='700'; mo.style.display='flex';
+    setTimeout(()=>mo.classList.add('open'),10);
+  };
+
+  // ═══ clearBitaFilters ══════════════════════════════════════════════
+  window.clearBitaFilters = function() {
+    ['bita-filter-staff','bita-filter-accion','bita-filter-desde','bita-filter-hasta'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    loadBitacora();
+  };
+
+  // ═══ confirmDeleteBitacora (PENDIENTE 4) ══════════════════════════
+  window.confirmDeleteBitacora = function() {
+    document.getElementById('bita-confirm-step1').style.display='block';
+    document.getElementById('bita-confirm-step2').style.display='none';
+    document.getElementById('bita-confirm-msg').textContent='';
+    document.getElementById('bita-delete-code').value='';
+    const mo=document.getElementById('modal-bita-confirm');
+    mo.style.display='flex'; setTimeout(()=>mo.classList.add('open'),10);
+  };
+
+  window._deleteCode = null;
+  window.sendDeleteCode = async function() {
+    const btn=document.querySelector('#bita-confirm-step1 button');
+    if(btn){btn.textContent='Enviando...';btn.disabled=true;}
+    const code = Math.floor(100000+Math.random()*900000).toString();
+    window._deleteCode = code;
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      await fetch('/api/send-welcome', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+        body: JSON.stringify({
+          to: auth.currentUser.email,
+          subject: 'Código para borrar bitácora bePWR',
+          html: '<div style="background:#0a0a0a;color:#fff;padding:32px;font-family:DM Sans,sans-serif">'
+            +'<h2 style="color:#FF5C1A">bePWR Staff</h2>'
+            +'<p>Solicitaste borrar la bitácora completa.</p>'
+            +'<div style="background:#181818;border:1px solid #FF5C1A;border-radius:12px;padding:20px;text-align:center;margin:20px 0">'
+            +'<div style="font-size:10px;color:#888;letter-spacing:3px;margin-bottom:8px">TU CÓDIGO</div>'
+            +'<div style="font-size:36px;font-family:Space Mono,monospace;color:#FF5C1A;letter-spacing:8px">'+code+'</div>'
+            +'</div>'
+            +'<p style="color:#888;font-size:13px">Si no solicitaste esto, ignora este mensaje.</p>'
+            +'</div>'
+        })
+      });
+      document.getElementById('bita-confirm-step1').style.display='none';
+      document.getElementById('bita-confirm-step2').style.display='block';
+    } catch(e) {
+      document.getElementById('bita-confirm-msg').textContent='Error al enviar: '+e.message;
+      if(btn){btn.textContent='Enviar código al email';btn.disabled=false;}
+    }
+  };
+
+  window.executeBitaDelete = async function() {
+    const entered = document.getElementById('bita-delete-code').value.trim();
+    const msgEl = document.getElementById('bita-confirm-msg');
+    if (entered !== window._deleteCode) {
+      msgEl.textContent = 'Código incorrecto. Inténtalo de nuevo.';
+      return;
+    }
+    msgEl.textContent = 'Borrando...';
+    try {
+      const snap = await db.collection('bitacora').limit(500).get();
+      const batch = db.batch();
+      snap.docs.forEach(d=>batch.delete(d.ref));
+      await batch.commit();
+      window._deleteCode = null;
+      window._bitaDocs = [];
+      document.getElementById('bitacora-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);font-family:Space Mono,monospace;font-size:13px">Bitácora borrada</div>';
+      closeModal('modal-bita-confirm');
+      showToast('Bitácora borrada ✓','success');
+    } catch(e) { msgEl.textContent='Error: '+e.message; }
+  };
+
+  // ═══ sendAvisoMiembro ══════════════════════════════════════════════
+  window.sendAvisoMiembro = function(uid, nombre) {
+    closeModal('modal-detail');
+    switchTab('notify');
+    showToast('Redactando aviso para '+nombre,'info');
+  };
+
+  // ═══ openDetail wrapper for Enviar aviso btn ══════════════════════
+  const _origOD = window.openDetail;
+  if (_origOD && !window._odPatched) {
+    window._odPatched = true;
+    window.openDetail = function(uid) {
+      window._detailUid = uid;
+      const mx=(window._allMembers||[]).find(x=>x.uid===uid);
+      window._detailNombre=mx?mx.nombre:'';
+      _origOD(uid);
+      setTimeout(function(){
+        const modal=document.getElementById('modal-detail');
+        if(!modal||modal.querySelector('.btn-enviar-aviso'))return;
+        const sb=modal.querySelector('button[onclick*="saveMemberEdit"]');
+        if(!sb)return;
+        const btn=document.createElement('button');
+        btn.className='btn-enviar-aviso';
+        btn.style.cssText='width:100%;background:rgba(255,92,26,.15);border:1px solid rgba(255,92,26,.4);color:#FF5C1A;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer;margin-top:10px;display:block';
+        btn.innerHTML='&#x1F4E3; Enviar aviso directo';
+        btn.onclick=()=>window.sendAvisoMiembro(window._detailUid,window._detailNombre);
+        sb.insertAdjacentElement('afterend',btn);
+      },500);
+    };
+  }
+
 </script>
 <!-- MODAL PERFIL STAFF -->
 <div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
@@ -1803,5 +1940,22 @@
     </div>
   </div>
   
+  <div class="modal-overlay" id="modal-bita-confirm" style="display:none;z-index:800">
+    <div class="modal" style="max-width:400px;text-align:center">
+      <div style="font-size:32px;margin-bottom:12px">&#x26A0;&#xFE0F;</div>
+      <div class="modal-title">Borrar bit&#xE1;cora</div>
+      <div style="font-size:14px;color:#aaa;margin:12px 0 20px;line-height:1.6">Se te enviar&#xE1; un c&#xF3;digo de verificaci&#xF3;n a tu email.<br>Ingr&#xE9;salo para confirmar el borrado.</div>
+      <div id="bita-confirm-step1">
+        <button onclick="sendDeleteCode()" style="width:100%;background:#f87171;border:none;color:#fff;font-size:14px;font-weight:700;padding:12px;border-radius:10px;cursor:pointer">Enviar c&#xF3;digo al email</button>
+      </div>
+      <div id="bita-confirm-step2" style="display:none">
+        <input id="bita-delete-code" type="text" placeholder="C&#xF3;digo de 6 d&#xED;gitos" maxlength="6"
+          style="width:100%;background:#181818;border:1px solid var(--border);border-radius:10px;padding:12px;color:#fff;font-size:18px;text-align:center;letter-spacing:6px;margin-bottom:12px;box-sizing:border-box"/>
+        <button onclick="executeBitaDelete()" style="width:100%;background:#f87171;border:none;color:#fff;font-size:14px;font-weight:700;padding:12px;border-radius:10px;cursor:pointer">Confirmar borrado</button>
+      </div>
+      <div id="bita-confirm-msg" style="font-size:12px;color:#f87171;margin-top:8px"></div>
+      <button onclick="closeModal('modal-bita-confirm')" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:13px;padding:10px;border-radius:10px;cursor:pointer;margin-top:10px">Cancelar</button>
+    </div>
+  </div>
 </body>
 </html>
