@@ -1,18 +1,37 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+// api/chat.js — AI message generation with 3/day limit per user (no Firebase Admin)
+const DAILY_LIMIT = 3;
+const PROJECT_ID = 'bepwr-app';
 
-if (!getApps().length) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.FCM_PROJECT_ID,
-      clientEmail: process.env.FCM_CLIENT_EMAIL,
-      privateKey: process.env.FCM_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
+async function getUsage(uid, today) {
+  try {
+    const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/ai_usage/${uid}_${today}`;
+    const r = await fetch(url);
+    if (!r.ok) return { count: 0, lastMessage: '' };
+    const doc = await r.json();
+    return {
+      count: parseInt(doc.fields?.count?.integerValue || 0),
+      lastMessage: doc.fields?.lastMessage?.stringValue || ''
+    };
+  } catch(e) { return { count: 0, lastMessage: '' }; }
 }
 
-const db = getFirestore();
-const DAILY_LIMIT = 3;
+async function setUsage(uid, today, count, lastMessage, idToken) {
+  try {
+    const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/ai_usage/${uid}_${today}`;
+    await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+      body: JSON.stringify({
+        fields: {
+          count: { integerValue: count },
+          lastMessage: { stringValue: lastMessage },
+          uid: { stringValue: uid },
+          date: { stringValue: today }
+        }
+      })
+    });
+  } catch(e) { /* non-critical */ }
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,21 +39,19 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { prompt, maxTokens, uid } = req.body;
+    const { prompt, maxTokens, uid, idToken } = req.body;
 
-    // Check daily limit if uid provided
+    // Check daily limit
     if (uid) {
-      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-      const ref = db.collection('ai_usage').doc(`${uid}_${today}`);
-      const snap = await ref.get();
-      const data = snap.exists ? snap.data() : { count: 0, lastMessage: '' };
+      const today = new Date().toISOString().slice(0, 10);
+      const usage = await getUsage(uid, today);
 
-      // If limit reached, return cached last message
-      if (data.count >= DAILY_LIMIT && data.lastMessage) {
-        return res.status(200).json({ message: data.lastMessage, cached: true });
+      if (usage.count >= DAILY_LIMIT && usage.lastMessage) {
+        // Return cached last message — don't call AI
+        return res.status(200).json({ message: usage.lastMessage });
       }
 
-      // Generate new message
+      // Generate new AI message
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -49,16 +66,16 @@ export default async function handler(req, res) {
         })
       });
 
-      const aiData = await response.json();
-      const message = aiData?.content?.[0]?.text || '';
+      const data = await response.json();
+      const message = data?.content?.[0]?.text || '';
 
-      // Save count + last message
-      await ref.set({ count: (data.count || 0) + 1, lastMessage: message, uid, date: today }, { merge: true });
+      // Save usage (non-blocking)
+      if (idToken) setUsage(uid, today, (usage.count || 0) + 1, message, idToken);
 
       return res.status(200).json({ message });
     }
 
-    // No uid - just generate without limit
+    // No uid — generate without limit (admin/staff use)
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
