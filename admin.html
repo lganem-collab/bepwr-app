@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+        if (s.primerIngreso !== false) {
+          setTimeout(function(){ showCambioPassModal(); }, 800);
+        }
 <html lang="es">
 <head>
 <script>
@@ -1777,11 +1780,12 @@
       logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
       showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
       // Reset form
-      ['ns-nombre','ns-apellido','ns-email','ns-email-confirm','ns-telefono'].forEach(function(id){
+      ['ns-nombre','ns-apellido','ns-email','ns-email-confirm','ns-telefono','ns-nacimiento'].forEach(function(id){
         var el = document.getElementById(id); if(el) el.value = '';
       });
       var matchEl = document.getElementById('ns-email-match'); if(matchEl) matchEl.textContent = '';
       var rolEl = document.getElementById('ns-rol'); if(rolEl) rolEl.selectedIndex = 0;
+      var dobEl = document.getElementById('ns-nacimiento'); if(dobEl) dobEl.value = '';
       if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
       loadStaffList();
     })
@@ -1890,6 +1894,34 @@
     }
   }
 
+
+  // Cambio de contrase&#xF1;a primer ingreso
+  function showCambioPassModal() {
+    var modal = document.getElementById('modal-cambio-pass');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    setTimeout(function(){ modal.classList.add('open'); }, 10);
+  }
+
+  window.guardarNuevaPass = async function() {
+    var nueva = (document.getElementById('cp-nueva')||{}).value||'';
+    var confirmar = (document.getElementById('cp-confirmar')||{}).value||'';
+    var errEl = document.getElementById('cp-error');
+    if (nueva.length < 6) { if(errEl) errEl.textContent='M\u00EDnimo 6 caracteres'; return; }
+    if (nueva !== confirmar) { if(errEl) errEl.textContent='Las contrase\u00F1as no coinciden'; return; }
+    try {
+      await firebase.auth().currentUser.updatePassword(nueva);
+      // Mark primerIngreso = false
+      var uid = firebase.auth().currentUser.uid;
+      await db.collection('staff').doc(uid).update({ primerIngreso: false });
+      var modal = document.getElementById('modal-cambio-pass');
+      if (modal) { modal.classList.remove('open'); setTimeout(function(){ modal.style.display='none'; }, 300); }
+      showToast('Contrase\u00F1a actualizada \u2713', 'success');
+    } catch(e) {
+      if(errEl) errEl.textContent = 'Error: ' + e.message;
+    }
+  };
+
 </script>
 <!-- MODAL PERFIL STAFF -->
 <div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
@@ -1978,5 +2010,27 @@
     </div>
   </div>
   
+
+  <!-- Modal cambio de contrase&#xF1;a primer ingreso -->
+  <div class="modal-overlay" id="modal-cambio-pass" style="display:none;z-index:800">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-title">Cambiar contrase&#xF1;a</div>
+      <p style="font-size:13px;color:#888;margin:8px 0 20px">Por seguridad debes cambiar tu contrase&#xF1;a temporal.</p>
+      <div style="display:grid;gap:12px">
+        <div>
+          <label style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px">NUEVA CONTRASE&#xD1;A</label>
+          <input type="password" id="cp-nueva" placeholder="M&#xED;nimo 6 caracteres" style="width:100%;background:#111;border:1px solid #333;border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;margin-top:6px;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px">CONFIRMAR CONTRASE&#xD1;A</label>
+          <input type="password" id="cp-confirmar" placeholder="Repite la contrase&#xF1;a" style="width:100%;background:#111;border:1px solid #333;border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;margin-top:6px;box-sizing:border-box"/>
+        </div>
+        <div id="cp-error" style="color:#f87171;font-size:12px;min-height:16px"></div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px">
+        <button class="btn btn-primary" onclick="window.guardarNuevaPass()">Guardar contrase&#xF1;a</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
