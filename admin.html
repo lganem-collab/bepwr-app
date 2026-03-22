@@ -490,7 +490,7 @@
 
   // AUTH STATE &#x2014; con verificaci\u00F3n de lista blanca
   auth.onAuthSt
-        window._checkPrimerIngreso(user.uid);ateChanged(async user => {
+ateChanged(async user => {
     if (user) {
       try {
         const staffDoc = await db.collection('staff').doc(user.uid).get();
@@ -849,6 +849,7 @@
       currentStaffProfileData = s;
       const isMaster = uid === MASTER_UID;
       const initials = (s.nombre || s.email).split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        window._checkPrimerIngreso(user.uid);
 
       document.getElementById('sp-avatar').textContent = initials;
       document.getElementById('sp-nombre').textContent = s.nombre || s.email;
