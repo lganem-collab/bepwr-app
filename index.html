@@ -1048,43 +1048,41 @@
   // &#x2500;&#x2500; AI MESSAGE Sin datos nuevo en cada sesi\u00F3n &#x2500;&#x2500;
   async function generateAIMessage(nombre, metrica, objetivo) {
     const el = document.getElementById('ai-message');
-    el.innerHTML = '<span class="ai-loading">Generando tu mensaje personalizado...</span>';
+    if (el) el.innerHTML = '<span class="ai-loading">Generando mensaje...</span>';
+
+    // Check 3/day limit via localStorage
+    const uid = window._currentUid || '';
+    const today = new Date().toISOString().slice(0, 10);
+    const storageKey = 'ai_usage_' + uid + '_' + today;
+    let usage = {};
+    try { usage = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
+    const count = usage.count || 0;
+
+    // If limit reached, show cached message
+    if (count >= 3 && usage.lastMessage) {
+      if (el) el.innerHTML = usage.lastMessage;
+      return;
+    }
+
     try {
-      const edad = cachedUserData.nacimiento ? Math.floor((new Date() - new Date(cachedUserData.nacimiento)) / (365.25*24*60*60*1000)) : null;
-      const genero = cachedUserData.genero || null;
-      const alturaCtx = cachedUserData.altura || null;
-
-      // Hora del d\u00EDa para saludo
-      const hora = new Date().getHours();
-      const saludo = hora < 12 ? 'buenos d\u00EDas' : hora < 19 ? 'buenas tardes' : 'buenas noches';
-
-      // Contexto persona
-      const contextoPersona = [
-        edad ? `${edad} a\u00F1os` : null,
-        alturaCtx ? `${alturaCtx}cm de altura` : null,
-        genero && genero !== 'prefiero-no-decir' ? `g\u00E9nero ${genero}` : null
-      ].filter(Boolean).join(', ');
-
-      const prompt = `Eres el coach de bePWR Quer\u00E9taro. Es de ${saludo}, ${nombre.split(' ')[0]}.
-Datos: peso ${metrica.peso}kg, m\u00FAsculo ${metrica.musculo}kg, PGC ${metrica.pgc}%, GV ${metrica.grasaVisceral}, InBody ${metrica.calificacion}/100. Objetivo: ${objetivo.meta}.
-Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comillas.`
+      const prompt = 'Genera un mensaje motivacional personalizado y breve (maximo 3 oraciones) para un miembro de un gimnasio de ejercicio funcional llamado ' + nombre + '. Sus metricas recientes: peso ' + (metrica.peso||'--') + 'kg, musculo ' + (metrica.musculo||'--') + 'kg, grasa ' + (metrica.grasaCorporal||'--') + 'kg, PGC ' + (metrica.pgc||'--') + '%, InBody ' + (metrica.calificacion||'--') + '/100. Objetivo: ' + (objetivo.meta||'general') + '. Incluye: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comillas.';
 
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, uid: user.uid, maxTokens: 200, idToken: await user.getIdToken() })
+        body: JSON.stringify({ prompt })
       });
-      const data = await res.json();
-      const msg = data.message || '';
-      if (msg) {
-        const htmlMsg = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-        el.innerHTML = htmlMsg;
-      } else {
-        el.innerHTML = '\u00A1Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi\u00F3n te acerca m\u00E1s a tu meta. &#x1F4AA;';
-      }
+      const aiData = await res.json();
+      const msg = aiData.message || 'No se pudo generar el mensaje.';
+
+      // Save to localStorage
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({ count: count + 1, lastMessage: msg, date: today }));
+      } catch(e) {}
+
+      if (el) el.innerHTML = msg;
     } catch(e) {
-      console.error('AI Error:', e);
-      el.innerHTML = '\u00A1Sigue adelante, <b>' + nombre.split(' ')[0] + '</b>! Cada sesi\u00F3n te acerca m\u00E1s a tu meta. &#x1F4AA;';
+      if (el) el.innerHTML = 'No se pudo generar el mensaje. Verifica tu conexion.';
     }
   }
 
