@@ -1781,7 +1781,7 @@
       logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
       showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
       // Reset form
-      ['ns-nombre','ns-apellido','ns-email','ns-email-confirm','ns-telefono','ns-nacimiento'].forEach(function(id){
+      ['ns-nombre','ns-apellido','ns-email','ns-email-confirm','ns-tel','ns-nacimiento'].forEach(function(id){
         var el = document.getElementById(id); if(el) el.value = '';
       });
       var matchEl = document.getElementById('ns-email-match'); if(matchEl) matchEl.textContent = '';
@@ -1950,6 +1950,33 @@
     });
   };
 
+
+  window.guardarNuevaPass = async function() {
+    var nueva = (document.getElementById("cp-nueva")||{}).value||"";
+    var confirma = (document.getElementById("cp-confirma")||{}).value||"";
+    var errEl = document.getElementById("cp-error");
+    if (nueva.length < 8) { if(errEl) errEl.textContent="M\u00EDnimo 8 caracteres"; return; }
+    if (nueva !== confirma) { if(errEl) errEl.textContent="Las contrase\u00F1as no coinciden"; return; }
+    try {
+      await firebase.auth().currentUser.updatePassword(nueva);
+      var uid2 = firebase.auth().currentUser.uid;
+      await db.collection("staff").doc(uid2).update({ primerIngreso: false });
+      var modal = document.getElementById("modal-cambio-pass");
+      if(modal){ modal.classList.remove("open"); setTimeout(function(){ modal.style.display="none"; },300); }
+      showToast("Contrase\u00F1a actualizada \u2713", "success");
+    } catch(e) { if(errEl) errEl.textContent="Error: "+e.message; }
+  };
+
+  window._checkPrimerIngreso = function(staffUid) {
+    db.collection("staff").doc(staffUid).get().then(function(snap) {
+      if (!snap.exists) return;
+      if (snap.data().primerIngreso !== false) {
+        var modal = document.getElementById("modal-cambio-pass");
+        if(modal){ modal.style.display="flex"; setTimeout(function(){ modal.classList.add("open"); },10); }
+      }
+    }).catch(function(){});
+  };
+
 </script>
 <!-- MODAL PERFIL STAFF -->
 <div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
@@ -2075,6 +2102,21 @@
           <label>CONFIRMAR CONTRASE&#xD1;A *</label>
           <input type="password" id="cp-confirma" placeholder="Repite la contrase&#xF1;a" />
         </div>
+        <div id="cp-error" style="color:#f87171;font-size:12px;min-height:16px"></div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px">
+        <button class="btn btn-primary" onclick="window.guardarNuevaPass()" style="width:100%">Guardar contrase&#xF1;a</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-cambio-pass" style="display:none;z-index:800">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-title">Cambia tu contrase&#xF1;a</div>
+      <p style="font-size:13px;color:#888;margin:12px 0 20px">Por seguridad, establece una nueva contrase&#xF1;a antes de continuar.</p>
+      <div style="display:grid;gap:14px">
+        <div class="field"><label>NUEVA CONTRASE&#xD1;A *</label><input type="password" id="cp-nueva" placeholder="M&#xED;nimo 8 caracteres"/></div>
+        <div class="field"><label>CONFIRMAR CONTRASE&#xD1;A *</label><input type="password" id="cp-confirma" placeholder="Repite la contrase&#xF1;a"/></div>
         <div id="cp-error" style="color:#f87171;font-size:12px;min-height:16px"></div>
       </div>
       <div class="modal-footer" style="margin-top:20px">
