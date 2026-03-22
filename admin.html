@@ -489,7 +489,8 @@
   window.currentStaffRole = null;
 
   // AUTH STATE &#x2014; con verificaci\u00F3n de lista blanca
-  auth.onAuthStateChanged(async user => {
+  auth.onAuthSt
+        window._checkPrimerIngreso(user.uid);ateChanged(async user => {
     if (user) {
       try {
         const staffDoc = await db.collection('staff').doc(user.uid).get();
