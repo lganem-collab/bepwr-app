@@ -210,7 +210,7 @@
       <label class="field-label">Contrase&#xF1;a</label>
       <div style="position:relative">
         <input class="field-input" id="inp-pass" type="password" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" autocomplete="current-password" style="padding-right:48px" />
-        <button onclick="togglePass('inp-pass','eye-login')" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1" id="eye-login">&#x1F441;</button>
+        <button onclick="togglePass('inp-pass','eye-login')" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:18px;padding:0;line-height:1" id="eye-login">👁</button>
       </div>
     </div>
     <button class="login-btn" id="btn-login">Entrar</button>
@@ -408,19 +408,19 @@
         <div class="modal-field"><label>Contrase&#xF1;a actual</label>
           <div class="pass-input-wrap">
             <input type="password" id="edit-pass-current" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;">
-            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">&#x1F441;</button>
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-current',this)">👁</button>
           </div>
         </div>
         <div class="modal-field"><label>Nueva contrase&#xF1;a</label>
           <div class="pass-input-wrap">
             <input type="password" id="edit-pass-new" placeholder="M&#xED;nimo 6 caracteres">
-            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">&#x1F441;</button>
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-pass-new',this)">👁</button>
           </div>
         </div>
         <div class="modal-field"><label>Confirmar nueva contrase&#xF1;a</label>
           <div class="pass-input-wrap">
             <input type="password" id="edit-confirm-pass" placeholder="Repite la contrase&#xF1;a">
-            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">&#x1F441;</button>
+            <button class="pass-toggle" type="button" onclick="toggleModalPass('edit-confirm-pass',this)">👁</button>
           </div>
         </div>
         <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
@@ -513,13 +513,13 @@
       <div class="modal-field"><label>Nueva contrase&#xF1;a</label>
         <div class="pass-input-wrap">
           <input type="password" id="primer-pass-new" placeholder="M&#xED;nimo 6 caracteres">
-          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-new',this)">&#x1F441;</button>
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-new',this)">👁</button>
         </div>
       </div>
       <div class="modal-field"><label>Confirmar contrase&#xF1;a</label>
         <div class="pass-input-wrap">
           <input type="password" id="primer-pass-confirm" placeholder="Repite tu contrase&#xF1;a">
-          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">&#x1F441;</button>
+          <button class="pass-toggle" type="button" onclick="toggleModalPass('primer-pass-confirm',this)">👁</button>
         </div>
       </div>
       <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6;margin-bottom:16px">
@@ -1101,7 +1101,7 @@
   window.toggleModalPass = (inputId, btn) => {
     const inp = document.getElementById(inputId);
     inp.type = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? '&#x1F441;' : '&#x1F648;';
+    btn.textContent = inp.type === 'password' ? '👁' : '&#x1F648;';
   };
 
   // &#x2500;&#x2500; MODAL EDITAR INFORMACI&#xD3;N &#x2500;&#x2500;
@@ -1422,14 +1422,14 @@
           <label>NUEVA CONTRASE&#xD1;A</label>
           <div style="position:relative;display:flex;align-items:center">
             <input type="password" id="mp-nueva" placeholder="Minimo 8 caracteres" style="flex:1;padding-right:44px"/>
-            <span onclick="var e=document.getElementById('mp-nueva');e.type=e.type==='password'?'text':'password';this.innerHTML=e.type==='password'?'&#x1F441;':'&#x1F576;'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">&#x1F441;</span>
+            <span onclick="var e=document.getElementById('mp-nueva');e.type=e.type==='password'?'text':'password';this.innerHTML=e.type==='password'?'👁':'🕵'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">👁</span>
           </div>
         </div>
         <div class="field">
           <label>CONFIRMAR CONTRASE&#xD1;A</label>
           <div style="position:relative;display:flex;align-items:center">
             <input type="password" id="mp-confirma" placeholder="Repite la contrasena" style="flex:1;padding-right:44px"/>
-            <span onclick="var e=document.getElementById('mp-confirma');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'&#x1F441;':'&#x1F576;'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">&#x1F441;</span>
+            <span onclick="var e=document.getElementById('mp-confirma');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'👁':'🕵'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">👁</span>
           </div>
         </div>
         <div id="mp-error" style="color:#f87171;font-size:12px;min-height:16px;text-align:center"></div>
