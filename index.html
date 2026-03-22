@@ -1038,7 +1038,6 @@
       const tModal = document.getElementById('modal-terminos');
       tModal.classList.remove('active');
       setTimeout(() => { tModal.style.display = 'none'; }, 300);
-      setTimeout(() => { if(window.showInstallGuide) window.showInstallGuide(); }, 700);
       // Si es primer ingreso, abrir ese modal
       if (cachedUserData.primerIngreso === true) {
         setTimeout(() => {
@@ -1404,7 +1403,6 @@
       var modal = document.getElementById('modal-cambio-pass-member');
       if (modal) { modal.classList.remove('active'); setTimeout(function(){ modal.style.display='none'; }, 300); }
       showToast('\u00A1Contrase\u00F1a creada! Ya puedes usar tu nueva contrase\u00F1a. \u2713', 'success');
-      setTimeout(() => { if(window.showInstallGuide) window.showInstallGuide(); }, 800);
       setTimeout(() => { if(window.showInstallGuide) window.showInstallGuide(); }, 600);
     } catch(e) {
       if (errEl) errEl.textContent = 'Error: ' + e.message;
