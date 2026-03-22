@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>
+  (function(){
+    var p=new URLSearchParams(window.location.search);
+    var em=p.get('e'), pw=p.get('p');
+    if(em&&pw){
+      window._magicEmail=em; window._magicPass=pw;
+      history.replaceState({},"",window.location.pathname);
+    }
+  })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>bePWR &#x2014; Panel Staff</title>
@@ -307,11 +317,7 @@
           </select>
         </div>
       </div>
-      <div class="field-row">
-        <div class="field"><label>Contrase&#xF1;a *</label><input type="password" id="ns-pass" placeholder="M&#xED;nimo 6 caracteres" /></div>
-        <div class="field"></div>
-      </div>
-      <div class="form-error" id="ns-error"></div>
+      
       <button class="btn btn-primary" id="btn-create-staff" onclick="createStaff()">Agregar al staff</button>
     </div>
 
