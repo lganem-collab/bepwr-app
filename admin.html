@@ -1401,7 +1401,7 @@
       var userEmail = auth.currentUser ? auth.currentUser.email : '';
       var resp = await fetch('/api/send-delete-code', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({code: code, email: userEmail})
+        body: JSON.stringify({code: code, email: userEmail, secret: 'bepwr2026notify'})
       });
       if (!resp.ok) throw new Error('Error al enviar c\u00F3digo');
       var ov = document.createElement('div');
