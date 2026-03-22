@@ -610,6 +610,13 @@
         if (mpass2) { mpass2.style.display='flex'; setTimeout(function(){ mpass2.classList.add('active'); }, 800); }
       }
     } else {
+      // Magic link auto-login
+      if (window._magicEmail && window._magicPass) {
+        const _em = window._magicEmail, _pw = window._magicPass;
+        window._magicEmail = null; window._magicPass = null;
+        try { await signInWithEmailAndPassword(auth, _em, _pw); } catch(e) { console.warn('magic login:', e.message); }
+        return;
+      }
       if (authReady) {
         appScr.classList.remove('active');
         loginScr.classList.add('active');
