@@ -1409,9 +1409,31 @@ onclick="var e=document.getElementById('mp-confirma');e.type=e.type==='password'
     }
   };
 
+
+  // Password modal buttons
+  (function() {
+    function setupPassModal() {
+      var e1 = document.getElementById('mp-eye1');
+      var e2 = document.getElementById('mp-eye2');
+      var sub = document.getElementById('mp-submit');
+      if (e1) e1.addEventListener('click', function() {
+        var inp = document.getElementById('mp-nueva');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        e1.textContent = inp.type === 'password' ? '\uD83D\uDC41' : '\uD83D\uDD75';
+      });
+      if (e2) e2.addEventListener('click', function() {
+        var inp = document.getElementById('mp-confirma');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        e2.textContent = inp.type === 'password' ? '\uD83D\uDC41' : '\uD83D\uDD75';
+      });
+      if (sub) sub.addEventListener('click', function() { window.guardarPassMiembro(); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupPassModal);
+    else setupPassModal();
+  })();
 </script>
 
-  <!-- Modal cambio de contraseña primer ingreso miembros -->
+  <!-- Modal cambio de contrasena primer ingreso miembros -->
   <div class="modal-overlay" id="modal-cambio-pass-member" style="display:none;z-index:800">
     <div class="modal" style="max-width:400px">
       <div class="modal-title">Crea tu contrase&#xF1;a</div>
@@ -1420,23 +1442,22 @@ onclick="var e=document.getElementById('mp-confirma');e.type=e.type==='password'
         <div class="field">
           <label>NUEVA CONTRASE&#xD1;A</label>
           <div style="position:relative;display:flex;align-items:center">
-            <input type="password" id="mp-nueva" placeholder="Minimo 8 caracteres" style="flex:1;padding-right:44px"/>
-            <span onclick="var e=document.getElementById('mp-nueva');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'👁':'🕵'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">👁</span>
+            <input type="password" id="mp-nueva" placeholder="M&#xED;nimo 8 caracteres" style="flex:1;padding-right:44px"/>
+            <button type="button" id="mp-eye1" style="position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:18px;padding:4px;color:#666">&#x1F441;</button>
           </div>
         </div>
         <div class="field">
           <label>CONFIRMAR CONTRASE&#xD1;A</label>
           <div style="position:relative;display:flex;align-items:center">
-            <input type="password" id="mp-confirma" placeholder="Repite la contrasena" style="flex:1;padding-right:44px"/>
-            <span onclick="var e=document.getElementById('mp-confirma');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'👁':'🕵'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">👁</span>
+            <input type="password" id="mp-confirma" placeholder="Repite la contrase&#xF1;a" style="flex:1;padding-right:44px"/>
+            <button type="button" id="mp-eye2" style="position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:18px;padding:4px;color:#666">&#x1F441;</button>
           </div>
         </div>
         <div id="mp-error" style="color:#f87171;font-size:12px;min-height:16px;text-align:center"></div>
       </div>
       <div class="modal-footer" style="margin-top:20px">
-        <button class="btn btn-primary" onclick="window.guardarPassMiembro()" style="width:100%;font-size:15px;padding:14px">Guardar contrase&#xF1;a</button>
+        <button class="btn btn-primary" id="mp-submit" style="width:100%;font-size:15px;padding:14px">Guardar contrase&#xF1;a</button>
       </div>
     </div>
   </div>
 </body>
-</html>
