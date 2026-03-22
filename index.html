@@ -604,8 +604,10 @@
         setTimeout(() => tModal.classList.add('active'), 10);
       } else if (cachedUserData.primerIngreso === true) {
         const primerModal = document.getElementById('modal-primer-ingreso');
-        primerModal.style.display = 'flex';
-        setTimeout(() => primerModal.classList.add('active'), 10);
+        if (primerModal) { primerModal.style.display = 'flex'; setTimeout(() => primerModal.classList.add('active'), 10); }
+        // Also show password change
+        const mpass2 = document.getElementById('modal-cambio-pass-member');
+        if (mpass2) { mpass2.style.display='flex'; setTimeout(function(){ mpass2.classList.add('active'); }, 800); }
       }
     } else {
       if (authReady) {
@@ -1370,6 +1372,64 @@
 
   // Set initial state
   history.replaceState({ view: 'home' }, '', '');
+
+  window.guardarPassMiembro = async function() {
+    var elnueva = document.getElementById('mp-nueva');
+    var elconfirma = document.getElementById('mp-confirma');
+    var errEl = document.getElementById('mp-error');
+    if (!elnueva || !elconfirma) return;
+    var nueva = elnueva.value;
+    var confirma = elconfirma.value;
+    if (errEl) errEl.textContent = '';
+    if (!nueva || nueva.length < 8) {
+      if (errEl) errEl.textContent = 'M\u00EDnimo 8 caracteres';
+      return;
+    }
+    if (nueva !== confirma) {
+      if (errEl) errEl.textContent = 'Las contrase\u00F1as no coinciden';
+      return;
+    }
+    try {
+      const user = auth.currentUser;
+      await user.updatePassword(nueva);
+      await doc(db, 'usuarios', user.uid);
+      await updateDoc(doc(db, 'usuarios', user.uid), { primerIngreso: false });
+      var modal = document.getElementById('modal-cambio-pass-member');
+      if (modal) { modal.classList.remove('active'); setTimeout(function(){ modal.style.display='none'; }, 300); }
+      showToast('\u00A1Contrase\u00F1a creada! Ya puedes usar tu nueva contrase\u00F1a. \u2713', 'success');
+    } catch(e) {
+      if (errEl) errEl.textContent = 'Error: ' + e.message;
+    }
+  };
+
 </script>
+
+  <!-- Modal cambio de contraseña primer ingreso miembros -->
+  <div class="modal-overlay" id="modal-cambio-pass-member" style="display:none;z-index:800">
+    <div class="modal" style="max-width:400px">
+      <div class="modal-title">Crea tu contrase&#xF1;a</div>
+      <p style="font-size:13px;color:#888;margin:12px 0 20px;line-height:1.6">Por seguridad, establece tu propia contrase&#xF1;a antes de continuar.</p>
+      <div style="display:grid;gap:16px">
+        <div class="field">
+          <label>NUEVA CONTRASE&#xD1;A</label>
+          <div style="position:relative;display:flex;align-items:center">
+            <input type="password" id="mp-nueva" placeholder="M&#xED;nimo 8 caracteres" style="flex:1;padding-right:44px"/>
+            <span onclick="var e=document.getElementById('mp-nueva');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'&#x1F441;':'&#x1F576;'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">&#x1F441;</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>CONFIRMAR CONTRASE&#xD1;A</label>
+          <div style="position:relative;display:flex;align-items:center">
+            <input type="password" id="mp-confirma" placeholder="Repite la contrase&#xF1;a" style="flex:1;padding-right:44px"/>
+            <span onclick="var e=document.getElementById('mp-confirma');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'&#x1F441;':'&#x1F576;'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">&#x1F441;</span>
+          </div>
+        </div>
+        <div id="mp-error" style="color:#f87171;font-size:12px;min-height:16px;text-align:center"></div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px">
+        <button class="btn btn-primary" onclick="window.guardarPassMiembro()" style="width:100%;font-size:15px;padding:14px">Guardar contrase&#xF1;a</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
