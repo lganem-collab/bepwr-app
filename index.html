@@ -1072,7 +1072,7 @@ Escribe 3 oraciones: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comil
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt, uid: user.uid, maxTokens: 200 })
       });
       const data = await res.json();
       const msg = data.message || '';
