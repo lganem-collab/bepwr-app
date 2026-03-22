@@ -295,8 +295,8 @@
         <div class="field"><label>Apellido(s) *</label><input type="text" id="ns-apellido" placeholder="L&#xF3;pez" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Email *</label><input type="email" id="ns-email" placeholder="ana@bepwr.com" /></div>
-        <div class="field"></div>
+        <div class="field"><label>Email *</label><input type="email" id="ns-email" placeholder="ana@bepwr.com" oninput="checkStaffEmailMatch()" /></div>
+        <div class="field"><label>CONFIRMAR EMAIL *</label><input type="text" id="ns-email-confirm" placeholder="ana@bepwr.com" oninput="checkStaffEmailMatch()" /><div id="ns-email-match" style="font-size:11px;margin-top:4px;min-height:14px"></div></div>
       </div>
       <div class="field-row">
         <div class="field"><label>Tel&#xE9;fono *</label><input type="tel" id="ns-tel" placeholder="10 d&#xED;gitos" maxlength="10" /></div>
@@ -1348,6 +1348,18 @@
     });
   }
 
+    window.checkStaffEmailMatch = function() {
+    var e1 = (document.getElementById('ns-email')||{}).value||'';
+    var e2 = (document.getElementById('ns-email-confirm')||{}).value||'';
+    var el = document.getElementById('ns-email-match');
+    if (!el || !e2) return;
+    if (e1.toLowerCase() === e2.toLowerCase()) {
+      el.style.color = '#4ade80'; el.textContent = '\u2713 Emails coinciden';
+    } else {
+      el.style.color = '#f87171'; el.textContent = '\u2717 Los emails no coinciden';
+    }
+  };
+
     window.openBitaDetail = function(idx) {
     var docs = window._bitaDocs;
     if (!docs || !docs[idx]) return;
@@ -1722,36 +1734,62 @@
   }
 
   async function createStaff() {
-    const nombreVal = document.getElementById('ns-nombre').value.trim();
-    const apellidoVal = document.getElementById('ns-apellido')?.value.trim() || '';
-    const nombre = apellidoVal ? nombreVal + ' ' + apellidoVal : nombreVal;
-    const email  = document.getElementById('ns-email').value.trim();
-    const tel    = document.getElementById('ns-tel').value.trim();
-    const pass   = document.getElementById('ns-pass').value;
-    const rol    = document.getElementById('ns-rol').value;
-    const errEl  = document.getElementById('ns-error');
-    errEl.textContent = '';
-    if (!nombre || !email || !tel || !pass) { errEl.textContent = 'Completa todos los campos'; return; }
-    if (rol === 'admin' && window.currentStaffRole !== 'admin') { errEl.textContent = 'Solo un admin puede crear otro admin'; return; }
-    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
-    if (!email.includes('@') || !email.includes('.')) { errEl.textContent = 'Email inv\u00E1lido'; return; }
-    const btn = document.getElementById('btn-create-staff');
-    btn.textContent = 'Creando...'; btn.disabled = true;
-    try {
-      const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
-      await secondaryAuth.signOut();
-      await db.collection('staff').doc(cred.user.uid).set({
-        nombre, email, telefono: tel, rol, activo: true, primerIngreso: true, fechaAlta: new Date().toISOString().slice(0,10)
+    const nombreVal    = document.getElementById('ns-nombre').value.trim();
+    const apellidoVal  = document.getElementById('ns-apellido').value.trim();
+    const emailVal     = document.getElementById('ns-email').value.trim().toLowerCase();
+    const emailConfirm = (document.getElementById('ns-email-confirm')||{}).value?.trim().toLowerCase() || '';
+    const rolVal       = document.getElementById('ns-rol').value;
+
+    if (!nombreVal || !apellidoVal) { showToast('Nombre y apellido son requeridos', 'error'); return; }
+    if (!emailVal) { showToast('El email es requerido', 'error'); return; }
+    if (emailVal !== emailConfirm) { showToast('Los emails no coinciden', 'error'); return; }
+    if (!rolVal) { showToast('Selecciona un rol', 'error'); return; }
+
+    // Generate simple password: Nombre + 4 digits
+    const pw = nombreVal.charAt(0).toUpperCase() + nombreVal.slice(1).toLowerCase().replace(/\s/g,'') + Math.floor(1000+Math.random()*9000);
+    const nombreCompleto = nombreVal + ' ' + apellidoVal;
+
+    const btn = document.getElementById('ns-submit-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Creando...'; }
+
+    firebase.auth().createUserWithEmailAndPassword(emailVal, pw)
+      .then(function(cred) {
+        var uid = cred.user.uid;
+        return db.collection('staff').doc(uid).set({
+          nombre: nombreCompleto,
+          email: emailVal,
+          rol: rolVal,
+          activo: true,
+          creadoEn: new Date().toISOString()
+        }).then(function() {
+          // Send welcome email with magic link
+          return fetch('/api/send-welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: emailVal,
+              nombre: nombreCompleto,
+              password: pw,
+              isStaff: true
+            })
+          });
+        }).then(function() {
+          logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
+          showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + emailVal, 'success');
+          // Reset form
+          ['ns-nombre','ns-apellido','ns-email','ns-email-confirm'].forEach(function(id){
+            var el = document.getElementById(id); if(el) el.value = '';
+          });
+          var matchEl = document.getElementById('ns-email-match'); if(matchEl) matchEl.textContent = '';
+          if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
+          loadStaff();
+        });
+      })
+      .catch(function(e) {
+        var msg = e.code === 'auth/email-already-in-use' ? 'Este email ya tiene una cuenta' : e.message;
+        showToast('Error: ' + msg, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
       });
-      showToast('\u2713 ' + nombre + ' agregado al staff', 'success');
-      logBitacora('alta_staff', 'Alta staff: ' + nombre + ' | ' + rol + ' | ' + email, nombre);
-      ['ns-nombre','ns-email','ns-tel','ns-pass'].forEach(id => document.getElementById(id).value = '');
-      loadStaffList();
-    } catch(e) {
-      const msgs = {'auth/email-already-in-use':'Ese email ya est\u00E1 registrado','auth/invalid-email':'Email inv\u00E1lido','auth/weak-password':'Contrase\u00F1a muy d\u00E9bil'};
-      errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
-    }
-    btn.textContent = 'Agregar al staff'; btn.disabled = false;
   }
 
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
