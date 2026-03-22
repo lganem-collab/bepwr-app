@@ -1897,18 +1897,27 @@
   }
 
   window.guardarNuevaPass = async function() {
-    var nueva = (document.getElementById('cp-nueva')||{}).value||'';
-    var confirmar = (document.getElementById('cp-confirmar')||{}).value||'';
+    var elnueva = document.getElementById('cp-nueva');
+    var elconfirma = document.getElementById('cp-confirma');
     var errEl = document.getElementById('cp-error');
-    if (nueva.length < 6) { if(errEl) errEl.textContent='M\u00EDnimo 6 caracteres'; return; }
-    if (nueva !== confirmar) { if(errEl) errEl.textContent='Las contrase\u00F1as no coinciden'; return; }
+    if (!elnueva || !elconfirma) return;
+    var nueva = elnueva.value;
+    var confirma = elconfirma.value;
+    if (errEl) errEl.textContent = '';
+    if (!nueva || nueva.length < 8) {
+      if(errEl) errEl.textContent = 'M\u00EDnimo 8 caracteres';
+      return;
+    }
+    if (nueva !== confirma) {
+      if(errEl) errEl.textContent = 'Las contrase\u00F1as no coinciden (nueva: '+nueva.length+' chars, confirma: '+confirma.length+' chars)';
+      return;
+    }
     try {
       await firebase.auth().currentUser.updatePassword(nueva);
-      // Mark primerIngreso = false
-      var uid = firebase.auth().currentUser.uid;
-      await db.collection('staff').doc(uid).update({ primerIngreso: false });
+      var uid2 = firebase.auth().currentUser.uid;
+      await db.collection('staff').doc(uid2).update({ primerIngreso: false });
       var modal = document.getElementById('modal-cambio-pass');
-      if (modal) { modal.classList.remove('open'); setTimeout(function(){ modal.style.display='none'; }, 300); }
+      if(modal){ modal.classList.remove('open'); setTimeout(function(){ modal.style.display='none'; },300); }
       showToast('Contrase\u00F1a actualizada \u2713', 'success');
     } catch(e) {
       if(errEl) errEl.textContent = 'Error: ' + e.message;
@@ -1965,6 +1974,7 @@
   };
 
   window._checkPrimerIngreso = function(staffUid) {
+    if (staffUid === '1zZIfBnLGqRiPKVRVfHxlt2O3Di2') return; // skip master
     db.collection("staff").doc(staffUid).get().then(function(snap) {
       if (!snap.exists) return;
       if (snap.data().primerIngreso !== false) {
@@ -2112,8 +2122,8 @@
       <div class="modal-title">Cambia tu contrase&#xF1;a</div>
       <p style="font-size:13px;color:#888;margin:12px 0 20px">Por seguridad, establece una nueva contrase&#xF1;a antes de continuar.</p>
       <div style="display:grid;gap:14px">
-        <div class="field"><label>NUEVA CONTRASE&#xD1;A *</label><input type="password" id="cp-nueva" placeholder="M&#xED;nimo 8 caracteres"/></div>
-        <div class="field"><label>CONFIRMAR CONTRASE&#xD1;A *</label><input type="password" id="cp-confirma" placeholder="Repite la contrase&#xF1;a"/></div>
+        <div class="field"><label>NUEVA CONTRASE&#xD1;A *</label><div style="position:relative"><input type="password" id="cp-nueva" placeholder="M&#xED;nimo 8 caracteres" style="width:100%;padding-right:40px;box-sizing:border-box"/><span onclick="var e=document.getElementById('cp-nueva');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#666;font-size:18px">&#x1F441;</span></div></div>
+<div class="field"><label>CONFIRMAR CONTRASE&#xD1;A *</label><div style="position:relative"><input type="password" id="cp-confirma" placeholder="Repite la contrase&#xF1;a" style="width:100%;padding-right:40px;box-sizing:border-box"/><span onclick="var e=document.getElementById('cp-confirma');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#666;font-size:18px">&#x1F441;</span></div></div>
         <div id="cp-error" style="color:#f87171;font-size:12px;min-height:16px"></div>
       </div>
       <div class="modal-footer" style="margin-top:20px">
