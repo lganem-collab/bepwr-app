@@ -7,8 +7,9 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { email, nombre, password } = req.body || {};
+  const { email, nombre, password, isStaff } = req.body || {};
 
+  const isStaffBool = !!isStaff;
   if (!email || !nombre || !password) {
     return res.status(400).json({ error: 'email, nombre y password son requeridos' });
   }
@@ -65,7 +66,7 @@ export default async function handler(req, res) {
 
           <!-- CTA -->
           <div style="text-align:center">
-            <a href="https://bepwr-app.vercel.app/?e=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}"
+            <a href="${isStaffBool ? "https://bepwr-app.vercel.app/admin.html" : "https://bepwr-app.vercel.app"}/?e=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}"
                style="display:inline-block;background:#FF5C1A;color:white;text-decoration:none;padding:16px 40px;border-radius:14px;font-size:15px;font-weight:700">
               Entrar a bePWR &#x2192;
             </a>
