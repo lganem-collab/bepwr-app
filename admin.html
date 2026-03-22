@@ -1,3 +1,19 @@
+
+  // Auto-login from magic link params
+  if (window._magicEmail && window._magicPass) {
+    window.addEventListener('DOMContentLoaded', function() {
+      var ef = document.getElementById('adm-email');
+      var pf = document.getElementById('adm-pass');
+      if (ef && pf) {
+        ef.value = window._magicEmail;
+        pf.value = window._magicPass;
+        window._magicEmail = null;
+        window._magicPass = null;
+        setTimeout(doLogin, 300);
+      }
+    });
+  }
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1777,12 +1793,13 @@
       logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
       showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
       // Reset form
-      ['ns-nombre','ns-apellido','ns-email','ns-email-confirm'].forEach(function(id){
+      ['ns-nombre','ns-apellido','ns-email','ns-email-confirm','ns-telefono'].forEach(function(id){
         var el = document.getElementById(id); if(el) el.value = '';
       });
       var matchEl = document.getElementById('ns-email-match'); if(matchEl) matchEl.textContent = '';
+      var rolEl = document.getElementById('ns-rol'); if(rolEl) rolEl.selectedIndex = 0;
       if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
-      loadStaff();
+      loadStaffList();
     })
     .catch(function(e) {
       showToast('Error: ' + e.message, 'error');
