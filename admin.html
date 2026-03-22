@@ -489,8 +489,7 @@
   window.currentStaffRole = null;
 
   // AUTH STATE &#x2014; con verificaci\u00F3n de lista blanca
-  auth.onAuthSt
-ateChanged(async user => {
+  auth.onAuthStateChanged(async user => {
     if (user) {
       try {
         const staffDoc = await db.collection('staff').doc(user.uid).get();
@@ -504,6 +503,7 @@ ateChanged(async user => {
         const staffData = staffDoc.data();
         window.currentStaffRole = staffData.rol || 'coach';
         show('s-app'); hide('s-login');
+        window._checkPrimerIngreso(user.uid);
         try {
           const rolBadge = window.currentStaffRole === 'admin' ? '&#x1F511; Admin' : '&#x1F45F; Coach';
           document.getElementById('staff-name').innerHTML = `${staffData.nombre || user.email} <span style="font-size:10px;color:var(--orange);font-family:Space Mono,monospace;letter-spacing:1px">${rolBadge}</span>`;
@@ -849,7 +849,6 @@ ateChanged(async user => {
       currentStaffProfileData = s;
       const isMaster = uid === MASTER_UID;
       const initials = (s.nombre || s.email).split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-        window._checkPrimerIngreso(user.uid);
 
       document.getElementById('sp-avatar').textContent = initials;
       document.getElementById('sp-nombre').textContent = s.nombre || s.email;
