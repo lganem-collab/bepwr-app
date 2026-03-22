@@ -1740,62 +1740,54 @@
   }
 
   async function createStaff() {
-    const nombreVal    = document.getElementById('ns-nombre').value.trim();
-    const apellidoVal  = document.getElementById('ns-apellido').value.trim();
-    const emailVal     = document.getElementById('ns-email').value.trim().toLowerCase();
-    const emailConfirm = (document.getElementById('ns-email-confirm')||{}).value?.trim().toLowerCase() || '';
-    const rolVal       = document.getElementById('ns-rol').value;
+    const nombreVal    = (document.getElementById('ns-nombre')||{}).value||'';
+    const apellidoVal  = (document.getElementById('ns-apellido')||{}).value||'';
+    const emailVal     = (document.getElementById('ns-email')||{}).value||'';
+    const emailConfirm = (document.getElementById('ns-email-confirm')||{}).value||'';
+    const rolVal       = (document.getElementById('ns-rol')||{}).value||'';
 
-    if (!nombreVal || !apellidoVal) { showToast('Nombre y apellido son requeridos', 'error'); return; }
-    if (!emailVal) { showToast('El email es requerido', 'error'); return; }
-    if (emailVal !== emailConfirm) { showToast('Los emails no coinciden', 'error'); return; }
+    const nTrim = nombreVal.trim();
+    const aTrim = apellidoVal.trim();
+    const eTrim = emailVal.trim().toLowerCase();
+    const ecTrim = emailConfirm.trim().toLowerCase();
+
+    if (!nTrim || !aTrim) { showToast('Nombre y apellido son requeridos', 'error'); return; }
+    if (!eTrim) { showToast('El email es requerido', 'error'); return; }
+    if (eTrim !== ecTrim) { showToast('Los emails no coinciden', 'error'); return; }
     if (!rolVal) { showToast('Selecciona un rol', 'error'); return; }
 
-    // Generate simple password: Nombre + 4 digits
-    const pw = nombreVal.charAt(0).toUpperCase() + nombreVal.slice(1).toLowerCase().replace(/\s/g,'') + Math.floor(1000+Math.random()*9000);
-    const nombreCompleto = nombreVal + ' ' + apellidoVal;
-
-    const btn = document.getElementById('ns-submit-btn');
+    var btn = document.getElementById('ns-submit-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Creando...'; }
 
-    firebase.auth().createUserWithEmailAndPassword(emailVal, pw)
-      .then(function(cred) {
-        var uid = cred.user.uid;
-        return db.collection('staff').doc(uid).set({
-          nombre: nombreCompleto,
-          email: emailVal,
-          rol: rolVal,
-          activo: true,
-          creadoEn: new Date().toISOString()
-        }).then(function() {
-          // Send welcome email with magic link
-          return fetch('/api/send-welcome', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: emailVal,
-              nombre: nombreCompleto,
-              password: pw,
-              isStaff: true
-            })
-          });
-        }).then(function() {
-          logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
-          showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + emailVal, 'success');
-          // Reset form
-          ['ns-nombre','ns-apellido','ns-email','ns-email-confirm'].forEach(function(id){
-            var el = document.getElementById(id); if(el) el.value = '';
-          });
-          var matchEl = document.getElementById('ns-email-match'); if(matchEl) matchEl.textContent = '';
-          if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
-          loadStaff();
-        });
-      })
-      .catch(function(e) {
-        var msg = e.code === 'auth/email-already-in-use' ? 'Este email ya tiene una cuenta' : e.message;
-        showToast('Error: ' + msg, 'error');
+    var nombreCompleto = nTrim + ' ' + aTrim;
+
+    // Use server-side endpoint — NEVER use client-side createUserWithEmailAndPassword
+    fetch('/api/create-staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre: nombreCompleto, email: eTrim, rol: rolVal, secret: 'bepwr2026notify' })
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok: r.ok, data: d}; }); })
+    .then(function(result) {
+      if (!result.ok) {
+        showToast('Error: ' + (result.data.error || 'No se pudo crear'), 'error');
         if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
+        return;
+      }
+      logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
+      showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
+      // Reset form
+      ['ns-nombre','ns-apellido','ns-email','ns-email-confirm'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
       });
+      var matchEl = document.getElementById('ns-email-match'); if(matchEl) matchEl.textContent = '';
+      if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
+      loadStaff();
+    })
+    .catch(function(e) {
+      showToast('Error: ' + e.message, 'error');
+      if (btn) { btn.disabled = false; btn.textContent = 'Agregar al staff'; }
+    });
   }
 
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
