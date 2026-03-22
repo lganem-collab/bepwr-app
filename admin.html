@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+      window._checkPrimerIngreso(user.uid);
         if (s.primerIngreso !== false) {
           setTimeout(function(){ showCambioPassModal(); }, 800);
         }
@@ -1883,15 +1884,10 @@
 
   // Auto-login from magic link
   if (window._magicEmail && window._magicPass) {
-    var _ef = document.getElementById('adm-email');
-    var _pf = document.getElementById('adm-pass');
-    if (_ef && _pf) {
-      _ef.value = window._magicEmail;
-      _pf.value = window._magicPass;
-      window._magicEmail = null;
-      window._magicPass = null;
-      setTimeout(doLogin, 500);
-    }
+    var _mle = window._magicEmail, _mlp = window._magicPass;
+    window._magicEmail = null; window._magicPass = null;
+    firebase.auth().signInWithEmailAndPassword(_mle, _mlp)
+      .catch(function(e){ console.warn('magic login failed:', e.message); });
   }
 
 
@@ -1920,6 +1916,38 @@
     } catch(e) {
       if(errEl) errEl.textContent = 'Error: ' + e.message;
     }
+  };
+
+
+  // Cambio de contraseña primer ingreso staff
+  window.guardarNuevaPass = async function() {
+    var nueva = (document.getElementById('cp-nueva')||{}).value||'';
+    var confirma = (document.getElementById('cp-confirma')||{}).value||'';
+    var errEl = document.getElementById('cp-error');
+    if (nueva.length < 8) { if(errEl) errEl.textContent='M\u00EDnimo 8 caracteres'; return; }
+    if (nueva !== confirma) { if(errEl) errEl.textContent='Las contrase\u00F1as no coinciden'; return; }
+    try {
+      await firebase.auth().currentUser.updatePassword(nueva);
+      // Mark primerIngreso as done
+      var uid2 = firebase.auth().currentUser.uid;
+      await db.collection('staff').doc(uid2).update({ primerIngreso: false });
+      document.getElementById('modal-cambio-pass').style.display = 'none';
+      showToast('Contrase\u00F1a actualizada \u2713', 'success');
+    } catch(e) {
+      if(errEl) errEl.textContent = 'Error: ' + e.message;
+    }
+  };
+
+  // Show password change modal if primerIngreso
+  window._checkPrimerIngreso = function(uid3) {
+    db.collection('staff').doc(uid3).get().then(function(snap) {
+      if (!snap.exists) return;
+      var d = snap.data();
+      if (d.primerIngreso !== false) {
+        var modal = document.getElementById('modal-cambio-pass');
+        if (modal) { modal.style.display = 'flex'; setTimeout(function(){ modal.classList.add('open'); }, 10); }
+      }
+    });
   };
 
 </script>
@@ -2029,6 +2057,28 @@
       </div>
       <div class="modal-footer" style="margin-top:20px">
         <button class="btn btn-primary" onclick="window.guardarNuevaPass()">Guardar contrase&#xF1;a</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: cambio de contraseña primer ingreso -->
+  <div class="modal-overlay" id="modal-cambio-pass" style="display:none;z-index:800">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-title">Cambia tu contrase&#xF1;a</div>
+      <p style="font-size:13px;color:#888;margin:12px 0 20px">Por seguridad, debes establecer una nueva contrase&#xF1;a antes de continuar.</p>
+      <div style="display:grid;gap:14px">
+        <div class="field">
+          <label>NUEVA CONTRASE&#xD1;A *</label>
+          <input type="password" id="cp-nueva" placeholder="M&#xED;nimo 8 caracteres" />
+        </div>
+        <div class="field">
+          <label>CONFIRMAR CONTRASE&#xD1;A *</label>
+          <input type="password" id="cp-confirma" placeholder="Repite la contrase&#xF1;a" />
+        </div>
+        <div id="cp-error" style="color:#f87171;font-size:12px;min-height:16px"></div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px">
+        <button class="btn btn-primary" onclick="window.guardarNuevaPass()" style="width:100%">Guardar contrase&#xF1;a</button>
       </div>
     </div>
   </div>
