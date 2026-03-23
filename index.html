@@ -3,9 +3,33 @@
 <head>
 <script>
   (function(){
+    // Step 1: capture magic link params
     var p=new URLSearchParams(window.location.search);
-    var em=p.get('e'),pw=p.get('p');
-    if(em&&pw){window._magicEmail=em;window._magicPass=pw;history.replaceState({},'',window.location.pathname);}
+    var em=p.get('e'), pw=p.get('p');
+    if(em&&pw){
+      sessionStorage.setItem('ml_e',em);
+      sessionStorage.setItem('ml_p',pw);
+      history.replaceState({},'',window.location.pathname);
+    }
+    // Restore from sessionStorage (after SW reload)
+    var se=sessionStorage.getItem('ml_e'), sp=sessionStorage.getItem('ml_p');
+    if(se&&sp){ window._magicEmail=se; window._magicPass=sp; }
+
+    // Step 2: kill old SW once, then let app run normally
+    if('serviceWorker' in navigator && !sessionStorage.getItem('sw_killed')){
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        if(regs.length===0){ sessionStorage.setItem('sw_killed','1'); return; }
+        sessionStorage.setItem('sw_killed','1');
+        Promise.all(regs.map(function(r){ return r.unregister(); }))
+          .then(function(){ return caches.keys(); })
+          .then(function(keys){ return Promise.all(keys.map(function(k){ return caches.delete(k); })); })
+          .then(function(){ location.reload(true); });
+      });
+    } else {
+      // SW already killed - clear params from sessionStorage now that module will read window._
+      sessionStorage.removeItem('ml_e');
+      sessionStorage.removeItem('ml_p');
+    }
   })();
 </script>
   <meta charset="UTF-8" />
