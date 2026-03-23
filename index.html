@@ -1403,7 +1403,12 @@
       var modal = document.getElementById('modal-cambio-pass-member');
       if (modal) { modal.classList.remove('active'); setTimeout(function(){ modal.style.display='none'; }, 300); }
       showToast('\u00A1Contrase\u00F1a creada! Ya puedes usar tu nueva contrase\u00F1a. \u2713', 'success');
-      if(window.showInstallGuide) window.showInstallGuide();
+      // Show install instructions modal directly
+      var installModal = document.getElementById('modal-install');
+      if (installModal) {
+        installModal.style.display = 'flex';
+        setTimeout(function(){ installModal.classList.add('active'); }, 10);
+      }
     } catch(e) {
       if (errEl) errEl.textContent = 'Error: ' + e.message;
     }
