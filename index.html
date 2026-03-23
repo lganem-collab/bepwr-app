@@ -8,7 +8,6 @@
     var p=new URLSearchParams(window.location.search);
     var em=p.get('e'), pw=p.get('p');
     if(em&&pw){
-      localStorage.removeItem('install_guide_shown'); // reset for new member
       window._magicEmail=em; window._magicPass=pw;
       history.replaceState({},"",window.location.pathname);
     }
@@ -236,6 +235,17 @@
   <!-- APP -->
   <div id="screen-app">
     <!-- MODAL INSTALAR PWA -->
+    <div class="modal-overlay" id="modal-install" style="display:none;z-index:2000">
+      <div class="modal-box" style="max-width:340px;text-align:center;padding:32px 24px">
+        <div style="font-size:40px;margin-bottom:12px">&#x1F4F2;</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:8px">Instala la app</div>
+        <div style="font-size:14px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:left" id="install-instructions"></div>
+        <div id="install-android-btn" style="display:none;margin-bottom:12px">
+          <button onclick="window.triggerPWAInstall()" style="width:100%;background:#FF5C1A;border:none;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer">Instalar ahora</button>
+        </div>
+        <button onclick="closeModal('modal-install')" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">Ya lo har&#xE9; despu&#xE9;s</button>
+      </div>
+    </div>
 
     <div id="notif-banner" onclick="navigate('notif')" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;align-items:center;gap:10px">
       <span style="font-size:18px">&#x1F514;</span>
@@ -583,23 +593,21 @@
       loginScr.classList.remove('active');
       appScr.classList.add('active');
       authReady = true;
-
       // Suscribir push notifications
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
       startNotifListener(user.uid);
-      // Primer ingreso: instrucciones -> terminos -> contraseña
-      if (!localStorage.getItem('install_guide_shown')) {
-        localStorage.setItem('install_guide_shown','1');
-        var im2 = document.getElementById('modal-install');
-        if(im2){ im2.style.display='flex'; setTimeout(function(){ im2.classList.add('active'); },10); }
-      } else if (!cachedUserData.terminosAceptados) {
+      // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
+      if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
         tModal.style.display = 'flex';
         setTimeout(() => tModal.classList.add('active'), 10);
       } else if (cachedUserData.primerIngreso === true) {
         const primerModal = document.getElementById('modal-primer-ingreso');
         if (primerModal) { primerModal.style.display = 'flex'; setTimeout(() => primerModal.classList.add('active'), 10); }
+        // Also show password change
+        const mpass2 = document.getElementById('modal-cambio-pass-member');
+        if (mpass2) { mpass2.style.display='flex'; setTimeout(function(){ mpass2.classList.add('active'); }, 800); }
       }
     } else {
       // Magic link auto-login
@@ -713,8 +721,8 @@
         document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
       }
       document.getElementById('prof-email').textContent = user.email;
-      document.getElementById('prof-phone').textContent = data.telefono || 'Sin datos';
-      let edadStr = 'Sin datos';
+      document.getElementById('prof-phone').textContent = data.telefono || '&#x2014;';
+      let edadStr = '&#x2014;';
       if (data.nacimiento) {
         const hoy = new Date(); const nac = new Date(data.nacimiento);
         let age = hoy.getFullYear() - nac.getFullYear();
@@ -722,14 +730,14 @@
         if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) age--;
         edadStr = age + ' a\u00F1os';
       }
-      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : 'Sin datos';
-      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : 'Sin datos';
+      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '&#x2014;';
+      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '&#x2014;';
 
       // Objetivo
       const obj = data.objetivo || {};
-      document.getElementById('prof-meta').textContent = obj.meta || 'Sin datos';
-      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : 'Sin datos';
-      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : 'Sin datos';
+      document.getElementById('prof-meta').textContent = obj.meta || '&#x2014;';
+      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '&#x2014;';
+      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '&#x2014;';
 
       // M\u00E9tricas Sin datos leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');
@@ -812,32 +820,32 @@
       </div>
       <div class="m-card">
         <div class="m-label">M\u00FAsculo Esquel\u00E9tico</div>
-        <div class="m-value">${m.musculo || 'Sin datos'}<span class="m-unit">kg</span></div>
+        <div class="m-value">${m.musculo || '&#x2014;'}<span class="m-unit">kg</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Corporal</div>
-        <div class="m-value">${m.grasaCorporal || 'Sin datos'}<span class="m-unit">kg</span></div>
+        <div class="m-value">${m.grasaCorporal || '&#x2014;'}<span class="m-unit">kg</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">IMC</div>
-        <div class="m-value">${m.imc || 'Sin datos'}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
+        <div class="m-value">${m.imc || '&#x2014;'}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
         <div class="m-delta green">${m.imc < 25 ? 'Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
       </div>
       <div class="m-card">
         <div class="m-label">PGC</div>
-        <div class="m-value">${m.pgc || 'Sin datos'}<span class="m-unit">%</span></div>
+        <div class="m-value">${m.pgc || '&#x2014;'}<span class="m-unit">%</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Visceral</div>
-        <div class="m-value">${m.grasaVisceral || 'Sin datos'}</div>
+        <div class="m-value">${m.grasaVisceral || '&#x2014;'}</div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Calificaci\u00F3n Inbody</div>
-        <div class="m-value">${m.calificacion || 'Sin datos'}<span class="m-unit">/100</span></div>
+        <div class="m-value">${m.calificacion || '&#x2014;'}<span class="m-unit">/100</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
@@ -1030,6 +1038,7 @@
       const tModal = document.getElementById('modal-terminos');
       tModal.classList.remove('active');
       setTimeout(() => { tModal.style.display = 'none'; }, 300);
+      setTimeout(() => { if(window.showInstallGuide) window.showInstallGuide(); }, 700);
       // Si es primer ingreso, abrir ese modal
       if (cachedUserData.primerIngreso === true) {
         setTimeout(() => {
@@ -1211,15 +1220,15 @@
     } else {
       list.innerHTML = [...cachedMetricas].reverse().map(m => `
         <div class="hist-row" style="flex-direction:column">
-          <div class="hist-date">${m.fecha || 'Sin datos'}</div>
+          <div class="hist-date">${m.fecha || '&#x2014;'}</div>
           <div class="hist-metrics">
-            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">IMC <span>${m.imc || 'Sin datos'}</span></div>
-            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
-            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
-            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
+            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">IMC <span>${m.imc || '&#x2014;'}</span></div>
+            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : '&#x2014;'}</span></div>
+            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || '&#x2014;'}</span></div>
+            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : '&#x2014;'}</span></div>
           </div>
         </div>`).join('');
     }
@@ -1400,22 +1409,6 @@
     }
   };
 
-
-  // Continue flow after install guide
-  window.continueAfterInstall = function() {
-    var im = document.getElementById('modal-install');
-    if(im){ im.classList.remove('active'); setTimeout(function(){ im.style.display='none'; }, 300); }
-    // Check what's next: terms or password
-    setTimeout(function(){
-      if (cachedUserData && !cachedUserData.terminosAceptados) {
-        var tModal = document.getElementById('modal-terminos');
-        if(tModal){ tModal.style.display='flex'; setTimeout(function(){ tModal.classList.add('active'); },10); }
-      } else if (cachedUserData && cachedUserData.primerIngreso === true) {
-        var pm = document.getElementById('modal-cambio-pass-member');
-        if(pm){ pm.style.display='flex'; setTimeout(function(){ pm.classList.add('active'); },10); }
-      }
-    }, 400);
-  };
 </script>
 
   <!-- Modal cambio de contraseña primer ingreso miembros -->
@@ -1445,18 +1438,5 @@
       </div>
     </div>
   </div>
-
-    <div class="modal-overlay" id="modal-install" style="display:none;z-index:2000;align-items:center;justify-content:center">
-      <div class="modal-box" style="max-width:340px;text-align:center;padding:32px 24px">
-        <div style="font-size:40px;margin-bottom:12px">&#x1F4F2;</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:8px">Instala la app</div>
-        <div style="font-size:14px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:left" id="install-instructions"></div>
-        <div id="install-android-btn" style="display:none;margin-bottom:12px">
-          <button onclick="window.triggerPWAInstall(); setTimeout(window.continueAfterInstall, 1000);" style="width:100%;background:#FF5C1A;border:none;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer">Instalar ahora</button>
-        </div>
-        <button onclick="closeModal('modal-install'); window.continueAfterInstall();" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">Ya lo har&#xE9; despu&#xE9;s</button>
-      </div>
-    </div>
-
 </body>
 </html>
