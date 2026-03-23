@@ -1038,7 +1038,6 @@
       const tModal = document.getElementById('modal-terminos');
       tModal.classList.remove('active');
       setTimeout(() => { tModal.style.display = 'none'; }, 300);
-      setTimeout(() => { if(window.showInstallGuide) window.showInstallGuide(); }, 700);
       // Si es primer ingreso, abrir ese modal
       if (cachedUserData.primerIngreso === true) {
         setTimeout(() => {
