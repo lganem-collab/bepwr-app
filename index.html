@@ -1114,7 +1114,6 @@
     if (!modal || !instr) return;
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isAndroid = /android/i.test(navigator.userAgent);
     if (isIOS) {
       instr.innerHTML = '<strong>Para instalar en iPhone/iPad:</strong><br><br>'
         + '1. Toca el bot\u00F3n <strong>Compartir</strong> &#x2197; en Safari<br>'
