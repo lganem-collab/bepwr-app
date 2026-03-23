@@ -588,7 +588,7 @@
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
       startNotifListener(user.uid);
-      // Mostrar instrucciones primero, luego términos
+      // Primer ingreso: instrucciones -> terminos -> contraseña
       if (!localStorage.getItem('install_guide_shown')) {
         localStorage.setItem('install_guide_shown','1');
         var im2 = document.getElementById('modal-install');
@@ -597,6 +597,9 @@
         const tModal = document.getElementById('modal-terminos');
         tModal.style.display = 'flex';
         setTimeout(() => tModal.classList.add('active'), 10);
+      } else if (cachedUserData.primerIngreso === true) {
+        const primerModal = document.getElementById('modal-primer-ingreso');
+        if (primerModal) { primerModal.style.display = 'flex'; setTimeout(() => primerModal.classList.add('active'), 10); }
       }
     } else {
       // Magic link auto-login
