@@ -593,6 +593,13 @@
       loginScr.classList.remove('active');
       appScr.classList.add('active');
       authReady = true;
+      if (sessionStorage.getItem('show_install_guide')) {
+        sessionStorage.removeItem('show_install_guide');
+        setTimeout(function(){
+          var im = document.getElementById('modal-install');
+          if(im){ im.style.display='flex'; setTimeout(function(){ im.classList.add('active'); },10); }
+        }, 600);
+      }
       // Suscribir push notifications
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
@@ -1403,12 +1410,8 @@
       var modal = document.getElementById('modal-cambio-pass-member');
       if (modal) { modal.classList.remove('active'); setTimeout(function(){ modal.style.display='none'; }, 300); }
       showToast('\u00A1Contrase\u00F1a creada! Ya puedes usar tu nueva contrase\u00F1a. \u2713', 'success');
-      // Show install instructions modal directly
-      var installModal = document.getElementById('modal-install');
-      if (installModal) {
-        installModal.style.display = 'flex';
-        setTimeout(function(){ installModal.classList.add('active'); }, 10);
-      }
+      // Set flag so install guide shows once app loads
+      sessionStorage.setItem('show_install_guide', '1');
     } catch(e) {
       if (errEl) errEl.textContent = 'Error: ' + e.message;
     }
