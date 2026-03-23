@@ -241,9 +241,9 @@
         <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:8px">Instala la app</div>
         <div style="font-size:14px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:left" id="install-instructions"></div>
         <div id="install-android-btn" style="display:none;margin-bottom:12px">
-          <button onclick="window.triggerPWAInstall()" style="width:100%;background:#FF5C1A;border:none;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer">Instalar ahora</button>
+          <button onclick="window.triggerPWAInstall(); setTimeout(window.continueAfterInstall, 1000);" style="width:100%;background:#FF5C1A;border:none;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer">Instalar ahora</button>
         </div>
-        <button onclick="closeModal('modal-install')" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">Ya lo har&#xE9; despu&#xE9;s</button>
+        <button onclick="closeModal('modal-install'); window.continueAfterInstall();" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">Ya lo har&#xE9; despu&#xE9;s</button>
       </div>
     </div>
 
@@ -593,25 +593,23 @@
       loginScr.classList.remove('active');
       appScr.classList.add('active');
       authReady = true;
-      if (sessionStorage.getItem('show_install_guide')) {
-        sessionStorage.removeItem('show_install_guide');
-        setTimeout(function(){
-          var im = document.getElementById('modal-install');
-          if(im){ im.style.display='flex'; setTimeout(function(){ im.classList.add('active'); },10); }
-        }, 600);
-      }
+
       // Suscribir push notifications
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
       startNotifListener(user.uid);
       // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
-      if (!cachedUserData.terminosAceptados) {
+      if (!cachedUserData.terminosAceptados || cachedUserData.primerIngreso === true) {
+        // New flow: install guide -> terminos -> cambio password
+        const installModal = document.getElementById('modal-install');
         const tModal = document.getElementById('modal-terminos');
-        tModal.style.display = 'flex';
-        setTimeout(() => tModal.classList.add('active'), 10);
-      } else if (cachedUserData.primerIngreso === true) {
-        const primerModal = document.getElementById('modal-primer-ingreso');
-        if (primerModal) { primerModal.style.display = 'flex'; setTimeout(() => primerModal.classList.add('active'), 10); }
+        const passModal = document.getElementById('modal-cambio-pass-member');
+        // Step 1: show install guide if not shown before
+        // Step 1: always show install guide first
+          if (installModal) {
+            installModal.style.display = 'flex';
+            setTimeout(function(){ installModal.classList.add('active'); }, 10);
+          }
         // Also show password change
         const mpass2 = document.getElementById('modal-cambio-pass-member');
         if (mpass2) { mpass2.style.display='flex'; setTimeout(function(){ mpass2.classList.add('active'); }, 800); }
@@ -1410,13 +1408,27 @@
       var modal = document.getElementById('modal-cambio-pass-member');
       if (modal) { modal.classList.remove('active'); setTimeout(function(){ modal.style.display='none'; }, 300); }
       showToast('\u00A1Contrase\u00F1a creada! Ya puedes usar tu nueva contrase\u00F1a. \u2713', 'success');
-      // Set flag so install guide shows once app loads
-      sessionStorage.setItem('show_install_guide', '1');
     } catch(e) {
       if (errEl) errEl.textContent = 'Error: ' + e.message;
     }
   };
 
+
+  // Continue flow after install guide
+  window.continueAfterInstall = function() {
+    var im = document.getElementById('modal-install');
+    if(im){ im.classList.remove('active'); setTimeout(function(){ im.style.display='none'; }, 300); }
+    // Check what's next: terms or password
+    setTimeout(function(){
+      if (cachedUserData && !cachedUserData.terminosAceptados) {
+        var tModal = document.getElementById('modal-terminos');
+        if(tModal){ tModal.style.display='flex'; setTimeout(function(){ tModal.classList.add('active'); },10); }
+      } else if (cachedUserData && cachedUserData.primerIngreso === true) {
+        var pm = document.getElementById('modal-cambio-pass-member');
+        if(pm){ pm.style.display='flex'; setTimeout(function(){ pm.classList.add('active'); },10); }
+      }
+    }, 400);
+  };
 </script>
 
   <!-- Modal cambio de contraseña primer ingreso miembros -->
