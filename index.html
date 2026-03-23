@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
   <meta charset="UTF-8" />
   <script>
   // Clean magic link params IMMEDIATELY so PWA install works
@@ -722,8 +721,8 @@
         document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
       }
       document.getElementById('prof-email').textContent = user.email;
-      document.getElementById('prof-phone').textContent = data.telefono || 'Sin datos';
-      let edadStr = 'Sin datos';
+      document.getElementById('prof-phone').textContent = data.telefono || '&#x2014;';
+      let edadStr = '&#x2014;';
       if (data.nacimiento) {
         const hoy = new Date(); const nac = new Date(data.nacimiento);
         let age = hoy.getFullYear() - nac.getFullYear();
@@ -731,14 +730,14 @@
         if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) age--;
         edadStr = age + ' a\u00F1os';
       }
-      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : 'Sin datos';
-      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : 'Sin datos';
+      document.getElementById('prof-dob').textContent = data.nacimiento ? data.nacimiento + ' (' + edadStr + ')' : '&#x2014;';
+      document.getElementById('prof-altura').textContent = data.altura ? data.altura + ' cm' : '&#x2014;';
 
       // Objetivo
       const obj = data.objetivo || {};
-      document.getElementById('prof-meta').textContent = obj.meta || 'Sin datos';
-      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : 'Sin datos';
-      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : 'Sin datos';
+      document.getElementById('prof-meta').textContent = obj.meta || '&#x2014;';
+      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : '&#x2014;';
+      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : '&#x2014;';
 
       // M\u00E9tricas Sin datos leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');
@@ -821,32 +820,32 @@
       </div>
       <div class="m-card">
         <div class="m-label">M\u00FAsculo Esquel\u00E9tico</div>
-        <div class="m-value">${m.musculo || 'Sin datos'}<span class="m-unit">kg</span></div>
+        <div class="m-value">${m.musculo || '&#x2014;'}<span class="m-unit">kg</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Corporal</div>
-        <div class="m-value">${m.grasaCorporal || 'Sin datos'}<span class="m-unit">kg</span></div>
+        <div class="m-value">${m.grasaCorporal || '&#x2014;'}<span class="m-unit">kg</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">IMC</div>
-        <div class="m-value">${m.imc || 'Sin datos'}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
+        <div class="m-value">${m.imc || '&#x2014;'}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
         <div class="m-delta green">${m.imc < 25 ? 'Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
       </div>
       <div class="m-card">
         <div class="m-label">PGC</div>
-        <div class="m-value">${m.pgc || 'Sin datos'}<span class="m-unit">%</span></div>
+        <div class="m-value">${m.pgc || '&#x2014;'}<span class="m-unit">%</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Grasa Visceral</div>
-        <div class="m-value">${m.grasaVisceral || 'Sin datos'}</div>
+        <div class="m-value">${m.grasaVisceral || '&#x2014;'}</div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
         <div class="m-label">Calificaci\u00F3n Inbody</div>
-        <div class="m-value">${m.calificacion || 'Sin datos'}<span class="m-unit">/100</span></div>
+        <div class="m-value">${m.calificacion || '&#x2014;'}<span class="m-unit">/100</span></div>
         <div class="m-delta green">Medici\u00F3n actual</div>
       </div>
       <div class="m-card">
@@ -1039,6 +1038,7 @@
       const tModal = document.getElementById('modal-terminos');
       tModal.classList.remove('active');
       setTimeout(() => { tModal.style.display = 'none'; }, 300);
+      setTimeout(() => { if(window.showInstallGuide) window.showInstallGuide(); }, 700);
       // Si es primer ingreso, abrir ese modal
       if (cachedUserData.primerIngreso === true) {
         setTimeout(() => {
@@ -1102,7 +1102,7 @@
   window.toggleModalPass = (inputId, btn) => {
     const inp = document.getElementById(inputId);
     inp.type = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? 'VER' : 'OK'';
+    btn.textContent = inp.type === 'password' ? 'VER' : 'OK';
   };
 
   // &#x2500;&#x2500; MODAL EDITAR INFORMACI&#xD3;N &#x2500;&#x2500;
@@ -1220,15 +1220,15 @@
     } else {
       list.innerHTML = [...cachedMetricas].reverse().map(m => `
         <div class="hist-row" style="flex-direction:column">
-          <div class="hist-date">${m.fecha || 'Sin datos'}</div>
+          <div class="hist-date">${m.fecha || '&#x2014;'}</div>
           <div class="hist-metrics">
-            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">IMC <span>${m.imc || 'Sin datos'}</span></div>
-            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
-            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
-            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
+            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : '&#x2014;'}</span></div>
+            <div class="hist-metric">IMC <span>${m.imc || '&#x2014;'}</span></div>
+            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : '&#x2014;'}</span></div>
+            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || '&#x2014;'}</span></div>
+            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : '&#x2014;'}</span></div>
           </div>
         </div>`).join('');
     }
@@ -1404,37 +1404,14 @@
       var modal = document.getElementById('modal-cambio-pass-member');
       if (modal) { modal.classList.remove('active'); setTimeout(function(){ modal.style.display='none'; }, 300); }
       showToast('\u00A1Contrase\u00F1a creada! Ya puedes usar tu nueva contrase\u00F1a. \u2713', 'success');
-      setTimeout(function(){ try{ if(typeof showInstallGuide!=="undefined") showInstallGuide(); else if(window.showInstallGuide) window.showInstallGuide(); }catch(e){} }, 1200);
     } catch(e) {
       if (errEl) errEl.textContent = 'Error: ' + e.message;
     }
   };
 
-
-  // Eye toggle for password modal
-  (function() {
-    function init() {
-      var e1 = document.getElementById('mp-eye1');
-      var e2 = document.getElementById('mp-eye2');
-      if (e1) e1.addEventListener('click', function() {
-        var inp = document.getElementById('mp-nueva');
-        if (!inp) return;
-        inp.type = inp.type === 'password' ? 'text' : 'password';
-        e1.textContent = inp.type === 'password' ? 'VER' : 'OK';
-      });
-      if (e2) e2.addEventListener('click', function() {
-        var inp = document.getElementById('mp-confirma');
-        if (!inp) return;
-        inp.type = inp.type === 'password' ? 'text' : 'password';
-        e2.textContent = inp.type === 'password' ? 'VER' : 'OK';
-      });
-    }
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else setTimeout(init, 500);
-  })();
 </script>
 
-  <!-- Modal cambio contrasena miembros -->
+  <!-- Modal cambio de contraseña primer ingreso miembros -->
   <div class="modal-overlay" id="modal-cambio-pass-member" style="display:none;z-index:800">
     <div class="modal" style="max-width:400px">
       <div class="modal-title">Crea tu contrase&#xF1;a</div>
@@ -1443,15 +1420,15 @@
         <div class="field">
           <label>NUEVA CONTRASE&#xD1;A</label>
           <div style="position:relative;display:flex;align-items:center">
-            <input type="password" id="mp-nueva" placeholder="Min 8 caracteres" style="flex:1;padding-right:50px"/>
-            <button type="button" id="mp-eye1" style="position:absolute;right:8px;background:none;border:none;cursor:pointer;font-size:13px;color:#888;padding:4px 6px;font-family:monospace">VER</button>
+            <input type="password" id="mp-nueva" placeholder="M&#xED;nimo 8 caracteres" style="flex:1;padding-right:44px"/>
+            <span onclick="var e=document.getElementById('mp-nueva');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'VER':'OK'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">VER</span>
           </div>
         </div>
         <div class="field">
           <label>CONFIRMAR CONTRASE&#xD1;A</label>
           <div style="position:relative;display:flex;align-items:center">
-            <input type="password" id="mp-confirma" placeholder="Repite la contrase&#xF1;a" style="flex:1;padding-right:50px"/>
-            <button type="button" id="mp-eye2" style="position:absolute;right:8px;background:none;border:none;cursor:pointer;font-size:13px;color:#888;padding:4px 6px;font-family:monospace">VER</button>
+            <input type="password" id="mp-confirma" placeholder="Repite la contrase&#xF1;a" style="flex:1;padding-right:44px"/>
+            <span onclick="var e=document.getElementById('mp-confirma');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'VER':'OK'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">VER</span>
           </div>
         </div>
         <div id="mp-error" style="color:#f87171;font-size:12px;min-height:16px;text-align:center"></div>
