@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      regs.forEach(function(r) { r.unregister(); });
+      if(regs.length > 0 && !sessionStorage.getItem('sw_cleared')) {
+        sessionStorage.setItem('sw_cleared','1');
+        location.reload(true);
+      }
+    });
+  }
+</script>
   <meta charset="UTF-8" />
   <script>
   // Clean magic link params IMMEDIATELY so PWA install works
