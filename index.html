@@ -8,6 +8,7 @@
     var p=new URLSearchParams(window.location.search);
     var em=p.get('e'), pw=p.get('p');
     if(em&&pw){
+      localStorage.removeItem('install_guide_shown'); // reset for new member
       window._magicEmail=em; window._magicPass=pw;
       history.replaceState({},"",window.location.pathname);
     }
