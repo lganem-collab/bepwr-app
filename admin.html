@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+          <input type="text" id="notif-user-search" placeholder="Buscar nombre, apellido o email..." style="width:100%;margin-bottom:6px" oninput="filterNotifUsers(this.value)"/>
+<!DOCTYPE html> confirmEl.blur();
 <html lang="es">
 <head>
 <script>
@@ -1984,6 +1985,21 @@
     }).catch(function(){});
   };
 
+
+  window.filterNotifUsers = function(q) {
+    const sel = document.getElementById('notif-user');
+    if (!sel) return;
+    const query = (q || '').toLowerCase().trim();
+    sel.innerHTML = '<option value="">Seleccionar miembro</option>';
+    (window._notifAllUsers || []).forEach(function(u) {
+      if (!query || u.label.toLowerCase().includes(query)) {
+        const o = document.createElement('option');
+        o.value = u.token;
+        o.textContent = u.label;
+        sel.appendChild(o);
+      }
+    });
+  };
 </script>
 <!-- MODAL PERFIL STAFF -->
 <div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
