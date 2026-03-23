@@ -235,17 +235,6 @@
   <!-- APP -->
   <div id="screen-app">
     <!-- MODAL INSTALAR PWA -->
-    <div class="modal-overlay" id="modal-install" style="display:none;z-index:2000">
-      <div class="modal-box" style="max-width:340px;text-align:center;padding:32px 24px">
-        <div style="font-size:40px;margin-bottom:12px">&#x1F4F2;</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:8px">Instala la app</div>
-        <div style="font-size:14px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:left" id="install-instructions"></div>
-        <div id="install-android-btn" style="display:none;margin-bottom:12px">
-          <button onclick="window.triggerPWAInstall(); setTimeout(window.continueAfterInstall, 1000);" style="width:100%;background:#FF5C1A;border:none;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer">Instalar ahora</button>
-        </div>
-        <button onclick="closeModal('modal-install'); window.continueAfterInstall();" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">Ya lo har&#xE9; despu&#xE9;s</button>
-      </div>
-    </div>
 
     <div id="notif-banner" onclick="navigate('notif')" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#FF5C1A,#ff8c00);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;font-family:DM Sans,sans-serif;box-shadow:0 4px 20px rgba(255,92,26,.4);cursor:pointer;align-items:center;gap:10px">
       <span style="font-size:18px">&#x1F514;</span>
@@ -598,21 +587,15 @@
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
       startNotifListener(user.uid);
-      // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
-      if (!cachedUserData.terminosAceptados || cachedUserData.primerIngreso === true) {
-        // New flow: install guide -> terminos -> cambio password
-        const installModal = document.getElementById('modal-install');
+      // Mostrar instrucciones primero, luego términos
+      if (!localStorage.getItem('install_guide_shown')) {
+        localStorage.setItem('install_guide_shown','1');
+        var im2 = document.getElementById('modal-install');
+        if(im2){ im2.style.display='flex'; setTimeout(function(){ im2.classList.add('active'); },10); }
+      } else if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
-        const passModal = document.getElementById('modal-cambio-pass-member');
-        // Step 1: show install guide if not shown before
-        // Step 1: always show install guide first
-          if (installModal) {
-            installModal.style.display = 'flex';
-            setTimeout(function(){ installModal.classList.add('active'); }, 10);
-          }
-        // Also show password change
-        const mpass2 = document.getElementById('modal-cambio-pass-member');
-        if (mpass2) { mpass2.style.display='flex'; setTimeout(function(){ mpass2.classList.add('active'); }, 800); }
+        tModal.style.display = 'flex';
+        setTimeout(() => tModal.classList.add('active'), 10);
       }
     } else {
       // Magic link auto-login
@@ -1458,5 +1441,17 @@
       </div>
     </div>
   </div>
+    <div class="modal-overlay" id="modal-install" style="display:none;z-index:2000">
+      <div class="modal-box" style="max-width:340px;text-align:center;padding:32px 24px">
+        <div style="font-size:40px;margin-bottom:12px">&#x1F4F2;</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:8px">Instala la app</div>
+        <div style="font-size:14px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:left" id="install-instructions"></div>
+        <div id="install-android-btn" style="display:none;margin-bottom:12px">
+          <button onclick="window.triggerPWAInstall(); setTimeout(window.continueAfterInstall, 1000);" style="width:100%;background:#FF5C1A;border:none;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer">Instalar ahora</button>
+        </div>
+        <button onclick="closeModal('modal-install'); window.continueAfterInstall();" style="width:100%;background:#2a2a2a;border:none;color:#aaa;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">Ya lo har&#xE9; despu&#xE9;s</button>
+      </div>
+    </div>
+
 </body>
 </html>
