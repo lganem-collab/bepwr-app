@@ -1446,20 +1446,73 @@
   };
 
   window.confirmDeleteBitacora = async function() {
-    var val = (document.getElementById('del-bita-inp') || {}).value || '';
-    var errEl = document.getElementById('del-bita-err');
-    if (val.trim() !== window._delCode) { if(errEl) errEl.textContent='C\u00F3digo incorrecto'; return; }
-    try {
-      var snap = await db.collection('bitacora').limit(500).get();
-      var batch = db.batch();
-      snap.docs.forEach(function(d){ batch.delete(d.ref); });
+  var val = (document.getElementById('del-bita-inp') || {}).value || '';
+  var errEl = document.getElementById('del-bita-err');
+
+  // Solo Admin Maestro
+  if (!auth.currentUser || auth.currentUser.uid !== MASTER_UID) {
+    if (errEl) errEl.textContent = 'Solo el Admin Maestro puede borrar la bitácora';
+    return;
+  }
+
+  if (val.trim() !== window._delCode) {
+    if (errEl) errEl.textContent = 'Código incorrecto';
+    return;
+  }
+
+  // Leer filtros actuales para decidir qué borrar
+  var accionFiltro = (document.getElementById('bita-filter-accion') || {}).value || '';
+  var desdeStr     = (document.getElementById('bita-filter-desde') || {}).value || '';
+  var hastaStr     = (document.getElementById('bita-filter-hasta') || {}).value || '';
+
+  try {
+    let query = db.collection('bitacora');
+
+    // Si hay filtro de acción (evento), filtramos por ese tipo
+    if (accionFiltro) {
+      query = query.where('accion', '==', accionFiltro);
+    }
+
+    // Si hay rango de fechas, asumimos que el campo 'fecha' es un timestamp/date
+    let desdeDate = null, hastaDate = null;
+
+    if (desdeStr) {
+      desdeDate = new Date(desdeStr + 'T00:00:00');
+      query = query.where('fecha', '>=', desdeDate);
+    }
+
+    if (hastaStr) {
+      hastaDate = new Date(hastaStr + 'T23:59:59');
+      query = query.where('fecha', '<=', hastaDate);
+    }
+
+    // Si NO hay ningún filtro, entonces borra TODO (comportamiento actual)
+    // pero siempre limitado a lotes de 500
+    let totalDeleted = 0;
+    while (true) {
+      const snap = await query.limit(500).get();
+      if (snap.empty) break;
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
       await batch.commit();
-      window._delCode = null;
-      var ov = document.getElementById('del-bita-ov'); if(ov) document.body.removeChild(ov);
-      showToast('Bit\u00E1cora borrada', 'success');
-      loadBitacora();
-    } catch(e) { var errEl=document.getElementById('del-bita-err'); if(errEl) errEl.textContent='Error: '+e.message; }
-  };
+      totalDeleted += snap.docs.length;
+      if (snap.docs.length < 500) break;
+    }
+
+    window._delCode = null;
+    var ov = document.getElementById('del-bita-ov'); 
+    if (ov) document.body.removeChild(ov);
+
+    if (totalDeleted === 0) {
+      showToast('No se encontraron registros para borrar con esos filtros', 'error');
+    } else {
+      showToast('Bitácora borrada (' + totalDeleted + ' registro(s))', 'success');
+    }
+    loadBitacora();
+  } catch(e) {
+    if (errEl) errEl.textContent = 'Error: ' + e.message;
+  }
+};
 
   async function editMetrica(uid, metricId) {
     if (window.currentStaffRole !== 'admin') return;
