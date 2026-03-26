@@ -517,10 +517,18 @@
           const rolBadge = window.currentStaffRole === 'admin' ? '&#x1F511; Admin' : '&#x1F45F; Coach';
           document.getElementById('staff-name').innerHTML = `${staffData.nombre || user.email} <span style="font-size:10px;color:var(--orange);font-family:Space Mono,monospace;letter-spacing:1px">${rolBadge}</span>`;
           if (window.currentStaffRole === 'admin') {
-            document.getElementById('tab-staff').style.display = 'inline-block';
-            document.getElementById('tab-notify').style.display = 'inline-block';
-            if (uid === MASTER_UID) document.getElementById('tab-bitacora').style.display = 'inline-block';
-          }
+  const tabStaff  = document.getElementById('tab-staff');
+  const tabNotify = document.getElementById('tab-notify');
+  if (tabStaff)  tabStaff.style.display  = 'inline-block';
+  if (tabNotify) tabNotify.style.display = 'inline-block';
+}
+
+// Solo Admin Maestro ve la bitácora
+if (user && user.uid === MASTER_UID) {
+  const tabBita = document.getElementById('tab-bitacora');
+  if (tabBita) tabBita.style.display = 'inline-block';
+}
+
         } catch(domErr) { console.error('DOM error:', domErr); }
         try {
           loadMembers();
