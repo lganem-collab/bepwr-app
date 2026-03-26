@@ -1150,7 +1150,7 @@ if (user && user.uid === MASTER_UID) {
   }
 
   // OPEN DETAIL
-  async function openDetail(uid) { window._detailUid = uid; var _m=(window._allMembers||[]).find(x=>x.uid===uid); window._detailNombre=_m?_m.nombre:'';
+  async function openDetail(uid) { window._detailUid = uid; window.currentDetailMemberUID = uid; var _m=(window._allMembers||[]).find(x=>x.uid===uid); window._detailNombre=_m?_m.nombre:'';
     const m = (window._allMembers||[]).find(x => x.uid === uid);
     if (!m) return;
     const initials = (m.nombre||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
