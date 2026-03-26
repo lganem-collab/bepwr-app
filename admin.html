@@ -2055,20 +2055,31 @@ if (user && user.uid === MASTER_UID) {
   };
 
 
-  window.filterNotifUsers = function(q) {
-    const sel = document.getElementById('notif-user');
-    if (!sel) return;
-    const query = (q || '').toLowerCase().trim();
-    sel.innerHTML = '<option value="">Seleccionar miembro</option>';
-    (window._notifAllUsers || []).forEach(function(u) {
-      if (!query || u.label.toLowerCase().includes(query)) {
-        const o = document.createElement('option');
-        o.value = u.token;
-        o.textContent = u.label;
-        sel.appendChild(o);
-      }
-    });
-  };
+  // Búsqueda predictiva de destinatarios para envío individual
+window.filterNotifUsers = function (q) {
+  const sel = document.getElementById('notif-member');
+  if (!sel || !window.allMembers) return;
+
+  const query = (q || '').toLowerCase().trim();
+
+  // Limpiar opciones actuales
+  sel.innerHTML = '<option value="">Selecciona un miembro...</option>';
+
+  // Tomar solo miembros activos
+  const candidates = window.allMembers.filter(m => m.activo !== false);
+
+  candidates.forEach(function (m) {
+    const label = (m.nombre + ' ' + (m.email || '')).toLowerCase();
+
+    if (!query || label.includes(query)) {
+      const o = document.createElement('option');
+      o.value = m.uid;                         // uid del miembro
+      o.textContent = m.nombre + ' — ' + m.email;
+      sel.appendChild(o);
+    }
+  });
+};
+
 </script>
 <!-- MODAL PERFIL STAFF -->
 <div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
