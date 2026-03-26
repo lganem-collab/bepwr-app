@@ -776,6 +776,13 @@ if (user && user.uid === MASTER_UID) {
   window.openNotifyForMember = function (uid) {
   if (!uid) return;
 
+  // Cerrar el modal de detalle si está abierto
+  const modalDetail = document.getElementById('modal-detail');
+  if (modalDetail) {
+    modalDetail.classList.remove('open');
+    modalDetail.style.display = 'none';
+  }
+
   // Ir a la pestaña de “Envío de Avisos”
   switchTab('notify');
 
@@ -803,6 +810,7 @@ if (user && user.uid === MASTER_UID) {
   const count = document.getElementById('notif-body-count');
   if (count) count.textContent = '0';
 };
+
 
   
   window.openNotifyForMember = function (uid) {
