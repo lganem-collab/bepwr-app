@@ -915,6 +915,11 @@ function renderProfileMetrics(m) {
   document.getElementById('val-pgc').innerHTML = m.pgc != null ? m.pgc + '%' : sd;
   document.getElementById('val-grasa-visc').innerHTML = m.grasaVisceral || sd;
   document.getElementById('val-calificacion').innerHTML = m.calificacion ? m.calificacion + '/100' : sd;
+  document.getElementById('val-brazo').innerHTML = m.brazo != null ? m.brazo + ' cm' : sd;
+  document.getElementById('val-abdomen').innerHTML = m.abdomen != null ? m.abdomen + ' cm' : sd;
+  document.getElementById('val-cintura').innerHTML = m.cintura != null ? m.cintura + ' cm' : sd;
+  document.getElementById('val-cadera').innerHTML = m.cadera != null ? m.cadera + ' cm' : sd;
+  document.getElementById('val-pantorrilla').innerHTML = m.pantorrilla != null ? m.pantorrilla + ' cm' : sd;
   document.getElementById('val-fecha').innerHTML = m.fecha || sd;
 }
   // NOTIFICACIONES (modular Firestore API)
