@@ -1218,13 +1218,20 @@ if (user && user.uid === MASTER_UID) {
         <div class="field"><label>IMC actual</label><input type="number" value="${m.ultimaMetrica?.imc||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
         <div class="field"><label>IMC meta</label><input type="number" id="edit-imc-meta" value="${m.objetivo?.imcMeta||''}" step="0.1" placeholder="24" /></div>
       </div>
-      <button class="btn btn-primary btn-sm" style="margin-bottom:20px" onclick="saveMemberEdit('${uid}')" ${window.currentStaffRole !== 'admin' ? 'disabled title="Solo admin puede editar datos"' : ''}>
+            <button class="btn btn-primary btn-sm" style="margin-bottom:20px" onclick="saveMemberEdit('${uid}')" ${window.currentStaffRole !== 'admin' ? 'disabled title="Solo admin puede editar datos"' : ''}>
         ${window.currentStaffRole !== 'admin' ? '&#x1F512; Editar datos (solo admin)' : 'Guardar cambios'}
       </button>
+
+      <!-- Nuevo botón: enviar aviso directo a este miembro -->
+      <button class="btn btn-secondary btn-sm" style="margin-left:8px;margin-bottom:20px" onclick="openNotifyForMember('${uid}')">
+        &#x1F4E3; Enviar aviso a este miembro
+      </button>
+
       <div class="modal-section">Historial de valoraciones</div>
       ${histHTML}
       <button class="btn btn-success btn-sm" style="margin-top:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoraci\u00F3n</button>
     `;
+
     document.getElementById('modal-detail').classList.add('open');
   }
 
