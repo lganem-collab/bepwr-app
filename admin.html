@@ -1715,8 +1715,26 @@ if (user && user.uid === MASTER_UID) {
     const grasaVisc  = parseFloat(document.getElementById('m-grasa-visc').value);
     const calific    = parseFloat(document.getElementById('m-calificacion').value);
     const fecha      = fmtDate(document.getElementById('m-fecha').value.trim());
+    const brazo      = parseFloat(document.getElementById('m-brazo').value);
+    const abdomen    = parseFloat(document.getElementById('m-abdomen').value);
+    const cintura    = parseFloat(document.getElementById('m-cintura').value);
+    const cadera     = parseFloat(document.getElementById('m-cadera').value);
+    const pantorrilla= parseFloat(document.getElementById('m-pantorrilla').value);
     const errEl = document.getElementById('metrics-error');
     errEl.textContent = '';
+    const medidasVal = [
+  { val: brazo,        nombre: 'Brazo',       min: 15, max: 60  },
+  { val: abdomen,      nombre: 'Abdomen',     min: 50, max: 200 },
+  { val: cintura,      nombre: 'Cintura',     min: 40, max: 180 },
+  { val: cadera,       nombre: 'Cadera',      min: 50, max: 200 },
+  { val: pantorrilla,  nombre: 'Pantorrilla', min: 20, max: 60  },
+];
+for (const med of medidasVal) {
+  if (!isNaN(med.val) && (med.val < med.min || med.val > med.max)) {
+    errEl.textContent = `${med.nombre} debe estar entre ${med.min} y ${med.max} cm`;
+    return;
+  }
+}
     if (!peso || !fecha) { errEl.textContent = 'Peso y fecha son obligatorios'; return; }
     try {
       const miembroDoc = await db.collection('usuarios').doc(uid).get();
@@ -1727,6 +1745,11 @@ if (user && user.uid === MASTER_UID) {
         imc: isNaN(imc)?null:imc, pgc: isNaN(pgc)?null:pgc,
         grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
         calificacion: isNaN(calific)?null:calific,
+        brazo:       isNaN(brazo)       ? null : brazo,
+        abdomen:     isNaN(abdomen)     ? null : abdomen,
+        cintura:     isNaN(cintura)     ? null : cintura,
+        cadera:      isNaN(cadera)      ? null : cadera,
+        pantorrilla: isNaN(pantorrilla) ? null : pantorrilla,
         fecha, registradoPor: auth.currentUser?.uid || null, miembroNombre
       };
       if (window._editingMetricId) {
