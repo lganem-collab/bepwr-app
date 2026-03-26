@@ -1425,7 +1425,7 @@ if (user && user.uid === MASTER_UID) {
     document.getElementById('metrics-uid').value = uid;
     document.getElementById('metrics-modal-sub').textContent = nombre;
     document.getElementById('metrics-error').textContent = '';
-    ['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion'].forEach(id => document.getElementById(id).value = '');
+['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion'].forEach(id => document.getElementById(id).value = '');
     const now = new Date();
     document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     document.getElementById('modal-metrics').classList.add('open');
