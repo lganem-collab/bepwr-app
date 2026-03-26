@@ -1,4 +1,3 @@
-          <input type="text" id="notif-user-search" placeholder="Buscar nombre, apellido o email..." style="width:100%;margin-bottom:6px" oninput="filterNotifUsers(this.value)"/>
 <!DOCTYPE html> confirmEl.blur();
 <html lang="es">
 <head>
@@ -395,6 +394,15 @@
               <option value="objetivo:Est&#xE9;tica / composici&#xF3;n equilibrada">&#x2728; Est&#xE9;tica / composici&#xF3;n equilibrada</option>
             </optgroup>
           </select>
+          <!-- Buscador de miembros para avisos -->
+<input
+  type="text"
+  id="notif-user-search"
+  placeholder="Buscar nombre, apellido o email..."
+  style="width:100%;margin-bottom:6px"
+  oninput="filterNotifUsers(this.value)"
+/>
+
           <select id="notif-member" style="display:none;margin-top:8px;width:100%;background:#141414;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--white);font-family:'DM Sans',sans-serif">
             <option value="">Selecciona un miembro...</option>
           </select>
