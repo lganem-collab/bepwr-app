@@ -2001,42 +2001,6 @@ if (user && user.uid === MASTER_UID) {
     setTimeout(function(){ modal.classList.add('open'); }, 10);
   };
 
-  // ── Enviar aviso directo desde detalle miembro ─────────────────────
-  window.sendAvisoMiembro = function(uid, nombre) {
-    closeModal('modal-detail');
-    switchTab('notify');
-    const memberSel = document.getElementById('notif-member-uid');
-    if (memberSel) { memberSel.value = uid; }
-    const titleEl = document.getElementById('notif-title');
-    if (titleEl) titleEl.focus();
-    showToast('Redactando aviso para ' + nombre, 'info');
-  };
-
-  // ── Store detailUid when opening member detail ─────────────────────
-  const _origOpenDetail = window.openDetail;
-  if (_origOpenDetail && !window._openDetailPatched) {
-    window._openDetailPatched = true;
-    window.openDetail = function(uid) {
-      window._detailUid = uid;
-      const m = (window._allMembers||[]).find(x=>x.uid===uid);
-      window._detailNombre = m ? m.nombre : '';
-      _origOpenDetail(uid);
-      // Inject Enviar aviso button after modal opens
-      setTimeout(function(){
-        const modal = document.getElementById('modal-detail');
-        if (!modal || modal.querySelector('.btn-enviar-aviso')) return;
-        const saveBtn = modal.querySelector('button[onclick*="saveMemberEdit"]');
-        if (!saveBtn) return;
-        const btn = document.createElement('button');
-        btn.className = 'btn-enviar-aviso';
-        btn.style.cssText = 'width:100%;background:rgba(255,92,26,.15);border:1px solid rgba(255,92,26,.4);color:#FF5C1A;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer;margin-top:10px;display:block';
-        btn.innerHTML = '&#x1F4E3; Enviar aviso directo';
-        btn.onclick = function(){ window.sendAvisoMiembro(window._detailUid, window._detailNombre); };
-        saveBtn.insertAdjacentElement('afterend', btn);
-      }, 400);
-    };
-  }
-
 
   // Auto-login from magic link
   if (window._magicEmail && window._magicPass) {
