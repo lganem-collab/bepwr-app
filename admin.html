@@ -995,28 +995,32 @@ if (user && user.uid === MASTER_UID) {
 
   // LOAD MEMBERS
   async function loadMembers() {
-    const list = document.getElementById('members-list');
-    list.innerHTML = '<div class="empty-state">Cargando...</div>';
-    try {
-      const snap = await db.collection('usuarios').get();
-      window._allMembers = [];
-      for (const d of snap.docs) {
-        const data = d.data();
-        let ultimaMetrica = null;
-        try {
-          const mSnap = await db.collection('usuarios').doc(d.id).collection('metricas').orderBy('fecha','desc').limit(1).get();
-          if (!mSnap.empty) ultimaMetrica = mSnap.docs[0].data();
-        } catch(e) {}
-        window._allMembers.push({ uid: d.id, ...data, ultimaMetrica });
-      }
-      // Verificar membres\u00EDas vencidas autom\u00E1ticamente
-      await checkVigenciaVencimientos(window._allMembers);
-      updateStats();
-      renderMembers(window._allMembers);
-    } catch(e) {
-      list.innerHTML = '<div class="empty-state">Error: ' + e.message + '</div>';
+  const list = document.getElementById('members-list');
+  list.innerHTML = '<div class="empty-state">Cargando...</div>';
+  try {
+    const snap = await db.collection('usuarios').get();
+    window._allMembers = [];
+    for (const d of snap.docs) {
+      const data = d.data();
+      let ultimaMetrica = null;
+      try {
+        const mSnap = await db.collection('usuarios').doc(d.id).collection('metricas').orderBy('fecha','desc').limit(1).get();
+        if (!mSnap.empty) ultimaMetrica = mSnap.docs[0].data();
+      } catch(e) {}
+      window._allMembers.push({ uid: d.id, ...data, ultimaMetrica });
     }
+
+    // 👉 AÑADE ESTA LÍNEA:
+    window.allMembers = window._allMembers;
+
+    // Verificar membresías vencidas automáticamente
+    await checkVigenciaVencimientos(window._allMembers);
+    updateStats();
+    renderMembers(window._allMembers);
+  } catch(e) {
+    list.innerHTML = '<div class="empty-state">Error: ' + e.message + '</div>';
   }
+}
 
   function updateStats() {
     const m = window._allMembers || [];
