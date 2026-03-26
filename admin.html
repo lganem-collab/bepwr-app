@@ -2077,18 +2077,26 @@ window.filterNotifUsers = function (q) {
 
   const candidates = lista.filter(m => m.activo !== false);
 
+  const matches = [];
+
   candidates.forEach(function (m) {
     const nombre = m.nombre || '';
     const email  = m.email  || '';
     const label  = (nombre + ' ' + email).toLowerCase();
 
     if (!query || label.includes(query)) {
+      matches.push(m);
       const o = document.createElement('option');
       o.value = m.uid;
       o.textContent = nombre + (email ? ' — ' + email : '');
       sel.appendChild(o);
     }
   });
+
+  // Si hay una sola coincidencia, seleccionarla automáticamente
+  if (matches.length === 1) {
+    sel.value = matches[0].uid;
+  }
 };
 
 
