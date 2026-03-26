@@ -1816,6 +1816,19 @@ if (user && user.uid === MASTER_UID) {
     if (!nombre||!apellido||!email||!tel) { errEl.textContent = 'Nombre, apellido, tel\u00E9fono, email y contrase\u00F1a son obligatorios'; return; }
     if (!peso || isNaN(peso)) { errEl.textContent = 'El peso es obligatorio'; return; }
     if (peso < 20 || peso > 400) { errEl.textContent = 'Peso inv\u00E1lido (debe ser 20-400 kg)'; return; }
+const medidasNew = [
+  { val: brazo,        nombre: 'Brazo',       min: 15, max: 60  },
+  { val: abdomen,      nombre: 'Abdomen',     min: 50, max: 200 },
+  { val: cintura,      nombre: 'Cintura',     min: 40, max: 180 },
+  { val: cadera,       nombre: 'Cadera',      min: 50, max: 200 },
+  { val: pantorrilla,  nombre: 'Pantorrilla', min: 20, max: 60  },
+];
+for (const med of medidasNew) {
+  if (!isNaN(med.val) && (med.val < med.min || med.val > med.max)) {
+    errEl.textContent = `${med.nombre} debe estar entre ${med.min} y ${med.max} cm`;
+    return;
+  }
+}
     const vigencia = document.getElementById('new-vigencia').value || 'permanente';
     const vigenciaFecha = document.getElementById('new-vigencia-fecha').value || null;
     const btn = document.getElementById('btn-create-member');
