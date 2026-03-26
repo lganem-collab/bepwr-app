@@ -765,7 +765,6 @@ if (user && user.uid === MASTER_UID) {
   if (val === 'individual') {
     searchInput.style.display = 'block';
     memberSel.style.display = 'block';
-    // Llenar inicialmente con todos
     filterNotifUsers('');
   } else {
     searchInput.value = '';
@@ -773,6 +772,7 @@ if (user && user.uid === MASTER_UID) {
     memberSel.style.display = 'none';
   }
 }
+
 
 
   async function sendNotification() {
