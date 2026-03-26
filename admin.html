@@ -1290,9 +1290,14 @@ if (user && user.uid === MASTER_UID) {
       </button>
 
       <!-- Nuevo botón: enviar aviso directo a este miembro -->
-      <button class="btn btn-secondary btn-sm" style="margin-left:8px;margin-bottom:20px" onclick="openNotifyForMember('${uid}')">
-        &#x1F4E3; Enviar aviso a este miembro
-      </button>
+      <button
+  class="btn btn-secondary btn-sm"
+  style="margin-left:8px;margin-bottom:20px"
+  onclick="document.getElementById('modal-detail').style.display='none'; document.getElementById('modal-detail').classList.remove('open'); openNotifyForMember('${uid}')"
+>
+  &#x1F4E3; Enviar aviso a este miembro
+</button>
+
 
       <div class="modal-section">Historial de valoraciones</div>
       ${histHTML}
