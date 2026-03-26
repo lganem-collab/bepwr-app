@@ -776,11 +776,15 @@ if (user && user.uid === MASTER_UID) {
   window.openNotifyForMember = function (uid) {
   if (!uid) return;
 
-  // Cerrar el modal de detalle si está abierto
-  const modalDetail = document.getElementById('modal-detail');
-  if (modalDetail) {
-    modalDetail.classList.remove('open');
-    modalDetail.style.display = 'none';
+  // Cerrar el modal de detalle usando la misma función global
+  if (typeof closeModal === 'function') {
+    closeModal('modal-detail');
+  } else {
+    const modalDetail = document.getElementById('modal-detail');
+    if (modalDetail) {
+      modalDetail.classList.remove('open');
+      modalDetail.style.display = 'none';
+    }
   }
 
   // Ir a la pestaña de “Envío de Avisos”
@@ -792,17 +796,11 @@ if (user && user.uid === MASTER_UID) {
 
   if (!targetSel || !memberSel || !searchInput) return;
 
-  // Poner “Envío individual”
   targetSel.value = 'individual';
   updateNotifTargetUI();
-
-  // Llenar lista de miembros
   filterNotifUsers('');
-
-  // Seleccionar a este miembro
   memberSel.value = uid;
 
-  // Limpiar título y mensaje
   const titleEl = document.getElementById('notif-title');
   const bodyEl  = document.getElementById('notif-body');
   if (titleEl) titleEl.value = '';
@@ -810,6 +808,7 @@ if (user && user.uid === MASTER_UID) {
   const count = document.getElementById('notif-body-count');
   if (count) count.textContent = '0';
 };
+
 
 
   
