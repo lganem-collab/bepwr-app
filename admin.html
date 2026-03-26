@@ -1262,40 +1262,47 @@ if (user && user.uid === MASTER_UID) {
       <div class="modal-section">Objetivo</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div class="field"><label>Meta</label>
-          <select id="edit-meta">
+<select id="edit-meta">
   <option value="">Selecciona...</option>
-  ${[
-    'Bajar grasa / bajar de peso',
-    'Ganar músculo / recomposición',
-    'Salud metabólica / salud general',
-    'Rendimiento funcional',
-    'Estética / composición equilibrada',
-    'Incrementar performance · Tenis',
-    'Incrementar performance · Ciclismo',
-    'Incrementar performance · Correr',
-    'Incrementar performance · Golf',
-    'Incrementar performance · Natación',
-    'Incrementar performance · Padel'
-  ].map(o => {
-    // Etiqueta con emoji según deporte
-    let label = o;
-    if (o.includes('Tenis'))      label = '🎾 Incrementar mi performance · Tenis';
-    if (o.includes('Ciclismo'))   label = '🚴 Incrementar mi performance · Ciclismo';
-    if (o.includes('Correr'))     label = '🏃 Incrementar mi performance · Correr';
-    if (o.includes('Golf'))       label = '⛳ Incrementar mi performance · Golf';
-    if (o.includes('Natación'))   label = '🏊 Incrementar mi performance · Natación';
-    if (o.includes('Padel'))      label = '🥎 Incrementar mi performance · Padel';
 
-    // Etiquetas base sin emoji
-    if (o === 'Bajar grasa / bajar de peso')           label = '🔥 ' + o;
-    if (o === 'Ganar músculo / recomposición')         label = '💪 ' + o;
-    if (o === 'Salud metabólica / salud general')      label = '💚 ' + o;
-    if (o === 'Rendimiento funcional')                 label = '⚡ ' + o;
-    if (o === 'Estética / composición equilibrada')    label = '✨ ' + o;
+  <option value="Bajar grasa / bajar de peso" ${m.objetivo?.meta === 'Bajar grasa / bajar de peso' ? 'selected' : ''}>
+    🔥 Bajar grasa / bajar de peso
+  </option>
+  <option value="Ganar músculo / recomposición" ${m.objetivo?.meta === 'Ganar músculo / recomposición' ? 'selected' : ''}>
+    💪 Ganar músculo / recomposición
+  </option>
+  <option value="Salud metabólica / salud general" ${m.objetivo?.meta === 'Salud metabólica / salud general' ? 'selected' : ''}>
+    💚 Salud metabólica / salud general
+  </option>
+  <option value="Rendimiento funcional" ${m.objetivo?.meta === 'Rendimiento funcional' ? 'selected' : ''}>
+    ⚡ Rendimiento funcional
+  </option>
+  <option value="Estética / composición equilibrada" ${m.objetivo?.meta === 'Estética / composición equilibrada' ? 'selected' : ''}>
+    ✨ Estética / composición equilibrada
+  </option>
 
-    return `<option value="${o}" ${m.objetivo?.meta===o?'selected':''}>${label}</option>`;
-  }).join('')}
+  <optgroup label="Incrementar mi performance">
+    <option value="Incrementar performance · Ciclismo" ${m.objetivo?.meta === 'Incrementar performance · Ciclismo' ? 'selected' : ''}>
+      🚴 Ciclismo
+    </option>
+    <option value="Incrementar performance · Correr" ${m.objetivo?.meta === 'Incrementar performance · Correr' ? 'selected' : ''}>
+      🏃 Correr
+    </option>
+    <option value="Incrementar performance · Golf" ${m.objetivo?.meta === 'Incrementar performance · Golf' ? 'selected' : ''}>
+      ⛳ Golf
+    </option>
+    <option value="Incrementar performance · Natación" ${m.objetivo?.meta === 'Incrementar performance · Natación' ? 'selected' : ''}>
+      🏊 Natación
+    </option>
+    <option value="Incrementar performance · Padel" ${m.objetivo?.meta === 'Incrementar performance · Padel' ? 'selected' : ''}>
+      🥎 Padel
+    </option>
+    <option value="Incrementar performance · Tenis" ${m.objetivo?.meta === 'Incrementar performance · Tenis' ? 'selected' : ''}>
+      🎾 Tenis
+    </option>
+  </optgroup>
 </select>
+
 
         </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
