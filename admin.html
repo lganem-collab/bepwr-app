@@ -755,18 +755,24 @@ if (user && user.uid === MASTER_UID) {
   }
 
   function updateNotifTargetUI() {
-    const val = document.getElementById('notif-target').value;
-    const memberSel = document.getElementById('notif-member');
-    if (val === 'individual') {
-      memberSel.style.display = 'block';
-      // Populate member list
-      const members = (window._allMembers||[]).filter(m=>m.activo!==false);
-      memberSel.innerHTML = '<option value="">Selecciona un miembro...</option>'
-        + members.map(m=>`<option value="${m.uid}">${m.nombre||m.email}</option>`).join('');
-    } else {
-      memberSel.style.display = 'none';
-    }
+  const val = document.getElementById('notif-target').value;
+  const memberSel = document.getElementById('notif-member');
+  const searchInput = document.getElementById('notif-user-search');
+
+  if (!memberSel || !searchInput) return;
+
+  if (val === 'individual') {
+    searchInput.style.display = 'block';
+    memberSel.style.display = 'block';
+    // Llenar inicialmente con todos
+    filterNotifUsers('');
+  } else {
+    searchInput.value = '';
+    searchInput.style.display = 'none';
+    memberSel.style.display = 'none';
   }
+}
+
 
   async function sendNotification() {
     if (window.currentStaffRole !== 'admin') { showToast('Solo admin puede enviar notificaciones', 'error'); return; }
