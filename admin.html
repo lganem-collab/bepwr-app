@@ -2059,30 +2059,32 @@ if (user && user.uid === MASTER_UID) {
   };
 
 
-  // Búsqueda predictiva de destinatarios para envío individual
+ // Búsqueda predictiva de destinatarios para envío individual
 window.filterNotifUsers = function (q) {
   const sel = document.getElementById('notif-member');
-  if (!sel || !window.allMembers) return;
+  const lista = window.allMembers || window._allMembers;
+  if (!sel || !lista) return;
 
   const query = (q || '').toLowerCase().trim();
 
-  // Limpiar opciones actuales
   sel.innerHTML = '<option value="">Selecciona un miembro...</option>';
 
-  // Tomar solo miembros activos
-  const candidates = window.allMembers.filter(m => m.activo !== false);
+  const candidates = lista.filter(m => m.activo !== false);
 
   candidates.forEach(function (m) {
-    const label = (m.nombre + ' ' + (m.email || '')).toLowerCase();
+    const nombre = m.nombre || '';
+    const email  = m.email  || '';
+    const label  = (nombre + ' ' + email).toLowerCase();
 
     if (!query || label.includes(query)) {
       const o = document.createElement('option');
-      o.value = m.uid;                         // uid del miembro
-      o.textContent = m.nombre + ' — ' + m.email;
+      o.value = m.uid;
+      o.textContent = nombre + (email ? ' — ' + email : '');
       sel.appendChild(o);
     }
   });
 };
+
 
 </script>
 <!-- MODAL PERFIL STAFF -->
