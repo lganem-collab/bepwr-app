@@ -900,18 +900,18 @@
         ${dots}${vals}${lbls}</svg>`;
   }
 
-  function renderProfileMetrics(m) {
-    const gc = m.grasaCorporal ?? m.grasaPct;
-    document.getElementById('val-peso').textContent = m.peso != null ? m.peso + ' kg' : 'Sin Datos';
-    document.getElementById('val-musculo').textContent = m.musculo != null ? m.musculo + ' kg' : 'Sin Datos';
-    document.getElementById('val-grasa').textContent = gc != null ? gc + ' kg' : 'Sin Datos';
-    document.getElementById('val-imc').textContent = m.imc || 'Sin Datos';
-    document.getElementById('val-pgc').textContent = m.pgc != null ? m.pgc + '%' : 'Sin Datos';
-    document.getElementById('val-grasa-visc').textContent = m.grasaVisceral || 'Sin Datos';
-    document.getElementById('val-calificacion').textContent = m.calificacion ? m.calificacion + '/100' : 'Sin Datos';
-    document.getElementById('val-fecha').textContent = m.fecha || 'Sin Datos';
-  }
-
+function renderProfileMetrics(m) {
+  const sd = '<span style="font-size:11px;color:#666;font-family:\'Space Mono\',monospace;letter-spacing:1px">Sin datos</span>';
+  const gc = m.grasaCorporal ?? m.grasaPct;
+  document.getElementById('val-peso').innerHTML = m.peso != null ? m.peso + ' kg' : sd;
+  document.getElementById('val-musculo').innerHTML = m.musculo != null ? m.musculo + ' kg' : sd;
+  document.getElementById('val-grasa').innerHTML = gc != null ? gc + ' kg' : sd;
+  document.getElementById('val-imc').innerHTML = m.imc || sd;
+  document.getElementById('val-pgc').innerHTML = m.pgc != null ? m.pgc + '%' : sd;
+  document.getElementById('val-grasa-visc').innerHTML = m.grasaVisceral || sd;
+  document.getElementById('val-calificacion').innerHTML = m.calificacion ? m.calificacion + '/100' : sd;
+  document.getElementById('val-fecha').innerHTML = m.fecha || sd;
+}
   // NOTIFICACIONES (modular Firestore API)
   async function loadNotifications(uid) {
     const listEl=document.getElementById('notif-list');
