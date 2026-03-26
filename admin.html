@@ -773,6 +773,37 @@ if (user && user.uid === MASTER_UID) {
   }
 }
 
+  window.openNotifyForMember = function (uid) {
+  if (!uid) return;
+
+  // Ir a la pestaña de “Envío de Avisos”
+  switchTab('notify');
+
+  const targetSel   = document.getElementById('notif-target');
+  const memberSel   = document.getElementById('notif-member');
+  const searchInput = document.getElementById('notif-user-search');
+
+  if (!targetSel || !memberSel || !searchInput) return;
+
+  // Poner “Envío individual”
+  targetSel.value = 'individual';
+  updateNotifTargetUI();
+
+  // Llenar lista de miembros
+  filterNotifUsers('');
+
+  // Seleccionar a este miembro
+  memberSel.value = uid;
+
+  // Limpiar título y mensaje
+  const titleEl = document.getElementById('notif-title');
+  const bodyEl  = document.getElementById('notif-body');
+  if (titleEl) titleEl.value = '';
+  if (bodyEl)  bodyEl.value  = '';
+  const count = document.getElementById('notif-body-count');
+  if (count) count.textContent = '0';
+};
+
   
   window.openNotifyForMember = function (uid) {
   if (!uid) return;
