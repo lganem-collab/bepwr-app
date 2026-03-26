@@ -1261,9 +1261,40 @@ if (user && user.uid === MASTER_UID) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div class="field"><label>Meta</label>
           <select id="edit-meta">
-            <option value="">Selecciona...</option>
-            ${['Bajar grasa / bajar de peso,Ganar m\u00FAsculo / recomposici\u00F3n,Salud metab\u00F3lica / salud general,Rendimiento funcional,Est\u00E9tica / composici\u00F3n equilibrada'].join(',').split(',').map(o=>`<option value="${o}" ${m.objetivo?.meta===o?'selected':''}>${o}</option>`).join('')}
-          </select>
+  <option value="">Selecciona...</option>
+  ${[
+    'Bajar grasa / bajar de peso',
+    'Ganar músculo / recomposición',
+    'Salud metabólica / salud general',
+    'Rendimiento funcional',
+    'Estética / composición equilibrada',
+    'Incrementar performance · Tenis',
+    'Incrementar performance · Ciclismo',
+    'Incrementar performance · Correr',
+    'Incrementar performance · Golf',
+    'Incrementar performance · Natación',
+    'Incrementar performance · Padel'
+  ].map(o => {
+    // Etiqueta con emoji según deporte
+    let label = o;
+    if (o.includes('Tenis'))      label = '🎾 Incrementar mi performance · Tenis';
+    if (o.includes('Ciclismo'))   label = '🚴 Incrementar mi performance · Ciclismo';
+    if (o.includes('Correr'))     label = '🏃 Incrementar mi performance · Correr';
+    if (o.includes('Golf'))       label = '⛳ Incrementar mi performance · Golf';
+    if (o.includes('Natación'))   label = '🏊 Incrementar mi performance · Natación';
+    if (o.includes('Padel'))      label = '🥎 Incrementar mi performance · Padel';
+
+    // Etiquetas base sin emoji
+    if (o === 'Bajar grasa / bajar de peso')           label = '🔥 ' + o;
+    if (o === 'Ganar músculo / recomposición')         label = '💪 ' + o;
+    if (o === 'Salud metabólica / salud general')      label = '💚 ' + o;
+    if (o === 'Rendimiento funcional')                 label = '⚡ ' + o;
+    if (o === 'Estética / composición equilibrada')    label = '✨ ' + o;
+
+    return `<option value="${o}" ${m.objetivo?.meta===o?'selected':''}>${label}</option>`;
+  }).join('')}
+</select>
+
         </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
         <div class="field"><label>Peso meta (kg)</label><input type="number" id="edit-peso-meta" value="${m.objetivo?.pesoMeta||''}" step="0.1" /></div>
