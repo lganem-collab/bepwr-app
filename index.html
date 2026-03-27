@@ -1598,7 +1598,7 @@ function normalizeObjetivo(obj) {
 let _metodoData = null;
 
 async function loadMetodoData() {
-  const uid = firebase.auth().currentUser?.uid;
+  const uid = auth.currentUser?.uid;
   if (!uid) return null;
   try {
     const snap = await db.collection('users').doc(uid).get();
