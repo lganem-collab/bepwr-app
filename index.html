@@ -1602,14 +1602,19 @@ async function loadMetodoData() {
   const uid = window._currentUid;
   if (!uid) return null;
   try {
-    const snap = await db.collection('users').doc(uid).get();
-    if (!snap.exists) return null;
-    const d = snap.data();
+    const db = getFirestore();
+    const userSnap = await getDoc(doc(db, 'users', uid));
+    if (!userSnap.exists()) return null;
+    const d = userSnap.data();
+
     let ultimaValoracion = null;
     try {
-      const vSnap = await db.collection('users').doc(uid)
-        .collection('valoraciones')
-        .orderBy('fecha', 'desc').limit(1).get();
+      const vQuery = query(
+        collection(db, 'users', uid, 'valoraciones'),
+        orderBy('fecha', 'desc'),
+        limit(1)
+      );
+      const vSnap = await getDocs(vQuery);
       if (!vSnap.empty) {
         const v = vSnap.docs[0].data();
         ultimaValoracion = {
@@ -1617,7 +1622,7 @@ async function loadMetodoData() {
           tipo: v.tipo || 'composicion'
         };
       }
-    } catch (e) {
+    } catch(e) {
       if (d.ultimaValoracion) {
         ultimaValoracion = {
           fecha: d.ultimaValoracion?.toDate ? d.ultimaValoracion.toDate() : new Date(d.ultimaValoracion),
@@ -1625,11 +1630,12 @@ async function loadMetodoData() {
         };
       }
     }
+
     let guiaUrls = {};
     try {
-      const gSnap = await db.collection('config').doc('guias').get();
-      if (gSnap.exists) guiaUrls = gSnap.data() || {};
-    } catch (e) {}
+      const gSnap = await getDoc(doc(db, 'config', 'guias'));
+      if (gSnap.exists()) guiaUrls = gSnap.data() || {};
+    } catch(e) {}
 
     return {
       objetivo: d.meta || null,
@@ -1641,7 +1647,7 @@ async function loadMetodoData() {
       ultimaValoracion,
       guiaUrls
     };
-  } catch (e) {
+  } catch(e) {
     console.error('loadMetodoData:', e);
     return null;
   }
