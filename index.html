@@ -1270,6 +1270,7 @@ function renderProfileMetrics(m) {
 };
 
   window.saveEditInfo = async () => {
+  console.log('DEBUG: saveEditInfo ejecutada');
   const errEl = document.getElementById('edit-error');
   const btn = document.querySelector('#modal-edit .btn-primary');
   if (!errEl || !btn) return;
@@ -1397,18 +1398,17 @@ function renderProfileMetrics(m) {
     }
 
     // ÉXITO: recargar Método en caliente
-    errEl.style.color = '#4ade80';
-    errEl.textContent = '¡Cambios guardados!';
+errEl.style.color = '#4ade80';
+errEl.textContent = '¡Cambios guardados!';
 
-    // Invalida siempre los datos de Método
 if (typeof metodoData !== 'undefined') {
   metodoData = null;
 }
-
-// Siempre intenta recargar Método
 if (typeof initMetodoTab === 'function') {
+  console.log('DEBUG: llamando initMetodoTab desde saveEditInfo');
   initMetodoTab();
 }
+
 
 
     btn.textContent = 'Guardado';
