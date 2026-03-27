@@ -1382,6 +1382,7 @@ function renderProfileMetrics(m) {
     }
     currentView = id;
     if(id==='notif'&&window._currentUid&&window.loadNotifications)window.loadNotifications(window._currentUid);
+    if(id==='metodo') initMetodoTab();
   }
 
   window.addEventListener('popstate', (e) => {
