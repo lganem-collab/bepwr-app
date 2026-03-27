@@ -1634,16 +1634,17 @@ async function loadMetodoData() {
       const gSnap = await getDoc(doc(db,'config','guias'));
       if (gSnap.exists()) guiaUrls = gSnap.data()||{};
     } catch(e) {}
-    return {
-      objetivo: d.meta||null,
-      nombre: d.nombre||d.name||'',
-      edad: d.edad||null,
-      peso: d.peso||null,
-      pruebaPeso: d.pruebaPeso||null,
-      medidas: d.medidas||null,
-      ultimaValoracion,
-      guiaUrls
+      return {
+        objetivo: (d.objetivo && d.objetivo.meta) || null,
+        nombre: d.nombre||d.name||'',
+        edad: d.edad||null,
+        peso: d.peso||null,
+        pruebaPeso: d.pruebaPeso||null,
+        medidas: d.medidas||null,
+        ultimaValoracion,
+        guiaUrls
     };
+
   } catch(e) {
     console.error('loadMetodoData:',e);
     return null;
