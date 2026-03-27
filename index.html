@@ -1598,7 +1598,7 @@ function normalizeObjetivo(obj) {
 let _metodoData = null;
 
 async function loadMetodoData() {
-  const uid = getAuth().currentUser?.uid;
+  const uid = window._currentUid;
   if (!uid) return null;
   try {
     const snap = await db.collection('users').doc(uid).get();
