@@ -1400,12 +1400,16 @@ function renderProfileMetrics(m) {
     errEl.style.color = '#4ade80';
     errEl.textContent = '¡Cambios guardados!';
 
-    if (typeof metodoData !== 'undefined') {
-      metodoData = null;
-    }
-    if (typeof currentView !== 'undefined' && currentView === 'metodo' && typeof initMetodoTab === 'function') {
-      initMetodoTab();
-    }
+    // Invalida siempre los datos de Método
+if (typeof metodoData !== 'undefined') {
+  metodoData = null;
+}
+
+// Siempre intenta recargar Método
+if (typeof initMetodoTab === 'function') {
+  initMetodoTab();
+}
+
 
     btn.textContent = 'Guardado';
 
