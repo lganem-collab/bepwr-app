@@ -1617,7 +1617,7 @@ async function loadMetodoData() {
     const query = window.query;
     const orderBy = window.orderBy;
     const limit = window.limit;
-    const userSnap = await getDoc(doc(db, 'users', uid));
+    const userSnap = await getDoc(doc(db, 'usuarios', uid));
     if (!userSnap.exists()) return null;
     const d = userSnap.data();
     let ultimaValoracion = null;
