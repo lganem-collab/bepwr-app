@@ -1484,7 +1484,356 @@ function renderProfileMetrics(m) {
       if (errEl) errEl.textContent = 'Error: ' + e.message;
     }
   };
+/* ── Configuración por objetivo ───────────────────────────── */
+const OBJETIVO_CONFIG = {
+  'bajar-de-peso': {
+    label: 'Bajar de Peso', color: '#FF6B35',
+    desc: 'Reduccion de grasa y mejora de composicion corporal',
+    rutina: [
+      { dia: 'Lun', tipo: 'Fuerza + HIIT',        dur: '60 min', nota: 'Enfasis en quema calorica' },
+      { dia: 'Mie', tipo: 'Cardio Funcional',      dur: '45 min', nota: 'Circuito metabolico' },
+      { dia: 'Vie', tipo: 'Fuerza Compuesta',      dur: '60 min', nota: 'Movimientos multiarticulares' },
+    ],
+    intervalo: 7, pdfKey: 'bajar-de-peso'
+  },
+  'ganar-musculo': {
+    label: 'Ganar Musculo', color: '#4CAF50',
+    desc: 'Hipertrofia muscular con base de fuerza progresiva',
+    rutina: [
+      { dia: 'Lun', tipo: 'Tren Superior A',       dur: '60 min', nota: 'Empuje + tiron' },
+      { dia: 'Mar', tipo: 'Tren Inferior A',        dur: '60 min', nota: 'Fuerza + volumen' },
+      { dia: 'Jue', tipo: 'Tren Superior B',        dur: '60 min', nota: 'Variante hipertrofia' },
+      { dia: 'Vie', tipo: 'Tren Inferior B',        dur: '60 min', nota: 'Potencia + estabilidad' },
+    ],
+    intervalo: 14, pdfKey: 'ganar-musculo'
+  },
+  'salud-metabolica': {
+    label: 'Salud Metabolica', color: '#2196F3',
+    desc: 'Mejora de indicadores de salud y funcion metabolica',
+    rutina: [
+      { dia: 'Lun', tipo: 'Movilidad + Fuerza',    dur: '50 min', nota: 'Rangos de movimiento' },
+      { dia: 'Mie', tipo: 'Funcional',              dur: '45 min', nota: 'Patrones basicos' },
+      { dia: 'Vie', tipo: 'Cardio Zona 2 + Core',  dur: '50 min', nota: 'Estabilidad central' },
+    ],
+    intervalo: 14, pdfKey: 'salud-metabolica'
+  },
+  'rendimiento-funcional': {
+    label: 'Rendimiento Funcional', color: '#9C27B0',
+    desc: 'Capacidad atletica integral y patrones de movimiento',
+    rutina: [
+      { dia: 'Lun', tipo: 'Fuerza + Potencia',     dur: '65 min', nota: 'Progresion cargada' },
+      { dia: 'Mar', tipo: 'HIIT + Agilidad',        dur: '50 min', nota: 'Velocidad de reaccion' },
+      { dia: 'Jue', tipo: 'Fuerza Funcional',       dur: '65 min', nota: 'Patrones integrados' },
+      { dia: 'Sab', tipo: 'Resistencia + Core',     dur: '55 min', nota: 'Capacidad aerobica' },
+    ],
+    intervalo: 14, pdfKey: 'rendimiento-funcional'
+  },
+  'estetico': {
+    label: 'Estetico', color: '#FF9800',
+    desc: 'Definicion muscular y estetica corporal',
+    rutina: [
+      { dia: 'Lun', tipo: 'Pecho + Hombro',        dur: '60 min', nota: 'Volumen moderado' },
+      { dia: 'Mar', tipo: 'Pierna + Gluteo',        dur: '60 min', nota: 'Hipertrofia dirigida' },
+      { dia: 'Jue', tipo: 'Espalda + Brazo',       dur: '60 min', nota: 'Conexion mente-musculo' },
+      { dia: 'Vie', tipo: 'Full Body Definicion',  dur: '55 min', nota: 'Alta densidad' },
+    ],
+    intervalo: 7, pdfKey: 'estetico'
+  },
+  'ciclismo': {
+    label: 'Ciclismo', color: '#00BCD4',
+    desc: 'Potencia y resistencia especifica para ciclista',
+    rutina: [
+      { dia: 'Lun', tipo: 'Pierna + Potencia',     dur: '60 min', nota: 'Fuerza especifica' },
+      { dia: 'Mie', tipo: 'Core + Movilidad',      dur: '45 min', nota: 'Postura de ciclista' },
+      { dia: 'Vie', tipo: 'Resistencia + HIIT',    dur: '60 min', nota: 'Zonas de frecuencia cardiaca' },
+    ],
+    intervalo: 14, pdfKey: 'ciclismo'
+  },
+  'natacion': {
+    label: 'Natacion', color: '#03A9F4',
+    desc: 'Fuerza y movilidad especifica para nadador',
+    rutina: [
+      { dia: 'Lun', tipo: 'Hombro + Espalda',     dur: '55 min', nota: 'Rango de movimiento' },
+      { dia: 'Mie', tipo: 'Core + Cadera',         dur: '50 min', nota: 'Transferencia acuatica' },
+      { dia: 'Vie', tipo: 'Full Body Funcional',   dur: '60 min', nota: 'Coordinacion y potencia' },
+    ],
+    intervalo: 14, pdfKey: 'natacion'
+  },
+  'deportivo': {
+    label: 'Deportivo', color: '#8BC34A',
+    desc: 'Base atletica para practicantes de deporte recreativo',
+    rutina: [
+      { dia: 'Lun', tipo: 'Fuerza + Potencia',    dur: '60 min', nota: 'Base atletica' },
+      { dia: 'Mie', tipo: 'Agilidad + HIIT',      dur: '50 min', nota: 'Velocidad y explosividad' },
+      { dia: 'Vie', tipo: 'Resistencia Muscular', dur: '60 min', nota: 'Capacidad de trabajo' },
+    ],
+    intervalo: 14, pdfKey: 'deportivo'
+  },
+  'Performance': {
+    label: 'Performance', color: '#F44336',
+    desc: 'Rendimiento atletico de alto nivel',
+    rutina: [
+      { dia: 'Lun', tipo: 'Fuerza Maxima',        dur: '70 min', nota: 'Cargas altas, volumen bajo' },
+      { dia: 'Mar', tipo: 'Potencia + Velocidad', dur: '60 min', nota: 'Explosividad' },
+      { dia: 'Jue', tipo: 'Hipertrofia Funcional',dur: '65 min', nota: 'Masa util' },
+      { dia: 'Sab', tipo: 'Acondicionamiento',    dur: '60 min', nota: 'Capacidad aerobica-anaerobica' },
+    ],
+    intervalo: 14, pdfKey: 'rendimiento-funcional'
+  }
+};
 
+function normalizeObjetivo(obj) {
+  if (!obj) return null;
+  const lower = obj.toLowerCase().replace(/\s+/g, '-');
+  if (OBJETIVO_CONFIG[obj]) return obj;
+  for (const key of Object.keys(OBJETIVO_CONFIG)) {
+    if (key.toLowerCase() === lower) return key;
+  }
+  for (const key of Object.keys(OBJETIVO_CONFIG)) {
+    if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) return key;
+  }
+  return null;
+}
+
+let _metodoData = null;
+
+async function loadMetodoData() {
+  const uid = firebase.auth().currentUser?.uid;
+  if (!uid) return null;
+  try {
+    const snap = await db.collection('users').doc(uid).get();
+    if (!snap.exists) return null;
+    const d = snap.data();
+    let ultimaValoracion = null;
+    try {
+      const vSnap = await db.collection('users').doc(uid)
+        .collection('valoraciones')
+        .orderBy('fecha', 'desc').limit(1).get();
+      if (!vSnap.empty) {
+        const v = vSnap.docs[0].data();
+        ultimaValoracion = {
+          fecha: v.fecha?.toDate ? v.fecha.toDate() : new Date(v.fecha),
+          tipo: v.tipo || 'composicion'
+        };
+      }
+    } catch (e) {
+      if (d.ultimaValoracion) {
+        ultimaValoracion = {
+          fecha: d.ultimaValoracion?.toDate ? d.ultimaValoracion.toDate() : new Date(d.ultimaValoracion),
+          tipo: d.tipoValoracion || 'composicion'
+        };
+      }
+    }
+    let guiaUrls = {};
+    try {
+      const gSnap = await db.collection('config').doc('guias').get();
+      if (gSnap.exists) guiaUrls = gSnap.data() || {};
+    } catch (e) {}
+
+    return {
+      objetivo: d.meta || null,
+      nombre: d.nombre || d.name || '',
+      edad: d.edad || null,
+      peso: d.peso || null,
+      pruebaPeso: d.pruebaPeso || null,
+      medidas: d.medidas || null,
+      ultimaValoracion,
+      guiaUrls
+    };
+  } catch (e) {
+    console.error('loadMetodoData:', e);
+    return null;
+  }
+}
+
+async function initMetodoTab() {
+  if (_metodoData) { renderMetodo(_metodoData); return; }
+  _metodoData = await loadMetodoData();
+  if (!_metodoData) {
+    document.getElementById('metodo-objetivo-desc').textContent = 'No se pudo cargar tu perfil';
+    return;
+  }
+  renderMetodo(_metodoData);
+}
+
+function renderMetodo(data) {
+  const objKey = normalizeObjetivo(data.objetivo);
+  const config = objKey ? OBJETIVO_CONFIG[objKey] : null;
+  renderObjetivo(data, config);
+  renderPruebaPeso(data);
+  renderRutina(config);
+  renderProximaValoracion(data, config);
+  renderGuiaNutrimental(data, config);
+}
+
+function renderObjetivo(data, config) {
+  const badge = document.getElementById('metodo-objetivo-badge');
+  const desc  = document.getElementById('metodo-objetivo-desc');
+  if (!data.objetivo) {
+    badge.textContent = 'Sin definir';
+    desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
+    return;
+  }
+  badge.textContent = config ? config.label : data.objetivo;
+  badge.style.background = config ? config.color + '22' : 'rgba(255,255,255,0.1)';
+  badge.style.color       = config ? config.color : '#fff';
+  badge.style.border      = config ? '1px solid ' + config.color + '44' : 'none';
+  desc.textContent = config ? config.desc : '';
+}
+
+function renderPruebaPeso(data) {
+  const minEl  = document.getElementById('metodo-peso-min');
+  const maxEl  = document.getElementById('metodo-peso-max');
+  const noteEl = document.getElementById('metodo-peso-note');
+  const sep    = document.querySelector('.peso-sep');
+  const unit   = document.querySelector('.peso-unit');
+  if (!data.pruebaPeso) {
+    minEl.textContent = '—';
+    maxEl.textContent = '';
+    if(sep) sep.style.display = 'none';
+    if(unit) unit.style.display = 'none';
+    noteEl.textContent = 'Pendiente: tu coach lo define en valoracion';
+    return;
+  }
+  if(sep) sep.style.display = '';
+  if(unit) unit.style.display = '';
+  if (typeof data.pruebaPeso === 'string') {
+    const parts = data.pruebaPeso.split('-');
+    minEl.textContent = parts[0]?.trim() || '—';
+    maxEl.textContent = parts[1]?.trim() || '—';
+  } else {
+    minEl.textContent = data.pruebaPeso.min ?? '—';
+    maxEl.textContent = data.pruebaPeso.max ?? '—';
+  }
+  noteEl.textContent = 'Definido por tu coach en valoracion';
+}
+
+function renderRutina(config) {
+  const container = document.getElementById('metodo-rutina-container');
+  if (!config) {
+    container.innerHTML = '<p class="metodo-loading">Sin rutina asignada aun</p>';
+    return;
+  }
+  const rows = config.rutina.map(r => `
+    <tr>
+      <td class="rutina-dia">${r.dia}</td>
+      <td><span class="rutina-tipo">${r.tipo}</span><span class="rutina-nota">${r.nota}</span></td>
+      <td class="rutina-dur">${r.dur}</td>
+    </tr>
+  `).join('');
+  container.innerHTML = `
+    <table class="rutina-table">
+      <thead><tr><th>Dia</th><th>Sesion</th><th style="text-align:right">Duracion</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function renderProximaValoracion(data, config) {
+  const fechaEl     = document.getElementById('metodo-valoracion-fecha');
+  const countdownEl = document.getElementById('metodo-valoracion-countdown');
+  const noteEl      = document.getElementById('metodo-valoracion-note');
+  if (!data.ultimaValoracion) {
+    fechaEl.textContent     = 'Por agendar';
+    countdownEl.textContent = '';
+    noteEl.textContent      = 'Habla con tu coach para tu primera valoracion';
+    return;
+  }
+  const intervalo = config?.intervalo ?? 14;
+  const ultima    = new Date(data.ultimaValoracion.fecha);
+  const proxima   = new Date(ultima.getTime() + intervalo * 24 * 60 * 60 * 1000);
+  const hoy       = new Date();
+  const diffDias  = Math.ceil((proxima - hoy) / (24 * 60 * 60 * 1000));
+  const dd   = String(proxima.getDate()).padStart(2,'0');
+  const mm   = String(proxima.getMonth()+1).padStart(2,'0');
+  const yyyy = proxima.getFullYear();
+  fechaEl.textContent = dd+'/'+mm+'/'+yyyy;
+  if (diffDias <= 0) {
+    countdownEl.textContent = 'Esta semana';
+    countdownEl.className   = 'valoracion-countdown valoracion-urgente';
+  } else if (diffDias <= 3) {
+    countdownEl.textContent = 'En '+diffDias+' dia'+(diffDias!==1?'s':'');
+    countdownEl.className   = 'valoracion-countdown valoracion-pronto';
+  } else {
+    countdownEl.textContent = 'En '+diffDias+' dias';
+    countdownEl.className   = 'valoracion-countdown';
+  }
+  noteEl.textContent = 'Valoracion cada '+intervalo+' dias';
+}
+
+function renderGuiaNutrimental(data, config) {
+  const btn     = document.getElementById('metodo-guia-btn');
+  const unavail = document.getElementById('metodo-guia-unavailable');
+  const descEl  = document.getElementById('metodo-guia-desc');
+  if (!config) {
+    btn.style.display     = 'none';
+    unavail.style.display = 'block';
+    return;
+  }
+  const url = (data.guiaUrls && data.guiaUrls[config.pdfKey])
+    ? data.guiaUrls[config.pdfKey]
+    : '/pdfs/'+config.pdfKey+'.pdf';
+  descEl.textContent    = 'Guia nutricional para tu objetivo: '+config.label;
+  btn.href              = url;
+  btn.style.display     = 'inline-flex';
+  unavail.style.display = 'none';
+}
+
+async function generarAnalisisIA() {
+  const btn    = document.getElementById('btn-analisis-ia');
+  const output = document.getElementById('metodo-ia-output');
+  btn.disabled   = true;
+  btn.textContent = 'Analizando...';
+  output.style.display = 'block';
+  output.className     = 'ia-output loading';
+  output.textContent   = 'Generando tu analisis personalizado...';
+  const data   = _metodoData || {};
+  const objKey = normalizeObjetivo(data.objetivo);
+  const config = objKey ? OBJETIVO_CONFIG[objKey] : null;
+  const ctx = {
+    objetivo:   config?.label || data.objetivo || 'No definido',
+    edad:       data.edad     ? data.edad+' anos' : 'No registrada',
+    peso:       data.peso     ? data.peso+' kg'   : 'No registrado',
+    pruebaPeso: !data.pruebaPeso ? 'No definido' :
+      typeof data.pruebaPeso==='string' ? data.pruebaPeso+' kg' :
+      (data.pruebaPeso.min||'?')+' - '+(data.pruebaPeso.max||'?')+' kg',
+    semanas: data.ultimaValoracion ? Math.floor(
+      (new Date()-new Date(data.ultimaValoracion.fecha))/(7*24*60*60*1000)
+    )+' semanas desde ultima valoracion' : 'Primera etapa'
+  };
+  const prompt = `Eres un experto en ciencias del ejercicio y fisiologia deportiva trabajando en bePWR, un centro fitness premium.
+Datos del miembro:
+- Objetivo: ${ctx.objetivo}
+- Edad: ${ctx.edad}
+- Peso corporal: ${ctx.peso}
+- Rango de mancuernas: ${ctx.pruebaPeso}
+- Historial: ${ctx.semanas}
+Proporciona un analisis cientifico breve y personalizado que incluya:
+1. Por que su objetivo es fisiologicamente alcanzable con entrenamiento de fuerza
+2. Que adaptaciones neuromusculares y metabolicas puede esperar en 4-8 semanas
+3. Un consejo especifico basado en su perfil actual
+Tono: cientifico pero accesible, motivador y directo. En espanol. Maximo 220 palabras. Sin titulos ni bullets, redaccion fluida en parrafos.`;
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const json = await resp.json();
+    const text = json.content?.find(b => b.type==='text')?.text || '';
+    output.className  = 'ia-output';
+    output.textContent = text || 'No se pudo generar el analisis. Intenta de nuevo.';
+  } catch (e) {
+    output.className  = 'ia-output';
+    output.textContent = 'Error al conectar. Verifica tu conexion e intenta de nuevo.';
+  } finally {
+    btn.disabled  = false;
+    btn.textContent = '⚡ Regenerar Analisis';
+  }
+}
 </script>
 
   <!-- Modal cambio de contraseña primer ingreso miembros -->
