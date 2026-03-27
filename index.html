@@ -1655,13 +1655,14 @@ async function initMetodoTab() {
 
 function renderMetodo(data) {
   const objKey = normalizeObjetivo(data.objetivo);
-  const config = objKey ? OBJETIVO_CONFIG[objKey] : null;
+  const config = null; // por ahora no usamos OBJETIVO_CONFIG
   renderObjetivo(data, config);
   renderPruebaPeso(data);
   renderRutina(config);
   renderProximaValoracion(data, config);
   renderGuiaNutrimental(data, config);
 }
+
 
 function renderObjetivo(data, config) {
   const badge = document.getElementById('metodo-objetivo-badge');
