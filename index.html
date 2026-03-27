@@ -1239,20 +1239,36 @@ function renderProfileMetrics(m) {
   window.startNotifListener=startNotifListener;
 
   window.openEditModal = () => {
-    document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
-    const _ms=document.getElementById('edit-meta');
-    if(_ms&&cachedUserData.objetivo?.meta){for(const o of _ms.options)o.selected=o.value===cachedUserData.objetivo.meta;}
-    document.getElementById('edit-email').value = auth.currentUser?.email || '';
-    document.getElementById('edit-tel').value = cachedUserData.telefono || '';
-    document.getElementById('edit-pass-current').value = '';
-    document.getElementById('edit-pass-new').value = '';
-    document.getElementById('edit-confirm-pass').value = '';
-    document.getElementById('edit-confirm-email').value = '';
-    document.getElementById('edit-confirm-tel').value = '';
-    document.getElementById('edit-error').textContent = '';
-    history.pushState({ modal: 'edit' }, '', '');
-    document.getElementById('modal-edit').classList.add('active');
-  };
+  // Nombre solo lectura
+  document.getElementById('edit-nombre').value = cachedUserData.nombre || '';
+
+  // Meta (sí se preselecciona)
+  const _ms = document.getElementById('edit-meta');
+  if (_ms && cachedUserData.objetivo?.meta) {
+    for (const o of _ms.options) {
+      o.selected = o.value === cachedUserData.objetivo.meta;
+    }
+  }
+
+  // Email y teléfono NUEVOS: SIEMPRE vacíos para que el usuario decida si quiere cambiarlos
+  document.getElementById('edit-email').value = '';
+  document.getElementById('edit-confirm-email').value = '';
+
+  document.getElementById('edit-tel').value = '';
+  document.getElementById('edit-confirm-tel').value = '';
+
+  // Passwords vacíos
+  document.getElementById('edit-pass-current').value = '';
+  document.getElementById('edit-pass-new').value = '';
+  document.getElementById('edit-confirm-pass').value = '';
+
+  // Limpiar errores
+  document.getElementById('edit-error').textContent = '';
+
+  history.pushState({ modal: 'edit' }, '', '');
+  document.getElementById('modal-edit').classList.add('active');
+};
+
   window.saveEditInfo = async () => {
   const errEl = document.getElementById('edit-error');
   const btn = document.querySelector('#modal-edit .btn-primary');
