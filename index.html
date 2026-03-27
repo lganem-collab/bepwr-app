@@ -618,6 +618,13 @@
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = window.db = getFirestore(app);
+  window.getDoc = getDoc;
+  window.doc = doc;
+  window.collection = collection;
+  window.getDocs = getDocs;
+  window.query = query;
+  window.orderBy = orderBy;
+  window.limit = limit;
 
   import('https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js').then(m=>m.setPersistence(auth,m.indexedDbLocalPersistence||m.browserLocalPersistence)).catch(()=>{});
 
