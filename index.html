@@ -1376,49 +1376,6 @@ function renderProfileMetrics(m) {
       }
     }
 
-    // CAMBIO DE CONTRASEÑA (AUTH)
-    if (passCurrent || passNew || passConfirm) {
-      if (!passCurrent) throw new Error('Escribe tu contraseña actual');
-      if (!passNew) throw new Error('Escribe la nueva contraseña');
-
-      const passRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-
-      if (!passRegex.test(passNew)) {
-        throw new Error('La contraseña debe tener mayúscula, minúscula, número y un símbolo');
-      }
-      if (passNew !== passConfirm) {
-        throw new Error('Las contraseñas no coinciden');
-      }
-
-      const cred = EmailAuthProvider.credential(user.email, passCurrent);
-      await reauthenticateWithCredential(user, cred);
-      await updatePassword(user, passNew);
-    }
-
-    errEl.style.color = '#4ade80';
-    errEl.textContent = '¡Cambios guardados!';
-    btn.textContent = 'Guardado';
-
-    setTimeout(() => {
-      closeModal('modal-edit');
-      errEl.textContent = '';
-      btn.textContent = 'Guardar cambios';
-      btn.disabled = false;
-    }, 1000);
-  } catch (e) {
-    console.error('saveEditInfo', e);
-    errEl.style.color = '#f87171';
-    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-      errEl.textContent = 'Contraseña actual incorrecta';
-    } else {
-      errEl.textContent = e.message || 'Error al guardar los cambios.';
-    }
-    btn.textContent = 'Guardar cambios';
-    btn.disabled = false;
-  }
-};
-
 
   // &#x2500;&#x2500; MODAL HISTORIAL &#x2500;&#x2500;
   let cachedMetricas = [];
