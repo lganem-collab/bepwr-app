@@ -1254,45 +1254,155 @@ function renderProfileMetrics(m) {
     document.getElementById('modal-edit').classList.add('active');
   };
   window.saveEditInfo = async () => {
-    const errEl = document.getElementById('edit-error');
-    errEl.textContent = '';
-    // nombre es solo lectura
-    const _nm=document.getElementById('edit-meta')?.value;
-    if(_nm&&_nm!==(cachedUserData.objetivo?.meta||'')){await updateDoc(doc(db,'usuarios',user.uid),{'objetivo.meta':_nm});if(!cachedUserData.objetivo)cachedUserData.objetivo={};cachedUserData.objetivo.meta=_nm;const _ep=document.getElementById('prof-meta');if(_ep)_ep.textContent=_nm;}
+  const errEl = document.getElementById('edit-error');
+  const btn = document.querySelector('#modal-edit .btn-primary');
+  if (!errEl || !btn) return;
+
+  errEl.style.color = '#f87171';
+  errEl.textContent = '';
+  btn.textContent = 'Guardando...';
+  btn.disabled = true;
+
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('Sin sesión activa');
+
+    // CAMPOS DEL FORM
+    const nuevaMeta = document.getElementById('edit-meta')?.value;
+    const nuevoEmail = document.getElementById('edit-email').value.trim();
+    const confEmail = document.getElementById('edit-confirm-email').value.trim();
+    const tel = document.getElementById('edit-tel').value.trim();
+    const confTel = document.getElementById('edit-confirm-tel').value.trim();
+
     const passCurrent = document.getElementById('edit-pass-current').value;
     const passNew = document.getElementById('edit-pass-new').value;
-    const user = auth.currentUser;
-    if (!user) return;
-    try {
-      // Guardar datos en Firestore
-      // nombre no se edita aqu\u00ED, solo el staff puede cambiarlo
-      if (cachedUserData.alias) {
-        document.getElementById('profile-since').textContent = (cachedUserData.fechaInicio ? 'Miembro desde ' + cachedUserData.fechaInicio : 'Miembro bePWR') + ' &#xB7; "' + cachedUserData.alias + '"';
-      }
-      // Cambiar contrase\u00F1a si se llenaron los campos
-      const passConfirm = document.getElementById('edit-confirm-pass').value;
-      if (passCurrent || passNew) {
-        if (!passCurrent) { errEl.textContent = 'Escribe tu contrase\u00F1a actual'; return; }
-        if (!passNew) { errEl.textContent = 'Escribe la nueva contrase\u00F1a'; return; }
-        const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-        if (!passRegex.test(passNew)) { errEl.textContent = 'La contrase\u00F1a debe tener may\u00FAscula, min\u00FAscula, n\u00FAmero y un s\u00EDmbolo'; return; }
-        if (passNew !== passConfirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
-        const cred = EmailAuthProvider.credential(user.email, passCurrent);
-        await reauthenticateWithCredential(user, cred);
-        await updatePassword(user, passNew);
-      }
-      errEl.style.color = '#4ade80';
-      errEl.textContent = '\u00A1Cambios guardados!';
-      setTimeout(() => closeModal('modal-edit'), 1200);
-    } catch(e) {
-      errEl.style.color = '#f87171';
-      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase\u00F1a actual incorrecta';
-      } else {
-        errEl.textContent = 'Error al guardar: ' + e.message;
+    const passConfirm = document.getElementById('edit-confirm-pass').value;
+
+    // VALIDACIONES EMAIL / TEL
+    if (nuevoEmail || confEmail) {
+      if (!nuevoEmail || !confEmail || nuevoEmail !== confEmail) {
+        throw new Error('El email y su confirmación deben coincidir.');
       }
     }
-  };
+
+    if (tel || confTel) {
+      if (!tel || !confTel || tel !== confTel) {
+        throw new Error('El teléfono y su confirmación deben coincidir.');
+      }
+      if (!/^\d{10}$/.test(tel)) {
+        throw new Error('El teléfono debe tener 10 dígitos.');
+      }
+    }
+
+    // ARMAR UPDATES A FIRESTORE
+    const updates = {};
+
+    // Meta (objetivo)
+    if (nuevaMeta && nuevaMeta !== (cachedUserData.objetivo?.meta || '')) {
+      const objActual = cachedUserData.objetivo || {};
+      updates.objetivo = {
+        ...objActual,
+        meta: nuevaMeta,
+        metageneral: nuevaMeta,
+      };
+    }
+
+    // Email de contacto (campo en Firestore, no el auth)
+    if (nuevoEmail && nuevoEmail !== (cachedUserData.email || user.email)) {
+      updates.email = nuevoEmail;
+    }
+
+    // Teléfono
+    if (tel && tel !== cachedUserData.telefono) {
+      updates.telefono = tel;
+    }
+
+    // GUARDAR EN FIRESTORE SI HAY CAMBIOS
+    if (Object.keys(updates).length > 0) {
+      await updateDoc(doc(db, 'usuarios', user.uid), updates);
+
+      // Actualizar cache local
+      cachedUserData = {
+        ...cachedUserData,
+        ...updates,
+        objetivo: updates.objetivo || cachedUserData.objetivo,
+      };
+
+      // REFRESCAR VISTAS RÁPIDO
+      if (updates.telefono) {
+        const telEl = document.getElementById('prof-phone');
+        if (telEl) telEl.textContent = updates.telefono;
+      }
+      if (updates.email) {
+        const emailEl = document.getElementById('prof-email');
+        if (emailEl) emailEl.textContent = updates.email;
+      }
+      if (updates.objetivo) {
+        const metaEl = document.getElementById('prof-meta');
+        if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
+
+        const objetivoBadge = document.getElementById('metodo-objetivo-badge');
+        const objetivoDesc = document.getElementById('metodo-objetivo-desc');
+        if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
+        if (objetivoDesc) objetivoDesc.textContent = updates.objetivo.meta;
+      }
+
+      // Mantener texto de "Miembro desde ... · alias" si aplica
+      if (cachedUserData.alias) {
+        const sinceEl = document.getElementById('profile-since');
+        if (sinceEl) {
+          sinceEl.innerHTML =
+            (cachedUserData.fechaInicio
+              ? 'Miembro desde ' + cachedUserData.fechaInicio
+              : 'Miembro bePWR') +
+            ' &#xB7; "' + cachedUserData.alias + '"';
+        }
+      }
+    }
+
+    // CAMBIO DE CONTRASEÑA (AUTH)
+    if (passCurrent || passNew || passConfirm) {
+      if (!passCurrent) throw new Error('Escribe tu contraseña actual');
+      if (!passNew) throw new Error('Escribe la nueva contraseña');
+
+      const passRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
+
+      if (!passRegex.test(passNew)) {
+        throw new Error('La contraseña debe tener mayúscula, minúscula, número y un símbolo');
+      }
+      if (passNew !== passConfirm) {
+        throw new Error('Las contraseñas no coinciden');
+      }
+
+      const cred = EmailAuthProvider.credential(user.email, passCurrent);
+      await reauthenticateWithCredential(user, cred);
+      await updatePassword(user, passNew);
+    }
+
+    errEl.style.color = '#4ade80';
+    errEl.textContent = '¡Cambios guardados!';
+    btn.textContent = 'Guardado';
+
+    setTimeout(() => {
+      closeModal('modal-edit');
+      errEl.textContent = '';
+      btn.textContent = 'Guardar cambios';
+      btn.disabled = false;
+    }, 1000);
+  } catch (e) {
+    console.error('saveEditInfo', e);
+    errEl.style.color = '#f87171';
+    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+      errEl.textContent = 'Contraseña actual incorrecta';
+    } else {
+      errEl.textContent = e.message || 'Error al guardar los cambios.';
+    }
+    btn.textContent = 'Guardar cambios';
+    btn.disabled = false;
+  }
+};
+
 
   // &#x2500;&#x2500; MODAL HISTORIAL &#x2500;&#x2500;
   let cachedMetricas = [];
