@@ -1602,7 +1602,7 @@ async function loadMetodoData() {
   const uid = window._currentUid;
   if (!uid) return null;
   try {
-    const db = getFirestore();
+    const db = window.db;
     const userSnap = await getDoc(doc(db, 'users', uid));
     if (!userSnap.exists()) return null;
     const d = userSnap.data();
