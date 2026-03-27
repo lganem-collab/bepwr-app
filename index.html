@@ -1606,49 +1606,32 @@ async function loadMetodoData() {
     const userSnap = await getDoc(doc(db, 'users', uid));
     if (!userSnap.exists()) return null;
     const d = userSnap.data();
-
     let ultimaValoracion = null;
     try {
-      const vQuery = query(
-        collection(db, 'users', uid, 'valoraciones'),
-        orderBy('fecha', 'desc'),
-        limit(1)
-      );
+      const vQuery = query(collection(db,'users',uid,'valoraciones'),orderBy('fecha','desc'),limit(1));
       const vSnap = await getDocs(vQuery);
       if (!vSnap.empty) {
         const v = vSnap.docs[0].data();
-        ultimaValoracion = {
-          fecha: v.fecha?.toDate ? v.fecha.toDate() : new Date(v.fecha),
-          tipo: v.tipo || 'composicion'
-        };
+        ultimaValoracion = { fecha: v.fecha?.toDate ? v.fecha.toDate() : new Date(v.fecha), tipo: v.tipo||'composicion' };
       }
-    } catch(e) {
-      if (d.ultimaValoracion) {
-        ultimaValoracion = {
-          fecha: d.ultimaValoracion?.toDate ? d.ultimaValoracion.toDate() : new Date(d.ultimaValoracion),
-          tipo: d.tipoValoracion || 'composicion'
-        };
-      }
-    }
-
+    } catch(e) {}
     let guiaUrls = {};
     try {
-      const gSnap = await getDoc(doc(db, 'config', 'guias'));
-      if (gSnap.exists()) guiaUrls = gSnap.data() || {};
+      const gSnap = await getDoc(doc(db,'config','guias'));
+      if (gSnap.exists()) guiaUrls = gSnap.data()||{};
     } catch(e) {}
-
     return {
-      objetivo: d.meta || null,
-      nombre: d.nombre || d.name || '',
-      edad: d.edad || null,
-      peso: d.peso || null,
-      pruebaPeso: d.pruebaPeso || null,
-      medidas: d.medidas || null,
+      objetivo: d.meta||null,
+      nombre: d.nombre||d.name||'',
+      edad: d.edad||null,
+      peso: d.peso||null,
+      pruebaPeso: d.pruebaPeso||null,
+      medidas: d.medidas||null,
       ultimaValoracion,
       guiaUrls
     };
   } catch(e) {
-    console.error('loadMetodoData:', e);
+    console.error('loadMetodoData:',e);
     return null;
   }
 }
