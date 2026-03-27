@@ -721,10 +721,8 @@
       document.getElementById('profile-av').textContent = initials;
       document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
       if (data.alias) {
-        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR') + ' &#xB7; "' + data.alias + '"';
-      } else {
-        document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + data.fechaInicio : 'Miembro bePWR';
-      }
+        document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + fmtFecha(data.fechaInicio) : 'Miembro bePWR') + ' · "' + data.alias + '"';      } else {
+        document.getElementById('profile-since').textContent = data.fechaInicio ? 'Miembro desde ' + fmtFecha(data.fechaInicio) : 'Miembro bePWR';      }
       document.getElementById('prof-email').textContent = user.email;
       document.getElementById('prof-phone').textContent = data.telefono || 'Sin datos';
       let edadStr = 'Sin datos';
