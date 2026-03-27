@@ -1591,17 +1591,9 @@ const OBJETIVO_CONFIG = {
 };
 
 function normalizeObjetivo(obj) {
-  if (!obj) return null;
-  const lower = obj.toLowerCase().replace(/\s+/g, '-');
-  if (OBJETIVO_CONFIG[obj]) return obj;
-  for (const key of Object.keys(OBJETIVO_CONFIG)) {
-    if (key.toLowerCase() === lower) return key;
-  }
-  for (const key of Object.keys(OBJETIVO_CONFIG)) {
-    if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) return key;
-  }
-  return null;
+  return obj || null;
 }
+
 
 let _metodoData = null;
 
