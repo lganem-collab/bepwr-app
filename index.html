@@ -1622,7 +1622,7 @@ async function loadMetodoData() {
     const d = userSnap.data();
     let ultimaValoracion = null;
     try {
-      const vQuery = query(collection(db,'users',uid,'valoraciones'),orderBy('fecha','desc'),limit(1));
+      const vQuery = query(collection(db,'usuarios',uid,'valoraciones'),orderBy('fecha','desc'),limit(1));
       const vSnap = await getDocs(vQuery);
       if (!vSnap.empty) {
         const v = vSnap.docs[0].data();
