@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1269,7 +1270,7 @@ function renderProfileMetrics(m) {
   document.getElementById('modal-edit').classList.add('active');
 };
 
-window.saveEditInfo = async () => {
+  window.saveEditInfo = async () => {
   const errEl = document.getElementById('edit-error');
   const btn = document.querySelector('#modal-edit .btn-primary');
   if (!errEl || !btn) return;
@@ -1313,17 +1314,19 @@ window.saveEditInfo = async () => {
     // ARMAR UPDATES A FIRESTORE
     const updates = {};
 
-    // Meta (objetivo)
-    // nuevaMeta viene del <select>, con el formato que ya entiende Método
-    if (nuevaMeta) {
-      const objActual = (window.cachedUserData && window.cachedUserData.objetivo) || {};
+  // Meta (objetivo)
+// nuevaMeta viene del <select>, con el formato que ya entiende Método
+if (nuevaMeta) {
+  const objActual = (window.cachedUserData && window.cachedUserData.objetivo) || {};
 
-      updates.objetivo = {
-        ...objActual,
-        meta: nuevaMeta,
-        metageneral: nuevaMeta,
-      };
-    }
+  updates.objetivo = {
+    ...objActual,
+    meta: nuevaMeta,
+    metageneral: nuevaMeta,
+  };
+}
+
+
 
     // Email
     if (nuevoEmail && nuevoEmail !== (cachedUserData.email || user.email)) {
@@ -1339,13 +1342,12 @@ window.saveEditInfo = async () => {
     if (Object.keys(updates).length > 0) {
       await updateDoc(doc(db, 'usuarios', user.uid), updates);
 
-      // Actualizar cache local en las dos variables
+      // Actualizar cache local
       cachedUserData = {
         ...cachedUserData,
         ...updates,
         objetivo: updates.objetivo || cachedUserData.objetivo,
       };
-      window.cachedUserData = cachedUserData;
 
       // REFRESCAR VISTAS RÁPIDO
       if (updates.telefono) {
@@ -1361,41 +1363,11 @@ window.saveEditInfo = async () => {
         if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
 
         const objetivoBadge = document.getElementById('metodo-objetivo-badge');
-        const objetivoDesc  = document.getElementById('metodo-objetivo-desc');
+        const objetivoDesc = document.getElementById('metodo-objetivo-desc');
         if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
-        if (objetivoDesc)  objetivoDesc.textContent  = updates.objetivo.meta;
+        if (objetivoDesc) objetivoDesc.textContent = updates.objetivo.meta;
       }
     }
-
-    // ÉXITO: recargar Método en caliente
-    errEl.style.color = '#4ade80';
-    errEl.textContent = '¡Cambios guardados!';
-
-    if (typeof window._metodoData !== 'undefined') {
-      window._metodoData = null;
-    }
-    if (typeof window.initMetodoTab === 'function') {
-      window.initMetodoTab();
-    }
-
-    btn.textContent = 'Guardado';
-
-    setTimeout(() => {
-      closeModal('modal-edit');
-      errEl.textContent = '';
-      btn.textContent = 'Guardar cambios';
-      btn.disabled = false;
-    }, 1000);
-  } catch (e) {
-    console.error('saveEditInfo', e);
-    errEl.style.color = '#f87171';
-    errEl.textContent = e.message || 'Error al guardar los cambios.';
-    btn.textContent = 'Guardar cambios';
-    btn.disabled = false;
-  }
-};
-
-
 
     // CAMBIO DE CONTRASEÑA (AUTH)
     if (passCurrent || passNew || passConfirm) {
