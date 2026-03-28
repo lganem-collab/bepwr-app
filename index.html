@@ -1337,36 +1337,38 @@ function renderProfileMetrics(m) {
     }
 
     // GUARDAR EN FIRESTORE SI HAY CAMBIOS
-    if (Object.keys(updates).length > 0) {
-      await updateDoc(doc(db, 'usuarios', user.uid), updates);
+if (Object.keys(updates).length > 0) {
+  await updateDoc(doc(db, 'usuarios', user.uid), updates);
 
-      // Actualizar cache local (las dos referencias)
-      cachedUserData = {
-        ...cachedUserData,
-        ...updates,
-        objetivo: updates.objetivo || cachedUserData.objetivo,
-      };
-      window.cachedUserData = cachedUserData;
+  // Actualizar cache local (las dos referencias)
+  cachedUserData = {
+    ...cachedUserData,
+    ...updates,
+    objetivo: updates.objetivo || cachedUserData.objetivo,
+  };
+  window.cachedUserData = cachedUserData;
 
-      // REFRESCAR VISTAS RÁPIDO
-      if (updates.telefono) {
-        const telEl = document.getElementById('prof-phone');
-        if (telEl) telEl.textContent = updates.telefono;
-      }
-      if (updates.email) {
-        const emailEl = document.getElementById('prof-email');
-        if (emailEl) emailEl.textContent = updates.email;
-      }
-      if (updates.objetivo) {
-        const metaEl = document.getElementById('prof-meta');
-        if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
+  // REFRESCAR VISTAS RÁPIDO
+  if (updates.telefono) {
+    const telEl = document.getElementById('prof-phone');
+    if (telEl) telEl.textContent = updates.telefono;
+  }
+  if (updates.email) {
+    const emailEl = document.getElementById('prof-email');
+    if (emailEl) emailEl.textContent = updates.email;
+  }
+  if (updates.objetivo) {
+    const metaEl = document.getElementById('prof-meta');
+    if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
 
-        const objetivoBadge = document.getElementById('metodo-objetivo-badge');
-        const objetivoDesc  = document.getElementById('metodo-objetivo-desc');
-        if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
-        if (objetivoDesc)  objetivoDesc.textContent  = '';
-      }
-    }
+    // Método: badge con el nuevo objetivo
+    const objetivoBadge = document.getElementById('metodo-objetivo-badge');
+    const objetivoDesc  = document.getElementById('metodo-objetivo-desc');
+    if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
+    if (objetivoDesc)  objetivoDesc.textContent  = '';
+  }
+}
+
 
     // ÉXITO: recargar Método en caliente
     errEl.style.color = '#4ade80';
