@@ -1389,24 +1389,25 @@ if (nuevaMeta) {
     }
 
     // ÉXITO: recargar Método en caliente
-    errEl.style.color = '#4ade80';
-    errEl.textContent = '¡Cambios guardados!';
+errEl.style.color = '#4ade80';
+errEl.textContent = '¡Cambios guardados!';
 
-    if (typeof metodoData !== 'undefined') {
-      metodoData = null;
-    }
-    if (typeof initMetodoTab === 'function') {
-      initMetodoTab();
-    }
+if (typeof window.metodoData !== 'undefined') {
+  window.metodoData = null;
+}
+if (typeof window.initMetodoTab === 'function') {
+  window.initMetodoTab();
+}
 
-    btn.textContent = 'Guardado';
+btn.textContent = 'Guardado';
 
-    setTimeout(() => {
-      closeModal('modal-edit');
-      errEl.textContent = '';
-      btn.textContent = 'Guardar cambios';
-      btn.disabled = false;
-    }, 1000);
+setTimeout(() => {
+  closeModal('modal-edit');
+  errEl.textContent = '';
+  btn.textContent = 'Guardar cambios';
+  btn.disabled = false;
+}, 1000);
+
   } catch (e) {
     console.error('saveEditInfo', e);
     errEl.style.color = '#f87171';
