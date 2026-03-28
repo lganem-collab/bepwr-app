@@ -1740,7 +1740,7 @@ async function loadMetodoData() {
       if (gSnap.exists()) guiaUrls = gSnap.data() || {};
     } catch (e) {}
 
-    return {
+return {
   objetivo: (d.objetivo && d.objetivo.meta) ? d.objetivo.meta : (d.meta || null),
   nombre: d.nombre || d.name || '',
   edad: d.edad || null,
