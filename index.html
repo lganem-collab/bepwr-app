@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1722,6 +1723,60 @@ function normalizeObjetivo(obj) {
 
 let _metodoData = null;
 
+async function loadMetodoData() {
+  const uid = window._currentUid;
+  if (!uid) return null;
+  try {
+    const db = window.db;
+    const getDoc = window.getDoc;
+    const doc = window.doc;
+    const collection = window.collection;
+    const getDocs = window.getDocs;
+    const query = window.query;
+    const orderBy = window.orderBy;
+    const limit = window.limit;
+
+    const userSnap = await getDoc(doc(db, 'usuarios', uid));
+    if (!userSnap.exists()) return null;
+    const d = userSnap.data();
+
+    let ultimaValoracion = null;
+    try {
+      const vQuery = query(
+        collection(db, 'usuarios', uid, 'metricas'),
+        orderBy('fecha', 'desc'),
+        limit(1)
+      );
+      const vSnap = await getDocs(vQuery);
+      if (!vSnap.empty) {
+        const v = vSnap.docs[0].data();
+        const fechaVal = v.fecha?.toDate ? v.fecha.toDate() : new Date(v.fecha || Date.now());
+        ultimaValoracion = { fecha: fechaVal, tipo: 'composicion' };
+      }
+    } catch (e) {}
+
+    let guiaUrls = {};
+    try {
+      const gSnap = await getDoc(doc(db, 'config', 'guias'));
+      if (gSnap.exists()) guiaUrls = gSnap.data() || {};
+    } catch (e) {}
+
+    return {
+      objetivo: (d.objetivo && d.objetivo.meta) ? d.objetivo.meta : (d.meta || null),
+      nombre: d.nombre || d.name || '',
+      edad: d.edad || null,
+      peso: d.peso || null,
+      pruebaPeso: d.pruebaPeso || null,
+      medidas: d.medidas || null,
+      ultimaValoracion,
+      guiaUrls
+    };
+  } catch (e) {
+    console.error('loadMetodoData:', e);
+    return null;
+  }
+}
+
 async function initMetodoTab() {
   if (_metodoData) { renderMetodo(_metodoData); return; }
   _metodoData = await loadMetodoData();
@@ -1734,13 +1789,14 @@ async function initMetodoTab() {
 
 function renderMetodo(data) {
   const objKey = normalizeObjetivo(data.objetivo);
-  const config = objKey ? OBJETIVO_CONFIG[objKey] : null;
+  const config = null; // por ahora no usamos OBJETIVO_CONFIG
   renderObjetivo(data, config);
   renderPruebaPeso(data);
   renderRutina(config);
   renderProximaValoracion(data, config);
   renderGuiaNutrimental(data, config);
 }
+
 
 function renderObjetivo(data, config) {
   const badge = document.getElementById('metodo-objetivo-badge');
@@ -1750,43 +1806,6 @@ function renderObjetivo(data, config) {
     desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
     return;
   }
-  badge.textContent = config ? config.label : data.objetivo;
-  badge.style.background = config ? config.color + '22' : 'rgba(255,255,255,0.1)';
-  badge.style.color       = config ? config.color : '#fff';
-  badge.style.border      = config ? '1px solid ' + config.color + '44' : 'none';
-  desc.textContent = config ? config.desc : '';
-}
-
-
-function renderMetodo(data) {
-  // objetivo: copiar lo que ya está en cachedUserData
-  renderObjetivoDesdeCached();
-
-  const objKey = normalizeObjetivo(data.objetivo);
-  const config = null; // por ahora no usamos OBJETIVO_CONFIG
-  renderPruebaPeso(data);
-  renderRutina(config);
-  renderProximaValoracion(data, config);
-  renderGuiaNutrimental(data, config);
-}
-
-// NUEVA función: usa cachedUserData
-function renderObjetivoDesdeCached() {
-  const badge = document.getElementById('metodo-objetivo-badge');
-  const desc  = document.getElementById('metodo-objetivo-desc');
-  if (!badge || !desc) return;
-
-  const obj = (window.cachedUserData && window.cachedUserData.objetivo) || null;
-  if (!obj || !obj.meta) {
-    badge.textContent = 'Sin definir';
-    desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
-    return;
-  }
-
-  badge.textContent = obj.meta;
-  desc.textContent  = '';
-}
-
   badge.textContent = config ? config.label : data.objetivo;
   badge.style.background = config ? config.color + '22' : 'rgba(255,255,255,0.1)';
   badge.style.color       = config ? config.color : '#fff';
