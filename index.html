@@ -1270,7 +1270,6 @@ function renderProfileMetrics(m) {
 };
 
   window.saveEditInfo = async () => {
-  console.log('DEBUG: saveEditInfo ejecutada');
   const errEl = document.getElementById('edit-error');
   const btn = document.querySelector('#modal-edit .btn-primary');
   if (!errEl || !btn) return;
@@ -1324,7 +1323,7 @@ function renderProfileMetrics(m) {
       };
     }
 
-    // Email de contacto (campo en Firestore, no el auth)
+    // Email
     if (nuevoEmail && nuevoEmail !== (cachedUserData.email || user.email)) {
       updates.email = nuevoEmail;
     }
@@ -1363,18 +1362,6 @@ function renderProfileMetrics(m) {
         if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
         if (objetivoDesc) objetivoDesc.textContent = updates.objetivo.meta;
       }
-
-      // Mantener texto de "Miembro desde ... · alias" si aplica
-       if (cachedUserData.alias) {
-        const sinceEl = document.getElementById('profile-since');
-        if (sinceEl) {
-          sinceEl.innerHTML =
-            (cachedUserData.fechaInicio
-              ? 'Miembro desde ' + cachedUserData.fechaInicio
-              : 'Miembro bePWR') +
-            ' &#xB7; "' + cachedUserData.alias + '"';
-        }
-      }
     }
 
     // CAMBIO DE CONTRASEÑA (AUTH)
@@ -1398,18 +1385,15 @@ function renderProfileMetrics(m) {
     }
 
     // ÉXITO: recargar Método en caliente
-errEl.style.color = '#4ade80';
-errEl.textContent = '¡Cambios guardados!';
+    errEl.style.color = '#4ade80';
+    errEl.textContent = '¡Cambios guardados!';
 
-if (typeof metodoData !== 'undefined') {
-  metodoData = null;
-}
-if (typeof initMetodoTab === 'function') {
-  console.log('DEBUG: llamando initMetodoTab desde saveEditInfo');
-  initMetodoTab();
-}
-
-
+    if (typeof metodoData !== 'undefined') {
+      metodoData = null;
+    }
+    if (typeof initMetodoTab === 'function') {
+      initMetodoTab();
+    }
 
     btn.textContent = 'Guardado';
 
@@ -1422,15 +1406,12 @@ if (typeof initMetodoTab === 'function') {
   } catch (e) {
     console.error('saveEditInfo', e);
     errEl.style.color = '#f87171';
-    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-      errEl.textContent = 'Contraseña actual incorrecta';
-    } else {
-      errEl.textContent = e.message || 'Error al guardar los cambios.';
-    }
+    errEl.textContent = e.message || 'Error al guardar los cambios.';
     btn.textContent = 'Guardar cambios';
     btn.disabled = false;
   }
-}; // ← CIERRE DE saveEditInfo
+};
+
 
 // ── MODAL HISTORIAL ──
 let cachedMetricas = [];
