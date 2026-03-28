@@ -788,6 +788,7 @@
         return;
       }
       cachedUserData = data;
+      window.cachedUserData = cachedUserData;
       const nombreReal = data.nombre || user.email.split('@')[0];
       const nombre = data.alias || nombreReal;
       const initials = nombreReal.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
