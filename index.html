@@ -1370,16 +1370,17 @@ if (Object.keys(updates).length > 0) {
 }
 
 
-    // ÉXITO: recargar Método en caliente
-    errEl.style.color = '#4ade80';
-    errEl.textContent = '¡Cambios guardados!';
+// ÉXITO: recargar Método en caliente
+errEl.style.color = '#4ade80';
+errEl.textContent = '¡Cambios guardados!';
 
-    if (typeof window._metodoData !== 'undefined') {
-      window._metodoData = null;
-    }
-    if (typeof window.initMetodoTab === 'function') {
-      window.initMetodoTab();
-    }
+if (typeof window._metodoData !== 'undefined') {
+  window._metodoData = null;
+}
+if (typeof window.initMetodoTab === 'function') {
+  window.initMetodoTab();
+}
+
 
     btn.textContent = 'Guardado';
 
