@@ -1287,12 +1287,12 @@ function renderProfileMetrics(m) {
     // CAMPOS DEL FORM
     const nuevaMeta = document.getElementById('edit-meta')?.value;
     const nuevoEmail = document.getElementById('edit-email').value.trim();
-    const confEmail = document.getElementById('edit-confirm-email').value.trim();
-    const tel = document.getElementById('edit-tel').value.trim();
-    const confTel = document.getElementById('edit-confirm-tel').value.trim();
+    const confEmail  = document.getElementById('edit-confirm-email').value.trim();
+    const tel        = document.getElementById('edit-tel').value.trim();
+    const confTel    = document.getElementById('edit-confirm-tel').value.trim();
 
     const passCurrent = document.getElementById('edit-pass-current').value;
-    const passNew = document.getElementById('edit-pass-new').value;
+    const passNew     = document.getElementById('edit-pass-new').value;
     const passConfirm = document.getElementById('edit-confirm-pass').value;
 
     // VALIDACIONES EMAIL / TEL
@@ -1314,19 +1314,16 @@ function renderProfileMetrics(m) {
     // ARMAR UPDATES A FIRESTORE
     const updates = {};
 
-  // Meta (objetivo)
-// nuevaMeta viene del <select>, con el formato que ya entiende Método
-if (nuevaMeta) {
-  const objActual = (window.cachedUserData && window.cachedUserData.objetivo) || {};
-
-  updates.objetivo = {
-    ...objActual,
-    meta: nuevaMeta,
-    metageneral: nuevaMeta,
-  };
-}
-
-
+    // Meta (objetivo)
+    // nuevaMeta viene del <select>, con el formato que ya entiende Método
+    if (nuevaMeta) {
+      const objActual = (window.cachedUserData && window.cachedUserData.objetivo) || {};
+      updates.objetivo = {
+        ...objActual,
+        meta: nuevaMeta,
+        metageneral: nuevaMeta,
+      };
+    }
 
     // Email
     if (nuevoEmail && nuevoEmail !== (cachedUserData.email || user.email)) {
@@ -1342,12 +1339,13 @@ if (nuevaMeta) {
     if (Object.keys(updates).length > 0) {
       await updateDoc(doc(db, 'usuarios', user.uid), updates);
 
-      // Actualizar cache local
+      // Actualizar cache local (las dos referencias)
       cachedUserData = {
         ...cachedUserData,
         ...updates,
         objetivo: updates.objetivo || cachedUserData.objetivo,
       };
+      window.cachedUserData = cachedUserData;
 
       // REFRESCAR VISTAS RÁPIDO
       if (updates.telefono) {
@@ -1363,52 +1361,31 @@ if (nuevaMeta) {
         if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
 
         const objetivoBadge = document.getElementById('metodo-objetivo-badge');
-        const objetivoDesc = document.getElementById('metodo-objetivo-desc');
+        const objetivoDesc  = document.getElementById('metodo-objetivo-desc');
         if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
-        if (objetivoDesc) objetivoDesc.textContent = updates.objetivo.meta;
+        if (objetivoDesc)  objetivoDesc.textContent  = '';
       }
-    }
-
-    // CAMBIO DE CONTRASEÑA (AUTH)
-    if (passCurrent || passNew || passConfirm) {
-      if (!passCurrent) throw new Error('Escribe tu contraseña actual');
-      if (!passNew) throw new Error('Escribe la nueva contraseña');
-
-      const passRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-
-      if (!passRegex.test(passNew)) {
-        throw new Error('La contraseña debe tener mayúscula, minúscula, número y un símbolo');
-      }
-      if (passNew !== passConfirm) {
-        throw new Error('Las contraseñas no coinciden');
-      }
-
-      const cred = EmailAuthProvider.credential(user.email, passCurrent);
-      await reauthenticateWithCredential(user, cred);
-      await updatePassword(user, passNew);
     }
 
     // ÉXITO: recargar Método en caliente
-errEl.style.color = '#4ade80';
-errEl.textContent = '¡Cambios guardados!';
+    errEl.style.color = '#4ade80';
+    errEl.textContent = '¡Cambios guardados!';
 
-if (typeof window._metodoData !== 'undefined') {
-  window._metodoData = null;
-}
-if (typeof window.initMetodoTab === 'function') {
-  window.initMetodoTab();
-}
+    if (typeof window._metodoData !== 'undefined') {
+      window._metodoData = null;
+    }
+    if (typeof window.initMetodoTab === 'function') {
+      window.initMetodoTab();
+    }
 
-btn.textContent = 'Guardado';
+    btn.textContent = 'Guardado';
 
-setTimeout(() => {
-  closeModal('modal-edit');
-  errEl.textContent = '';
-  btn.textContent = 'Guardar cambios';
-  btn.disabled = false;
-}, 1000);
-
+    setTimeout(() => {
+      closeModal('modal-edit');
+      errEl.textContent = '';
+      btn.textContent = 'Guardar cambios';
+      btn.disabled = false;
+    }, 1000);
   } catch (e) {
     console.error('saveEditInfo', e);
     errEl.style.color = '#f87171';
@@ -1417,6 +1394,7 @@ setTimeout(() => {
     btn.disabled = false;
   }
 };
+
 
 
 // ── MODAL HISTORIAL ──
