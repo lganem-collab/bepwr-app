@@ -1805,7 +1805,7 @@ function renderObjetivo(data, config) {
     desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
     return;
   }
-badge.textContent = config ? config.label : data.objetivo;
+  badge.textContent = config ? config.label : data.objetivo;
   badge.style.background = config ? config.color + '22' : 'rgba(255,255,255,0.1)';
   badge.style.color       = config ? config.color : '#fff';
   badge.style.border      = config ? '1px solid ' + config.color + '44' : 'none';
