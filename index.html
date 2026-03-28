@@ -1311,10 +1311,51 @@ function renderProfileMetrics(m) {
       }
     }
 
-    // ARMAR UPDATES A FIRESTORE
-    const updates = {};
+    window.saveEditInfo = async () => {
+  const errEl = document.getElementById('edit-error');
+  const btn = document.querySelector('#modal-edit .btn-primary');
+  if (!errEl || !btn) return;
 
-  // Meta (objetivo)
+  errEl.style.color = '#f87171';
+  errEl.textContent = '';
+  btn.textContent = 'Guardando...';
+  btn.disabled = true;
+
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('Sin sesión activa');
+
+    // CAMPOS DEL FORM
+    const nuevaMeta = document.getElementById('edit-meta')?.value;
+    const nuevoEmail = document.getElementById('edit-email').value.trim();
+    const confEmail = document.getElementById('edit-confirm-email').value.trim();
+    const tel = document.getElementById('edit-tel').value.trim();
+    const confTel = document.getElementById('edit-confirm-tel').value.trim();
+
+    const passCurrent = document.getElementById('edit-pass-current').value;
+    const passNew = document.getElementById('edit-pass-new').value;
+    const passConfirm = document.getElementById('edit-confirm-pass').value;
+
+    // VALIDACIONES EMAIL / TEL
+    if (nuevoEmail || confEmail) {
+      if (!nuevoEmail || !confEmail || nuevoEmail !== confEmail) {
+        throw new Error('El email y su confirmación deben coincidir.');
+      }
+    }
+
+    if (tel || confTel) {
+      if (!tel || !confTel || tel !== confTel) {
+        throw new Error('El teléfono y su confirmación deben coincidir.');
+      }
+      if (!/^\d{10}$/.test(tel)) {
+        throw new Error('El teléfono debe tener 10 dígitos.');
+      }
+    }
+
+    // ARMAR UPDATES A FIRESTORE
+const updates = {};
+
+// Meta (objetivo)
 // nuevaMeta viene del <select>, con el formato que ya entiende Método
 if (nuevaMeta) {
   const objActual = (window.cachedUserData && window.cachedUserData.objetivo) || {};
@@ -1326,48 +1367,48 @@ if (nuevaMeta) {
   };
 }
 
+// Email
+if (nuevoEmail && nuevoEmail !== (cachedUserData.email || user.email)) {
+  updates.email = nuevoEmail;
+}
 
+// Teléfono
+if (tel && tel !== cachedUserData.telefono) {
+  updates.telefono = tel;
+}
 
-    // Email
-    if (nuevoEmail && nuevoEmail !== (cachedUserData.email || user.email)) {
-      updates.email = nuevoEmail;
-    }
+// GUARDAR EN FIRESTORE SI HAY CAMBIOS
+if (Object.keys(updates).length > 0) {
+  await updateDoc(doc(db, 'usuarios', user.uid), updates);
 
-    // Teléfono
-    if (tel && tel !== cachedUserData.telefono) {
-      updates.telefono = tel;
-    }
+  // Actualizar cache local en las dos variables
+  cachedUserData = {
+    ...cachedUserData,
+    ...updates,
+    objetivo: updates.objetivo || cachedUserData.objetivo,
+  };
+  window.cachedUserData = cachedUserData;
 
-    // GUARDAR EN FIRESTORE SI HAY CAMBIOS
-    if (Object.keys(updates).length > 0) {
-      await updateDoc(doc(db, 'usuarios', user.uid), updates);
+  // REFRESCAR VISTAS RÁPIDO
+  if (updates.telefono) {
+    const telEl = document.getElementById('prof-phone');
+    if (telEl) telEl.textContent = updates.telefono;
+  }
+  if (updates.email) {
+    const emailEl = document.getElementById('prof-email');
+    if (emailEl) emailEl.textContent = updates.email;
+  }
+  if (updates.objetivo) {
+    const metaEl = document.getElementById('prof-meta');
+    if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
 
-      // Actualizar cache local
-      cachedUserData = {
-        ...cachedUserData,
-        ...updates,
-        objetivo: updates.objetivo || cachedUserData.objetivo,
-      };
+    const objetivoBadge = document.getElementById('metodo-objetivo-badge');
+    const objetivoDesc  = document.getElementById('metodo-objetivo-desc');
+    if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
+    if (objetivoDesc)  objetivoDesc.textContent  = updates.objetivo.meta;
+  }
+}
 
-      // REFRESCAR VISTAS RÁPIDO
-      if (updates.telefono) {
-        const telEl = document.getElementById('prof-phone');
-        if (telEl) telEl.textContent = updates.telefono;
-      }
-      if (updates.email) {
-        const emailEl = document.getElementById('prof-email');
-        if (emailEl) emailEl.textContent = updates.email;
-      }
-      if (updates.objetivo) {
-        const metaEl = document.getElementById('prof-meta');
-        if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
-
-        const objetivoBadge = document.getElementById('metodo-objetivo-badge');
-        const objetivoDesc = document.getElementById('metodo-objetivo-desc');
-        if (objetivoBadge) objetivoBadge.textContent = updates.objetivo.meta;
-        if (objetivoDesc) objetivoDesc.textContent = updates.objetivo.meta;
-      }
-    }
 
     // CAMBIO DE CONTRASEÑA (AUTH)
     if (passCurrent || passNew || passConfirm) {
