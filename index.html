@@ -1313,26 +1313,18 @@ function renderProfileMetrics(m) {
     // ARMAR UPDATES A FIRESTORE
     const updates = {};
 
-   // Meta (objetivo)
-  // nuevaMeta viene del <select>, con el formato que ya entiende Método
-  if (nuevaMeta && nuevaMeta !== (cachedUserData.objetivo?.meta || '')) {
-  const objActual = cachedUserData.objetivo || {};
-
-  // Opcional: si quieres guardar también una versión bonita con "·", la derivamos aquí
-  let metaBonita = nuevaMeta;
-  if (nuevaMeta.startsWith('Incrementar performance ')) {
-    // Ej: "Incrementar performance Golf Golf" -> "Incrementar performance · Golf"
-    const partes = nuevaMeta.replace('Incrementar performance ', '').trim().split(' ');
-    const deporte = partes[0] || '';
-    metaBonita = 'Incrementar performance · ' + deporte;
-  }
+  // Meta (objetivo)
+// nuevaMeta viene del <select>, con el formato que ya entiende Método
+if (nuevaMeta) {
+  const objActual = (window.cachedUserData && window.cachedUserData.objetivo) || {};
 
   updates.objetivo = {
     ...objActual,
-    meta: nuevaMeta,        // lo que usa Método y el select
-    metageneral: metaBonita // lo que puedes mostrar en otros lugares si quieres
+    meta: nuevaMeta,
+    metageneral: nuevaMeta,
   };
 }
+
 
 
     // Email
