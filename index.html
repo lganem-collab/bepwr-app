@@ -1788,13 +1788,31 @@ async function initMetodoTab() {
 }
 
 function renderMetodo(data) {
+  // Objetivo en Método: misma fuente que Inicio
+  renderObjetivoMetodoDesdeCached();
+
   const objKey = normalizeObjetivo(data.objetivo);
-  const config = null; // por ahora no usamos OBJETIVO_CONFIG
-  renderObjetivo(data, config);
+  const config = objKey ? OBJETIVO_CONFIG[objKey] : null;
   renderPruebaPeso(data);
   renderRutina(config);
   renderProximaValoracion(data, config);
   renderGuiaNutrimental(data, config);
+}
+
+  function renderObjetivoMetodoDesdeCached() {
+  const badge = document.getElementById('metodo-objetivo-badge');
+  const desc  = document.getElementById('metodo-objetivo-desc');
+  if (!badge || !desc) return;
+
+  const obj = (window.cachedUserData && window.cachedUserData.objetivo) || null;
+  if (!obj || !obj.meta) {
+    badge.textContent = 'Sin definir';
+    desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
+    return;
+  }
+
+  badge.textContent = obj.meta;
+  desc.textContent  = '';
 }
 
 
