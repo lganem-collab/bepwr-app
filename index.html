@@ -1787,24 +1787,34 @@ async function initMetodoTab() {
 }
 
 function renderMetodo(data) {
+  // objetivo: copiar lo que ya está en cachedUserData
+  renderObjetivoDesdeCached();
+
   const objKey = normalizeObjetivo(data.objetivo);
   const config = null; // por ahora no usamos OBJETIVO_CONFIG
-  renderObjetivo(data, config);
   renderPruebaPeso(data);
   renderRutina(config);
   renderProximaValoracion(data, config);
   renderGuiaNutrimental(data, config);
 }
 
-
-function renderObjetivo(data, config) {
+// NUEVA función: usa cachedUserData
+function renderObjetivoDesdeCached() {
   const badge = document.getElementById('metodo-objetivo-badge');
   const desc  = document.getElementById('metodo-objetivo-desc');
-  if (!data.objetivo) {
+  if (!badge || !desc) return;
+
+  const obj = (window.cachedUserData && window.cachedUserData.objetivo) || null;
+  if (!obj || !obj.meta) {
     badge.textContent = 'Sin definir';
     desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
     return;
   }
+
+  badge.textContent = obj.meta;
+  desc.textContent  = '';
+}
+
   badge.textContent = config ? config.label : data.objetivo;
   badge.style.background = config ? config.color + '22' : 'rgba(255,255,255,0.1)';
   badge.style.color       = config ? config.color : '#fff';
