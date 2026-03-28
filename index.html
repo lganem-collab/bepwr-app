@@ -1734,9 +1734,11 @@ async function loadMetodoData() {
     const query = window.query;
     const orderBy = window.orderBy;
     const limit = window.limit;
+
     const userSnap = await getDoc(doc(db, 'usuarios', uid));
     if (!userSnap.exists()) return null;
     const d = userSnap.data();
+
     let ultimaValoracion = null;
     try {
       const vQuery = query(
@@ -1750,27 +1752,28 @@ async function loadMetodoData() {
         const fechaVal = v.fecha?.toDate ? v.fecha.toDate() : new Date(v.fecha || Date.now());
         ultimaValoracion = { fecha: fechaVal, tipo: 'composicion' };
       }
-    } catch(e) {}
+    } catch (e) {}
 
     let guiaUrls = {};
     try {
-      const gSnap = await getDoc(doc(db,'config','guias'));
-      if (gSnap.exists()) guiaUrls = gSnap.data()||{};
-    } catch(e) {}
-      return {
-  objetivo: (d.objetivo && d.objetivo.meta) ? d.objetivo.meta : (d.meta || null),
-  nombre: d.nombre || d.name || '',
-  edad: d.edad || null,
-  peso: d.peso || null,
-  pruebaPeso: d.pruebaPeso || null,
-  medidas: d.medidas || null,
-  ultimaValoracion,
-  guiaUrls
-};
-} catch(e) {
-  console.error('loadMetodoData:',e);
-  return null;
- }
+      const gSnap = await getDoc(doc(db, 'config', 'guias'));
+      if (gSnap.exists()) guiaUrls = gSnap.data() || {};
+    } catch (e) {}
+
+    return {
+      objetivo: (d.objetivo && d.objetivo.meta) ? d.objetivo.meta : (d.meta || null),
+      nombre: d.nombre || d.name || '',
+      edad: d.edad || null,
+      peso: d.peso || null,
+      pruebaPeso: d.pruebaPeso || null,
+      medidas: d.medidas || null,
+      ultimaValoracion,
+      guiaUrls
+    };
+  } catch (e) {
+    console.error('loadMetodoData:', e);
+    return null;
+  }
 }
 
 async function initMetodoTab() {
