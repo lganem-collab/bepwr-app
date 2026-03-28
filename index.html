@@ -1767,12 +1767,10 @@ async function loadMetodoData() {
   ultimaValoracion,
   guiaUrls
 };
-
-
-  } catch(e) {
-    console.error('loadMetodoData:',e);
-    return null;
-  }
+} catch(e) {
+  console.error('loadMetodoData:',e);
+  return null;
+ }
 }
 
 async function initMetodoTab() {
