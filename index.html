@@ -321,54 +321,52 @@
 
 
     <div class="metodo-card" id="card-objetivo">
-      <div class="metodo-card-label">Mi Objetivo</div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <span class="objetivo-badge" id="metodo-objetivo-badge">—</span>
-        <p class="objetivo-desc" id="metodo-objetivo-desc" style="margin:0;font-size:13px;color:#aaa"></p>
-      </div>
-    </div>
-
-    <div class="metodo-card" id="card-peso">
-      <div class="metodo-card-label">Rango de Mancuernas</div>
-      <div style="display:flex;align-items:baseline;gap:6px;margin:4px 0">
-        <span class="peso-valor" id="metodo-peso-min">—</span>
-        <span class="peso-sep" style="font-size:14px;color:#aaa">a</span>
-        <span class="peso-valor" id="metodo-peso-max"></span>
-        <span class="peso-unit" style="font-size:16px;color:#aaa;font-weight:500">kg</span>
-      </div>
-      <p class="metodo-note" id="metodo-peso-note">Definido por tu coach en valoración</p>
-    </div>
-
-    <div class="metodo-card" id="card-rutina">
-      <div class="metodo-card-label">Mi Rutina Semanal</div>
-      <div id="metodo-rutina-container"><p class="metodo-loading">Cargando rutina...</p></div>
-    </div>
-
-    <div class="metodo-card" id="card-valoracion">
-      <div class="metodo-card-label">Próxima Valoración</div>
-      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
-        <div class="valoracion-fecha" id="metodo-valoracion-fecha">—</div>
-        <div class="valoracion-countdown" id="metodo-valoracion-countdown"></div>
-      </div>
-      <p class="metodo-note" id="metodo-valoracion-note"></p>
-    </div>
-
-    <div class="metodo-card" id="card-guia">
-      <div class="metodo-card-label">Guía Nutrimental</div>
-      <p class="guia-desc" id="metodo-guia-desc" style="font-size:13px;color:#aaa;margin:0 0 12px">Guía personalizada para tu objetivo</p>
-      <a id="metodo-guia-btn" href="#" target="_blank" class="metodo-btn metodo-btn--outline" style="display:none">Descargar PDF</a>
-      <p id="metodo-guia-unavailable" class="metodo-note" style="display:none">PDF no disponible aún</p>
-    </div>
-
-    <div class="metodo-card metodo-card--ia" id="card-ia">
-      <div class="metodo-card-label">Análisis IA Científico</div>
-      <p class="ia-intro">Recibe un análisis personalizado basado en tu perfil y métricas actuales.</p>
-      <button id="btn-analisis-ia" class="metodo-btn metodo-btn--primary" onclick="generarAnalisisIA()">⚡ Generar Análisis</button>
-      <div id="metodo-ia-output" class="ia-output" style="display:none"></div>
-    </div>
-
+  <div class="metodo-card-label" style="color:var(--orange)">Mi Objetivo</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="objetivo-badge" id="metodo-objetivo-badge">—</span>
+    <p class="objetivo-desc" id="metodo-objetivo-desc" style="margin:0;font-size:13px;color:#aaa"></p>
   </div>
 </div>
+
+<div class="metodo-card" id="card-peso">
+  <div class="metodo-card-label" style="color:var(--orange)">Rango de Mancuernas</div>
+  <div style="display:flex;align-items:baseline;gap:6px;margin:4px 0">
+    <span class="peso-valor" id="metodo-peso-min">—</span>
+    <span class="peso-sep" style="font-size:14px;color:#aaa">a</span>
+    <span class="peso-valor" id="metodo-peso-max"></span>
+    <span class="peso-unit" style="font-size:16px;color:#aaa;font-weight:500">kg</span>
+  </div>
+  <p class="metodo-note" id="metodo-peso-note">Definido por tu coach en valoración</p>
+</div>
+
+<div class="metodo-card" id="card-rutina">
+  <div class="metodo-card-label" style="color:var(--orange)">Mi Rutina Semanal</div>
+  <div id="metodo-rutina-container"><p class="metodo-loading">Cargando rutina...</p></div>
+</div>
+
+<div class="metodo-card" id="card-valoracion">
+  <div class="metodo-card-label" style="color:var(--orange)">Próxima Valoración</div>
+  <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+    <div class="valoracion-fecha" id="metodo-valoracion-fecha">—</div>
+    <div class="valoracion-countdown" id="metodo-valoracion-countdown"></div>
+  </div>
+  <p class="metodo-note" id="metodo-valoracion-note"></p>
+</div>
+
+<div class="metodo-card" id="card-guia">
+  <div class="metodo-card-label" style="color:var(--orange)">Guía Nutrimental</div>
+  <p class="guia-desc" id="metodo-guia-desc" style="font-size:13px;color:#aaa;margin:0 0 12px">Guía personalizada para tu objetivo</p>
+  <a id="metodo-guia-btn" href="#" target="_blank" class="metodo-btn metodo-btn--outline" style="display:none">Descargar PDF</a>
+  <p id="metodo-guia-unavailable" class="metodo-note" style="display:none">PDF no disponible aún</p>
+</div>
+
+<div class="metodo-card metodo-card--ia" id="card-ia">
+  <div class="metodo-card-label" style="color:var(--orange)">Análisis Científico</div>
+  <p class="ia-intro">Recibe un análisis personalizado basado en tu perfil y métricas actuales.</p>
+  <button id="btn-analisis-ia" class="metodo-btn metodo-btn--primary" onclick="generarAnalisisIA()">⚡ Generar Análisis</button>
+  <div id="metodo-ia-output" class="ia-output" style="display:none"></div>
+</div>
+
       <!-- RESERVE VIEW -->
       <div class="view" id="view-reserve">
         <div class="reserve-hero">
