@@ -1374,9 +1374,7 @@ if (Object.keys(updates).length > 0) {
 errEl.style.color = '#4ade80';
 errEl.textContent = '¡Cambios guardados!';
 
-if (typeof window._metodoData !== 'undefined') {
-  window._metodoData = null;
-}
+_metodoData = null;
 if (typeof window.initMetodoTab === 'function') {
   window.initMetodoTab();
 }
