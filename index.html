@@ -1361,6 +1361,10 @@ if (Object.keys(updates).length > 0) {
     const metaEl = document.getElementById('prof-meta');
     if (metaEl) metaEl.textContent = updates.objetivo.meta || 'Sin datos';
 
+    // Inicio: actualizar card de objetivo en metrics-grid
+    const goalTitleEl = document.querySelector('#metrics-grid .goal-title');
+    if (goalTitleEl) goalTitleEl.textContent = updates.objetivo.meta || 'Meta personal';
+
     // Método: badge con el nuevo objetivo
     const objetivoBadge = document.getElementById('metodo-objetivo-badge');
     const objetivoDesc  = document.getElementById('metodo-objetivo-desc');
