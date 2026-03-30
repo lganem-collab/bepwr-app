@@ -330,7 +330,7 @@
     </div>
 
     <div class="metodo-card" id="card-peso">
-      <div class="metodo-card-label">Rango de Mancuernas</div>
+      <div class="metodo-card-label">Peso Base Mancuernas</div>
       <div style="display:flex;align-items:baseline;gap:6px;margin:4px 0">
         <span class="peso-valor" id="metodo-peso-min">—</span>
         <span class="peso-sep" style="font-size:14px;color:#aaa">a</span>
@@ -391,6 +391,7 @@
     <div class="metodo-card metodo-card--ia" id="card-ia">
       <div class="metodo-card-label">Análisis Científico</div>
       <div id="metodo-ia-output" style="font-size:.85rem;color:#fff;font-family:DM Sans,sans-serif;line-height:1.6;white-space:pre-wrap">Cargando análisis...</div>
+      <div id="metodo-ia-updated" style="font-size:.7rem;color:#aaa;margin-top:8px;font-family:DM Sans,sans-serif"></div>
     </div>
 
   </div>
@@ -654,6 +655,7 @@
   window.query = query;
   window.orderBy = orderBy;
   window.limit = limit;
+  window.updateDoc = updateDoc;
 
   import('https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js').then(m=>m.setPersistence(auth,m.indexedDbLocalPersistence||m.browserLocalPersistence)).catch(()=>{});
 
@@ -1798,7 +1800,10 @@ return {
   pruebaPeso: d.pruebaPeso || null,
   medidas: d.medidas || null,
   ultimaValoracion,
-  guiaUrls
+  guiaUrls,
+  analisisIA: d.analisisIA || null,
+  analisisIA_fecha: d.analisisIA_fecha || null,
+  analisisIA_valFecha: d.analisisIA_valFecha || null
 };
 
 
@@ -2040,31 +2045,57 @@ function renderHabitos(data) {
 }
 async function renderAnalisisCientifico(data, config) {
   var output = document.getElementById('metodo-ia-output');
+  var updatedEl = document.getElementById('metodo-ia-updated');
   if (!output) return;
+
   var uid = window._currentUid || 'anon';
-  var cacheKey = 'ia-analisis-' + uid;
-  var today = new Date().toISOString().slice(0, 10);
-  try {
-    var cached = JSON.parse(localStorage.getItem(cacheKey) || '{}');
-    if (cached.fecha === today && cached.texto && cached.texto.length >= 500) {
-      output.textContent = cached.texto;
-      return;
+  var updateDoc = window.updateDoc;
+  var docRef = window.doc(window.db, 'usuarios', uid);
+
+  // Fecha de la última valoración actual
+  var valFechaActual = null;
+  if (data.ultimaValoracion && data.ultimaValoracion.fecha) {
+    valFechaActual = data.ultimaValoracion.fecha instanceof Date
+      ? data.ultimaValoracion.fecha.toISOString().slice(0, 10)
+      : new Date(data.ultimaValoracion.fecha).toISOString().slice(0, 10);
+  }
+
+  // Verificar si el análisis guardado en Firestore está vigente
+  var needsRegen = true;
+  if (data.analisisIA && data.analisisIA_fecha) {
+    var genDate = new Date(data.analisisIA_fecha);
+    var diasPasados = Math.floor((Date.now() - genDate.getTime()) / (24 * 60 * 60 * 1000));
+    var valNoChanged = (!valFechaActual && !data.analisisIA_valFecha) ||
+                       (valFechaActual === data.analisisIA_valFecha);
+
+    if (diasPasados < 7 && valNoChanged && data.analisisIA.length >= 100) {
+      // Análisis vigente: mostrar desde Firestore
+      output.textContent = data.analisisIA;
+      output.style.opacity = '1';
+      if (updatedEl) {
+        updatedEl.textContent = 'Actualizado hace ' + diasPasados +
+          (diasPasados === 1 ? ' día' : ' días') +
+          ' · Se renueva con cada nueva valoración o cada semana';
+      }
+      needsRegen = false;
     }
-  } catch (e) {}
-  output.textContent = 'Generando tu analisis personalizado...';
+  }
+
+  if (!needsRegen) return;
+
+  // Necesita regenerar
+  output.textContent = 'Generando tu análisis personalizado...';
   output.style.opacity = '0.5';
+  if (updatedEl) updatedEl.textContent = '';
+
   var val = data.ultimaValoracion || {};
   var objLabel = config ? config.label : (data.objetivo || 'No definido');
   var lines = [];
   lines.push('- Objetivo: ' + objLabel);
-  if (data.edad) lines.push('- Edad: ' + data.edad + ' anos');
+  if (data.edad) lines.push('- Edad: ' + data.edad + ' años');
   if (val.peso || data.peso) lines.push('- Peso corporal: ' + (val.peso || data.peso) + ' kg');
   if (val.musculo) lines.push('- Masa muscular: ' + val.musculo + ' kg');
-  if (val.grasaCorporal) lines.push('- Grasa corporal: ' + val.grasaCorporal + ' kg');
-  if (val.pgc) lines.push('- Porcentaje grasa corporal: ' + val.pgc + '%');
-  if (val.imc) lines.push('- IMC: ' + val.imc);
-  if (val.grasaVisceral) lines.push('- Grasa visceral: ' + val.grasaVisceral);
-  if (val.calificacion) lines.push('- Calificacion InBody: ' + val.calificacion);
+  if (val.grasa) lines.push('- Grasa corporal: ' + val.grasa + '%');
   if (val.brazo) lines.push('- Medida brazo: ' + val.brazo + ' cm');
   if (val.abdomen) lines.push('- Medida abdomen: ' + val.abdomen + ' cm');
   if (val.cintura) lines.push('- Medida cintura: ' + val.cintura + ' cm');
@@ -2073,13 +2104,15 @@ async function renderAnalisisCientifico(data, config) {
   if (data.pruebaPeso) {
     var pp = typeof data.pruebaPeso === 'string' ? data.pruebaPeso + ' kg' :
       (data.pruebaPeso.min || '?') + ' - ' + (data.pruebaPeso.max || '?') + ' kg';
-    lines.push('- Rango de mancuernas: ' + pp);
+    lines.push('- Peso Base Mancuernas: ' + pp);
   }
   if (val.fecha) {
     var semanas = Math.floor((new Date() - new Date(val.fecha)) / (7*24*60*60*1000));
-    lines.push('- Tiempo desde ultima valoracion: ' + semanas + ' semanas');
+    lines.push('- Tiempo desde última valoración: ' + semanas + ' semanas');
   }
-  var prompt = 'Eres un experto en ciencias del ejercicio, fisiologia deportiva y nutricion deportiva. Trabajas en bePWR, un centro de entrenamiento funcional premium en Queretaro, Mexico.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nGenera un analisis cientifico personalizado y detallado que incluya:\n1. Interpretacion de sus metricas actuales (composicion corporal, IMC, grasa visceral, calificacion InBody) explicando que significan para su salud y rendimiento\n2. Relacion entre sus medidas corporales y su objetivo especifico\n3. Que adaptaciones neuromusculares y metabolicas puede esperar en las proximas 4-8 semanas con entrenamiento funcional\n4. Pronostico realista de resultados basado en evidencia cientifica para su perfil\n5. Un consejo especifico y accionable basado en sus datos actuales\n\nTono: cientifico pero accesible, motivador y directo. En espanol. Minimo 500 caracteres. Sin titulos ni bullets, redaccion fluida en parrafos. No uses asteriscos ni formato markdown.';
+
+  var prompt = 'Eres un experto en ciencias del ejercicio, fisiología deportiva y nutrición deportiva. Trabajas en bePWR, un centro de entrenamiento funcional premium en Querétaro, México.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nGenera un análisis científico personalizado y detallado que incluya:\n1. Interpretación de sus métricas actuales\n2. Relación entre su composición corporal y su objetivo\n3. Recomendaciones específicas basadas en evidencia\n4. Proyección de progreso si mantiene consistencia\n\nTono científico pero accesible, motivador y directo. En español. Mínimo 500 caracteres. Sin títulos ni bullets, redacción fluida en párrafos. No uses asteriscos ni formato markdown.';
+
   try {
     var resp = await fetch('/api/chat', {
       method: 'POST',
@@ -2091,13 +2124,28 @@ async function renderAnalisisCientifico(data, config) {
     if (text && text.length >= 100) {
       output.textContent = text;
       output.style.opacity = '1';
-      localStorage.setItem(cacheKey, JSON.stringify({ fecha: today, texto: text }));
+
+      // Guardar en Firestore
+      var hoy = new Date().toISOString().slice(0, 10);
+      try {
+        await updateDoc(docRef, {
+          analisisIA: text,
+          analisisIA_fecha: hoy,
+          analisisIA_valFecha: valFechaActual || null
+        });
+      } catch (e) {
+        console.error('Error guardando análisis en Firestore:', e);
+      }
+
+      if (updatedEl) {
+        updatedEl.textContent = 'Actualizado hoy · Se renueva con cada nueva valoración o cada semana';
+      }
     } else {
-      output.textContent = 'No se pudo generar el analisis. Intenta mas tarde.';
+      output.textContent = 'No se pudo generar el análisis. Intenta más tarde.';
       output.style.opacity = '1';
     }
   } catch (e) {
-    output.textContent = 'Error al conectar. Verifica tu conexion.';
+    output.textContent = 'Error al conectar. Verifica tu conexión.';
     output.style.opacity = '1';
   }
 }
