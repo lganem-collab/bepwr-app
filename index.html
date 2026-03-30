@@ -360,7 +360,34 @@
       <a id="metodo-guia-btn" href="#" target="_blank" class="metodo-btn metodo-btn--outline" style="display:none">Descargar PDF</a>
       <p id="metodo-guia-unavailable" class="metodo-note" style="display:none">PDF no disponible aún</p>
     </div>
-
+<div class="metodo-card" id="card-habitos">
+      <div class="metodo-card-label">Hábitos Saludables</div>
+      <div id="metodo-habitos-container">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:20px;flex-shrink:0">💧</span>
+            <div>
+              <div style="font-size:.85rem;font-weight:600;color:#fff;font-family:DM Sans,sans-serif">Hidratación diaria</div>
+              <div id="habitos-hidratacion" style="font-size:.8rem;color:#aaa;font-family:DM Sans,sans-serif;margin-top:2px">Calculando...</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:20px;flex-shrink:0">😴</span>
+            <div>
+              <div style="font-size:.85rem;font-weight:600;color:#fff;font-family:DM Sans,sans-serif">Descanso nocturno</div>
+              <div style="font-size:.8rem;color:#aaa;font-family:DM Sans,sans-serif;margin-top:2px">Dormir de 7 a 8 horas diarias</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:20px;flex-shrink:0">🛋️</span>
+            <div>
+              <div style="font-size:.85rem;font-weight:600;color:#fff;font-family:DM Sans,sans-serif">Recuperación semanal</div>
+              <div style="font-size:.8rem;color:#aaa;font-family:DM Sans,sans-serif;margin-top:2px">Descansar 1 día a la semana de actividad física</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="metodo-card metodo-card--ia" id="card-ia">
       <div class="metodo-card-label">Análisis Científico</div>
       <div id="metodo-ia-output" style="font-size:.85rem;color:#fff;font-family:DM Sans,sans-serif;line-height:1.6;white-space:pre-wrap">Cargando análisis...</div>
@@ -1766,6 +1793,7 @@ return {
   nombre: d.nombre || d.name || '',
   edad: d.edad || null,
   nacimiento: d.nacimiento || null,
+  genero: d.genero || null,
   peso: d.peso || null,
   pruebaPeso: d.pruebaPeso || null,
   medidas: d.medidas || null,
@@ -1798,6 +1826,7 @@ function renderMetodo(data) {
   renderRutina(config, data);
   renderProximaValoracion(data, config);
   renderGuiaNutrimental(data, config);
+  renderHabitos(data);
   renderAnalisisCientifico(data, config);
 }
 
@@ -1958,7 +1987,57 @@ function renderGuiaNutrimental(data, config) {
   btn.style.display     = 'inline-flex';
   unavail.style.display = 'none';
 }
+function renderHabitos(data) {
+  var el = document.getElementById('habitos-hidratacion');
+  if (!el) return;
 
+  var edad = null;
+  if (data && data.nacimiento) {
+    var nac = data.nacimiento.toDate ? data.nacimiento.toDate() : new Date(data.nacimiento);
+    var hoy = new Date();
+    edad = hoy.getFullYear() - nac.getFullYear();
+    var m = hoy.getMonth() - nac.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+  } else if (data && data.edad) {
+    edad = parseInt(data.edad);
+  }
+
+  var peso = null;
+  if (data.ultimaValoracion && data.ultimaValoracion.peso) {
+    peso = data.ultimaValoracion.peso;
+  } else if (data.peso) {
+    peso = data.peso;
+  }
+
+  if (edad === null || peso === null) {
+    el.textContent = 'Necesitamos tu edad y peso para calcular';
+    return;
+  }
+
+  var genero = (data.genero || '').toLowerCase();
+  var factores;
+  if (edad < 30) {
+    factores = { f: 37.5, m: 39.5 };
+  } else if (edad <= 45) {
+    factores = { f: 35.5, m: 37.5 };
+  } else {
+    factores = { f: 37.5, m: 38.5 };
+  }
+
+  var factor;
+  if (genero === 'masculino') {
+    factor = factores.m;
+  } else if (genero === 'femenino') {
+    factor = factores.f;
+  } else {
+    factor = (factores.f + factores.m) / 2;
+  }
+
+  var ml = Math.round(peso * factor);
+  var litros = (ml / 1000).toFixed(1);
+
+  el.textContent = 'Tomar ' + litros + ' litros de agua al día (' + ml + ' ml)';
+}
 async function renderAnalisisCientifico(data, config) {
   var output = document.getElementById('metodo-ia-output');
   if (!output) return;
