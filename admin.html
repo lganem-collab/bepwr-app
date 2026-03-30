@@ -481,10 +481,20 @@
 </div>
 <div class="field-row">
   <div class="field"><label>Pantorrilla (cm)</label><input type="number" id="m-pantorrilla" placeholder="36" step="0.1" /></div>
-  <div class="field"></div>
+  <div class="field"><label>Peso Base Mancuernas</label>
+    <select id="m-pruebaPeso" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#181818;color:#fff;font-family:DM Sans,sans-serif;font-size:.9rem">
+      <option value="">Sin evaluar</option>
+      <option value="Ligas de resistencia">Ligas de resistencia</option>
+      <option value="10 lb">10 lb</option>
+      <option value="15 lb">15 lb</option>
+      <option value="20 lb">20 lb</option>
+      <option value="25 lb">25 lb</option>
+      <option value="30 lb">30 lb</option>
+      <option value="40 lb">40 lb</option>
+    </select>
+  </div>
 </div>
-<div class="form-error" id="metrics-error"></div>
-    <div class="modal-footer">
+<div class="form-error" id="metrics-error"></div>    <div class="modal-footer">
       <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoraci&#xF3;n</button>
       <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-metrics')">Cancelar</button>
     </div>
@@ -1434,6 +1444,7 @@ if (user && user.uid === MASTER_UID) {
     document.getElementById('metrics-modal-sub').textContent = nombre;
     document.getElementById('metrics-error').textContent = '';
 ['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('m-pruebaPeso').value = '';
     const now = new Date();
     document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     document.getElementById('modal-metrics').classList.add('open');
@@ -1728,6 +1739,7 @@ if (user && user.uid === MASTER_UID) {
     const cintura    = parseFloat(document.getElementById('m-cintura').value);
     const cadera     = parseFloat(document.getElementById('m-cadera').value);
     const pantorrilla= parseFloat(document.getElementById('m-pantorrilla').value);
+    const pruebaPeso = document.getElementById('m-pruebaPeso').value;
     const errEl = document.getElementById('metrics-error');
     errEl.textContent = '';
     const medidasVal = [
@@ -1758,6 +1770,7 @@ for (const med of medidasVal) {
         cintura:     isNaN(cintura)     ? null : cintura,
         cadera:      isNaN(cadera)      ? null : cadera,
         pantorrilla: isNaN(pantorrilla) ? null : pantorrilla,
+        pruebaPeso: pruebaPeso || null,
         fecha, registradoPor: auth.currentUser?.uid || null, miembroNombre
       };
       if (window._editingMetricId) {
@@ -1799,6 +1812,10 @@ for (const med of medidasVal) {
         return;
       } else {
         await db.collection('usuarios').doc(uid).collection('metricas').add(metricData);
+        // Actualizar pruebaPeso en documento del usuario
+      if (pruebaPeso) {
+        await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
+      }
       }
       showToast('Valoraci\u00F3n guardada \u2713', 'success');
       logBitacora('nueva_valoracion', 'Valoraci\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
