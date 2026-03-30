@@ -1813,7 +1813,7 @@ function renderObjetivo(data, config) {
   badge.textContent = config ? config.label : data.objetivo;
   badge.style.background = config ? config.color + '22' : 'rgba(255,255,255,0.1)';
   badge.style.color       = '#fff';
-  badge.style.border      = config ? '1px solid ' + config.color + '44' : 'none';
+  badge.style.border      = 'none';
   desc.textContent = config ? config.desc : '';
 }
 
@@ -1830,7 +1830,7 @@ function renderObjetivo(data, config) {
   badge.textContent = config ? config.label : data.objetivo;
   badge.style.background = config ? config.color + '22' : 'rgba(255,255,255,0.1)';
   badge.style.color       = '#fff';
-  badge.style.border      = config ? '1px solid ' + config.color + '44' : 'none';
+  badge.style.border      = 'none';
 
   desc.textContent = config
     ? config.desc
