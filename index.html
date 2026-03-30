@@ -1890,8 +1890,8 @@ function renderRutina(config, data) {
           return;
         }
         var html = '';
-        html += '<div style="margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center">';
         html += '<div style="margin-bottom:.5rem;font-size:.95rem;font-weight:700;color:var(--accent);font-family:DM Sans,sans-serif">' + plan.total + '</div>';
+        html += '<table style="width:100%;border-collapse:collapse;margin-bottom:.5rem">';
         for (var i = 0; i < plan.clases.length; i++) {
           var c = plan.clases[i];
           html += '<tr>';
