@@ -1889,18 +1889,14 @@ function renderRutina(config, data) {
           container.innerHTML = '<p style="color:var(--gray);font-size:.85rem">Sin rutina disponible</p>';
           return;
         }
-        var edadLabel = bracket === 'sub30' ? 'Menor de 30' : bracket === 'mid' ? '30-45 años' : '45+ años';
         var html = '';
         html += '<div style="margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center">';
-        html += '<span style="font-size:.85rem;color:var(--gray);font-family:DM Sans,sans-serif">' + edadLabel + (edad !== null ? ' (' + edad + ' a\u00f1os)' : '') + '</span>';
-        html += '<span style="font-size:.95rem;font-weight:700;color:var(--accent);font-family:DM Sans,sans-serif">' + plan.total + '</span>';
-        html += '</div>';
-        html += '<table style="width:100%;border-collapse:collapse;margin-bottom:.5rem">';
+        html += '<div style="margin-bottom:.5rem;font-size:.95rem;font-weight:700;color:var(--accent);font-family:DM Sans,sans-serif">' + plan.total + '</div>';
         for (var i = 0; i < plan.clases.length; i++) {
           var c = plan.clases[i];
           html += '<tr>';
-          html += '<td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.08);font-family:DM Sans,sans-serif;font-size:.9rem;color:#fff;font-weight:600">' + c.tipo + '</td>';
-          html += '<td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.08);font-family:DM Sans,sans-serif;font-size:.85rem;color:var(--gray);text-align:right">' + c.freq + '</td>';
+          html += '<td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.08);font-family:DM Sans,sans-serif;font-size:.9rem;color:#fff;font-weight:600">' + c.freq + '</td>';
+          html += '<td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.08);font-family:DM Sans,sans-serif;font-size:.85rem;color:var(--gray);text-align:right">' + c.tipo + '</td>';
           html += '</tr>';
         }
         html += '</table>';
