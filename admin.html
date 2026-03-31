@@ -913,6 +913,9 @@ if (user && user.uid === MASTER_UID) {
       if (res.ok) {
         showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
         logBitacora('envio_aviso', 'Aviso: \"' + title + '\" (' + data.sent + ' enviados)', '');
+        // Reset destinatarios a "Todos"
+        const tgt = document.getElementById('notif-target');
+        if (tgt) { tgt.value = 'all'; tgt.dispatchEvent(new Event('change')); }
         switchTab('members');
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
