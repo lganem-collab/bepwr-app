@@ -1,4 +1,4 @@
-const CACHE = 'bepwr-v13';
+const CACHE = 'bepwr-v14';
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 
@@ -10,7 +10,6 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Sin cacheo - todo va directo a red
 self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (url.includes('firestore.googleapis.com') || url.includes('googleapis.com/identitytoolkit')) return;
@@ -18,11 +17,9 @@ self.addEventListener('fetch', e => {
   e.respondWith(fetch(e.request));
 });
 
-// Recibir push de FCM y mostrar notificación nativa
 self.addEventListener('push', e => {
   let data = {};
   try { data = e.data ? e.data.json() : {}; } catch(err) {}
-
   const n = data.notification || {};
   const title = n.title || data.title || 'bePWR';
   const body  = n.body  || data.body  || '';
@@ -30,26 +27,28 @@ self.addEventListener('push', e => {
   const badge = '/icons/icon-192.png';
   const url   = (data.webpush && data.webpush.fcmOptions && data.webpush.fcmOptions.link)
                 || data.url || 'https://bepwr-app.vercel.app';
-
   e.waitUntil(
     self.registration.showNotification(title, {
-      body,
-      icon,
-      badge,
+      body, icon, badge,
       data: { url },
       vibrate: [200, 100, 200],
       tag: 'bepwr-notif',
       renotify: true
     })
   );
+  // Avisar a clientes para badge
+  self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then(clients => {
+    clients.forEach(c => c.postMessage({ type: 'PUSH_RECEIVED' }));
+  });
 });
 
-// Click en notificación -> abrir/enfocar la app
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   const url = (e.notification.data && e.notification.data.url) || 'https://bepwr-app.vercel.app';
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      // Avisar a clientes para registrar notif_abierta
+      clients.forEach(c => c.postMessage({ type: 'NOTIF_ABIERTA' }));
       for (const client of clients) {
         if (client.url.includes('bepwr-app.vercel.app') && 'focus' in client) {
           client.navigate(url);
@@ -59,11 +58,4 @@ self.addEventListener('notificationclick', e => {
       return self.clients.openWindow(url);
     })
   );
-});
-
-// Notificar a clientes abiertos para que actualicen el badge
-self.addEventListener('push', e => {
-  self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then(clients => {
-    clients.forEach(client => client.postMessage({ type: 'PUSH_RECEIVED' }));
-  });
 });
