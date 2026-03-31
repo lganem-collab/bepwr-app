@@ -738,6 +738,7 @@
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
       startNotifListener(user.uid);
+      if (navigator.clearAppBadge) navigator.clearAppBadge();
       // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
       if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
@@ -1217,7 +1218,18 @@ function renderProfileMetrics(m) {
     if (title && body && Notification.permission === 'granted') {
       new Notification(title, { body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png' });
     }
+    // Badge en ícono de PWA
+    if (navigator.setAppBadge) navigator.setAppBadge(1);
   });
+
+  // Escuchar mensajes del SW (push en background)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data && e.data.type === 'PUSH_RECEIVED') {
+        if (navigator.setAppBadge) navigator.setAppBadge(1);
+      }
+    });
+  }
 
   // &#x2500;&#x2500; T&#xC9;RMINOS Y AVISO DE PRIVACIDAD &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
   window.toggleTerminosBtn = function() {
