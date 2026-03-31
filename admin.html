@@ -156,6 +156,7 @@
     <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">&#x1F465; Staff</div>
     <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">&#x1F4E3; Env&#xED;o de Avisos</div>
     <div class="tab" id="tab-bitacora" onclick="switchTab('bitacora')" style="display:none">&#x1F4CB; Bit&#xE1;cora</div>
+    <div class="tab" id="tab-dashboard" onclick="switchTab('dashboard')" style="display:none">&#x1F4CA; Dashboard</div>
   </div>
   <div class="content">
 
@@ -502,6 +503,44 @@
   </div>
 </div>
 
+<div id="tab-content-dashboard" style="display:none;padding:16px">
+  <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="font-family:'Space Mono',monospace;font-size:13px;color:#FF5C1A;letter-spacing:1px">DASHBOARD</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" id="dash-period-day" onclick="setDashPeriod('day')" style="font-size:11px;background:#FF5C1A;color:#fff;border:none">Diario</button>
+      <button class="btn btn-sm" id="dash-period-week" onclick="setDashPeriod('week')" style="font-size:11px;background:#222;color:#aaa;border:1px solid #333">Semanal</button>
+      <button class="btn btn-sm" id="dash-period-month" onclick="setDashPeriod('month')" style="font-size:11px;background:#222;color:#aaa;border:1px solid #333">Mensual</button>
+    </div>
+  </div>
+
+  <!-- STATS GENERALES -->
+  <div id="dash-stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
+
+  <!-- GRAFICA VISITAS -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">VISITAS A LA APP</div>
+    <div id="dash-chart-visitas" style="width:100%;overflow-x:auto"></div>
+  </div>
+
+  <!-- GRAFICA ALTAS -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ALTAS DE MIEMBROS</div>
+    <div id="dash-chart-altas" style="width:100%;overflow-x:auto"></div>
+  </div>
+
+  <!-- GRAFICA ACCIONES -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ACCIONES (RESERVAS · IA · AN&#xC1;LISIS · NOTIF)</div>
+    <div id="dash-chart-acciones" style="width:100%;overflow-x:auto"></div>
+  </div>
+
+  <!-- VISITAS POR MIEMBRO -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">VISITAS POR MIEMBRO</div>
+    <div id="dash-table-miembros"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <!-- Firebase Compat SDK (m&#xE1;s compatible) -->
@@ -564,6 +603,8 @@
 if (user && user.uid === MASTER_UID) {
   const tabBita = document.getElementById('tab-bitacora');
   if (tabBita) tabBita.style.display = 'inline-block';
+  const tabDash = document.getElementById('tab-dashboard');
+  if (tabDash) tabDash.style.display = 'inline-block';
 }
 
         } catch(domErr) { console.error('DOM error:', domErr); }
@@ -2321,7 +2362,7 @@ for (const med of medidasVal) {
   }
 
   function switchTab(tab) {
-    const tabs = ['home','members','new','staff','notify','bitacora'];
+    const tabs = ['home','members','new','staff','notify','bitacora','dashboard'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
       const contentEl = document.getElementById('tab-content-'+t);
@@ -2330,6 +2371,7 @@ for (const med of medidasVal) {
     });
     if (tab === 'staff') loadStaffList();
     if (tab === 'bitacora') loadBitacora();
+    if (tab === 'dashboard') loadDashboard();
     if (auth?.currentUser?.uid === MASTER_UID) {
       const _bt = document.getElementById('tab-bitacora');
       if (_bt) _bt.style.display = 'inline-block';
@@ -2667,6 +2709,154 @@ window.filterNotifUsers = function (q) {
     sel.value = matches[0].uid;
   }
 };
+
+
+  // ─── DASHBOARD ────────────────────────────────────────────────────────
+  window._dashPeriod = 'day';
+
+  function setDashPeriod(p) {
+    window._dashPeriod = p;
+    ['day','week','month'].forEach(x => {
+      const b = document.getElementById('dash-period-' + x);
+      if (b) { b.style.background = x===p ? '#FF5C1A' : '#222'; b.style.color = x===p ? '#fff' : '#aaa'; b.style.border = x===p ? 'none' : '1px solid #333'; }
+    });
+    loadDashboard();
+  }
+
+  function dashGetKey(isoDate, period) {
+    const d = new Date(isoDate);
+    if (period === 'day') return isoDate.slice(0,10);
+    if (period === 'month') return isoDate.slice(0,7);
+    // week: lunes de la semana
+    const day = d.getDay(), diff = (day === 0 ? -6 : 1 - day);
+    const mon = new Date(d); mon.setDate(d.getDate() + diff);
+    return mon.toISOString().slice(0,10);
+  }
+
+  function dashBarChart(containerId, data, color) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (!data.length) { el.innerHTML = '<div style="color:#555;font-size:12px;font-family:Space Mono,monospace;padding:8px">Sin datos en este período</div>'; return; }
+    const max = Math.max(...data.map(d => d.v), 1);
+    const barW = Math.max(28, Math.min(48, Math.floor(280 / data.length)));
+    const w = barW * data.length + 20;
+    const svgH = 90;
+    let bars = '', labels = '', vals = '';
+    data.forEach((d, i) => {
+      const x = 10 + i * barW;
+      const barH = Math.max(2, Math.round((d.v / max) * 60));
+      const y = svgH - 24 - barH;
+      bars += `<rect x="${x+2}" y="${y}" width="${barW-6}" height="${barH}" rx="3" fill="${color}" opacity="0.85"/>`;
+      vals += `<text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" font-size="9" fill="#ccc" font-family="Space Mono,monospace">${d.v > 0 ? d.v : ''}</text>`;
+      const lbl = d.k.length > 5 ? d.k.slice(5) : d.k;
+      labels += `<text x="${x + barW/2}" y="${svgH - 6}" text-anchor="middle" font-size="8" fill="#666" font-family="Space Mono,monospace">${lbl}</text>`;
+    });
+    el.innerHTML = `<svg width="${w}" height="${svgH}" style="display:block">${bars}${vals}${labels}</svg>`;
+  }
+
+  async function loadDashboard() {
+    const period = window._dashPeriod || 'day';
+
+    // Calcular rango: últimos N períodos
+    const N = period === 'day' ? 14 : period === 'week' ? 10 : 6;
+    const now = new Date();
+    const keys = [];
+    for (let i = N-1; i >= 0; i--) {
+      const d = new Date(now);
+      if (period === 'day') d.setDate(now.getDate() - i);
+      else if (period === 'week') d.setDate(now.getDate() - i*7);
+      else d.setMonth(now.getMonth() - i);
+      keys.push(dashGetKey(d.toISOString(), period));
+    }
+    const keySet = new Set(keys);
+
+    try {
+      // Cargar eventos
+      const evSnap = await db.collection('eventos').orderBy('fecha','desc').limit(2000).get();
+      const eventos = evSnap.docs.map(d => d.data());
+
+      // Filtrar por rango
+      const enRango = eventos.filter(e => e.dia && keySet.has(dashGetKey(e.fecha || e.dia, period)));
+
+      // Agrupar visitas
+      const visitasMap = {}; keys.forEach(k => visitasMap[k] = 0);
+      const reservasMap = {}; keys.forEach(k => reservasMap[k] = 0);
+      const iaMap = {}; keys.forEach(k => iaMap[k] = 0);
+      const analisisMap = {}; keys.forEach(k => analisisMap[k] = 0);
+      const notifMap = {}; keys.forEach(k => notifMap[k] = 0);
+
+      enRango.forEach(e => {
+        const k = dashGetKey(e.fecha || e.dia, period);
+        if (!keySet.has(k)) return;
+        if (e.tipo === 'visita') visitasMap[k]++;
+        if (e.tipo === 'reserva') reservasMap[k]++;
+        if (e.tipo === 'mensaje_ia') iaMap[k]++;
+        if (e.tipo === 'analisis_cientifico') analisisMap[k]++;
+        if (e.tipo === 'notif_abierta') notifMap[k]++;
+      });
+
+      const toData = m => keys.map(k => ({k, v: m[k]||0}));
+
+      // Stats generales totales en el período
+      const totVisitas = Object.values(visitasMap).reduce((a,b)=>a+b,0);
+      const totReservas = Object.values(reservasMap).reduce((a,b)=>a+b,0);
+      const totIA = Object.values(iaMap).reduce((a,b)=>a+b,0) + Object.values(analisisMap).reduce((a,b)=>a+b,0);
+      const totNotif = Object.values(notifMap).reduce((a,b)=>a+b,0);
+      const miembrosActivos = new Set(enRango.filter(e=>e.tipo==='visita').map(e=>e.uid)).size;
+
+      const statsRow = document.getElementById('dash-stats-row');
+      if (statsRow) statsRow.innerHTML = [
+        {label:'Visitas', val:totVisitas, icon:'👁'},
+        {label:'Miembros activos', val:miembrosActivos, icon:'👤'},
+        {label:'Reservas', val:totReservas, icon:'📅'},
+        {label:'Msgs IA', val:totIA, icon:'🤖'},
+        {label:'Notif abiertas', val:totNotif, icon:'🔔'},
+      ].map(s=>`<div style="background:#141414;border:1px solid #222;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:18px">${s.icon}</div>
+        <div style="font-size:22px;font-weight:700;color:#FF5C1A;font-family:'Space Mono',monospace">${s.val}</div>
+        <div style="font-size:10px;color:#666;font-family:'Space Mono',monospace;margin-top:2px">${s.label}</div>
+      </div>`).join('');
+
+      dashBarChart('dash-chart-visitas', toData(visitasMap), '#FF5C1A');
+
+      // Altas desde fechaInicio de miembros
+      const altasMap = {}; keys.forEach(k => altasMap[k] = 0);
+      (window._allMembers||[]).forEach(m => {
+        if (!m.fechaInicio) return;
+        const fi = m.fechaInicio.toDate ? m.fechaInicio.toDate().toISOString() : new Date(m.fechaInicio).toISOString();
+        const k = dashGetKey(fi, period);
+        if (keySet.has(k)) altasMap[k]++;
+      });
+      dashBarChart('dash-chart-altas', toData(altasMap), '#4ade80');
+
+      // Acciones combinadas
+      const accionesData = keys.map(k => ({k, v: (reservasMap[k]||0)+(iaMap[k]||0)+(analisisMap[k]||0)+(notifMap[k]||0)}));
+      dashBarChart('dash-chart-acciones', accionesData, '#60a5fa');
+
+      // Tabla de visitas por miembro
+      const byMember = {};
+      enRango.filter(e=>e.tipo==='visita').forEach(e => {
+        if (!byMember[e.uid]) byMember[e.uid] = {nombre: e.nombre||e.uid, count:0, ultima:''};
+        byMember[e.uid].count++;
+        if (!byMember[e.uid].ultima || e.dia > byMember[e.uid].ultima) byMember[e.uid].ultima = e.dia;
+      });
+      const sorted = Object.values(byMember).sort((a,b)=>b.count-a.count);
+      const tbl = document.getElementById('dash-table-miembros');
+      if (tbl) {
+        if (!sorted.length) { tbl.innerHTML = '<div style="color:#555;font-size:12px;font-family:Space Mono,monospace">Sin visitas en este período</div>'; }
+        else {
+          tbl.innerHTML = `<div style="display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-family:'Space Mono',monospace;font-size:11px">
+            <div style="color:#555;padding-bottom:4px">MIEMBRO</div><div style="color:#555;padding-bottom:4px">VISITAS</div><div style="color:#555;padding-bottom:4px">ÚLTIMA</div>
+            ${sorted.map(m=>`<div style="color:#ddd">${m.nombre}</div><div style="color:#FF5C1A;text-align:right">${m.count}</div><div style="color:#666">${m.ultima}</div>`).join('')}
+          </div>`;
+        }
+      }
+
+    } catch(e) {
+      console.error('loadDashboard:', e);
+      showToast('Error cargando dashboard: ' + e.message, 'error');
+    }
+  }
 
 
 </script>
