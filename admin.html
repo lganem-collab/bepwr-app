@@ -911,12 +911,16 @@ if (user && user.uid === MASTER_UID) {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
-        logBitacora('envio_aviso', 'Aviso: \"' + title + '\" (' + data.sent + ' enviados)', '');
-        // Reset destinatarios a "Todos"
-        const tgt = document.getElementById('notif-target');
-        if (tgt) { tgt.value = 'all'; tgt.dispatchEvent(new Event('change')); }
-        switchTab('members');
+        if (data.sent === 0) {
+          errEl.textContent = data.message || 'El miembro no tiene notificaciones activadas en su dispositivo.';
+        } else {
+          showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
+          logBitacora('envio_aviso', 'Aviso: \"' + title + '\" (' + data.sent + ' enviados)', '');
+          // Reset destinatarios a "Todos"
+          const tgt = document.getElementById('notif-target');
+          if (tgt) { tgt.value = 'all'; tgt.dispatchEvent(new Event('change')); }
+          switchTab('members');
+        }
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
