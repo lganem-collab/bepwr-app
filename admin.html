@@ -280,29 +280,21 @@
         </div>
 
       </div>
-      <div class="field-row">
-        <div class="field"><label>Peso meta (kg)</label><input type="number" id="new-peso-meta" placeholder="65" step="0.1" /></div>
-        <div class="field"></div>
-      </div>
-      <div class="modal-section">Valoraci&#xF3;n inicial</div>
-      <div class="field-row">
-        <div class="field"><label>Peso (kg) *</label><input type="number" id="new-peso" placeholder="70" step="0.1" /></div>
-        <div class="field"><label>Masa M&#xFA;sculo Esquel&#xE9;tico (kg)</label><input type="number" id="new-musculo" placeholder="42" step="0.1" /></div>
-      </div>
-      <div class="field-row">
-        <div class="field"><label>Grasa Corporal (kg)</label><input type="number" id="new-grasa-corp" placeholder="18.5" step="0.1" /></div>
-        <div class="field"><label>IMC (kg/m&#xB2;)</label><input type="number" id="new-imc" placeholder="24.5" step="0.1" /></div>
-      </div>
-      <div class="field-row">
-        <div class="field"><label>PGC (%)</label><input type="number" id="new-pgc" placeholder="25.0" step="0.1" /></div>
-        <div class="field"><label>Grasa Visceral</label><input type="number" id="new-grasa-visc" placeholder="8" step="1" /></div>
-      </div>
-      <div class="field-row">
-        <div class="field"><label>Calificaci&#xF3;n Inbody (1-100)</label><input type="number" id="new-calificacion" placeholder="75" min="1" max="100" /></div>
-        <div class="field"><label>Fecha de valoraci&#xF3;n</label><input type="date" id="new-fecha-val" /></div>
+      <!-- Valoración Inicial -->
+      <div id="new-val-card" style="margin-top:20px;padding:16px;background:#1a1a1a;border-radius:12px;border:1px solid #333">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:.9rem;font-weight:600;color:#fff;font-family:'DM Sans',sans-serif">Valoración Inicial</div>
+            <div id="new-val-status" style="font-size:.75rem;color:#aaa;margin-top:4px;font-family:'DM Sans',sans-serif">Sin capturar aún</div>
+          </div>
+          <button class="btn btn-success btn-sm" onclick="openInitialMetricsModal()" style="white-space:nowrap">+ Capturar Valoración</button>
+        </div>
       </div>
       <div class="form-error" id="new-member-error"></div>
-      <button class="btn btn-primary" id="btn-create-member" onclick="createMember()" style="margin-top:8px">Crear miembro</button>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-primary" id="btn-create-member" onclick="createMember()" style="flex:1">Guardar Miembro</button>
+        <button class="btn btn-secondary" onclick="cancelNewMember()" style="flex:1">Cancelar</button>
+      </div>
     </div>
 
     <!-- STAFF TAB -->
@@ -1740,6 +1732,29 @@ if (user && user.uid === MASTER_UID) {
     const cadera     = parseFloat(document.getElementById('m-cadera').value);
     const pantorrilla= parseFloat(document.getElementById('m-pantorrilla').value);
     const pruebaPeso = document.getElementById('m-pruebaPeso').value;
+    // --- Modo valoración inicial (nuevo miembro) ---
+    if (window._initialMetricsMode) {
+      window._initialMetricsMode = false;
+      window._pendingInitialMetrics = {
+        peso, musculo: isNaN(musculo)?null:musculo,
+        grasaCorporal: isNaN(grasaCorp)?null:grasaCorp,
+        imc: isNaN(imc)?null:imc, pgc: isNaN(pgc)?null:pgc,
+        grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
+        calificacion: isNaN(calific)?null:calific,
+        brazo: isNaN(brazo)?null:brazo,
+        abdomen: isNaN(abdomen)?null:abdomen,
+        cintura: isNaN(cintura)?null:cintura,
+        cadera: isNaN(cadera)?null:cadera,
+        pantorrilla: isNaN(pantorrilla)?null:pantorrilla,
+        pruebaPeso: pruebaPeso || null,
+        fecha, fechaRaw: document.getElementById('m-fecha').value
+      };
+      document.getElementById('new-val-status').textContent = '✓ Valoración capturada';
+      document.getElementById('new-val-status').style.color = '#4ade80';
+      closeModal('modal-metrics');
+      showToast('Valoración inicial capturada ✓', 'success');
+      return;
+    }
     const errEl = document.getElementById('metrics-error');
     errEl.textContent = '';
     const medidasVal = [
@@ -1830,7 +1845,38 @@ for (const med of medidasVal) {
     const w=["Fit","Run","Box","Gym","Pro","Max"],s=["!","@","#","$","%"];
     return w[w.length*Math.random()|0]+((Math.random()*900+100)|0)+s[s.length*Math.random()|0];
   }
+function openInitialMetricsModal() {
+    window._initialMetricsMode = true;
+    document.getElementById('metrics-uid').value = 'PENDING';
+    document.getElementById('metrics-modal-sub').textContent = 'Valoración inicial del nuevo miembro';
+    document.getElementById('metrics-error').textContent = '';
+    ['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-brazo','m-abdomen','m-cintura','m-cadera','m-pantorrilla'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('m-pruebaPeso').value = '';
+    const now = new Date();
+    document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+    if (window._pendingInitialMetrics) {
+      const pm = window._pendingInitialMetrics;
+      const campos = {peso:'m-peso',musculo:'m-musculo',grasaCorporal:'m-grasa-corp',imc:'m-imc',pgc:'m-pgc',grasaVisceral:'m-grasa-visc',calificacion:'m-calificacion',brazo:'m-brazo',abdomen:'m-abdomen',cintura:'m-cintura',cadera:'m-cadera',pantorrilla:'m-pantorrilla'};
+      for (const [key, id] of Object.entries(campos)) {
+        if (pm[key] != null) document.getElementById(id).value = pm[key];
+      }
+      if (pm.pruebaPeso) document.getElementById('m-pruebaPeso').value = pm.pruebaPeso;
+      if (pm.fechaRaw) document.getElementById('m-fecha').value = pm.fechaRaw;
+    }
+    document.getElementById('modal-metrics').classList.add('open');
+  }
 
+  function cancelNewMember() {
+    window._pendingInitialMetrics = null;
+    document.getElementById('new-genero').value = 'prefiero-no-decir';
+    ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-email-confirm','new-altura','new-vigencia-fecha'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('new-meta').value = '';
+    document.getElementById('new-vigencia').value = 'permanente';
+    document.getElementById('new-val-status').textContent = 'Sin capturar aún';
+    document.getElementById('new-val-status').style.color = '#aaa';
+    document.getElementById('new-member-error').textContent = '';
+    switchTab('members');
+  }
   async function createMember() {
     const nombre   = document.getElementById('new-nombre').value.trim();
     const apellido = document.getElementById('new-apellido').value.trim();
@@ -1843,83 +1889,82 @@ for (const med of medidasVal) {
     const inicio  = document.getElementById('new-inicio').value.trim();
     const genero  = document.getElementById('new-genero').value;
     const meta    = document.getElementById('new-meta').value;
-    const pesoMeta= parseFloat(document.getElementById('new-peso-meta').value)||0;
-    const peso       = parseFloat(document.getElementById('new-peso').value);
-    const musculo    = parseFloat(document.getElementById('new-musculo').value);
-    const grasaCorp  = parseFloat(document.getElementById('new-grasa-corp').value);
-    const imc        = parseFloat(document.getElementById('new-imc').value);
-    const pgc        = parseFloat(document.getElementById('new-pgc').value);
-    const grasaVisc  = parseFloat(document.getElementById('new-grasa-visc').value);
-    const calific    = parseFloat(document.getElementById('new-calificacion').value);
-    const brazo      = parseFloat(document.getElementById('new-brazo').value);
-    const abdomen    = parseFloat(document.getElementById('new-abdomen').value);
-    const cintura    = parseFloat(document.getElementById('new-cintura').value);
-    const cadera     = parseFloat(document.getElementById('new-cadera').value);
-    const pantorrilla= parseFloat(document.getElementById('new-pantorrilla').value);
-    const fechaVal= fmtDate(document.getElementById('new-fecha-val').value.trim());
-    const errEl   = document.getElementById('new-member-error');
-    errEl.textContent = '';
-    const emailConfirm = document.getElementById('new-email-confirm')?.value.trim();
-    if (email !== emailConfirm) { errEl.textContent = 'Los emails no coinciden'; return; }
-    if (!nombre||!apellido||!email||!tel) { errEl.textContent = 'Nombre, apellido, tel\u00E9fono, email y contrase\u00F1a son obligatorios'; return; }
-    if (!peso || isNaN(peso)) { errEl.textContent = 'El peso es obligatorio'; return; }
-    if (peso < 20 || peso > 400) { errEl.textContent = 'Peso inv\u00E1lido (debe ser 20-400 kg)'; return; }
-const medidasNew = [
-  { val: brazo,        nombre: 'Brazo',       min: 15, max: 60  },
-  { val: abdomen,      nombre: 'Abdomen',     min: 50, max: 200 },
-  { val: cintura,      nombre: 'Cintura',     min: 40, max: 180 },
-  { val: cadera,       nombre: 'Cadera',      min: 50, max: 200 },
-  { val: pantorrilla,  nombre: 'Pantorrilla', min: 20, max: 60  },
-];
-for (const med of medidasNew) {
-  if (!isNaN(med.val) && (med.val < med.min || med.val > med.max)) {
-    errEl.textContent = `${med.nombre} debe estar entre ${med.min} y ${med.max} cm`;
-    return;
-  }
-}
     const vigencia = document.getElementById('new-vigencia').value || 'permanente';
     const vigenciaFecha = document.getElementById('new-vigencia-fecha').value || null;
+
+    const errEl = document.getElementById('new-member-error');
+    errEl.textContent = '';
+
+    const emailConfirm = document.getElementById('new-email-confirm')?.value.trim();
+    if (email !== emailConfirm) { errEl.textContent = 'Los emails no coinciden'; return; }
+    if (!nombre || !apellido || !email || !tel) { errEl.textContent = 'Nombre, apellido, teléfono y email son obligatorios'; return; }
+
+    const pm = window._pendingInitialMetrics;
+
     const btn = document.getElementById('btn-create-member');
     btn.textContent = 'Creando...'; btn.disabled = true;
+
     try {
       const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
       await secondaryAuth.signOut();
-      const uid  = cred.user.uid;
-      await db.collection('usuarios').doc(uid).set({
-        nombre: nombreCompleto, alias, telefono:tel, nacimiento:dob, fechaInicio:inicio, email, genero,
-        altura: Number(document.getElementById('new-altura').value)||null, primerIngreso: true,
-        activo: true, vigencia, vigenciaFecha: vigenciaFecha || null,
-        objetivo:{ meta, pesoInicial:isNaN(peso)?0:peso, pesoMeta }
-      });
-      await db.collection('usuarios').doc(uid).collection('metricas').add({
-        peso,
-        musculo: isNaN(musculo)?null:musculo,
-        grasaCorporal: isNaN(grasaCorp)?null:grasaCorp,
-        imc: isNaN(imc)?null:imc,
-        pgc: isNaN(pgc)?null:pgc,
-        grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
-        calificacion: isNaN(calific)?null:calific,
-        fecha: fechaVal || inicio || 'Inicio',
-        registradoPor: auth.currentUser?.uid || null,
-        miembroNombre: nombreCompleto
-      });
-      fetch('/api/send-welcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,nombre:nombreCompleto,password:pass})})
+      const uid = cred.user.uid;
+
+      // Documento del usuario
+      const userData = {
+        nombre: nombreCompleto, alias, telefono: tel, nacimiento: dob,
+        fechaInicio: inicio, email, genero,
+        altura: Number(document.getElementById('new-altura').value) || null,
+        primerIngreso: true, activo: true,
+        vigencia, vigenciaFecha: vigenciaFecha || null,
+        objetivo: { meta, pesoInicial: (pm && pm.peso) ? pm.peso : 0 }
+      };
+      if (pm && pm.pruebaPeso) userData.pruebaPeso = pm.pruebaPeso;
+
+      await db.collection('usuarios').doc(uid).set(userData);
+
+      // Guardar valoración inicial si fue capturada
+      if (pm) {
+        await db.collection('usuarios').doc(uid).collection('metricas').add({
+          peso: pm.peso,
+          musculo: pm.musculo,
+          grasaCorporal: pm.grasaCorporal,
+          imc: pm.imc, pgc: pm.pgc,
+          grasaVisceral: pm.grasaVisceral,
+          calificacion: pm.calificacion,
+          brazo: pm.brazo, abdomen: pm.abdomen,
+          cintura: pm.cintura, cadera: pm.cadera,
+          pantorrilla: pm.pantorrilla,
+          pruebaPeso: pm.pruebaPeso,
+          fecha: pm.fecha || inicio || 'Inicio',
+          registradoPor: auth.currentUser?.uid || null,
+          miembroNombre: nombreCompleto
+        });
+      }
+
+      // Email de bienvenida
+      fetch('/api/send-welcome', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, nombre:nombreCompleto, password:pass})})
         .then(r=>r.json()).then(d=>console.log('email result:',d))
         .catch(e=>console.error('email error:',e.message));
-      showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
-       logBitacora('alta_miembro', 'Alta de miembro: ' + nombreCompleto + ' | ' + email, nombreCompleto);
+
+      showToast('✓ ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
+      logBitacora('alta_miembro', 'Alta de miembro: ' + nombreCompleto + ' | ' + email, nombreCompleto);
+
+      // Limpiar formulario
       document.getElementById('new-genero').value = 'prefiero-no-decir';
-      ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email',
-       'new-peso-meta','new-peso','new-musculo','new-grasa-corp','new-imc','new-pgc','new-grasa-visc','new-calificacion','new-fecha-val','new-altura']
-        .forEach(id => document.getElementById(id).value = '');
+      ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-email-confirm','new-altura','new-vigencia-fecha'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
       document.getElementById('new-meta').value = '';
+      document.getElementById('new-vigencia').value = 'permanente';
+      document.getElementById('new-val-status').textContent = 'Sin capturar aún';
+      document.getElementById('new-val-status').style.color = '#aaa';
+      window._pendingInitialMetrics = null;
+
       switchTab('members');
       loadMembers();
     } catch(e) {
-      const msgs = {'auth/email-already-in-use':'Ese email ya est\u00E1 registrado','auth/invalid-email':'Email inv\u00E1lido','auth/weak-password':'Contrase\u00F1a muy d\u00E9bil'};
+      const msgs = {'auth/email-already-in-use':'Ese email ya está registrado','auth/invalid-email':'Email inválido','auth/weak-password':'Contraseña muy débil'};
       errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
     }
-    btn.textContent = 'Crear miembro'; btn.disabled = false;
+    btn.textContent = 'Guardar Miembro'; btn.disabled = false;
   }
 
   function switchTab(tab) {
