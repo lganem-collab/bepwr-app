@@ -188,6 +188,11 @@
     .install-btn-el{background:var(--orange);color:white;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif}
     .install-close{color:var(--gray);cursor:pointer;font-size:18px;line-height:1;padding:4px}
     .metodo-card-label { color: var(--orange); }
+      .comp-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:4px;padding:9px 12px;border-bottom:1px solid var(--border);align-items:center}
+    .comp-row:last-child{border-bottom:none}
+    .comp-label{font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:.5px}
+    .comp-val{text-align:center;font-size:13px;font-family:'DM Sans',sans-serif}
+    .comp-prog{text-align:center;font-size:12px;font-weight:600}
   </style>
 </head>
 <body>
@@ -284,14 +289,47 @@
           <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
         </div>
 
-        <div class="sec-title">Mis m&#xE9;tricas</div>
-        <div class="metrics-grid" id="metrics-grid">
-          <!-- Populated by JS -->
-          <div class="m-card wide"><div style="width:100%"><div class="skeleton" style="height:16px;width:40%"></div><div class="skeleton" style="height:12px;width:60%"></div><div class="skeleton" style="height:6px"></div></div></div>
-          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
-          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
-          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
-          <div class="m-card"><div class="skeleton"></div><div class="skeleton" style="height:36px;width:60%"></div></div>
+        <div class="sec-title">Mi progreso</div>
+        <div id="bepwr-score-section">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+            <div class="m-card" style="text-align:center;padding:18px 14px">
+              <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:10px">bePWR Score</div>
+              <div style="position:relative;width:90px;height:90px;margin:0 auto 8px">
+                <svg width="90" height="90" viewBox="0 0 90 90">
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+                  <circle id="bepwr-score-ring" cx="45" cy="45" r="38" fill="none" stroke="#FF5C1A" stroke-width="6"
+                    stroke-dasharray="0 239" stroke-linecap="round" transform="rotate(-90 45 45)"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                  <span id="bepwr-score-value" style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:#fff">\u2014</span>
+                </div>
+              </div>
+              <div id="bepwr-score-label" style="font-size:10px;color:var(--gray);font-family:'DM Sans',sans-serif">Cargando...</div>
+            </div>
+            <div class="m-card" style="text-align:center;padding:18px 14px">
+              <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:10px">Calificaci\u00F3n InBody</div>
+              <div style="position:relative;width:90px;height:90px;margin:0 auto 8px">
+                <svg width="90" height="90" viewBox="0 0 90 90">
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="#2a2a2a" stroke-width="6"/>
+                  <circle id="inbody-score-ring" cx="45" cy="45" r="38" fill="none" stroke="#4ade80" stroke-width="6"
+                    stroke-dasharray="0 239" stroke-linecap="round" transform="rotate(-90 45 45)"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                  <span id="inbody-score-value" style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:#fff">\u2014</span>
+                </div>
+              </div>
+              <div id="inbody-score-label" style="font-size:10px;color:var(--gray);font-family:'DM Sans',sans-serif">Cargando...</div>
+            </div>
+          </div>
+          <div class="sec-title" style="margin-top:8px">M\u00E9tricas Iniciales vs. Actuales</div>
+          <div id="metricas-comparativa" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px">
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:4px;padding:10px 12px;background:#0f0f0f;font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
+              <div>M\u00E9trica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
+            </div>
+            <div id="metricas-comparativa-body" style="font-size:12px">
+              <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m\u00E9tricas...</div>
+            </div>
+          </div>
         </div>
 
         <div class="sec-title">Historial de peso</div>
@@ -852,14 +890,31 @@
 
       // M\u00E9tricas Sin datos leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');
-      const metQ   = query(metRef, orderBy('fecha', 'desc'), limit(7));
+      const metQ   = query(metRef, orderBy('fecha', 'desc'), limit(50));
       const metSnap = await getDocs(metQ);
-      const metricas = metSnap.docs.map(d => d.data()).reverse();
+      const MESES_MAP = {ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
+      function parseFechaTs(f) {
+        if (!f) return 0;
+        if (f.toDate) return f.toDate().getTime();
+        if (typeof f === 'string') {
+          if (f.match(/^\d{4}-\d{2}-\d{2}/)) return new Date(f).getTime();
+          if (f.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) { var p=f.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
+          var mx = f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+          if (mx && MESES_MAP[mx[2]] !== undefined) return new Date(parseInt(mx[3]), MESES_MAP[mx[2]], parseInt(mx[1])).getTime();
+          try { return new Date(f).getTime(); } catch(e) { return 0; }
+        }
+        return 0;
+      }
+      const metricasRaw = metSnap.docs.map(d => d.data());
+      metricasRaw.forEach(m => { m._ts = parseFechaTs(m.fecha); });
+      metricasRaw.sort((a,b) => a._ts - b._ts);
+      const metricas = metricasRaw;
       cachedMetricas = metricas;
 
       if (metricas.length > 0) {
+        const inicial = metricas[0];
         const ultima = metricas[metricas.length - 1];
-        renderMetrics(ultima, obj);
+        renderMetrics(ultima, obj, inicial);
         renderChart(metricas);
         renderProfileMetrics(ultima);
 
@@ -883,97 +938,130 @@
 
   function calcProgreso(meta,m,obj){const cl=v=>(isNaN(v)||!isFinite(v))?null:Math.max(0,Math.min(100,v));const wavg=pairs=>{const ok=pairs.filter(([v])=>v!==null);if(!ok.length)return null;const tw=ok.reduce((s,[,w])=>s+w,0);return Math.round(ok.reduce((s,[v,w])=>s+v*(w/tw),0));};const pgcP=(obj.pgcInicial!=null&&obj.pgcMeta!=null&&m.pgc!=null&&obj.pgcInicial!==obj.pgcMeta)?cl(((obj.pgcInicial-m.pgc)/(obj.pgcInicial-obj.pgcMeta))*100):null;const gvP=(obj.gvInicial!=null&&obj.gvMeta!=null&&m.grasaVisceral!=null&&obj.gvInicial!==obj.gvMeta)?cl(((obj.gvInicial-m.grasaVisceral)/(obj.gvInicial-obj.gvMeta))*100):null;const mmP=(obj.mmInicial!=null&&obj.mmMeta!=null&&m.musculo!=null&&obj.mmInicial!==obj.mmMeta)?cl(((m.musculo-obj.mmInicial)/(obj.mmMeta-obj.mmInicial))*100):null;const ibP=(obj.inbodyInicial!=null&&obj.inbodyMeta!=null&&m.calificacion!=null&&obj.inbodyInicial!==obj.inbodyMeta)?cl(((m.calificacion-obj.inbodyInicial)/(obj.inbodyMeta-obj.inbodyInicial))*100):null;const imcP=(obj.imcInicial!=null&&obj.imcMeta!=null&&m.imc!=null&&Math.abs(obj.imcInicial-obj.imcMeta)>0)?cl(((Math.abs(obj.imcInicial-obj.imcMeta)-Math.abs(m.imc-obj.imcMeta))/Math.abs(obj.imcInicial-obj.imcMeta))*100):null;const mt=(meta||'').toLowerCase();if(mt.includes('grasa')||mt.includes('peso'))return wavg([[pgcP,0.4],[gvP,0.3],[ibP,0.3]]);if(mt.includes('m\u00FAsculo')||mt.includes('recomposici'))return wavg([[mmP,0.4],[pgcP,0.3],[ibP,0.3]]);if(mt.includes('salud')||mt.includes('metab'))return wavg([[pgcP,0.3],[gvP,0.3],[imcP,0.2],[ibP,0.2]]);if(mt.includes('rendimiento')||mt.includes('funcional'))return wavg([[mmP,0.5],[pgcP,0.2],[ibP,0.3]]);if(mt.includes('est\u00E9tica')||mt.includes('composici'))return wavg([[mmP,0.3],[pgcP,0.3],[imcP,0.2],[ibP,0.2]]);return null;}
 
-  function renderMetrics(m, obj) {
-    const pesoIni  = obj.pesoInicial || m.peso;
-    const pesoMeta = obj.pesoMeta || m.peso;
-    const _prog = calcProgreso(obj.meta,m,obj);
-    const pct = _prog !== null && _prog !== undefined ? _prog : (Math.round(Math.max(0, Math.min(100, ((pesoIni - m.peso) / (pesoIni - pesoMeta)) * 100))) || 0);
-    const circum = 2 * Math.PI * 34;
+  function calcBePWRScore(inicial, actual, obj) {
+    const meta = obj?.meta || '';
+    const metricDefs = [
+      { ini: 'peso', act: 'peso', inv: true, key: 'peso' },
+      { ini: 'musculo', act: 'musculo', inv: false, key: 'musculo' },
+      { ini: 'grasaCorporal', act: 'grasaCorporal', inv: true, key: 'grasa' },
+      { ini: 'pgc', act: 'pgc', inv: true, key: 'pgc' },
+      { ini: 'grasaVisceral', act: 'grasaVisceral', inv: true, key: 'gvisc' },
+      { ini: 'calificacion', act: 'calificacion', inv: false, key: 'inbody' },
+    ];
+    const WEIGHTS = {
+      'Bajar grasa / bajar de peso': { pgc:30, grasa:20, peso:15, gvisc:15, musculo:10, inbody:10 },
+      'Ganar m\u00FAsculo / recomposici\u00F3n': { musculo:30, inbody:20, peso:5, pgc:15, grasa:15, gvisc:15 },
+      'Salud metab\u00F3lica / salud general': { gvisc:25, pgc:20, inbody:20, grasa:15, musculo:10, peso:10 },
+      'Rendimiento funcional': { musculo:25, inbody:25, pgc:15, grasa:10, gvisc:10, peso:15 },
+      'Est\u00E9tica / composici\u00F3n equilibrada': { pgc:25, musculo:20, grasa:15, gvisc:15, inbody:15, peso:10 },
+    };
+    const pesoInv = { 'Ganar m\u00FAsculo / recomposici\u00F3n': false, 'Rendimiento funcional': false };
+    const defaultW = { musculo:25, inbody:20, pgc:15, grasa:15, gvisc:15, peso:10 };
+    const weights = WEIGHTS[meta] || defaultW;
+    if (pesoInv[meta] === false) { const pd = metricDefs.find(d => d.key === 'peso'); if (pd) pd.inv = false; }
+    let tw = 0, ws = 0, used = 0;
+    for (const def of metricDefs) {
+      const iv = parseFloat(inicial[def.ini]), av = parseFloat(actual[def.act]), w = weights[def.key] || 0;
+      if (isNaN(iv) || isNaN(av) || w === 0 || iv === 0) continue;
+      let cp = ((av - iv) / Math.abs(iv)) * 100;
+      if (def.inv) cp = -cp;
+      let ms = 50 + Math.max(-50, Math.min(50, cp * 2));
+      ws += ms * w; tw += w; used++;
+    }
+    if (used < 2) return null;
+    return Math.round(Math.max(0, Math.min(100, ws / tw)));
+  }
 
-    const califPct = m.calificacion || 0;
-    const califCircum = 2 * Math.PI * 34;
-    const califColor = califPct >= 90 ? '#a855f7' : califPct >= 80 ? '#60a5fa' : califPct >= 60 ? '#4ade80' : califPct >= 50 ? '#FF5C1A' : '#f87171';
-
-    document.getElementById('metrics-grid').innerHTML = `
-      <div class="m-card wide">
-        <div class="ring-wrap">
-          <svg width="84" height="84" viewBox="0 0 84 84">
-            <circle cx="42" cy="42" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
-            <circle cx="42" cy="42" r="34" fill="none" stroke="#FF5C1A" stroke-width="6"
-              stroke-dasharray="${circum * pct/100} ${circum}" stroke-linecap="round"/>
-          </svg>
-          <div class="ring-text"><div class="ring-val">${pct}%</div><div class="ring-lbl">META</div></div>
-        </div>
-        <div class="goal-body">
-          <div class="m-label">Objetivo</div>
-          <div class="goal-title">${obj.meta || 'Meta personal'}</div>
-          <div class="goal-sub">De ${pesoIni} kg &#x2192; ${pesoMeta} kg</div>
-          <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
-          <div class="bar-labels"><span>${pesoIni} kg</span><span>${m.peso} actual</span><span>${pesoMeta} kg</span></div>
-        </div>
-      </div>
-      <div class="m-card wide">
-        <div class="ring-wrap">
-          <svg width="84" height="84" viewBox="0 0 84 84">
-            <circle cx="42" cy="42" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
-            <circle cx="42" cy="42" r="34" fill="none" stroke="${califColor}" stroke-width="6"
-              stroke-dasharray="${califCircum * califPct/100} ${califCircum}" stroke-linecap="round"/>
-          </svg>
-          <div class="ring-text"><div class="ring-val" style="color:${califColor}">${califPct}</div><div class="ring-lbl">INBODY</div></div>
-        </div>
-        <div class="goal-body">
-          <div class="m-label">Calificaci\u00F3n Inbody</div>
-          <div class="goal-title" style="color:${califColor}">${califPct >= 90 ? '&#xC9;lite' : califPct >= 80 ? 'Muy buena' : califPct >= 60 ? 'Buena' : califPct >= 50 ? 'Regular' : 'Por mejorar'}</div>
-          <div class="goal-sub">Escala del 1 al 100</div>
-          <div class="bar-bg"><div class="bar-fill" style="width:${califPct}%;background:${califColor}"></div></div>
-          <div class="bar-labels"><span>0</span><span>${califPct} pts</span><span>100</span></div>
-        </div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">M\u00FAsculo Esquel\u00E9tico</div>
-        <div class="m-value">${m.musculo || '<span style="font-size:11px;color:#666;font-family:\'DM Sans\',sans-serif;font-weight:400">Sin datos</span>'}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medici\u00F3n actual</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">Grasa Corporal</div>
-        <div class="m-value">${m.grasaCorporal || '<span style="font-size:11px;color:#666;font-family:\'DM Sans\',sans-serif;font-weight:400">Sin datos</span>'}<span class="m-unit">kg</span></div>
-        <div class="m-delta green">Medici\u00F3n actual</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">IMC</div>
-        <div class="m-value">${m.imc || '<span style="font-size:11px;color:#666;font-family:\'DM Sans\',sans-serif;font-weight:400">Sin datos</span>'}<span class="m-unit" style="font-size:11px">kg/m&#xB2;</span></div>
-        <div class="m-delta green">${m.imc < 25 ? 'Normal' : m.imc < 30 ? 'Sobrepeso' : 'Obesidad'}</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">PGC</div>
-        <div class="m-value">${m.pgc || '<span style="font-size:11px;color:#666;font-family:\'DM Sans\',sans-serif;font-weight:400">Sin datos</span>'}<span class="m-unit">%</span></div>
-        <div class="m-delta green">Medici\u00F3n actual</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">Grasa Visceral</div>
-        <div class="m-value">${m.grasaVisceral || '<span style="font-size:11px;color:#666;font-family:\'DM Sans\',sans-serif;font-weight:400">Sin datos</span>'}</div>
-        <div class="m-delta green">Medici\u00F3n actual</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">Calificaci\u00F3n Inbody</div>
-        <div class="m-value">${m.calificacion || '<span style="font-size:11px;color:#666;font-family:\'DM Sans\',sans-serif;font-weight:400">Sin datos</span>'}<span class="m-unit">/100</span></div>
-        <div class="m-delta green">Medici\u00F3n actual</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">Peso actual</div>
-        <div class="m-value">${m.peso}<span class="m-unit">kg</span></div>
-        <div style="font-size:10px;color:var(--gray);margin-top:6px">${m.fecha || ''}</div>
-      </div>`;
+  function renderMetrics(m, obj, inicial) {
+    if (!inicial) inicial = m;
+    var score = calcBePWRScore(inicial, m, obj);
+    var scoreCircum = 2 * Math.PI * 38;
+    var scoreEl = document.getElementById('bepwr-score-value');
+    var scoreRing = document.getElementById('bepwr-score-ring');
+    var scoreLabel = document.getElementById('bepwr-score-label');
+    if (scoreEl) {
+      if (score !== null) {
+        scoreEl.textContent = score;
+        var scoreColor = score >= 70 ? '#4ade80' : score >= 50 ? '#FF5C1A' : '#f87171';
+        scoreRing.setAttribute('stroke', scoreColor);
+        scoreRing.setAttribute('stroke-dasharray', (scoreCircum * score / 100) + ' ' + scoreCircum);
+        scoreLabel.textContent = score >= 70 ? 'Excelente progreso' : score >= 50 ? 'Buen progreso' : 'Necesita mejorar';
+        scoreLabel.style.color = scoreColor;
+      } else {
+        scoreEl.textContent = '\u2014';
+        scoreRing.setAttribute('stroke-dasharray', '0 ' + scoreCircum);
+        scoreLabel.textContent = 'Necesita m\u00E1s datos';
+      }
+    }
+    var califPct = m.calificacion || 0;
+    var califCircum = 2 * Math.PI * 38;
+    var califColor = califPct >= 90 ? '#a855f7' : califPct >= 80 ? '#60a5fa' : califPct >= 60 ? '#4ade80' : califPct >= 50 ? '#FF5C1A' : '#f87171';
+    var inbodyEl = document.getElementById('inbody-score-value');
+    var inbodyRing = document.getElementById('inbody-score-ring');
+    var inbodyLabel = document.getElementById('inbody-score-label');
+    if (inbodyEl) {
+      if (califPct > 0) {
+        inbodyEl.textContent = califPct;
+        inbodyRing.setAttribute('stroke', califColor);
+        inbodyRing.setAttribute('stroke-dasharray', (califCircum * califPct / 100) + ' ' + califCircum);
+        inbodyLabel.textContent = 'Puntuaci\u00F3n /100';
+        inbodyLabel.style.color = califColor;
+      } else {
+        inbodyEl.textContent = '\u2014';
+        inbodyRing.setAttribute('stroke-dasharray', '0 ' + califCircum);
+        inbodyLabel.textContent = 'Sin datos';
+      }
+    }
+    function v(val) { return (val != null && val !== '' && !isNaN(val)) ? val : '\u2014'; }
+    function prog(ini, act, invertir) {
+      if (ini == null || act == null || isNaN(ini) || isNaN(act)) return '<span style="color:var(--gray)">\u2014</span>';
+      var diff = parseFloat(act) - parseFloat(ini);
+      if (diff === 0) return '<span style="color:var(--gray)">0</span>';
+      var bueno = invertir ? diff < 0 : diff > 0;
+      var color = bueno ? '#4ade80' : '#f87171';
+      var signo = diff > 0 ? '+' : '';
+      return '<span style="color:' + color + '">' + signo + diff.toFixed(1) + '</span>';
+    }
+    var rows = [
+      { label:'Peso', ini:inicial.peso, act:m.peso, inv:false, unit:'kg' },
+      { label:'M\u00FAsculo Esq.', ini:inicial.musculo, act:m.musculo, inv:false, unit:'kg' },
+      { label:'Grasa Corporal', ini:inicial.grasaCorporal, act:m.grasaCorporal, inv:true, unit:'kg' },
+      { label:'IMC', ini:inicial.imc, act:m.imc, inv:true, unit:'' },
+      { label:'PGC', ini:inicial.pgc, act:m.pgc, inv:true, unit:'%' },
+      { label:'Grasa Visceral', ini:inicial.grasaVisceral, act:m.grasaVisceral, inv:true, unit:'' },
+      { label:'Calif. InBody', ini:inicial.calificacion, act:m.calificacion, inv:false, unit:'/100' },
+      { label:'Brazo', ini:inicial.brazo, act:m.brazo, inv:false, unit:'cm' },
+      { label:'Abdomen', ini:inicial.abdomen, act:m.abdomen, inv:true, unit:'cm' },
+      { label:'Cintura', ini:inicial.cintura, act:m.cintura, inv:true, unit:'cm' },
+      { label:'Cadera', ini:inicial.cadera, act:m.cadera, inv:true, unit:'cm' },
+      { label:'Pantorrilla', ini:inicial.pantorrilla, act:m.pantorrilla, inv:false, unit:'cm' },
+    ];
+    var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
+    var bodyEl = document.getElementById('metricas-comparativa-body');
+    if (bodyEl) {
+      if (visibleRows.length === 0) {
+        bodyEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Sin m\u00E9tricas registradas</div>';
+      } else {
+        bodyEl.innerHTML = visibleRows.map(function(r) {
+          var iniStr = (r.ini != null && !isNaN(r.ini)) ? r.ini + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">' + r.unit + '</span>' : '') : '\u2014';
+          var actStr = (r.act != null && !isNaN(r.act)) ? r.act + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">' + r.unit + '</span>' : '') : '\u2014';
+          return '<div class="comp-row"><div class="comp-label">' + r.label + '</div><div class="comp-val">' + iniStr + '</div><div class="comp-val">' + actStr + '</div><div class="comp-prog">' + prog(r.ini, r.act, r.inv) + '</div></div>';
+        }).join('');
+      }
+    }
   }
 
   function renderMetricsEmpty() {
-    document.getElementById('metrics-grid').innerHTML = `
-      <div class="m-card wide" style="justify-content:center;text-align:center;padding:24px">
-        <div style="font-size:13px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">
-          Sin m\u00E9tricas registradas a\u00FAn
-        </div>
-      </div>`;
-    document.getElementById('chart-card').innerHTML = `<div style="text-align:center;padding:20px;font-size:12px;color:var(--gray);font-family:'Space Mono',monospace">Sin historial a\u00FAn</div>`;
+    const scoreEl = document.getElementById('bepwr-score-value');
+    const inbodyEl = document.getElementById('inbody-score-value');
+    const bodyEl = document.getElementById('metricas-comparativa-body');
+    if (scoreEl) scoreEl.textContent = '\u2014';
+    if (inbodyEl) inbodyEl.textContent = '\u2014';
+    const scoreLabel = document.getElementById('bepwr-score-label');
+    const inbodyLabel = document.getElementById('inbody-score-label');
+    if (scoreLabel) scoreLabel.textContent = 'Sin m\u00E9tricas a\u00FAn';
+    if (inbodyLabel) inbodyLabel.textContent = 'Sin datos';
+    if (bodyEl) bodyEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:11px;font-family:\'Space Mono\',monospace">Sin m\u00E9tricas registradas a\u00FAn</div>';
   }
 
   function renderChart(metricas) {
