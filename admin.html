@@ -259,21 +259,21 @@
 <select id="new-meta">
   <option value="">Selecciona...</option>
 
-  <option value="Bajar grasa / bajar de peso">🔥 Bajar grasa / bajar de peso</option>
-  <option value="Ganar músculo / recomposición">💪 Ganar músculo / recomposición</option>
-  <option value="Salud metabólica / salud general">💚 Salud metabólica / salud general</option>
-  <option value="Rendimiento funcional">⚡ Rendimiento funcional</option>
-  <option value="Estética / composición equilibrada">✨ Estética / composición equilibrada</option>
+  <option value="Bajar grasa / bajar de peso">🔥  Bajar grasa / bajar de peso</option>
+  <option value="Ganar músculo / recomposición">💪  Ganar músculo / recomposición</option>
+  <option value="Salud metabólica / salud general">💚  Salud metabólica / salud general</option>
+  <option value="Rendimiento funcional">⚡  Rendimiento funcional</option>
+  <option value="Estética / composición equilibrada">✨  Estética / composición equilibrada</option>
 
   <optgroup label="Incrementar mi performance">
-    <option value="Incrementar performance · Ciclismo">🚴 Ciclismo</option>
-    <option value="Incrementar performance · Correr">🏃 Correr</option>
-    <option value="Incrementar performance · Golf">⛳ Golf</option>
-    <option value="Incrementar performance · Natación">🏊 Natación</option>
-    <option value="Incrementar performance · Padel">🥎 Padel</option>
-    <option value="Incrementar performance · Tenis">🎾 Tenis</option>
-    <option value="Incrementar performance · Fútbol">⚽ Fútbol</option>
-    <option value="Incrementar performance · Otro">🏅 Otro</option>
+    <option value="Incrementar performance · Ciclismo">🚴  Ciclismo</option>
+    <option value="Incrementar performance · Correr">🏃  Correr</option>
+    <option value="Incrementar performance · Golf">⛳  Golf</option>
+    <option value="Incrementar performance · Natación">🏊  Natación</option>
+    <option value="Incrementar performance · Padel">🥎  Padel</option>
+    <option value="Incrementar performance · Tenis">🎾  Tenis</option>
+    <option value="Incrementar performance · Fútbol">⚽  Fútbol</option>
+    <option value="Incrementar performance · Otro">🏅  Otro</option>
   </optgroup>
 </select>
 
@@ -290,10 +290,11 @@
           <button class="btn btn-success btn-sm" onclick="openInitialMetricsModal()" style="white-space:nowrap">+ Capturar Valoración</button>
         </div>
       </div>
+
       <div class="form-error" id="new-member-error"></div>
       <div style="display:flex;gap:10px;margin-top:16px">
-        <button class="btn btn-secondary" onclick="cancelNewMember()" style="flex:1">Cancelar</button>
         <button class="btn btn-primary" id="btn-create-member" onclick="createMember()" style="flex:1">Guardar Miembro</button>
+        <button class="btn btn-secondary" onclick="cancelNewMember()" style="flex:1">Cancelar</button>
       </div>
     </div>
 
@@ -444,10 +445,7 @@
 <!-- MODAL METRICS -->
 <div class="modal-overlay" id="modal-metrics">
   <div class="modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <div class="modal-title">Nueva Valoraci&#xF3;n</div>
-      <input type="date" id="m-fecha" style="background:#141414;border:1px solid #333;border-radius:8px;padding:6px 10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;flex-shrink:0" />
-    </div>
+    <div class="modal-title">Nueva Valoraci&#xF3;n</div>
     <div class="modal-sub" id="metrics-modal-sub"></div>
     <input type="hidden" id="metrics-uid" />
     <div class="field-row">
@@ -464,7 +462,7 @@
     </div>
 <div class="field-row">
   <div class="field"><label>Calificaci&#xF3;n Inbody (1-100)</label><input type="number" id="m-calificacion" placeholder="75" min="1" max="100" /></div>
-  <div class="field"></div>
+  <div class="field"><label>Fecha *</label><input type="date" id="m-fecha" /></div>
 </div>
 <div class="field-row">
   <div class="field"><label>Brazo (cm)</label><input type="number" id="m-brazo" placeholder="32" step="0.1" /></div>
@@ -490,8 +488,8 @@
   </div>
 </div>
 <div class="form-error" id="metrics-error"></div>    <div class="modal-footer">
-      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-metrics')">Cancelar</button>
       <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoraci&#xF3;n</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-metrics')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -521,14 +519,14 @@
   // Admin Maestro &#x2014; no puede ser desactivado ni degradado
   const MASTER_UID = '1zZIfBnLGqRiPKVRVfHxlt2O3Di2';
 
-  // Segunda instancia para crear usuarios sin afectar la sesi\u00F3n del staff
+  // Segunda instancia para crear usuarios sin afectar la sesi\\u00F3n del staff
   const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
   const secondaryAuth = secondaryApp.auth();
 
   // ROL ACTUAL DEL STAFF
   window.currentStaffRole = null;
 
-  // AUTH STATE &#x2014; con verificaci\u00F3n de lista blanca
+  // AUTH STATE &#x2014; con verificaci\\u00F3n de lista blanca
   auth.onAuthStateChanged(async user => {
     if (user) {
       try {
@@ -569,7 +567,7 @@ if (user && user.uid === MASTER_UID) {
         } catch(loadErr) { console.error('loadMembers error:', loadErr); }
       } catch(e) {
         console.error('Auth error:', e.code, e.message, e);
-        // Solo redirigir al login si es error de autenticaci\u00F3n/permisos
+        // Solo redirigir al login si es error de autenticaci\\u00F3n/permisos
         if (e.code && (e.code.startsWith('auth/') || e.code.startsWith('permission'))) {
           await auth.signOut();
           show('s-login'); hide('s-app');
@@ -606,11 +604,11 @@ if (user && user.uid === MASTER_UID) {
     if (!email || !pass) { errEl.textContent = 'Completa los campos'; return; }
     const btn = document.getElementById('adm-login-btn');
     btn.textContent = 'Verificando...'; btn.disabled = true;
-    // SESSION persistence: cada pesta\u00F1a es independiente, no afecta la sesi\u00F3n del miembro
+    // SESSION persistence: cada pesta\\u00F1a es independiente, no afecta la sesi\\u00F3n del miembro
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
       .then(() => auth.signInWithEmailAndPassword(email, pass))
       .catch(e => {
-        errEl.textContent = 'Email o contrase\u00F1a incorrectos';
+        errEl.textContent = 'Email o contrase\\u00F1a incorrectos';
         btn.textContent = 'Entrar al panel'; btn.disabled = false;
       });
   }
@@ -621,7 +619,7 @@ if (user && user.uid === MASTER_UID) {
   function doLogout() { auth.signOut().then(() => window.location.reload()); }
 
   // &#x2500;&#x2500; COACH AI MESSAGE &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
-    // &#x2500;&#x2500;&#x2500; VIGENCIA DE MEMBRES\u00CDA &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    // &#x2500;&#x2500;&#x2500; VIGENCIA DE MEMBRES\\u00CDA &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
   function calcVigenciaFecha(prefix) {
     const vigencia = document.getElementById(prefix + '-vigencia')?.value || 'permanente';
     const inicio = document.getElementById(prefix + '-inicio')?.value || '';
@@ -653,13 +651,13 @@ if (user && user.uid === MASTER_UID) {
         const ref = db.collection('usuarios').doc(m.uid);
         batch.update(ref, { activo: false });
         cambios++;
-        console.log(`Membres\u00EDa vencida: ${m.nombre} (${m.vigenciaFecha})`);
+        console.log(`Membres\\u00EDa vencida: ${m.nombre} (${m.vigenciaFecha})`);
       }
     }
     
     if (cambios > 0) {
       await batch.commit();
-      console.log(`${cambios} membres\u00EDas vencidas marcadas como inactivas`);
+      console.log(`${cambios} membres\\u00EDas vencidas marcadas como inactivas`);
       return true; // Indica que se deben recargar los datos
     }
     return false;
@@ -681,32 +679,32 @@ if (user && user.uid === MASTER_UID) {
     const el = document.getElementById('home-ai-message') || document.getElementById('coach-ai-message');
     if (!el) return;
 
-    // Cache: 1 mensaje por d\u00EDa por coach
+    // Cache: 1 mensaje por d\\u00EDa por coach
     const today = new Date().toISOString().slice(0,10);
     const cacheKey = 'bepwr_coach_msg_' + today;
     const cached = localStorage.getItem(cacheKey);
     if (cached && !cached.includes('&#xFFFD') && !cached.includes('=A') && cached.length > 50) { el.innerHTML = cached; return; }
 
     const hora = new Date().getHours();
-    const saludo = hora < 12 ? 'buenos d\u00EDas' : hora < 19 ? 'buenas tardes' : 'buenas noches';
+    const saludo = hora < 12 ? 'buenos d\\u00EDas' : hora < 19 ? 'buenas tardes' : 'buenas noches';
 
     const temas = [
-      't\u00E9cnicas de correcci\u00F3n de patrones de movimiento funcional (sentadilla, bisagra de cadera, empuje, jal\u00F3n, carga)',
-      'programaci\u00F3n de sesiones: periodizaci\u00F3n, variedad de est\u00EDmulos y progresi\u00F3n de carga en entrenamiento funcional',
-      'fisiolog\u00EDa del ejercicio aplicada: adaptaciones neuromusculares, metabolismo energ\u00E9tico y recuperaci\u00F3n',
-      'psicolog\u00EDa del coaching: motivaci\u00F3n, comunicaci\u00F3n efectiva y manejo de diferentes perfiles de clientes',
-      'nutrici\u00F3n deportiva b\u00E1sica que todo coach funcional debe conocer: macros, timing y hidrataci\u00F3n',
-      'movilidad y estabilidad: evaluaci\u00F3n funcional y correcci\u00F3n de limitaciones comunes',
-      'lesiones frecuentes en entrenamiento funcional: prevenci\u00F3n, se\u00F1ales de alerta y modificaciones',
-      'herramientas de evaluaci\u00F3n: InBody, pruebas funcionales y c\u00F3mo interpretar resultados con el cliente',
+      't\\u00E9cnicas de correcci\\u00F3n de patrones de movimiento funcional (sentadilla, bisagra de cadera, empuje, jal\\u00F3n, carga)',
+      'programaci\\u00F3n de sesiones: periodizaci\\u00F3n, variedad de est\\u00EDmulos y progresi\\u00F3n de carga en entrenamiento funcional',
+      'fisiolog\\u00EDa del ejercicio aplicada: adaptaciones neuromusculares, metabolismo energ\\u00E9tico y recuperaci\\u00F3n',
+      'psicolog\\u00EDa del coaching: motivaci\\u00F3n, comunicaci\\u00F3n efectiva y manejo de diferentes perfiles de clientes',
+      'nutrici\\u00F3n deportiva b\\u00E1sica que todo coach funcional debe conocer: macros, timing y hidrataci\\u00F3n',
+      'movilidad y estabilidad: evaluaci\\u00F3n funcional y correcci\\u00F3n de limitaciones comunes',
+      'lesiones frecuentes en entrenamiento funcional: prevenci\\u00F3n, se\\u00F1ales de alerta y modificaciones',
+      'herramientas de evaluaci\\u00F3n: InBody, pruebas funcionales y c\\u00F3mo interpretar resultados con el cliente',
       'variaciones avanzadas de ejercicios funcionales: TRX, kettlebell, bandas, peso corporal',
-      'c\u00F3mo dise\u00F1ar clases grupales efectivas: estructura, energ\u00EDa, m\u00FAsica y manejo del grupo',
-      'datos cient\u00EDficos recientes sobre entrenamiento de fuerza funcional y longevidad',
-      'c\u00F3mo trabajar con poblaciones especiales: adultos mayores, mujeres embarazadas, rehabilitaci\u00F3n post-lesi\u00F3n'
+      'c\\u00F3mo dise\\u00F1ar clases grupales efectivas: estructura, energ\\u00EDa, m\\u00FAsica y manejo del grupo',
+      'datos cient\\u00EDficos recientes sobre entrenamiento de fuerza funcional y longevidad',
+      'c\\u00F3mo trabajar con poblaciones especiales: adultos mayores, mujeres embarazadas, rehabilitaci\\u00F3n post-lesi\\u00F3n'
     ];
     const tema = temas[new Date().getDate() % temas.length];
 
-    const prompt = `Coach bePWR Quer\u00E9taro. ${saludo}. Escribe un mensaje motivador y educativo del d\u00EDa sobre: ${tema}. M\u00E1ximo 3 p\u00E1rrafos. Incluye un dato cient\u00EDfico pr\u00E1ctico. Espa\u00F1ol, directo, sin clich\u00E9s.`;
+    const prompt = `Coach bePWR Quer\\u00E9taro. ${saludo}. Escribe un mensaje motivador y educativo del d\\u00EDa sobre: ${tema}. M\\u00E1ximo 3 p\\u00E1rrafos. Incluye un dato cient\\u00EDfico pr\\u00E1ctico. Espa\\u00F1ol, directo, sin clich\\u00E9s.`;
 
     try {
       const res = await fetch('/api/chat', {
@@ -717,13 +715,13 @@ if (user && user.uid === MASTER_UID) {
       const data = await res.json();
       const msg = data.message || '';
       if (msg) {
-        const html = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n\n/g, '</p><p style="margin-top:10px">').replace(/\n/g, '<br>');
+        const html = msg.replace(/\\*\\*(.*?)\\*\\*/g, '<b>$1</b>').replace(/\\n\\n/g, '</p><p style="margin-top:10px">').replace(/\\n/g, '<br>');
         const htmlFinal = '<p>' + html + '</p>';
         el.innerHTML = htmlFinal;
         localStorage.setItem(cacheKey, htmlFinal);
       }
     } catch(e) {
-      el.innerHTML = '<span style="color:var(--gray);font-size:12px;font-family:Space Mono,monospace">Error al cargar el mensaje del d\u00EDa.</span>';
+      el.innerHTML = '<span style="color:var(--gray);font-size:12px;font-family:Space Mono,monospace">Error al cargar el mensaje del d\\u00EDa.</span>';
     }
   }
 
@@ -758,7 +756,7 @@ if (user && user.uid === MASTER_UID) {
     }
   });
 
-  // Guarda la notificaci\u00F3n en Firestore de cada miembro destinatario
+  // Guarda la notificaci\\u00F3n en Firestore de cada miembro destinatario
   async function saveNotificationsFirestore(title, body, target) {
     const fecha = new Date().toISOString();
     const notifData = { titulo: title, cuerpo: body, fecha, leida: false };
@@ -813,7 +811,7 @@ if (user && user.uid === MASTER_UID) {
     modalDetail.style.display = 'none';
   }
 
-  // Ir a la pestaña de “Envío de Avisos”
+  // Ir a la pestaña de Envío de Avisos
   switchTab('notify');
 
   const targetSel   = document.getElementById('notif-target');
@@ -842,7 +840,7 @@ if (user && user.uid === MASTER_UID) {
   window.openNotifyForMember = function (uid) {
   if (!uid) return;
 
-  // Ir a la pestaña de “Envío de Avisos”
+  // Ir a la pestaña de Envío de Avisos
   switchTab('notify');
 
   const targetSel   = document.getElementById('notif-target');
@@ -851,7 +849,7 @@ if (user && user.uid === MASTER_UID) {
 
   if (!targetSel || !memberSel || !searchInput) return;
 
-  // Poner “Envío individual”
+  // Poner Envío individual
   targetSel.value = 'individual';
   updateNotifTargetUI();
 
@@ -881,7 +879,7 @@ if (user && user.uid === MASTER_UID) {
     const btn = document.getElementById('btn-send-notif');
     errEl.textContent = '';
 
-    if (!title) { errEl.textContent = 'El t\u00EDtulo es obligatorio'; return; }
+    if (!title) { errEl.textContent = 'El t\\u00EDtulo es obligatorio'; return; }
     if (!body) { errEl.textContent = 'El mensaje es obligatorio'; return; }
 
     btn.textContent = 'Enviando...'; btn.disabled = true;
@@ -905,8 +903,8 @@ if (user && user.uid === MASTER_UID) {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
-        logBitacora('envio_aviso', 'Aviso: \"' + title + '\" (' + data.sent + ' enviados)', '');
+        showToast('\\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
+        logBitacora('envio_aviso', 'Aviso: \\"' + title + '\\" (' + data.sent + ' enviados)', '');
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
@@ -915,9 +913,9 @@ if (user && user.uid === MASTER_UID) {
         errEl.textContent = data.error || ('Enviado a ' + (data.sent||0) + ' miembros');
       }
     } catch(e) {
-      errEl.textContent = 'Error de conexi\u00F3n: ' + e.message;
+      errEl.textContent = 'Error de conexi\\u00F3n: ' + e.message;
     } finally {
-      btn.textContent = '\u{1F4E3} Enviar notificaci\u00F3n'; btn.disabled = false;
+      btn.textContent = '\\u{1F4E3} Enviar notificaci\\u00F3n'; btn.disabled = false;
     }
   }
 
@@ -933,7 +931,7 @@ if (user && user.uid === MASTER_UID) {
     auth.sendPasswordResetEmail(email)
       .then(() => {
         errEl.style.color = '#4ade80';
-        errEl.textContent = 'Te enviamos un correo para restablecer tu contrase\u00F1a';
+        errEl.textContent = 'Te enviamos un correo para restablecer tu contrase\\u00F1a';
         setTimeout(() => { errEl.style.color = '#f87171'; errEl.textContent = ''; }, 5000);
       })
       .catch(() => {
@@ -996,7 +994,7 @@ if (user && user.uid === MASTER_UID) {
       // Load valoraciones registered by this staff
       const metSnap = await db.collectionGroup('metricas').where('registradoPor', '==', uid).orderBy('fecha','desc').limit(20).get();
       if (metSnap.empty) {
-        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas a\u00FAn';
+        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas a\\u00FAn';
       } else {
         document.getElementById('sp-historial').innerHTML = metSnap.docs.map(d => {
           const m = d.data();
@@ -1025,11 +1023,11 @@ if (user && user.uid === MASTER_UID) {
     const tel = document.getElementById('sp-edit-tel').value.trim();
     const rol = document.getElementById('sp-edit-rol').value;
     if (!nombre) { errEl.textContent = 'El nombre es requerido'; return; }
-    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
+    if (!/^\\d{10}$/.test(tel)) { errEl.textContent = 'El tel\\u00E9fono debe tener exactamente 10 d\\u00EDgitos'; return; }
     try {
       await db.collection('staff').doc(currentStaffProfileUID).update({ nombre, telefono: tel, rol });
       errEl.style.color = '#4ade80';
-      errEl.textContent = '\u00A1Datos actualizados!';
+      errEl.textContent = '\\u00A1Datos actualizados!';
       document.getElementById('sp-nombre').textContent = nombre;
       document.getElementById('sp-tel').textContent = tel;
       setTimeout(() => loadStaffList(), 1000);
@@ -1043,22 +1041,22 @@ if (user && user.uid === MASTER_UID) {
     const newPass = document.getElementById('sp-new').value;
     const confirm = document.getElementById('sp-confirm').value;
     errEl.textContent = '';
-    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
-    if (!current) { errEl.textContent = 'Escribe tu contrase\u00F1a actual'; return; }
-    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrase\u00F1a no cumple los requisitos'; return; }
-    if (newPass !== confirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
+    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[.!*@#$%^&+=_\\-?])[A-Za-z\\d.!*@#$%^&+=_\\-?]{6,}$/;
+    if (!current) { errEl.textContent = 'Escribe tu contrase\\u00F1a actual'; return; }
+    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrase\\u00F1a no cumple los requisitos'; return; }
+    if (newPass !== confirm) { errEl.textContent = 'Las contrase\\u00F1as no coinciden'; return; }
     try {
       const user = auth.currentUser;
       const cred = firebase.auth.EmailAuthProvider.credential(user.email, current);
       await user.reauthenticateWithCredential(cred);
       await user.updatePassword(newPass);
       errEl.style.color = '#4ade80';
-      errEl.textContent = '\u00A1Contrase\u00F1a actualizada!';
+      errEl.textContent = '\\u00A1Contrase\\u00F1a actualizada!';
       setTimeout(closeChangePass, 1500);
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase\u00F1a actual incorrecta';
+        errEl.textContent = 'Contrase\\u00F1a actual incorrecta';
       } else {
         errEl.textContent = 'Error: ' + e.message;
       }
@@ -1077,7 +1075,7 @@ if (user && user.uid === MASTER_UID) {
   }
   function fmtDate(val) {
     if (!val) return '';
-    if (val.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    if (val.match(/^\\d{4}-\\d{2}-\\d{2}$/)) {
       const [y,m,d] = val.split('-');
       const dt = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
       return dt.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}).replace('.','').replace(',','');
@@ -1088,9 +1086,9 @@ if (user && user.uid === MASTER_UID) {
   // Convert any date format to YYYY-MM-DD for <input type="date">
   function toDateInput(val) {
     if (!val) return '';
-    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+    if (/^\\d{4}-\\d{2}-\\d{2}$/.test(val)) return val;
     const months = {ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
-    const m = val.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+    const m = val.toLowerCase().match(/(\\d{1,2})\\s+([a-z]+)\\s+(\\d{4})/);
     if (m) {
       return `${m[3]}-${String((months[m[2]]??0)+1).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
     }
@@ -1114,7 +1112,7 @@ if (user && user.uid === MASTER_UID) {
       window._allMembers.push({ uid: d.id, ...data, ultimaMetrica });
     }
 
-    // 👉 AÑADE ESTA LÍNEA:
+    // 👉  AÑADE ESTA LÍNEA:
     window.allMembers = window._allMembers;
 
     // Verificar membresías vencidas automáticamente
@@ -1164,6 +1162,7 @@ if (user && user.uid === MASTER_UID) {
         <div style="display:flex;align-items:center;flex:1;min-width:0">${dot}<div><div style="font-size:14px;font-weight:600;color:${activo?'var(--white)':'#888'}">${displayName}${vBadge}</div><div style="font-size:12px;color:var(--gray);margin-top:2px">${m.email||''}</div></div></div>
         <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
           <button onclick="event.stopPropagation();openDetail('${m.uid}')" style="background:#FF5C1A;border:none;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace">Ver</button>
+          <button onclick="event.stopPropagation();openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\\'")}')" style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80;font-size:10px;padding:5px 8px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace;white-space:nowrap">+ Valoración</button>
         </div>
         </div>`;
     }).join('');
@@ -1199,7 +1198,7 @@ if (user && user.uid === MASTER_UID) {
     const msg = document.getElementById('email-match-msg');
     if (!msg || !e2) return;
     if (e1 === e2) {
-      msg.textContent = '\u2713 Emails coinciden';
+      msg.textContent = '\\u2713 Emails coinciden';
       msg.style.color = '#4ade80';
     } else {
       msg.textContent = 'Los emails no coinciden';
@@ -1215,55 +1214,158 @@ if (user && user.uid === MASTER_UID) {
   }
 
   // OPEN DETAIL
-  async function openDetail(uid) { window._detailUid = uid; window.currentDetailMemberUID = uid; var _m=(window._allMembers||[]).find(x=>x.uid===uid); window._detailNombre=_m?_m.nombre:'';
+  async function openDetail(uid) {
+    window._detailUid = uid; window.currentDetailMemberUID = uid;
+    var _m=(window._allMembers||[]).find(x=>x.uid===uid); window._detailNombre=_m?_m.nombre:'';
     const m = (window._allMembers||[]).find(x => x.uid === uid);
     if (!m) return;
     const initials = (m.nombre||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-    let histHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--gray);font-family:\'Space Mono\',monospace">Sin m\u00E9tricas registradas</div>';
+
+    let metricsAll = [];
     try {
       const mSnap = await db.collection('usuarios').doc(uid).collection('metricas').orderBy('fecha','desc').get();
-      if (!mSnap.empty) {
-        histHTML = `<div class="metrics-history">
-          <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>M\u00FAsculo</div><div>Grasa Corp.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
-          ${mSnap.docs.map(d => {
-            const x = d.data();
-            const gc=x.grasaCorporal??x.grasaPct;return `<div class="mh-row"><div class="mh-date">${x.fecha||'&#x2014;'}</div><div class="mh-val">${x.peso!=null?x.peso+' kg':'&#x2014;'}</div><div class="mh-val">${x.musculo!=null?x.musculo+' kg':'&#x2014;'}</div><div class="mh-val">${gc!=null?gc+' kg':'&#x2014;'}</div><div class="mh-val">${x.imc||'&#x2014;'}</div><div class="mh-val">${x.pgc!=null?x.pgc+'%':'&#x2014;'}</div><div class="mh-val">${x.grasaVisceral||'&#x2014;'}</div><div class="mh-val">${x.calificacion||'&#x2014;'}</div>${window.currentStaffRole==='admin'?`<div class=\"mh-val\"><button onclick=\"editMetrica('${uid}','${d.id}')\" style=\"background:none;border:1px solid #444;color:#aaa;font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer\">&#x270F;</button></div>`:''}</div>`;
-          }).join('')}
-        </div>`;
-      }
-    } catch(e) {}
+      if (!mSnap.empty) { metricsAll = mSnap.docs.map(d => ({ id: d.id, ...d.data() })); }
+    } catch(e) { console.error('Error cargando métricas:', e); }
 
-    document.getElementById('modal-detail-content').innerHTML = `
+    const ultima = metricsAll[0] || null;
+    const inicial = metricsAll.length > 0 ? metricsAll[metricsAll.length - 1] : null;
+
+    function fmtF(f) {
+      if (!f) return '\u2014';
+      if (f.toDate) f = f.toDate();
+      if (typeof f === 'string' && f.includes('/')) return f;
+      try { const d = new Date(f); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+      catch(e) { return f; }
+    }
+    function v(val) { return (val != null && val !== '' && val !== 'NaN') ? val : '\u2014'; }
+    function progreso(ini, act, invertir) {
+      if (ini == null || act == null || isNaN(ini) || isNaN(act)) return '\u2014';
+      const diff = parseFloat(act) - parseFloat(ini);
+      if (diff === 0) return '<span style="color:#aaa">0</span>';
+      const positivo = invertir ? diff < 0 : diff > 0;
+      const color = positivo ? '#4ade80' : '#f87171';
+      const signo = diff > 0 ? '+' : '';
+      return `<span style="color:${color};font-weight:600">${signo}${diff.toFixed(1)}</span>`;
+    }
+
+    let histHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--gray);font-family:Space Mono,monospace">Sin métricas registradas</div>';
+    if (metricsAll.length > 0) {
+      histHTML = `<div class="metrics-history">
+        <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>Músculo</div><div>Grasa C.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
+        ${metricsAll.map(d => {
+          return `<div class="mh-row" style="cursor:pointer" onclick="editMetricFromHistory('${uid}','${d.id}')">
+            <div class="mh-date">${fmtF(d.fecha)}</div>
+            <div class="mh-val">${v(d.peso)}</div><div class="mh-val">${v(d.musculo)}</div>
+            <div class="mh-val">${v(d.grasaCorporal)}</div><div class="mh-val">${v(d.imc)}</div>
+            <div class="mh-val">${v(d.pgc)}</div><div class="mh-val">${v(d.grasaVisceral)}</div>
+            <div class="mh-val">${v(d.calificacion)}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }
+
+    const metricRows = [
+      { label:'Peso (kg)',           iniVal:inicial?.peso,          actVal:ultima?.peso,          inv:false },
+      { label:'Músculo Esq. (kg)',   iniVal:inicial?.musculo,       actVal:ultima?.musculo,       inv:false },
+      { label:'Grasa Corporal (kg)', iniVal:inicial?.grasaCorporal, actVal:ultima?.grasaCorporal, inv:true  },
+      { label:'IMC',                 iniVal:inicial?.imc,           actVal:ultima?.imc,           inv:true  },
+      { label:'PGC (%)',             iniVal:inicial?.pgc,           actVal:ultima?.pgc,           inv:true  },
+      { label:'Grasa Visceral',      iniVal:inicial?.grasaVisceral, actVal:ultima?.grasaVisceral, inv:true  },
+      { label:'Calificación Inbody', iniVal:inicial?.calificacion,  actVal:ultima?.calificacion,  inv:false },
+      { label:'Brazo (cm)',          iniVal:inicial?.brazo,         actVal:ultima?.brazo,         inv:false },
+      { label:'Abdomen (cm)',        iniVal:inicial?.abdomen,       actVal:ultima?.abdomen,       inv:true  },
+      { label:'Cintura (cm)',        iniVal:inicial?.cintura,       actVal:ultima?.cintura,       inv:true  },
+      { label:'Cadera (cm)',         iniVal:inicial?.cadera,        actVal:ultima?.cadera,        inv:true  },
+      { label:'Pantorrilla (cm)',    iniVal:inicial?.pantorrilla,   actVal:ultima?.pantorrilla,   inv:false },
+      { label:'Peso Base Mancuernas',iniVal:inicial?.pruebaPeso,    actVal:ultima?.pruebaPeso,    inv:false, isText:true },
+    ];
+
+    let metricasTableHTML = metricRows.map(r => {
+      const prog = r.isText
+        ? (r.actVal && r.iniVal && r.actVal !== r.iniVal ? `<span style="color:#4ade80">Cambio</span>` : '\u2014')
+        : progreso(r.iniVal, r.actVal, r.inv);
+      return `<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;align-items:center">
+        <div style="color:var(--gray);font-family:Space Mono,monospace;font-size:10px">${r.label}</div>
+        <div style="text-align:center">${v(r.iniVal)}</div>
+        <div style="text-align:center">${v(r.actVal)}</div>
+        <div style="text-align:center">${prog}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('detail-content').innerHTML = `
       <div class="detail-header">
         <div class="detail-avatar">${initials}</div>
-        <div><div class="detail-name">${m.nombre||'Sin nombre'}</div><div class="detail-since">${m.fechaInicio ? 'Miembro desde '+m.fechaInicio : 'bePWR'}${m.altura?' &#xB7; '+m.altura+' cm':''}</div></div>
+        <div>
+          <div class="detail-name">${m.nombre||'Sin nombre'}</div>
+          <div class="detail-since">${m.email||''}</div>
+          <div class="detail-since" style="margin-top:2px">Miembro desde ${fmtF(m.fechaInicio)}</div>
+        </div>
       </div>
-      <div class="modal-section">Contacto</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div class="field"><label>Nombre completo</label><input type="text" id="edit-nombre" value="${m.nombre||''}" /></div>
-        <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${m.alias||''}" placeholder="C\u00F3mo le llaman" /></div>
-        <div class="field"><label>Email</label><input type="email" id="edit-email-member" value="${m.email||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
-        <div class="field"><label>Tel\u00E9fono</label><input type="text" id="edit-tel" value="${m.telefono||''}" /></div>
-        <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${toDateInput(m.nacimiento||'')}" /></div>
-        <div class="field"><label>Fecha inicio</label><input type="date" id="edit-inicio" value="${toDateInput(m.fechaInicio||'')}" onchange="calcVigenciaFecha('edit')" /></div>
-        <div class="field"><label>Altura (cm)</label><input type="number" id="edit-altura" value="${m.altura||''}" placeholder="170" min="100" max="230" /></div>
+
+      <div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-family:Space Mono,monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--orange)">Datos del miembro</div>
+          ${window.currentStaffRole === 'admin' ? `<button class="btn btn-secondary btn-sm" onclick="openEditMember('${uid}')">Editar datos</button>` : ''}
         </div>
-        <div class="field-row">
-        <div class="field">
-          <label>Vigencia</label>
-          <select id="edit-vigencia" onchange="calcVigenciaFecha('edit')">
-            <option value="permanente" ${(!m.vigencia||m.vigencia==='permanente')?'selected':''}>Permanente</option>
-            <option value="anual" ${m.vigencia==='anual'?'selected':''}>Anual (12 meses)</option>
-            <option value="semestral" ${m.vigencia==='semestral'?'selected':''}>Semestral (6 meses)</option>
-            <option value="trimestral" ${m.vigencia==='trimestral'?'selected':''}>Trimestral (3 meses)</option>
-            <option value="mensual" ${m.vigencia==='mensual'?'selected':''}>Mensual (1 mes)</option>
-          </select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">NOMBRE</div><div style="font-size:13px">${m.nombre||'\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">ALIAS</div><div style="font-size:13px">${m.alias||'\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">TELÉFONO</div><div style="font-size:13px">${m.telefono||'\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">NACIMIENTO</div><div style="font-size:13px">${fmtF(m.nacimiento)}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">GÉNERO</div><div style="font-size:13px">${m.genero||'\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">ALTURA</div><div style="font-size:13px">${m.altura ? m.altura+' cm' : '\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">META</div><div style="font-size:13px">${m.objetivo?.meta || m.meta || '\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">PESO INICIAL</div><div style="font-size:13px">${m.objetivo?.pesoInicial ? m.objetivo.pesoInicial+' kg' : '\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">VIGENCIA</div><div style="font-size:13px">${m.vigencia||'permanente'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">VENCIMIENTO</div><div style="font-size:13px">${fmtF(m.vigenciaFecha)}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">ESTADO</div><div style="font-size:13px;font-weight:600;color:${m.activo!==false?'#4ade80':'#f87171'}">${m.activo!==false?'Activo':'Inactivo'}</div></div>
         </div>
-        <div class="field">
-          <label>Fecha vencimiento</label>
-          <input type="date" id="edit-vigencia-fecha" value="${m.vigenciaFecha||''}" />
+      </div>
+
+      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoración</button>
+
+      <div class="modal-section">Historial de valoraciones</div>
+      <div style="font-size:10px;color:var(--gray);margin:-10px 0 12px;font-family:Space Mono,monospace">Haz clic en una valoración para consultarla o editarla</div>
+      ${histHTML}
+
+      <div class="modal-section" style="margin-top:20px">Métricas Iniciales y Actuales</div>
+      <div style="background:#141414;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px;padding:10px 12px;background:#0a0a0a;font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace;border-bottom:1px solid var(--border)">
+          <div>Métrica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
         </div>
-        <div class="field"><label>G\u00E9nero</label>
+        ${metricasTableHTML}
+      </div>
+
+      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="document.getElementById('modal-detail').style.display='none'; document.getElementById('modal-detail').classList.remove('open'); openNotifyForMember('${uid}')">📣 Enviar aviso a este miembro</button>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-detail')">Cerrar</button>
+      </div>
+    `;
+
+    document.getElementById('modal-detail').classList.add('open');
+  }
+
+  function openEditMember(uid) {
+    const m = (window._allMembers||[]).find(x => x.uid === uid);
+    if (!m) return;
+    const container = document.getElementById('detail-content');
+    const sections = container.children;
+    if (!sections[1]) return;
+
+    const editHTML = `
+    <div id="edit-member-overlay" style="background:#141414;border:1px solid var(--orange);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-family:Space Mono,monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Editar datos del miembro</div>
+      <div class="field-row">
+        <div class="field"><label>Nombre completo</label><input type="text" id="edit-nombre" value="${(m.nombre||'').replace(/"/g,'&quot;')}" /></div>
+        <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${(m.alias||'').replace(/"/g,'&quot;')}" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Teléfono</label><input type="tel" id="edit-tel" value="${m.telefono||''}" maxlength="10" /></div>
+        <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${m.nacimiento||''}" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Género</label>
           <select id="edit-genero">
             <option value="prefiero-no-decir" ${(!m.genero||m.genero==='prefiero-no-decir')?'selected':''}>Prefiero no decirlo</option>
             <option value="femenino" ${m.genero==='femenino'?'selected':''}>Femenino</option>
@@ -1271,114 +1373,92 @@ if (user && user.uid === MASTER_UID) {
             <option value="otro" ${m.genero==='otro'?'selected':''}>Otro</option>
           </select>
         </div>
-        <div class="field"><label>Estado</label>
-          <select id="edit-activo">
-            <option value="true" ${m.activo !== false ? 'selected' : ''}>Activo</option>
-            <option value="false" ${m.activo === false ? 'selected' : ''}>Inactivo</option>
+        <div class="field"><label>Altura (cm)</label><input type="number" id="edit-altura" value="${m.altura||''}" min="100" max="230" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Meta principal</label>
+          <select id="edit-meta">
+            <option value="">Selecciona...</option>
+            <option value="Bajar grasa / bajar de peso" ${(m.objetivo?.meta||m.meta)==='Bajar grasa / bajar de peso'?'selected':''}>🔥 Bajar grasa / bajar de peso</option>
+            <option value="Ganar músculo / recomposición" ${(m.objetivo?.meta||m.meta)==='Ganar músculo / recomposición'?'selected':''}>💪 Ganar músculo / recomposición</option>
+            <option value="Salud metabólica / salud general" ${(m.objetivo?.meta||m.meta)==='Salud metabólica / salud general'?'selected':''}>💚 Salud metabólica / salud general</option>
+            <option value="Rendimiento funcional" ${(m.objetivo?.meta||m.meta)==='Rendimiento funcional'?'selected':''}>⚡ Rendimiento funcional</option>
+            <option value="Estética / composición equilibrada" ${(m.objetivo?.meta||m.meta)==='Estética / composición equilibrada'?'selected':''}>✨ Estética / composición equilibrada</option>
+            <option value="Incrementar performance · Ciclismo" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Ciclismo'?'selected':''}>🚴 Ciclismo</option>
+            <option value="Incrementar performance · Correr" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Correr'?'selected':''}>🏃 Correr</option>
+            <option value="Incrementar performance · Golf" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Golf'?'selected':''}>⛳ Golf</option>
+            <option value="Incrementar performance · Natación" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Natación'?'selected':''}>🏊 Natación</option>
+            <option value="Incrementar performance · Padel" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Padel'?'selected':''}>🥎 Padel</option>
+            <option value="Incrementar performance · Tenis" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Tenis'?'selected':''}>🎾 Tenis</option>
+            <option value="Incrementar performance · Fútbol" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Fútbol'?'selected':''}>⚽ Fútbol</option>
+            <option value="Incrementar performance · Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Otro'?'selected':''}>🏅 Otro</option>
           </select>
         </div>
-      </div>
-      <div class="modal-section">Objetivo</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div class="field"><label>Meta</label>
-<select id="edit-meta">
-  <option value="">Selecciona...</option>
-
-  <option value="Bajar grasa / bajar de peso" ${m.objetivo?.meta === 'Bajar grasa / bajar de peso' ? 'selected' : ''}>
-    🔥 Bajar grasa / bajar de peso
-  </option>
-  <option value="Ganar músculo / recomposición" ${m.objetivo?.meta === 'Ganar músculo / recomposición' ? 'selected' : ''}>
-    💪 Ganar músculo / recomposición
-  </option>
-  <option value="Salud metabólica / salud general" ${m.objetivo?.meta === 'Salud metabólica / salud general' ? 'selected' : ''}>
-    💚 Salud metabólica / salud general
-  </option>
-  <option value="Rendimiento funcional" ${m.objetivo?.meta === 'Rendimiento funcional' ? 'selected' : ''}>
-    ⚡ Rendimiento funcional
-  </option>
-  <option value="Estética / composición equilibrada" ${m.objetivo?.meta === 'Estética / composición equilibrada' ? 'selected' : ''}>
-    ✨ Estética / composición equilibrada
-  </option>
-
-  <optgroup label="Incrementar mi performance">
-    <option value="Incrementar performance · Ciclismo" ${m.objetivo?.meta === 'Incrementar performance · Ciclismo' ? 'selected' : ''}>
-      🚴 Ciclismo
-    </option>
-    <option value="Incrementar performance · Correr" ${m.objetivo?.meta === 'Incrementar performance · Correr' ? 'selected' : ''}>
-      🏃 Correr
-    </option>
-    <option value="Incrementar performance · Golf" ${m.objetivo?.meta === 'Incrementar performance · Golf' ? 'selected' : ''}>
-      ⛳ Golf
-    </option>
-    <option value="Incrementar performance · Natación" ${m.objetivo?.meta === 'Incrementar performance · Natación' ? 'selected' : ''}>
-      🏊 Natación
-    </option>
-    <option value="Incrementar performance · Padel" ${m.objetivo?.meta === 'Incrementar performance · Padel' ? 'selected' : ''}>
-      🥎 Padel
-    </option>
-    <option value="Incrementar performance · Tenis" ${m.objetivo?.meta === 'Incrementar performance · Tenis' ? 'selected' : ''}>
-      🎾 Tenis
-    <option value="Incrementar performance · Fútbol" ${m.objetivo?.meta === 'Incrementar performance · Fútbol' ? 'selected' : ''}>
-      ⚽ Fútbol
-    </option>
-    <option value="Incrementar performance · Otro" ${m.objetivo?.meta === 'Incrementar performance · Otro' ? 'selected' : ''}>
-      🏅 Otro
-</option>
-    </option>
-  </optgroup>
-</select>
-
-
-        </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
-        <div class="field"><label>Peso meta (kg)</label><input type="number" id="edit-peso-meta" value="${m.objetivo?.pesoMeta||''}" step="0.1" /></div>
       </div>
-      <div class="modal-section" style="font-size:9px">M\u00E9tricas iniciales y metas para c\u00E1lculo de progreso</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-        <div class="field"><label>PGC inicial (%)</label><input type="number" id="edit-pgc-ini" value="${m.objetivo?.pgcInicial||''}" step="0.1" placeholder="28" /></div>
-        <div class="field"><label>PGC actual (%)</label><input type="number" value="${m.ultimaMetrica?.pgc||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
-        <div class="field"><label>PGC meta (%)</label><input type="number" id="edit-pgc-meta" value="${m.objetivo?.pgcMeta||''}" step="0.1" placeholder="22" /></div>
+      <div class="field-row">
+        <div class="field"><label>Vigencia</label>
+          <select id="edit-vigencia" onchange="calcVigenciaFecha('edit')">
+            <option value="permanente" ${m.vigencia==='permanente'||!m.vigencia?'selected':''}>Permanente</option>
+            <option value="anual" ${m.vigencia==='anual'?'selected':''}>Anual</option>
+            <option value="semestral" ${m.vigencia==='semestral'?'selected':''}>Semestral</option>
+            <option value="trimestral" ${m.vigencia==='trimestral'?'selected':''}>Trimestral</option>
+            <option value="mensual" ${m.vigencia==='mensual'?'selected':''}>Mensual</option>
+          </select>
+        </div>
+        <div class="field"><label>Vencimiento</label><input type="date" id="edit-vigencia-fecha" value="${m.vigenciaFecha||''}" /></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-        <div class="field"><label>Grasa Visc. inicial</label><input type="number" id="edit-gv-ini" value="${m.objetivo?.gvInicial||''}" step="1" placeholder="10" /></div>
-        <div class="field"><label>G.Visc. actual</label><input type="number" value="${m.ultimaMetrica?.grasaVisceral||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
-        <div class="field"><label>G.Visc. meta</label><input type="number" id="edit-gv-meta" value="${m.objetivo?.gvMeta||''}" step="1" placeholder="7" /></div>
+      <div class="field-row">
+        <div class="field"><label>Estado</label>
+          <select id="edit-activo">
+            <option value="true" ${m.activo!==false?'selected':''}>Activo</option>
+            <option value="false" ${m.activo===false?'selected':''}>Inactivo</option>
+          </select>
+        </div>
+        <div class="field"></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-        <div class="field"><label>M\u00FAsc. Esquel. inicial (kg)</label><input type="number" id="edit-mm-ini" value="${m.objetivo?.mmInicial||''}" step="0.1" placeholder="42" /></div>
-        <div class="field"><label>M\u00FAsc. actual (kg)</label><input type="number" value="${m.ultimaMetrica?.musculo||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
-        <div class="field"><label>M\u00FAsc. meta (kg)</label><input type="number" id="edit-mm-meta" value="${m.objetivo?.mmMeta||''}" step="0.1" placeholder="46" /></div>
+      <div id="edit-member-error" style="color:#f87171;font-size:12px;min-height:16px;text-align:center;margin:8px 0"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="confirmSaveMemberEdit('${uid}')">Guardar cambios</button>
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="openDetail('${uid}')">Cancelar</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-        <div class="field"><label>InBody inicial</label><input type="number" id="edit-ib-ini" value="${m.objetivo?.inbodyInicial||''}" step="1" placeholder="72" /></div>
-        <div class="field"><label>InBody actual</label><input type="number" value="${m.ultimaMetrica?.calificacion||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
-        <div class="field"><label>InBody meta</label><input type="number" id="edit-ib-meta" value="${m.objetivo?.inbodyMeta||''}" step="1" placeholder="80" /></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
-        <div class="field"><label>IMC inicial</label><input type="number" id="edit-imc-ini" value="${m.objetivo?.imcInicial||''}" step="0.1" placeholder="26.5" /></div>
-        <div class="field"><label>IMC actual</label><input type="number" value="${m.ultimaMetrica?.imc||''}" readonly style="opacity:.6;cursor:not-allowed" /></div>
-        <div class="field"><label>IMC meta</label><input type="number" id="edit-imc-meta" value="${m.objetivo?.imcMeta||''}" step="0.1" placeholder="24" /></div>
-      </div>
-            <button class="btn btn-primary btn-sm" style="margin-bottom:20px" onclick="saveMemberEdit('${uid}')" ${window.currentStaffRole !== 'admin' ? 'disabled title="Solo admin puede editar datos"' : ''}>
-        ${window.currentStaffRole !== 'admin' ? '&#x1F512; Editar datos (solo admin)' : 'Guardar cambios'}
-      </button>
+    </div>`;
+    sections[1].outerHTML = editHTML;
+  }
 
-      <!-- Nuevo botón: enviar aviso directo a este miembro -->
-      <button
-  class="btn btn-secondary btn-sm"
-  style="margin-left:8px;margin-bottom:20px"
-  onclick="document.getElementById('modal-detail').style.display='none'; document.getElementById('modal-detail').classList.remove('open'); openNotifyForMember('${uid}')"
->
-  &#x1F4E3; Enviar aviso a este miembro
-</button>
-
-
-      <div class="modal-section">Historial de valoraciones</div>
-      ${histHTML}
-      <button class="btn btn-success btn-sm" style="margin-top:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoraci\u00F3n</button>
-    `;
-
-    document.getElementById('modal-detail').classList.add('open');
+  async function confirmSaveMemberEdit(uid) {
+    const confirmed = await showConfirm('¿Confirmas que deseas editar los datos de este miembro?');
+    if (!confirmed) return;
+    try {
+      const _mOrig = (window._allMembers||[]).find(x=>x.uid===uid)||{};
+      const activoVal = document.getElementById('edit-activo')?.value === 'false' ? false : true;
+      const newMeta = document.getElementById('edit-meta').value;
+      const newPesoIni = Number(document.getElementById('edit-peso-ini').value) || null;
+      await db.collection('usuarios').doc(uid).update({
+        nombre: document.getElementById('edit-nombre').value,
+        alias: document.getElementById('edit-alias').value,
+        telefono: document.getElementById('edit-tel').value,
+        nacimiento: document.getElementById('edit-dob').value,
+        genero: document.getElementById('edit-genero').value,
+        altura: Number(document.getElementById('edit-altura').value)||null,
+        vigencia: document.getElementById('edit-vigencia').value,
+        vigenciaFecha: document.getElementById('edit-vigencia-fecha').value || null,
+        activo: activoVal,
+        'objetivo.meta': newMeta,
+        'objetivo.pesoInicial': newPesoIni
+      });
+      const cambios = [];
+      if (document.getElementById('edit-nombre').value !== (_mOrig.nombre||'')) cambios.push('nombre');
+      if (newMeta !== (_mOrig.objetivo?.meta||'')) cambios.push('meta→'+newMeta);
+      if (activoVal !== (_mOrig.activo!==false)) cambios.push(activoVal?'activado':'desactivado');
+      logBitacora('modificacion_miembro', 'Editado: '+(cambios.join(', ')||'datos')+' de '+document.getElementById('edit-nombre').value, document.getElementById('edit-nombre').value);
+      showToast('Datos actualizados ✓', 'success');
+      await loadMembers();
+      setTimeout(() => openDetail(uid), 500);
+    } catch(e) {
+      const errEl = document.getElementById('edit-member-error');
+      if (errEl) errEl.textContent = 'Error: ' + e.message;
+    }
   }
 
   async function saveMemberEdit(uid) {
@@ -1413,20 +1493,20 @@ if (user && user.uid === MASTER_UID) {
           imcMeta:      Number(document.getElementById('edit-imc-meta').value)||null,
         }
       });
-      showToast('Cambios guardados \u2713', 'success');
+      showToast('Cambios guardados \\u2713', 'success');
       var _mDiffs = [];
       var _newNombre2 = (document.getElementById('edit-nombre')||{}).value||'';
       var _vigNew = (document.getElementById('edit-vigencia')||{}).value||'';
       var _vigFechaNew = (document.getElementById('edit-vigencia-fecha')||{}).value||'';
       var _objNew = (document.getElementById('edit-meta')||{}).value||'';
       var _actNewVal = (document.getElementById('edit-activo')||{}).value;
-      if (_mOrig.nombre && _newNombre2 && _mOrig.nombre !== _newNombre2) _mDiffs.push('Nombre: '+_mOrig.nombre+' \u2192 '+_newNombre2);
-      if (_actNewVal !== undefined && String(_mOrig.activo||'true') !== String(_actNewVal)) _mDiffs.push('Estado: '+(_mOrig.activo!==false?'Activo':'Inactivo')+' \u2192 '+(_actNewVal==='false'?'Inactivo':'Activo'));
-      if (_vigNew && _mOrig.vigencia !== _vigNew) _mDiffs.push('Vigencia: '+(_mOrig.vigencia||'sin definir')+' \u2192 '+_vigNew);
-      if (_vigFechaNew && _mOrig.vigenciaFecha !== _vigFechaNew) _mDiffs.push('Fecha vigencia: '+(_mOrig.vigenciaFecha||'-')+' \u2192 '+_vigFechaNew);
-      if (_objNew && (_mOrig.objetivo||{}).meta !== _objNew) _mDiffs.push('Objetivo: '+((_mOrig.objetivo||{}).meta||'-')+' \u2192 '+_objNew);
+      if (_mOrig.nombre && _newNombre2 && _mOrig.nombre !== _newNombre2) _mDiffs.push('Nombre: '+_mOrig.nombre+' \\u2192 '+_newNombre2);
+      if (_actNewVal !== undefined && String(_mOrig.activo||'true') !== String(_actNewVal)) _mDiffs.push('Estado: '+(_mOrig.activo!==false?'Activo':'Inactivo')+' \\u2192 '+(_actNewVal==='false'?'Inactivo':'Activo'));
+      if (_vigNew && _mOrig.vigencia !== _vigNew) _mDiffs.push('Vigencia: '+(_mOrig.vigencia||'sin definir')+' \\u2192 '+_vigNew);
+      if (_vigFechaNew && _mOrig.vigenciaFecha !== _vigFechaNew) _mDiffs.push('Fecha vigencia: '+(_mOrig.vigenciaFecha||'-')+' \\u2192 '+_vigFechaNew);
+      if (_objNew && (_mOrig.objetivo||{}).meta !== _objNew) _mDiffs.push('Objetivo: '+((_mOrig.objetivo||{}).meta||'-')+' \\u2192 '+_objNew);
       var _mNombreFinal2 = _newNombre2 || _mOrig.nombre || uid;
-      logBitacora('modificacion_miembro', 'Modificaci\u00F3n de '+_mNombreFinal2+(_mDiffs.length?' | '+_mDiffs.join(', '):''), _mNombreFinal2);
+      logBitacora('modificacion_miembro', 'Modificaci\\u00F3n de '+_mNombreFinal2+(_mDiffs.length?' | '+_mDiffs.join(', '):''), _mNombreFinal2);
       closeModal('modal-detail');
       loadMembers();
     } catch(e) {
@@ -1434,11 +1514,52 @@ if (user && user.uid === MASTER_UID) {
     }
   }
 
+  async function editMetricFromHistory(uid, metricId) {
+    const nombre = window._detailNombre || '';
+    try {
+      const docSnap = await db.collection('usuarios').doc(uid).collection('metricas').doc(metricId).get();
+      if (!docSnap.exists()) { showToast('Métrica no encontrada', 'error'); return; }
+      const data = docSnap.data();
+      document.getElementById('metrics-uid').value = uid;
+      document.getElementById('metrics-modal-sub').textContent = nombre + ' — Editar valoración';
+      document.getElementById('metrics-error').textContent = '';
+      document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoración';
+      window._editingMetricId = metricId;
+      window._editingMetricOrig = data;
+      const campos = {
+        peso:'m-peso', musculo:'m-musculo', grasaCorporal:'m-grasa-corp',
+        imc:'m-imc', pgc:'m-pgc', grasaVisceral:'m-grasa-visc',
+        calificacion:'m-calificacion', brazo:'m-brazo', abdomen:'m-abdomen',
+        cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla'
+      };
+      for (const [key, id] of Object.entries(campos)) {
+        const el = document.getElementById(id);
+        if (el) el.value = (data[key] != null && data[key] !== '') ? data[key] : '';
+      }
+      const ppEl = document.getElementById('m-pruebaPeso');
+      if (ppEl) ppEl.value = data.pruebaPeso || '';
+      const fechaEl = document.getElementById('m-fecha');
+      if (fechaEl && data.fecha) {
+        let f = data.fecha;
+        if (f.toDate) f = f.toDate();
+        if (typeof f === 'string' && f.includes('/')) {
+          const parts = f.split('/');
+          if (parts.length === 3) f = parts[2]+'-'+parts[1].padStart(2,'0')+'-'+parts[0].padStart(2,'0');
+        }
+        try { fechaEl.value = new Date(f).toISOString().slice(0,10); } catch(e) { fechaEl.value = ''; }
+      }
+      document.getElementById('modal-metrics').classList.add('open');
+    } catch(e) {
+      showToast('Error al cargar métrica: ' + e.message, 'error');
+    }
+  }
+
   function openMetricsModal(uid, nombre) {
     document.getElementById('metrics-uid').value = uid;
     document.getElementById('metrics-modal-sub').textContent = nombre;
     document.getElementById('metrics-error').textContent = '';
-['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion'].forEach(id => document.getElementById(id).value = '');
+['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-brazo','m-abdomen','m-cintura','m-cadera','m-pantorrilla'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('m-pruebaPeso').value = '';
     document.getElementById('m-pruebaPeso').value = '';
     const now = new Date();
     document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
@@ -1543,9 +1664,9 @@ if (user && user.uid === MASTER_UID) {
     var el = document.getElementById('ns-email-match');
     if (!el || !e2) return;
     if (e1.toLowerCase() === e2.toLowerCase()) {
-      el.style.color = '#4ade80'; el.textContent = '\u2713 Emails coinciden';
+      el.style.color = '#4ade80'; el.textContent = '\\u2713 Emails coinciden';
     } else {
-      el.style.color = '#f87171'; el.textContent = '\u2717 Los emails no coinciden';
+      el.style.color = '#f87171'; el.textContent = '\\u2717 Los emails no coinciden';
     }
   };
 
@@ -1594,7 +1715,7 @@ if (user && user.uid === MASTER_UID) {
   };
 
   window.initDeleteBitacora = async function() {
-    var ok = await showConfirm('Se enviar\u00E1 un c\u00F3digo a tu email. \u00BFDeseas continuar?');
+    var ok = await showConfirm('Se enviar\\u00E1 un c\\u00F3digo a tu email. \\u00BFDeseas continuar?');
     if (!ok) return;
     var code = Math.floor(100000 + Math.random() * 900000).toString();
     window._delCode = code;
@@ -1604,14 +1725,14 @@ if (user && user.uid === MASTER_UID) {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({code: code, email: userEmail, secret: 'bepwr2026notify'})
       });
-      if (!resp.ok) throw new Error('Error al enviar c\u00F3digo');
+      if (!resp.ok) throw new Error('Error al enviar c\\u00F3digo');
       var ov = document.createElement('div');
       ov.id = 'del-bita-ov';
       ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
       var box = document.createElement('div');
       box.style.cssText = 'background:#1a1a1a;border:1px solid #f87171;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center';
-      var t = document.createElement('div'); t.style.cssText='font-size:15px;color:#fff;margin-bottom:8px;font-weight:600'; t.textContent='C\u00F3digo de confirmaci\u00F3n';
-      var s = document.createElement('div'); s.style.cssText='font-size:13px;color:#aaa;margin-bottom:20px'; s.textContent='Ingresa el c\u00F3digo enviado a tu email';
+      var t = document.createElement('div'); t.style.cssText='font-size:15px;color:#fff;margin-bottom:8px;font-weight:600'; t.textContent='C\\u00F3digo de confirmaci\\u00F3n';
+      var s = document.createElement('div'); s.style.cssText='font-size:13px;color:#aaa;margin-bottom:20px'; s.textContent='Ingresa el c\\u00F3digo enviado a tu email';
       var inp = document.createElement('input'); inp.id='del-bita-inp'; inp.type='text'; inp.maxLength=6; inp.placeholder='000000';
       inp.style.cssText='width:100%;background:#111;border:1px solid #444;color:#fff;font-size:24px;text-align:center;padding:12px;border-radius:10px;margin-bottom:12px;font-family:Space Mono,monospace;box-sizing:border-box';
       var err = document.createElement('div'); err.id='del-bita-err'; err.style.cssText='color:#f87171;font-size:12px;margin-bottom:12px;min-height:16px';
@@ -1711,7 +1832,7 @@ if (user && user.uid === MASTER_UID) {
     document.getElementById('m-calificacion').value = x.calificacion || '';
     document.getElementById('m-fecha').value = x.fecha || '';
     // Change title and save action
-    document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoraci\u00F3n';
+    document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoraci\\u00F3n';
     window._editingMetricId = metricId;
     window._editingMetricOrig = x; // store original for diff
     document.getElementById('modal-metrics').style.display = 'flex';
@@ -1735,7 +1856,27 @@ if (user && user.uid === MASTER_UID) {
     const cadera     = parseFloat(document.getElementById('m-cadera').value);
     const pantorrilla= parseFloat(document.getElementById('m-pantorrilla').value);
     const pruebaPeso = document.getElementById('m-pruebaPeso').value;
-    // --- Modo valoración inicial (nuevo miembro) ---
+    const pruebaPeso = document.getElementById('m-pruebaPeso').value;
+    const errEl = document.getElementById('metrics-error');
+    errEl.textContent = '';
+    const medidasVal = [
+  { val: brazo,        nombre: 'Brazo',       min: 15, max: 60  },
+  { val: abdomen,      nombre: 'Abdomen',     min: 50, max: 200 },
+  { val: cintura,      nombre: 'Cintura',     min: 40, max: 180 },
+  { val: cadera,       nombre: 'Cadera',      min: 50, max: 200 },
+  { val: pantorrilla,  nombre: 'Pantorrilla', min: 20, max: 60  },
+];
+for (const med of medidasVal) {
+  if (!isNaN(med.val) && (med.val < med.min || med.val > med.max)) {
+    errEl.textContent = `${med.nombre} debe estar entre ${med.min} y ${med.max} cm`;
+    return;
+  }
+}
+    if (!peso || !fecha) { errEl.textContent = 'Peso y fecha son obligatorios'; return; }
+    try {
+      const miembroDoc = await db.collection('usuarios').doc(uid).get();
+      const miembroNombre = miembroDoc.exists ? (miembroDoc.data().nombre || '') : '';
+      // --- Modo valoración inicial (nuevo miembro) ---
     if (window._initialMetricsMode) {
       window._initialMetricsMode = false;
       window._pendingInitialMetrics = {
@@ -1758,26 +1899,8 @@ if (user && user.uid === MASTER_UID) {
       showToast('Valoración inicial capturada ✓', 'success');
       return;
     }
-    const errEl = document.getElementById('metrics-error');
-    errEl.textContent = '';
-    const medidasVal = [
-  { val: brazo,        nombre: 'Brazo',       min: 15, max: 60  },
-  { val: abdomen,      nombre: 'Abdomen',     min: 50, max: 200 },
-  { val: cintura,      nombre: 'Cintura',     min: 40, max: 180 },
-  { val: cadera,       nombre: 'Cadera',      min: 50, max: 200 },
-  { val: pantorrilla,  nombre: 'Pantorrilla', min: 20, max: 60  },
-];
-for (const med of medidasVal) {
-  if (!isNaN(med.val) && (med.val < med.min || med.val > med.max)) {
-    errEl.textContent = `${med.nombre} debe estar entre ${med.min} y ${med.max} cm`;
-    return;
-  }
-}
-    if (!peso || !fecha) { errEl.textContent = 'Peso y fecha son obligatorios'; return; }
-    try {
-      const miembroDoc = await db.collection('usuarios').doc(uid).get();
-      const miembroNombre = miembroDoc.exists ? (miembroDoc.data().nombre || '') : '';
-      const metricData = {
+
+    const metricData = {
         peso, musculo: isNaN(musculo)?null:musculo,
         grasaCorporal: isNaN(grasaCorp)?null:grasaCorp,
         imc: isNaN(imc)?null:imc, pgc: isNaN(pgc)?null:pgc,
@@ -1795,15 +1918,15 @@ for (const med of medidasVal) {
         // Confirm before editing past metric
         const fechaEdit = document.getElementById('m-fecha')?.value || 'esta fecha';
         const confirmed = await showConfirm(
-          '\u00BFConfirmas que deseas modificar las m\u00E9tricas de ' + fechaEdit + '?'
+          '\\u00BFConfirmas que deseas modificar las m\\u00E9tricas de ' + fechaEdit + '?'
         );
         if (!confirmed) return;
         await db.collection('usuarios').doc(uid).collection('metricas').doc(window._editingMetricId).update(metricData);
         window._editingMetricId = null;
-        document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\u00F3n';
+        document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\\u00F3n';
         const _orig = window._editingMetricOrig || {};
         const _fields = [
-          {k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\u00FAsc',u:'kg'},
+          {k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\\u00FAsc',u:'kg'},
           {k:'grasaCorporal',l:'Grasa Corp',u:'kg'},{k:'imc',l:'IMC',u:''},
           {k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},
           {k:'calificacion',l:'Calif',u:''}
@@ -1811,32 +1934,36 @@ for (const med of medidasVal) {
         const _diffs = _fields.filter(f => {
           const ov = _orig[f.k]; const nv = metricData[f.k];
           return ov != null && nv != null && ov !== nv;
-        }).map(f => f.l+': '+_orig[f.k]+f.u+' \u2192 '+metricData[f.k]+f.u);
+        }).map(f => f.l+': '+_orig[f.k]+f.u+' \\u2192 '+metricData[f.k]+f.u);
         const _fecha = document.getElementById('m-fecha')?.value||'';
         const _mNombre = (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||'';
-        const _detalle = 'Edici\u00F3n m\u00E9trica del '+_fecha+(_diffs.length?' | '+_diffs.join(', '):'');
+        const _detalle = 'Edici\\u00F3n m\\u00E9trica del '+_fecha+(_diffs.length?' | '+_diffs.join(', '):'');
         var _origVals = window._editingMetricOrig || {};
-        var _diffFields = [{k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\u00FAsc',u:'kg'},{k:'grasaCorporal',l:'Grasa',u:'kg'},{k:'imc',l:'IMC',u:''},{k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},{k:'calificacion',l:'Calif',u:''}];
-        var _diffList = _diffFields.filter(function(f){ var ov=_origVals[f.k],nv=metricData[f.k]; return ov!=null&&nv!=null&&String(ov)!==String(nv); }).map(function(f){ return f.l+': '+_origVals[f.k]+f.u+' \u2192 '+metricData[f.k]+f.u; });
+        var _diffFields = [{k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\\u00FAsc',u:'kg'},{k:'grasaCorporal',l:'Grasa',u:'kg'},{k:'imc',l:'IMC',u:''},{k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},{k:'calificacion',l:'Calif',u:''}];
+        var _diffList = _diffFields.filter(function(f){ var ov=_origVals[f.k],nv=metricData[f.k]; return ov!=null&&nv!=null&&String(ov)!==String(nv); }).map(function(f){ return f.l+': '+_origVals[f.k]+f.u+' \\u2192 '+metricData[f.k]+f.u; });
         var _editFechaVal = (document.getElementById('m-fecha')||{}).value||'';
         var _editMiembro = ((window._allMembers||[]).find(function(x){return x.uid===uid;})||{}).nombre||'';
-        var _editDetalle = 'Edici\u00F3n m\u00E9trica del '+_editFechaVal+(_diffList.length?' | '+_diffList.join(', '):'');
+        var _editDetalle = 'Edici\\u00F3n m\\u00E9trica del '+_editFechaVal+(_diffList.length?' | '+_diffList.join(', '):'');
         logBitacora('edicion_metrica', _editDetalle, _editMiembro);
         // Close metrics modal and refresh the detail panel
         closeModal('modal-metrics');
-        showToast('Valoraci\u00F3n actualizada \u2713', 'success');
+        showToast('Valoraci\\u00F3n actualizada \\u2713', 'success');
         loadMembers();
         setTimeout(() => openDetail(uid), 600);
         return;
       } else {
         await db.collection('usuarios').doc(uid).collection('metricas').add(metricData);
+      // Actualizar pruebaPeso en documento del usuario
+      if (pruebaPeso) {
+        await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
+      }
         // Actualizar pruebaPeso en documento del usuario
       if (pruebaPeso) {
         await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
       }
       }
-      showToast('Valoraci\u00F3n guardada \u2713', 'success');
-      logBitacora('nueva_valoracion', 'Valoraci\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
+      showToast('Valoraci\\u00F3n guardada \\u2713', 'success');
+      logBitacora('nueva_valoracion', 'Valoraci\\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
       closeModal('modal-metrics');
       loadMembers();
     } catch(e) {
@@ -1848,24 +1975,27 @@ for (const med of medidasVal) {
     const w=["Fit","Run","Box","Gym","Pro","Max"],s=["!","@","#","$","%"];
     return w[w.length*Math.random()|0]+((Math.random()*900+100)|0)+s[s.length*Math.random()|0];
   }
-function openInitialMetricsModal() {
+
+  function openInitialMetricsModal() {
     window._initialMetricsMode = true;
     document.getElementById('metrics-uid').value = 'PENDING';
     document.getElementById('metrics-modal-sub').textContent = 'Valoración inicial del nuevo miembro';
     document.getElementById('metrics-error').textContent = '';
+    document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoración';
     ['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-brazo','m-abdomen','m-cintura','m-cadera','m-pantorrilla'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('m-pruebaPeso').value = '';
     const now = new Date();
     document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     if (window._pendingInitialMetrics) {
       const pm = window._pendingInitialMetrics;
-      const campos = {peso:'m-peso',musculo:'m-musculo',grasaCorporal:'m-grasa-corp',imc:'m-imc',pgc:'m-pgc',grasaVisceral:'m-grasa-visc',calificacion:'m-calificacion',brazo:'m-brazo',abdomen:'m-abdomen',cintura:'m-cintura',cadera:'m-cadera',pantorrilla:'m-pantorrilla'};
+      const campos = {peso:'m-peso', musculo:'m-musculo', grasaCorporal:'m-grasa-corp', imc:'m-imc', pgc:'m-pgc', grasaVisceral:'m-grasa-visc', calificacion:'m-calificacion', brazo:'m-brazo', abdomen:'m-abdomen', cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla'};
       for (const [key, id] of Object.entries(campos)) {
         if (pm[key] != null) document.getElementById(id).value = pm[key];
       }
       if (pm.pruebaPeso) document.getElementById('m-pruebaPeso').value = pm.pruebaPeso;
       if (pm.fechaRaw) document.getElementById('m-fecha').value = pm.fechaRaw;
     }
+    window._editingMetricId = null;
     document.getElementById('modal-metrics').classList.add('open');
   }
 
@@ -1880,6 +2010,7 @@ function openInitialMetricsModal() {
     document.getElementById('new-member-error').textContent = '';
     switchTab('members');
   }
+
   async function createMember() {
     const nombre   = document.getElementById('new-nombre').value.trim();
     const apellido = document.getElementById('new-apellido').value.trim();
@@ -1912,7 +2043,6 @@ function openInitialMetricsModal() {
       await secondaryAuth.signOut();
       const uid = cred.user.uid;
 
-      // Documento del usuario
       const userData = {
         nombre: nombreCompleto, alias, telefono: tel, nacimiento: dob,
         fechaInicio: inicio, email, genero,
@@ -1925,11 +2055,9 @@ function openInitialMetricsModal() {
 
       await db.collection('usuarios').doc(uid).set(userData);
 
-      // Guardar valoración inicial si fue capturada
       if (pm) {
         await db.collection('usuarios').doc(uid).collection('metricas').add({
-          peso: pm.peso,
-          musculo: pm.musculo,
+          peso: pm.peso, musculo: pm.musculo,
           grasaCorporal: pm.grasaCorporal,
           imc: pm.imc, pgc: pm.pgc,
           grasaVisceral: pm.grasaVisceral,
@@ -1944,7 +2072,6 @@ function openInitialMetricsModal() {
         });
       }
 
-      // Email de bienvenida
       fetch('/api/send-welcome', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, nombre:nombreCompleto, password:pass})})
         .then(r=>r.json()).then(d=>console.log('email result:',d))
         .catch(e=>console.error('email error:',e.message));
@@ -1952,7 +2079,6 @@ function openInitialMetricsModal() {
       showToast('✓ ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
       logBitacora('alta_miembro', 'Alta de miembro: ' + nombreCompleto + ' | ' + email, nombreCompleto);
 
-      // Limpiar formulario
       document.getElementById('new-genero').value = 'prefiero-no-decir';
       ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-email-confirm','new-altura','new-vigencia-fecha'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
       document.getElementById('new-meta').value = '';
@@ -2005,7 +2131,7 @@ function openInitialMetricsModal() {
     listEl.innerHTML = '<div style="color:var(--gray);font-size:13px">Cargando...</div>';
     try {
       const snap = await db.collection('staff').get();
-      if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado a\u00FAn</div>'; return; }
+      if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado a\\u00FAn</div>'; return; }
       const staffDocs = [...snap.docs].sort((a,b)=>{
         const getAp = d => { const parts=(d.data().nombre||'').trim().split(' '); return parts.length>1?parts.slice(1).join(' ').toLowerCase():parts[0].toLowerCase(); };
         return getAp(a).localeCompare(getAp(b),'es');
@@ -2042,10 +2168,10 @@ function openInitialMetricsModal() {
   async function quickToggleMember(uid, currentActivo, nombre) {
     if (window.currentStaffRole !== 'admin') { showToast('Solo admin puede hacer esto', 'error'); return; }
     const action = currentActivo ? 'desactivar' : 'activar';
-    if (!confirm(`\u00BF${action.charAt(0).toUpperCase()+action.slice(1)} a ${nombre}?`)) return;
+    if (!confirm(`\\u00BF${action.charAt(0).toUpperCase()+action.slice(1)} a ${nombre}?`)) return;
     try {
       await db.collection('usuarios').doc(uid).update({ activo: !currentActivo });
-      logBitacora('cambio_estado', (!currentActivo?'Activaci\u00F3n':'Desactivaci\u00F3n') + ': ' + ((window._allMembers||[]).find(x=>x.uid===uid)?.nombre||uid), '');
+      logBitacora('cambio_estado', (!currentActivo?'Activaci\\u00F3n':'Desactivaci\\u00F3n') + ': ' + ((window._allMembers||[]).find(x=>x.uid===uid)?.nombre||uid), '');
       // Update local cache
       const m = (window._allMembers||[]).find(x => x.uid === uid);
       if (m) m.activo = !currentActivo;
@@ -2061,7 +2187,7 @@ function openInitialMetricsModal() {
     if (window.currentStaffRole !== 'admin') { showToast('Solo un admin puede hacer esto', 'error'); return; }
     try {
       await db.collection('staff').doc(uid).update({ activo: !currentActivo });
-      showToast(currentActivo ? 'Staff desactivado' : 'Staff activado \u2713', 'success');
+      showToast(currentActivo ? 'Staff desactivado' : 'Staff activado \\u2713', 'success');
       loadStaffList();
     } catch(e) { showToast('Error: ' + e.message, 'error'); }
   }
@@ -2071,7 +2197,7 @@ function openInitialMetricsModal() {
     if (window.currentStaffRole !== 'admin') { showToast('Solo un admin puede cambiar roles', 'error'); return; }
     try {
       await db.collection('staff').doc(uid).update({ rol: newRol });
-      showToast('Rol actualizado \u2713', 'success');
+      showToast('Rol actualizado \\u2713', 'success');
     } catch(e) { showToast('Error: ' + e.message, 'error'); }
   }
 
@@ -2097,7 +2223,7 @@ function openInitialMetricsModal() {
 
     var nombreCompleto = nTrim + ' ' + aTrim;
 
-    // Use server-side endpoint — NEVER use client-side createUserWithEmailAndPassword
+    // Use server-side endpoint  NEVER use client-side createUserWithEmailAndPassword
     fetch('/api/create-staff', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2111,7 +2237,7 @@ function openInitialMetricsModal() {
         return;
       }
       logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
-      showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
+      showToast('\\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
       // Reset form
       ['ns-nombre','ns-apellido','ns-email','ns-email-confirm','ns-tel','ns-nacimiento'].forEach(function(id){
         var el = document.getElementById(id); if(el) el.value = '';
@@ -2140,30 +2266,30 @@ function openInitialMetricsModal() {
     el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
   });
 
-  // ── Bitácora detail modal ──────────────────────────────────────────
+  // ──  Bitácora detail modal \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 
   window.openBitaDetail = function(idx) {
     const docs = window._bitaDocs;
     if (!docs || !docs[idx]) return;
     const x = docs[idx];
     const fecha = x.fecha ? new Date(x.fecha).toLocaleString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-    const LABELS = {alta_miembro:'Alta de miembro',nueva_valoracion:'Nueva valoraci\u00F3n',
-      edicion_metrica:'Edici\u00F3n de m\u00E9trica',modificacion_miembro:'Modificaci\u00F3n miembro',
-      cambio_estado:'Cambio de estado',alta_staff:'Alta de staff',baja_staff:'Baja staff',envio_aviso:'Env\u00EDo de aviso'};
+    const LABELS = {alta_miembro:'Alta de miembro',nueva_valoracion:'Nueva valoraci\\u00F3n',
+      edicion_metrica:'Edici\\u00F3n de m\\u00E9trica',modificacion_miembro:'Modificaci\\u00F3n miembro',
+      cambio_estado:'Cambio de estado',alta_staff:'Alta de staff',baja_staff:'Baja staff',envio_aviso:'Env\\u00EDo de aviso'};
     document.getElementById('bita-detail-title').textContent = LABELS[x.accion] || x.accion;
     document.getElementById('bita-detail-body').innerHTML =
       '<div style="display:grid;gap:14px">'
       +'<div style="background:#111;border-radius:12px;padding:16px">'
       +'<div style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;margin-bottom:8px">DETALLE</div>'
-      +'<div style="font-size:14px;color:#fff;line-height:1.6">'+(x.detalle||'\u2014')+'</div>'
+      +'<div style="font-size:14px;color:#fff;line-height:1.6">'+(x.detalle||'\\u2014')+'</div>'
       +'</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
       +'<div style="background:#111;border-radius:12px;padding:14px">'
       +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">STAFF</div>'
-      +'<div style="font-size:13px;color:#ccc">'+(x.staffNombre||x.staffEmail||'\u2014')+'</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.staffNombre||x.staffEmail||'\\u2014')+'</div>'
       +'</div>'
       +'<div style="background:#111;border-radius:12px;padding:14px">'
       +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">MIEMBRO</div>'
-      +'<div style="font-size:13px;color:#ccc">'+(x.miembroNombre||'\u2014')+'</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.miembroNombre||'\\u2014')+'</div>'
       +'</div>'
       +'</div>'
       +'<div style="background:#111;border-radius:12px;padding:14px">'
@@ -2204,11 +2330,11 @@ function openInitialMetricsModal() {
     var confirma = elconfirma.value;
     if (errEl) errEl.textContent = '';
     if (!nueva || nueva.length < 8) {
-      if(errEl) errEl.textContent = 'M\u00EDnimo 8 caracteres';
+      if(errEl) errEl.textContent = 'M\\u00EDnimo 8 caracteres';
       return;
     }
     if (nueva !== confirma) {
-      if(errEl) errEl.textContent = 'Las contrase\u00F1as no coinciden (nueva: '+nueva.length+' chars, confirma: '+confirma.length+' chars)';
+      if(errEl) errEl.textContent = 'Las contrase\\u00F1as no coinciden (nueva: '+nueva.length+' chars, confirma: '+confirma.length+' chars)';
       return;
     }
     try {
@@ -2217,7 +2343,7 @@ function openInitialMetricsModal() {
       await db.collection('staff').doc(uid2).update({ primerIngreso: false });
       var modal = document.getElementById('modal-cambio-pass');
       if(modal){ modal.classList.remove('open'); setTimeout(function(){ modal.style.display='none'; },300); }
-      showToast('Contrase\u00F1a actualizada \u2713', 'success');
+      showToast('Contrase\\u00F1a actualizada \\u2713', 'success');
     } catch(e) {
       if(errEl) errEl.textContent = 'Error: ' + e.message;
     }
@@ -2229,15 +2355,15 @@ function openInitialMetricsModal() {
     var nueva = (document.getElementById('cp-nueva')||{}).value||'';
     var confirma = (document.getElementById('cp-confirma')||{}).value||'';
     var errEl = document.getElementById('cp-error');
-    if (nueva.length < 8) { if(errEl) errEl.textContent='M\u00EDnimo 8 caracteres'; return; }
-    if (nueva !== confirma) { if(errEl) errEl.textContent='Las contrase\u00F1as no coinciden'; return; }
+    if (nueva.length < 8) { if(errEl) errEl.textContent='M\\u00EDnimo 8 caracteres'; return; }
+    if (nueva !== confirma) { if(errEl) errEl.textContent='Las contrase\\u00F1as no coinciden'; return; }
     try {
       await firebase.auth().currentUser.updatePassword(nueva);
       // Mark primerIngreso as done
       var uid2 = firebase.auth().currentUser.uid;
       await db.collection('staff').doc(uid2).update({ primerIngreso: false });
       document.getElementById('modal-cambio-pass').style.display = 'none';
-      showToast('Contrase\u00F1a actualizada \u2713', 'success');
+      showToast('Contrase\\u00F1a actualizada \\u2713', 'success');
     } catch(e) {
       if(errEl) errEl.textContent = 'Error: ' + e.message;
     }
@@ -2260,15 +2386,15 @@ function openInitialMetricsModal() {
     var nueva = (document.getElementById("cp-nueva")||{}).value||"";
     var confirma = (document.getElementById("cp-confirma")||{}).value||"";
     var errEl = document.getElementById("cp-error");
-    if (nueva.length < 8) { if(errEl) errEl.textContent="M\u00EDnimo 8 caracteres"; return; }
-    if (nueva !== confirma) { if(errEl) errEl.textContent="Las contrase\u00F1as no coinciden"; return; }
+    if (nueva.length < 8) { if(errEl) errEl.textContent="M\\u00EDnimo 8 caracteres"; return; }
+    if (nueva !== confirma) { if(errEl) errEl.textContent="Las contrase\\u00F1as no coinciden"; return; }
     try {
       await firebase.auth().currentUser.updatePassword(nueva);
       var uid2 = firebase.auth().currentUser.uid;
       await db.collection("staff").doc(uid2).update({ primerIngreso: false });
       var modal = document.getElementById("modal-cambio-pass");
       if(modal){ modal.classList.remove("open"); setTimeout(function(){ modal.style.display="none"; },300); }
-      showToast("Contrase\u00F1a actualizada \u2713", "success");
+      showToast("Contrase\\u00F1a actualizada \\u2713", "success");
     } catch(e) { if(errEl) errEl.textContent="Error: "+e.message; }
   };
 
@@ -2307,7 +2433,7 @@ window.filterNotifUsers = function (q) {
       matches.push(m);
       const o = document.createElement('option');
       o.value = m.uid;
-      o.textContent = nombre + (email ? ' — ' + email : '');
+      o.textContent = nombre + (email ? '  ' + email : '');
       sel.appendChild(o);
     }
   });
