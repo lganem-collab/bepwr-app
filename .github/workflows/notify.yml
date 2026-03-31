@@ -1,0 +1,37 @@
+name: bePWR Notificaciones Programadas
+
+on:
+  schedule:
+    - cron: '0 12 * * 1,5'
+    - cron: '0 1 * * 3,0'
+    - cron: '30 11 * * 1-5'
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determinar endpoint
+        id: endpoint
+        run: |
+          HOUR=$(date -u +%H)
+          MIN=$(date -u +%M)
+          if [ "$HOUR" = "12" ] && [ "$MIN" = "00" ]; then
+            echo "path=/api/cron/notify-morning" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "01" ] && [ "$MIN" = "00" ]; then
+            echo "path=/api/cron/notify-evening" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "11" ] && [ "$MIN" = "30" ]; then
+            echo "path=/api/cron/notify-coaches" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "15" ] && [ "$MIN" = "00" ]; then
+            echo "path=/api/cron/notify-daily" >> $GITHUB_OUTPUT
+          else
+            echo "path=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Llamar endpoint
+        if: steps.endpoint.outputs.path != 'none'
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.NOTIFY_SECRET }}" \
+            "https://bepwr-app.vercel.app${{ steps.endpoint.outputs.path }}"
