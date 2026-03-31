@@ -415,7 +415,10 @@
           </select>
         </div>
         <div id="notif-error" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:12px;font-family:Space Mono,monospace"></div>
-        <button class="btn btn-primary" id="btn-send-notif" onclick="sendNotification()">&#x1F4E3; Enviar notificaci&#xF3;n</button>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" onclick="switchTab('members')" style="flex:1">Cancelar</button>
+          <button class="btn btn-primary" id="btn-send-notif" onclick="sendNotification()" style="flex:1">&#x1F4E3; Enviar notificaci&#xF3;n</button>
+        </div>
       </div>
 
       <div style="margin-top:28px">
@@ -1325,6 +1328,39 @@ if (user && user.uid === MASTER_UID) {
         </div>
       </div>
 
+      <!-- META PRINCIPAL -->
+      <div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="flex:1">
+            <div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:4px">META PRINCIPAL</div>
+            <div id="detail-meta-display" style="font-size:14px;font-weight:600">${m.objetivo?.meta || m.meta || '—'}</div>
+          </div>
+          ${window.currentStaffRole === 'admin' ? `<button class="btn btn-secondary btn-sm" onclick="toggleEditMeta('${uid}')">Editar</button>` : ''}
+        </div>
+        <div id="detail-meta-edit" style="display:none;margin-top:12px">
+          <select id="detail-meta-select" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#181818;color:#fff;font-family:DM Sans,sans-serif;font-size:.9rem;margin-bottom:10px">
+            <option value="">Selecciona...</option>
+            <option value="Bajar grasa / bajar de peso" ${(m.objetivo?.meta||m.meta)==='Bajar grasa / bajar de peso'?'selected':''}>🔥 Bajar grasa / bajar de peso</option>
+            <option value="Ganar músculo / recomposición" ${(m.objetivo?.meta||m.meta)==='Ganar músculo / recomposición'?'selected':''}>💪 Ganar músculo / recomposición</option>
+            <option value="Salud metabólica / salud general" ${(m.objetivo?.meta||m.meta)==='Salud metabólica / salud general'?'selected':''}>💚 Salud metabólica / salud general</option>
+            <option value="Rendimiento funcional" ${(m.objetivo?.meta||m.meta)==='Rendimiento funcional'?'selected':''}>⚡ Rendimiento funcional</option>
+            <option value="Estética / composición equilibrada" ${(m.objetivo?.meta||m.meta)==='Estética / composición equilibrada'?'selected':''}>✨ Estética / composición equilibrada</option>
+            <option value="Incrementar performance · Ciclismo" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Ciclismo'?'selected':''}>🚴 Ciclismo</option>
+            <option value="Incrementar performance · Correr" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Correr'?'selected':''}>🏃 Correr</option>
+            <option value="Incrementar performance · Golf" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Golf'?'selected':''}>⛳ Golf</option>
+            <option value="Incrementar performance · Natación" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Natación'?'selected':''}>🏊 Natación</option>
+            <option value="Incrementar performance · Padel" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Padel'?'selected':''}>🥎 Padel</option>
+            <option value="Incrementar performance · Tenis" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Tenis'?'selected':''}>🎾 Tenis</option>
+            <option value="Incrementar performance · Fútbol" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Fútbol'?'selected':''}>⚽ Fútbol</option>
+            <option value="Incrementar performance · Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Otro'?'selected':''}>🏅 Otro</option>
+          </select>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="toggleEditMeta()">Cancelar</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="saveMetaEdit('${uid}')">Guardar Meta</button>
+          </div>
+        </div>
+      </div>
+
       <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración</button>
 
       <div class="modal-section">Historial de valoraciones</div>
@@ -1341,12 +1377,31 @@ if (user && user.uid === MASTER_UID) {
 
       <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="document.getElementById('modal-detail').style.display='none'; document.getElementById('modal-detail').classList.remove('open'); openNotifyForMember('${uid}')">📣 Enviar aviso a este miembro</button>
 
-      <div class="modal-footer">
-        <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-detail')">Cerrar</button>
-      </div>
-    `;
+      `;
 
     document.getElementById('modal-detail').classList.add('open');
+  }
+
+  function toggleEditMeta(uid) {
+    const editDiv = document.getElementById('detail-meta-edit');
+    if (!editDiv) return;
+    editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
+  }
+
+  async function saveMetaEdit(uid) {
+    const newMeta = document.getElementById('detail-meta-select').value;
+    if (!newMeta) { showToast('Selecciona una meta', 'error'); return; }
+    const confirmed = await showConfirm('¿Confirmas que deseas cambiar la meta de este miembro?');
+    if (!confirmed) return;
+    try {
+      await db.collection('usuarios').doc(uid).update({ 'objetivo.meta': newMeta, meta: newMeta });
+      logBitacora('modificacion_miembro', 'Meta cambiada a: ' + newMeta, window._detailNombre || '');
+      showToast('Meta actualizada ✓', 'success');
+      await loadMembers();
+      setTimeout(() => openDetail(uid), 500);
+    } catch(e) {
+      showToast('Error: ' + e.message, 'error');
+    }
   }
 
   function openEditMember(uid) {
@@ -1521,7 +1576,7 @@ if (user && user.uid === MASTER_UID) {
     const nombre = window._detailNombre || '';
     try {
       const docSnap = await db.collection('usuarios').doc(uid).collection('metricas').doc(metricId).get();
-      if (!docSnap.exists()) { showToast('Métrica no encontrada', 'error'); return; }
+      if (!docSnap.exists) { showToast('Métrica no encontrada', 'error'); return; }
       const data = docSnap.data();
       document.getElementById('metrics-uid').value = uid;
       document.getElementById('metrics-modal-sub').textContent = nombre + ' — Editar valoración';
