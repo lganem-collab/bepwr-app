@@ -262,35 +262,35 @@
 <select id="new-meta">
   <option value="">Selecciona...</option>
 
-  <option value="Bajar grasa / bajar de peso">🔥  Bajar grasa / bajar de peso</option>
-  <option value="Ganar músculo / recomposición">💪  Ganar músculo / recomposición</option>
-  <option value="Salud metabólica / salud general">💚  Salud metabólica / salud general</option>
-  <option value="Rendimiento funcional">⚡  Rendimiento funcional</option>
-  <option value="Estética / composición equilibrada">✨  Estética / composición equilibrada</option>
+  <option value="Bajar grasa / bajar de peso">ð¥  Bajar grasa / bajar de peso</option>
+  <option value="Ganar mÃºsculo / recomposiciÃ³n">ðª  Ganar mÃºsculo / recomposiciÃ³n</option>
+  <option value="Salud metabÃ³lica / salud general">ð  Salud metabÃ³lica / salud general</option>
+  <option value="Rendimiento funcional">â¡  Rendimiento funcional</option>
+  <option value="EstÃ©tica / composiciÃ³n equilibrada">â¨  EstÃ©tica / composiciÃ³n equilibrada</option>
 
   <optgroup label="Incrementar mi performance">
-    <option value="Incrementar performance · Ciclismo">🚴  Ciclismo</option>
-    <option value="Incrementar performance · Correr">🏃  Correr</option>
-    <option value="Incrementar performance · Golf">⛳  Golf</option>
-    <option value="Incrementar performance · Natación">🏊  Natación</option>
-    <option value="Incrementar performance · Padel">🥎  Padel</option>
-    <option value="Incrementar performance · Tenis">🎾  Tenis</option>
-    <option value="Incrementar performance · Fútbol">⚽  Fútbol</option>
-    <option value="Incrementar performance · Otro">🏅  Otro</option>
+    <option value="Incrementar performance Â· Ciclismo">ð´  Ciclismo</option>
+    <option value="Incrementar performance Â· Correr">ð  Correr</option>
+    <option value="Incrementar performance Â· Golf">â³  Golf</option>
+    <option value="Incrementar performance Â· NataciÃ³n">ð  NataciÃ³n</option>
+    <option value="Incrementar performance Â· Padel">ð¥  Padel</option>
+    <option value="Incrementar performance Â· Tenis">ð¾  Tenis</option>
+    <option value="Incrementar performance Â· FÃºtbol">â½  FÃºtbol</option>
+    <option value="Incrementar performance Â· Otro">ð  Otro</option>
   </optgroup>
 </select>
 
         </div>
 
       </div>
-      <!-- Valoración Inicial -->
+      <!-- ValoraciÃ³n Inicial -->
       <div id="new-val-card" style="margin-top:20px;padding:16px;background:#1a1a1a;border-radius:12px;border:1px solid #333">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div>
-            <div style="font-size:.9rem;font-weight:600;color:#fff;font-family:'DM Sans',sans-serif">Valoración Inicial</div>
-            <div id="new-val-status" style="font-size:.75rem;color:#aaa;margin-top:4px;font-family:'DM Sans',sans-serif">Sin capturar aún</div>
+            <div style="font-size:.9rem;font-weight:600;color:#fff;font-family:'DM Sans',sans-serif">ValoraciÃ³n Inicial</div>
+            <div id="new-val-status" style="font-size:.75rem;color:#aaa;margin-top:4px;font-family:'DM Sans',sans-serif">Sin capturar aÃºn</div>
           </div>
-          <button class="btn btn-success btn-sm" onclick="openInitialMetricsModal()" style="white-space:nowrap">+ Capturar Valoración</button>
+          <button class="btn btn-success btn-sm" onclick="openInitialMetricsModal()" style="white-space:nowrap">+ Capturar ValoraciÃ³n</button>
         </div>
       </div>
 
@@ -435,9 +435,6 @@
       </div>
     </div>
 
-  </div>
-</div>
-
   <div id="tab-content-dashboard" style="display:none;padding:16px">
   <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
     <div style="font-family:'Space Mono',monospace;font-size:13px;color:#FF5C1A;letter-spacing:1px">DASHBOARD</div>
@@ -465,7 +462,7 @@
 
   <!-- GRAFICA ACCIONES -->
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ACCIONES (RESERVAS · IA · AN&#xC1;LISIS · NOTIF)</div>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ACCIONES (RESERVAS Â· IA Â· AN&#xC1;LISIS Â· NOTIF)</div>
     <div id="dash-chart-acciones" style="width:100%;overflow-x:auto"></div>
   </div>
 
@@ -541,6 +538,9 @@
   </div>
 </div>
 
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <!-- Firebase Compat SDK (m&#xE1;s compatible) -->
@@ -599,7 +599,7 @@
   if (tabNotify) tabNotify.style.display = 'inline-block';
 }
 
-// Solo Admin Maestro ve la bitácora
+// Solo Admin Maestro ve la bitÃ¡cora
 if (user && user.uid === MASTER_UID) {
   const tabBita = document.getElementById('tab-bitacora');
   if (tabBita) tabBita.style.display = 'inline-block';
@@ -860,7 +860,7 @@ if (user && user.uid === MASTER_UID) {
     modalDetail.style.display = 'none';
   }
 
-  // Ir a la pestaña de Envío de Avisos
+  // Ir a la pestaÃ±a de ÂEnvÃ­o de AvisosÂ
   switchTab('notify');
 
   const targetSel   = document.getElementById('notif-target');
@@ -889,7 +889,7 @@ if (user && user.uid === MASTER_UID) {
   window.openNotifyForMember = function (uid) {
   if (!uid) return;
 
-  // Ir a la pestaña de Envío de Avisos
+  // Ir a la pestaÃ±a de ÂEnvÃ­o de AvisosÂ
   switchTab('notify');
 
   const targetSel   = document.getElementById('notif-target');
@@ -898,7 +898,7 @@ if (user && user.uid === MASTER_UID) {
 
   if (!targetSel || !memberSel || !searchInput) return;
 
-  // Poner Envío individual
+  // Poner ÂEnvÃ­o individualÂ
   targetSel.value = 'individual';
   updateNotifTargetUI();
 
@@ -908,7 +908,7 @@ if (user && user.uid === MASTER_UID) {
   // Seleccionar a este miembro
   memberSel.value = uid;
 
-  // Limpiar título y mensaje
+  // Limpiar tÃ­tulo y mensaje
   const titleEl = document.getElementById('notif-title');
   const bodyEl  = document.getElementById('notif-body');
   if (titleEl) titleEl.value = '';
@@ -1174,10 +1174,10 @@ if (user && user.uid === MASTER_UID) {
       window._allMembers.push({ uid: d.id, ...data, ultimaMetrica });
     }
 
-    // 👉  AÑADE ESTA LÍNEA:
+    // ð  AÃADE ESTA LÃNEA:
     window.allMembers = window._allMembers;
 
-    // Verificar membresías vencidas automáticamente
+    // Verificar membresÃ­as vencidas automÃ¡ticamente
     await checkVigenciaVencimientos(window._allMembers);
     updateStats();
     renderMembers(window._allMembers);
@@ -1224,7 +1224,7 @@ if (user && user.uid === MASTER_UID) {
         <div style="display:flex;align-items:center;flex:1;min-width:0">${dot}<div><div style="font-size:14px;font-weight:600;color:${activo?'var(--white)':'#888'}">${displayName}${vBadge}</div><div style="font-size:12px;color:var(--gray);margin-top:2px">${m.email||''}</div></div></div>
         <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
           <button onclick="event.stopPropagation();openDetail('${m.uid}')" style="background:#FF5C1A;border:none;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace">Ver</button>
-          <button onclick="event.stopPropagation();openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\'")}')" style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80;font-size:10px;padding:5px 8px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace;white-space:nowrap">+ Valoración</button>
+          <button onclick="event.stopPropagation();openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\'")}')" style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80;font-size:10px;padding:5px 8px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace;white-space:nowrap">+ ValoraciÃ³n</button>
         </div>
         </div>`;
     }).join('');
@@ -1430,7 +1430,7 @@ if (user && user.uid === MASTER_UID) {
         // Sort desc by parsed timestamp (newest first)
         metricsAll.sort((a, b) => b._ts - a._ts);
       }
-    } catch(e) { console.error('Error cargando métricas:', e); }
+    } catch(e) { console.error('Error cargando mÃ©tricas:', e); }
 
     const ultima = metricsAll[0] || null;
     const inicial = metricsAll.length > 0 ? metricsAll[metricsAll.length - 1] : null;
@@ -1453,10 +1453,10 @@ if (user && user.uid === MASTER_UID) {
       return `<span style="color:${color};font-weight:600">${signo}${diff.toFixed(1)}</span>`;
     }
 
-    let histHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--gray);font-family:Space Mono,monospace">Sin métricas registradas</div>';
+    let histHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--gray);font-family:Space Mono,monospace">Sin mÃ©tricas registradas</div>';
     if (metricsAll.length > 0) {
       histHTML = `<div class="metrics-history">
-        <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>Músculo</div><div>Grasa C.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
+        <div class="mh-row mh-head"><div>Fecha</div><div>Peso</div><div>MÃºsculo</div><div>Grasa C.</div><div>IMC</div><div>PGC</div><div>G.Visc</div><div>Calif.</div></div>
         ${metricsAll.map(d => {
           return `<div class="mh-row" style="cursor:pointer" onclick="editMetricFromHistory('${uid}','${d.id}')">
             <div class="mh-date">${fmtF(d.fecha)}</div>
@@ -1471,12 +1471,12 @@ if (user && user.uid === MASTER_UID) {
 
     const metricRows = [
       { label:'Peso (kg)',           iniVal:inicial?.peso,          actVal:ultima?.peso,          inv:!['Ganar m\u00FAsculo / recomposici\u00F3n','Rendimiento funcional'].includes(m.objetivo?.meta||m.meta||'') },
-      { label:'Músculo Esq. (kg)',   iniVal:inicial?.musculo,       actVal:ultima?.musculo,       inv:false },
+      { label:'MÃºsculo Esq. (kg)',   iniVal:inicial?.musculo,       actVal:ultima?.musculo,       inv:false },
       { label:'Grasa Corporal (kg)', iniVal:inicial?.grasaCorporal, actVal:ultima?.grasaCorporal, inv:true  },
       { label:'IMC',                 iniVal:inicial?.imc,           actVal:ultima?.imc,           inv:true  },
       { label:'PGC (%)',             iniVal:inicial?.pgc,           actVal:ultima?.pgc,           inv:true  },
       { label:'Grasa Visceral',      iniVal:inicial?.grasaVisceral, actVal:ultima?.grasaVisceral, inv:true  },
-      { label:'Calificación Inbody', iniVal:inicial?.calificacion,  actVal:ultima?.calificacion,  inv:false },
+      { label:'CalificaciÃ³n Inbody', iniVal:inicial?.calificacion,  actVal:ultima?.calificacion,  inv:false },
       { label:'Brazo (cm)',          iniVal:inicial?.brazo,         actVal:ultima?.brazo,         inv:false },
       { label:'Abdomen (cm)',        iniVal:inicial?.abdomen,       actVal:ultima?.abdomen,       inv:true  },
       { label:'Cintura (cm)',        iniVal:inicial?.cintura,       actVal:ultima?.cintura,       inv:true  },
@@ -1515,9 +1515,9 @@ if (user && user.uid === MASTER_UID) {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">NOMBRE</div><div style="font-size:13px">${m.nombre||'\u2014'}</div></div>
           <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">ALIAS</div><div style="font-size:13px">${m.alias||'\u2014'}</div></div>
-          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">TELÉFONO</div><div style="font-size:13px">${m.telefono||'\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">TELÃFONO</div><div style="font-size:13px">${m.telefono||'\u2014'}</div></div>
           <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">NACIMIENTO</div><div style="font-size:13px">${fmtF(m.nacimiento)}</div></div>
-          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">GÉNERO</div><div style="font-size:13px">${m.genero||'\u2014'}</div></div>
+          <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">GÃNERO</div><div style="font-size:13px">${m.genero||'\u2014'}</div></div>
           <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">ALTURA</div><div style="font-size:13px">${m.altura ? m.altura+' cm' : '\u2014'}</div></div>
           <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">META</div><div style="font-size:13px">${m.objetivo?.meta || m.meta || '\u2014'}</div></div>
           <div><div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:2px">PESO INICIAL</div><div style="font-size:13px">${m.objetivo?.pesoInicial ? m.objetivo.pesoInicial+' kg' : '\u2014'}</div></div>
@@ -1532,26 +1532,26 @@ if (user && user.uid === MASTER_UID) {
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div style="flex:1">
             <div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:4px">META PRINCIPAL</div>
-            <div id="detail-meta-display" style="font-size:14px;font-weight:600">${m.objetivo?.meta || m.meta || '—'}</div>
+            <div id="detail-meta-display" style="font-size:14px;font-weight:600">${m.objetivo?.meta || m.meta || 'â'}</div>
           </div>
           ${window.currentStaffRole === 'admin' ? `<button class="btn btn-secondary btn-sm" onclick="toggleEditMeta('${uid}')">Editar</button>` : ''}
         </div>
         <div id="detail-meta-edit" style="display:none;margin-top:12px">
           <select id="detail-meta-select" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#181818;color:#fff;font-family:DM Sans,sans-serif;font-size:.9rem;margin-bottom:10px">
             <option value="">Selecciona...</option>
-            <option value="Bajar grasa / bajar de peso" ${(m.objetivo?.meta||m.meta)==='Bajar grasa / bajar de peso'?'selected':''}>🔥 Bajar grasa / bajar de peso</option>
-            <option value="Ganar músculo / recomposición" ${(m.objetivo?.meta||m.meta)==='Ganar músculo / recomposición'?'selected':''}>💪 Ganar músculo / recomposición</option>
-            <option value="Salud metabólica / salud general" ${(m.objetivo?.meta||m.meta)==='Salud metabólica / salud general'?'selected':''}>💚 Salud metabólica / salud general</option>
-            <option value="Rendimiento funcional" ${(m.objetivo?.meta||m.meta)==='Rendimiento funcional'?'selected':''}>⚡ Rendimiento funcional</option>
-            <option value="Estética / composición equilibrada" ${(m.objetivo?.meta||m.meta)==='Estética / composición equilibrada'?'selected':''}>✨ Estética / composición equilibrada</option>
-            <option value="Incrementar performance · Ciclismo" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Ciclismo'?'selected':''}>🚴 Ciclismo</option>
-            <option value="Incrementar performance · Correr" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Correr'?'selected':''}>🏃 Correr</option>
-            <option value="Incrementar performance · Golf" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Golf'?'selected':''}>⛳ Golf</option>
-            <option value="Incrementar performance · Natación" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Natación'?'selected':''}>🏊 Natación</option>
-            <option value="Incrementar performance · Padel" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Padel'?'selected':''}>🥎 Padel</option>
-            <option value="Incrementar performance · Tenis" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Tenis'?'selected':''}>🎾 Tenis</option>
-            <option value="Incrementar performance · Fútbol" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Fútbol'?'selected':''}>⚽ Fútbol</option>
-            <option value="Incrementar performance · Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Otro'?'selected':''}>🏅 Otro</option>
+            <option value="Bajar grasa / bajar de peso" ${(m.objetivo?.meta||m.meta)==='Bajar grasa / bajar de peso'?'selected':''}>ð¥ Bajar grasa / bajar de peso</option>
+            <option value="Ganar mÃºsculo / recomposiciÃ³n" ${(m.objetivo?.meta||m.meta)==='Ganar mÃºsculo / recomposiciÃ³n'?'selected':''}>ðª Ganar mÃºsculo / recomposiciÃ³n</option>
+            <option value="Salud metabÃ³lica / salud general" ${(m.objetivo?.meta||m.meta)==='Salud metabÃ³lica / salud general'?'selected':''}>ð Salud metabÃ³lica / salud general</option>
+            <option value="Rendimiento funcional" ${(m.objetivo?.meta||m.meta)==='Rendimiento funcional'?'selected':''}>â¡ Rendimiento funcional</option>
+            <option value="EstÃ©tica / composiciÃ³n equilibrada" ${(m.objetivo?.meta||m.meta)==='EstÃ©tica / composiciÃ³n equilibrada'?'selected':''}>â¨ EstÃ©tica / composiciÃ³n equilibrada</option>
+            <option value="Incrementar performance Â· Ciclismo" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Ciclismo'?'selected':''}>ð´ Ciclismo</option>
+            <option value="Incrementar performance Â· Correr" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Correr'?'selected':''}>ð Correr</option>
+            <option value="Incrementar performance Â· Golf" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Golf'?'selected':''}>â³ Golf</option>
+            <option value="Incrementar performance Â· NataciÃ³n" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· NataciÃ³n'?'selected':''}>ð NataciÃ³n</option>
+            <option value="Incrementar performance Â· Padel" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Padel'?'selected':''}>ð¥ Padel</option>
+            <option value="Incrementar performance Â· Tenis" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Tenis'?'selected':''}>ð¾ Tenis</option>
+            <option value="Incrementar performance Â· FÃºtbol" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· FÃºtbol'?'selected':''}>â½ FÃºtbol</option>
+            <option value="Incrementar performance Â· Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Otro'?'selected':''}>ð Otro</option>
           </select>
           <div style="display:flex;gap:8px">
             <button class="btn btn-secondary btn-sm" style="flex:1" onclick="toggleEditMeta()">Cancelar</button>
@@ -1562,21 +1562,21 @@ if (user && user.uid === MASTER_UID) {
 
       ${getRutinaHTML(m.objetivo?.meta || m.meta, m.nacimiento, m.edad)}
 
-      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración</button>
+      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoraciÃ³n</button>
 
       <div class="modal-section">Historial de valoraciones</div>
-      <div style="font-size:10px;color:var(--gray);margin:-10px 0 12px;font-family:Space Mono,monospace">Haz clic en una valoración para consultarla o editarla</div>
+      <div style="font-size:10px;color:var(--gray);margin:-10px 0 12px;font-family:Space Mono,monospace">Haz clic en una valoraciÃ³n para consultarla o editarla</div>
       ${histHTML}
 
-      <div class="modal-section" style="margin-top:20px">Métricas Iniciales y Actuales</div>
+      <div class="modal-section" style="margin-top:20px">MÃ©tricas Iniciales y Actuales</div>
       <div style="background:#141414;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
         <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px;padding:10px 12px;background:#0a0a0a;font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace;border-bottom:1px solid var(--border)">
-          <div>Métrica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
+          <div>MÃ©trica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
         </div>
         ${metricasTableHTML}
       </div>
 
-      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="closeModal('modal-detail'); openNotifyForMember('${uid}')">📣 Enviar aviso a este miembro</button>
+      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="closeModal('modal-detail'); openNotifyForMember('${uid}')">ð£ Enviar aviso a este miembro</button>
 
       `;
 
@@ -1593,12 +1593,12 @@ if (user && user.uid === MASTER_UID) {
   async function saveMetaEdit(uid) {
     const newMeta = document.getElementById('detail-meta-select').value;
     if (!newMeta) { showToast('Selecciona una meta', 'error'); return; }
-    const confirmed = await showConfirm('¿Confirmas que deseas cambiar la meta de este miembro?');
+    const confirmed = await showConfirm('Â¿Confirmas que deseas cambiar la meta de este miembro?');
     if (!confirmed) return;
     try {
       await db.collection('usuarios').doc(uid).update({ 'objetivo.meta': newMeta, meta: newMeta });
       logBitacora('modificacion_miembro', 'Meta cambiada a: ' + newMeta, window._detailNombre || '');
-      showToast('Meta actualizada ✓', 'success');
+      showToast('Meta actualizada â', 'success');
       await loadMembers();
       setTimeout(() => openDetail(uid), 500);
     } catch(e) {
@@ -1621,11 +1621,11 @@ if (user && user.uid === MASTER_UID) {
         <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${(m.alias||'').replace(/"/g,'&quot;')}" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Teléfono</label><input type="tel" id="edit-tel" value="${m.telefono||''}" maxlength="10" /></div>
+        <div class="field"><label>TelÃ©fono</label><input type="tel" id="edit-tel" value="${m.telefono||''}" maxlength="10" /></div>
         <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${m.nacimiento||''}" /></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Género</label>
+        <div class="field"><label>GÃ©nero</label>
           <select id="edit-genero">
             <option value="prefiero-no-decir" ${(!m.genero||m.genero==='prefiero-no-decir')?'selected':''}>Prefiero no decirlo</option>
             <option value="femenino" ${m.genero==='femenino'?'selected':''}>Femenino</option>
@@ -1639,19 +1639,19 @@ if (user && user.uid === MASTER_UID) {
         <div class="field"><label>Meta principal</label>
           <select id="edit-meta">
             <option value="">Selecciona...</option>
-            <option value="Bajar grasa / bajar de peso" ${(m.objetivo?.meta||m.meta)==='Bajar grasa / bajar de peso'?'selected':''}>🔥 Bajar grasa / bajar de peso</option>
-            <option value="Ganar músculo / recomposición" ${(m.objetivo?.meta||m.meta)==='Ganar músculo / recomposición'?'selected':''}>💪 Ganar músculo / recomposición</option>
-            <option value="Salud metabólica / salud general" ${(m.objetivo?.meta||m.meta)==='Salud metabólica / salud general'?'selected':''}>💚 Salud metabólica / salud general</option>
-            <option value="Rendimiento funcional" ${(m.objetivo?.meta||m.meta)==='Rendimiento funcional'?'selected':''}>⚡ Rendimiento funcional</option>
-            <option value="Estética / composición equilibrada" ${(m.objetivo?.meta||m.meta)==='Estética / composición equilibrada'?'selected':''}>✨ Estética / composición equilibrada</option>
-            <option value="Incrementar performance · Ciclismo" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Ciclismo'?'selected':''}>🚴 Ciclismo</option>
-            <option value="Incrementar performance · Correr" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Correr'?'selected':''}>🏃 Correr</option>
-            <option value="Incrementar performance · Golf" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Golf'?'selected':''}>⛳ Golf</option>
-            <option value="Incrementar performance · Natación" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Natación'?'selected':''}>🏊 Natación</option>
-            <option value="Incrementar performance · Padel" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Padel'?'selected':''}>🥎 Padel</option>
-            <option value="Incrementar performance · Tenis" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Tenis'?'selected':''}>🎾 Tenis</option>
-            <option value="Incrementar performance · Fútbol" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Fútbol'?'selected':''}>⚽ Fútbol</option>
-            <option value="Incrementar performance · Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Otro'?'selected':''}>🏅 Otro</option>
+            <option value="Bajar grasa / bajar de peso" ${(m.objetivo?.meta||m.meta)==='Bajar grasa / bajar de peso'?'selected':''}>ð¥ Bajar grasa / bajar de peso</option>
+            <option value="Ganar mÃºsculo / recomposiciÃ³n" ${(m.objetivo?.meta||m.meta)==='Ganar mÃºsculo / recomposiciÃ³n'?'selected':''}>ðª Ganar mÃºsculo / recomposiciÃ³n</option>
+            <option value="Salud metabÃ³lica / salud general" ${(m.objetivo?.meta||m.meta)==='Salud metabÃ³lica / salud general'?'selected':''}>ð Salud metabÃ³lica / salud general</option>
+            <option value="Rendimiento funcional" ${(m.objetivo?.meta||m.meta)==='Rendimiento funcional'?'selected':''}>â¡ Rendimiento funcional</option>
+            <option value="EstÃ©tica / composiciÃ³n equilibrada" ${(m.objetivo?.meta||m.meta)==='EstÃ©tica / composiciÃ³n equilibrada'?'selected':''}>â¨ EstÃ©tica / composiciÃ³n equilibrada</option>
+            <option value="Incrementar performance Â· Ciclismo" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Ciclismo'?'selected':''}>ð´ Ciclismo</option>
+            <option value="Incrementar performance Â· Correr" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Correr'?'selected':''}>ð Correr</option>
+            <option value="Incrementar performance Â· Golf" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Golf'?'selected':''}>â³ Golf</option>
+            <option value="Incrementar performance Â· NataciÃ³n" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· NataciÃ³n'?'selected':''}>ð NataciÃ³n</option>
+            <option value="Incrementar performance Â· Padel" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Padel'?'selected':''}>ð¥ Padel</option>
+            <option value="Incrementar performance Â· Tenis" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Tenis'?'selected':''}>ð¾ Tenis</option>
+            <option value="Incrementar performance Â· FÃºtbol" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· FÃºtbol'?'selected':''}>â½ FÃºtbol</option>
+            <option value="Incrementar performance Â· Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance Â· Otro'?'selected':''}>ð Otro</option>
           </select>
         </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
@@ -1687,7 +1687,7 @@ if (user && user.uid === MASTER_UID) {
   }
 
   async function confirmSaveMemberEdit(uid) {
-    const confirmed = await showConfirm('¿Confirmas que deseas editar los datos de este miembro?');
+    const confirmed = await showConfirm('Â¿Confirmas que deseas editar los datos de este miembro?');
     if (!confirmed) return;
     try {
       const _mOrig = (window._allMembers||[]).find(x=>x.uid===uid)||{};
@@ -1709,10 +1709,10 @@ if (user && user.uid === MASTER_UID) {
       });
       const cambios = [];
       if (document.getElementById('edit-nombre').value !== (_mOrig.nombre||'')) cambios.push('nombre');
-      if (newMeta !== (_mOrig.objetivo?.meta||'')) cambios.push('meta→'+newMeta);
+      if (newMeta !== (_mOrig.objetivo?.meta||'')) cambios.push('metaâ'+newMeta);
       if (activoVal !== (_mOrig.activo!==false)) cambios.push(activoVal?'activado':'desactivado');
       logBitacora('modificacion_miembro', 'Editado: '+(cambios.join(', ')||'datos')+' de '+document.getElementById('edit-nombre').value, document.getElementById('edit-nombre').value);
-      showToast('Datos actualizados ✓', 'success');
+      showToast('Datos actualizados â', 'success');
       await loadMembers();
       setTimeout(() => openDetail(uid), 500);
     } catch(e) {
@@ -1778,12 +1778,12 @@ if (user && user.uid === MASTER_UID) {
     const nombre = window._detailNombre || '';
     try {
       const docSnap = await db.collection('usuarios').doc(uid).collection('metricas').doc(metricId).get();
-      if (!docSnap.exists) { showToast('Métrica no encontrada', 'error'); return; }
+      if (!docSnap.exists) { showToast('MÃ©trica no encontrada', 'error'); return; }
       const data = docSnap.data();
       document.getElementById('metrics-uid').value = uid;
-      document.getElementById('metrics-modal-sub').textContent = nombre + ' — Editar valoración';
+      document.getElementById('metrics-modal-sub').textContent = nombre + ' â Editar valoraciÃ³n';
       document.getElementById('metrics-error').textContent = '';
-      document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoración';
+      document.querySelector('#modal-metrics .modal-title').textContent = 'Editar ValoraciÃ³n';
       window._editingMetricId = metricId;
       window._editingMetricOrig = data;
       const campos = {
@@ -1810,7 +1810,7 @@ if (user && user.uid === MASTER_UID) {
       }
       document.getElementById('modal-metrics').classList.add('open');
     } catch(e) {
-      showToast('Error al cargar métrica: ' + e.message, 'error');
+      showToast('Error al cargar mÃ©trica: ' + e.message, 'error');
     }
   }
 
@@ -2023,16 +2023,16 @@ if (user && user.uid === MASTER_UID) {
 
   // Solo Admin Maestro
   if (!auth.currentUser || auth.currentUser.uid !== MASTER_UID) {
-    if (errEl) errEl.textContent = 'Solo el Admin Maestro puede borrar la bitácora';
+    if (errEl) errEl.textContent = 'Solo el Admin Maestro puede borrar la bitÃ¡cora';
     return;
   }
 
   if (val.trim() !== window._delCode) {
-    if (errEl) errEl.textContent = 'Código incorrecto';
+    if (errEl) errEl.textContent = 'CÃ³digo incorrecto';
     return;
   }
 
-  // Leer filtros actuales para decidir qué borrar
+  // Leer filtros actuales para decidir quÃ© borrar
   var accionFiltro = (document.getElementById('bita-filter-accion') || {}).value || '';
   var desdeStr     = (document.getElementById('bita-filter-desde') || {}).value || '';
   var hastaStr     = (document.getElementById('bita-filter-hasta') || {}).value || '';
@@ -2040,7 +2040,7 @@ if (user && user.uid === MASTER_UID) {
   try {
     let query = db.collection('bitacora');
 
-    // Si hay filtro de acción (evento), filtramos por ese tipo
+    // Si hay filtro de acciÃ³n (evento), filtramos por ese tipo
     if (accionFiltro) {
       query = query.where('accion', '==', accionFiltro);
     }
@@ -2058,7 +2058,7 @@ if (user && user.uid === MASTER_UID) {
       query = query.where('fecha', '<=', hastaDate);
     }
 
-    // Si NO hay ningún filtro, entonces borra TODO (comportamiento actual)
+    // Si NO hay ningÃºn filtro, entonces borra TODO (comportamiento actual)
     // pero siempre limitado a lotes de 500
     let totalDeleted = 0;
     while (true) {
@@ -2078,7 +2078,7 @@ if (user && user.uid === MASTER_UID) {
     if (totalDeleted === 0) {
       showToast('No se encontraron registros para borrar con esos filtros', 'error');
     } else {
-      showToast('Bitácora borrada (' + totalDeleted + ' registro(s))', 'success');
+      showToast('BitÃ¡cora borrada (' + totalDeleted + ' registro(s))', 'success');
     }
     loadBitacora();
   } catch(e) {
@@ -2145,7 +2145,7 @@ for (const med of medidasVal) {
     try {
       const miembroDoc = await db.collection('usuarios').doc(uid).get();
       const miembroNombre = miembroDoc.exists ? (miembroDoc.data().nombre || '') : '';
-      // --- Modo valoración inicial (nuevo miembro) ---
+      // --- Modo valoraciÃ³n inicial (nuevo miembro) ---
     if (window._initialMetricsMode) {
       window._initialMetricsMode = false;
       window._pendingInitialMetrics = {
@@ -2162,10 +2162,10 @@ for (const med of medidasVal) {
         pruebaPeso: pruebaPeso || null,
         fecha, fechaRaw: document.getElementById('m-fecha').value
       };
-      document.getElementById('new-val-status').textContent = '✓ Valoración capturada';
+      document.getElementById('new-val-status').textContent = 'â ValoraciÃ³n capturada';
       document.getElementById('new-val-status').style.color = '#4ade80';
       closeModal('modal-metrics');
-      showToast('Valoración inicial capturada ✓', 'success');
+      showToast('ValoraciÃ³n inicial capturada â', 'success');
       return;
     }
 
@@ -2244,9 +2244,9 @@ for (const med of medidasVal) {
   function openInitialMetricsModal() {
     window._initialMetricsMode = true;
     document.getElementById('metrics-uid').value = 'PENDING';
-    document.getElementById('metrics-modal-sub').textContent = 'Valoración inicial del nuevo miembro';
+    document.getElementById('metrics-modal-sub').textContent = 'ValoraciÃ³n inicial del nuevo miembro';
     document.getElementById('metrics-error').textContent = '';
-    document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoración';
+    document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva ValoraciÃ³n';
     ['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-brazo','m-abdomen','m-cintura','m-cadera','m-pantorrilla'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('m-pruebaPeso').value = '';
     const now = new Date();
@@ -2270,7 +2270,7 @@ for (const med of medidasVal) {
     ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-email-confirm','new-altura','new-vigencia-fecha'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     document.getElementById('new-meta').value = '';
     document.getElementById('new-vigencia').value = 'permanente';
-    document.getElementById('new-val-status').textContent = 'Sin capturar aún';
+    document.getElementById('new-val-status').textContent = 'Sin capturar aÃºn';
     document.getElementById('new-val-status').style.color = '#aaa';
     document.getElementById('new-member-error').textContent = '';
     switchTab('members');
@@ -2296,7 +2296,7 @@ for (const med of medidasVal) {
 
     const emailConfirm = document.getElementById('new-email-confirm')?.value.trim();
     if (email !== emailConfirm) { errEl.textContent = 'Los emails no coinciden'; return; }
-    if (!nombre || !apellido || !email || !tel) { errEl.textContent = 'Nombre, apellido, teléfono y email son obligatorios'; return; }
+    if (!nombre || !apellido || !email || !tel) { errEl.textContent = 'Nombre, apellido, telÃ©fono y email son obligatorios'; return; }
 
     const pm = window._pendingInitialMetrics;
 
@@ -2341,21 +2341,21 @@ for (const med of medidasVal) {
         .then(r=>r.json()).then(d=>console.log('email result:',d))
         .catch(e=>console.error('email error:',e.message));
 
-      showToast('✓ ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
+      showToast('â ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
       logBitacora('alta_miembro', 'Alta de miembro: ' + nombreCompleto + ' | ' + email, nombreCompleto);
 
       document.getElementById('new-genero').value = 'prefiero-no-decir';
       ['new-nombre','new-apellido','new-alias','new-tel','new-dob','new-inicio','new-email','new-email-confirm','new-altura','new-vigencia-fecha'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
       document.getElementById('new-meta').value = '';
       document.getElementById('new-vigencia').value = 'permanente';
-      document.getElementById('new-val-status').textContent = 'Sin capturar aún';
+      document.getElementById('new-val-status').textContent = 'Sin capturar aÃºn';
       document.getElementById('new-val-status').style.color = '#aaa';
       window._pendingInitialMetrics = null;
 
       switchTab('members');
       loadMembers();
     } catch(e) {
-      const msgs = {'auth/email-already-in-use':'Ese email ya está registrado','auth/invalid-email':'Email inválido','auth/weak-password':'Contraseña muy débil'};
+      const msgs = {'auth/email-already-in-use':'Ese email ya estÃ¡ registrado','auth/invalid-email':'Email invÃ¡lido','auth/weak-password':'ContraseÃ±a muy dÃ©bil'};
       errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
     }
     btn.textContent = 'Guardar Miembro'; btn.disabled = false;
@@ -2489,7 +2489,7 @@ for (const med of medidasVal) {
 
     var nombreCompleto = nTrim + ' ' + aTrim;
 
-    // Use server-side endpoint  NEVER use client-side createUserWithEmailAndPassword
+    // Use server-side endpoint Â NEVER use client-side createUserWithEmailAndPassword
     fetch('/api/create-staff', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2532,7 +2532,7 @@ for (const med of medidasVal) {
     el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
   });
 
-  // ──  Bitácora detail modal \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 
+  // ââ  BitÃ¡cora detail modal \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 \u9472 
   window.openBitaDetail = function(idx) {
     const docs = window._bitaDocs;
     if (!docs || !docs[idx]) return;
@@ -2616,7 +2616,7 @@ for (const med of medidasVal) {
   };
 
 
-  // Cambio de contraseña primer ingreso staff
+  // Cambio de contraseÃ±a primer ingreso staff
   window.guardarNuevaPass = async function() {
     var nueva = (document.getElementById('cp-nueva')||{}).value||'';
     var confirma = (document.getElementById('cp-confirma')||{}).value||'';
@@ -2676,7 +2676,7 @@ for (const med of medidasVal) {
   };
 
 
- // Búsqueda predictiva de destinatarios para envío individual
+ // BÃºsqueda predictiva de destinatarios para envÃ­o individual
 window.filterNotifUsers = function (q) {
   const sel = document.getElementById('notif-member');
   const lista = window.allMembers || window._allMembers;
@@ -2699,19 +2699,19 @@ window.filterNotifUsers = function (q) {
       matches.push(m);
       const o = document.createElement('option');
       o.value = m.uid;
-      o.textContent = nombre + (email ? '  ' + email : '');
+      o.textContent = nombre + (email ? ' Â ' + email : '');
       sel.appendChild(o);
     }
   });
 
-  // Si hay una sola coincidencia, seleccionarla automáticamente
+  // Si hay una sola coincidencia, seleccionarla automÃ¡ticamente
   if (matches.length === 1) {
     sel.value = matches[0].uid;
   }
 };
 
 
-  // ─── DASHBOARD ────────────────────────────────────────────────────────
+  // âââ DASHBOARD ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   window._dashPeriod = 'day';
 
   function setDashPeriod(p) {
@@ -2736,7 +2736,7 @@ window.filterNotifUsers = function (q) {
   function dashBarChart(containerId, data, color) {
     const el = document.getElementById(containerId);
     if (!el) return;
-    if (!data.length) { el.innerHTML = '<div style="color:#555;font-size:12px;font-family:Space Mono,monospace;padding:8px">Sin datos en este período</div>'; return; }
+    if (!data.length) { el.innerHTML = '<div style="color:#555;font-size:12px;font-family:Space Mono,monospace;padding:8px">Sin datos en este perÃ­odo</div>'; return; }
     const max = Math.max(...data.map(d => d.v), 1);
     const barW = Math.max(28, Math.min(48, Math.floor(280 / data.length)));
     const w = barW * data.length + 20;
@@ -2757,7 +2757,7 @@ window.filterNotifUsers = function (q) {
   async function loadDashboard() {
     const period = window._dashPeriod || 'day';
 
-    // Calcular rango: últimos N períodos
+    // Calcular rango: Ãºltimos N perÃ­odos
     const N = period === 'day' ? 14 : period === 'week' ? 10 : 6;
     const now = new Date();
     const keys = [];
@@ -2797,7 +2797,7 @@ window.filterNotifUsers = function (q) {
 
       const toData = m => keys.map(k => ({k, v: m[k]||0}));
 
-      // Stats generales totales en el período
+      // Stats generales totales en el perÃ­odo
       const totVisitas = Object.values(visitasMap).reduce((a,b)=>a+b,0);
       const totReservas = Object.values(reservasMap).reduce((a,b)=>a+b,0);
       const totIA = Object.values(iaMap).reduce((a,b)=>a+b,0) + Object.values(analisisMap).reduce((a,b)=>a+b,0);
@@ -2806,11 +2806,11 @@ window.filterNotifUsers = function (q) {
 
       const statsRow = document.getElementById('dash-stats-row');
       if (statsRow) statsRow.innerHTML = [
-        {label:'Visitas', val:totVisitas, icon:'👁'},
-        {label:'Miembros activos', val:miembrosActivos, icon:'👤'},
-        {label:'Reservas', val:totReservas, icon:'📅'},
-        {label:'Msgs IA', val:totIA, icon:'🤖'},
-        {label:'Notif abiertas', val:totNotif, icon:'🔔'},
+        {label:'Visitas', val:totVisitas, icon:'ð'},
+        {label:'Miembros activos', val:miembrosActivos, icon:'ð¤'},
+        {label:'Reservas', val:totReservas, icon:'ð'},
+        {label:'Msgs IA', val:totIA, icon:'ð¤'},
+        {label:'Notif abiertas', val:totNotif, icon:'ð'},
       ].map(s=>`<div style="background:#141414;border:1px solid #222;border-radius:10px;padding:12px;text-align:center">
         <div style="font-size:18px">${s.icon}</div>
         <div style="font-size:22px;font-weight:700;color:#FF5C1A;font-family:'Space Mono',monospace">${s.val}</div>
@@ -2843,10 +2843,10 @@ window.filterNotifUsers = function (q) {
       const sorted = Object.values(byMember).sort((a,b)=>b.count-a.count);
       const tbl = document.getElementById('dash-table-miembros');
       if (tbl) {
-        if (!sorted.length) { tbl.innerHTML = '<div style="color:#555;font-size:12px;font-family:Space Mono,monospace">Sin visitas en este período</div>'; }
+        if (!sorted.length) { tbl.innerHTML = '<div style="color:#555;font-size:12px;font-family:Space Mono,monospace">Sin visitas en este perÃ­odo</div>'; }
         else {
           tbl.innerHTML = `<div style="display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-family:'Space Mono',monospace;font-size:11px">
-            <div style="color:#555;padding-bottom:4px">MIEMBRO</div><div style="color:#555;padding-bottom:4px">VISITAS</div><div style="color:#555;padding-bottom:4px">ÚLTIMA</div>
+            <div style="color:#555;padding-bottom:4px">MIEMBRO</div><div style="color:#555;padding-bottom:4px">VISITAS</div><div style="color:#555;padding-bottom:4px">ÃLTIMA</div>
             ${sorted.map(m=>`<div style="color:#ddd">${m.nombre}</div><div style="color:#FF5C1A;text-align:right">${m.count}</div><div style="color:#666">${m.ultima}</div>`).join('')}
           </div>`;
         }
@@ -2952,12 +2952,12 @@ window.filterNotifUsers = function (q) {
   <!-- Modal cambio de contrase&#xF1;a primer ingreso -->
   
 
-  <!-- Modal: cambio de contraseña primer ingreso -->
+  <!-- Modal: cambio de contraseÃ±a primer ingreso -->
   
 
   
 
-  <!-- Modal cambio de contraseña primer ingreso -->
+  <!-- Modal cambio de contraseÃ±a primer ingreso -->
   <div class="modal-overlay" id="modal-cambio-pass" style="display:none;z-index:800">
     <div class="modal" style="max-width:420px">
       <div class="modal-title">Cambia tu contrase&#xF1;a</div>
