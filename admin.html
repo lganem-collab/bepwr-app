@@ -1416,7 +1416,7 @@ if (user && user.uid === MASTER_UID) {
     }
 
     const metricRows = [
-      { label:'Peso (kg)',           iniVal:inicial?.peso,          actVal:ultima?.peso,          inv:false },
+      { label:'Peso (kg)',           iniVal:inicial?.peso,          actVal:ultima?.peso,          inv:!['Ganar m\u00FAsculo / recomposici\u00F3n','Rendimiento funcional'].includes(m.objetivo?.meta||m.meta||'') },
       { label:'Músculo Esq. (kg)',   iniVal:inicial?.musculo,       actVal:ultima?.musculo,       inv:false },
       { label:'Grasa Corporal (kg)', iniVal:inicial?.grasaCorporal, actVal:ultima?.grasaCorporal, inv:true  },
       { label:'IMC',                 iniVal:inicial?.imc,           actVal:ultima?.imc,           inv:true  },
