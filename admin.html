@@ -1238,11 +1238,26 @@ if (user && user.uid === MASTER_UID) {
           if (data.fecha) {
             let f = data.fecha;
             if (f.toDate) { ts = f.toDate().getTime(); }
-            else if (typeof f === 'string' && f.includes('/')) {
-              const p = f.split('/');
-              if (p.length === 3) ts = new Date(p[2], p[1]-1, p[0]).getTime();
-            } else {
-              try { ts = new Date(f).getTime(); } catch(e) {}
+            else if (typeof f === 'string') {
+              // Try dd/mm/aaaa
+              if (f.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
+                const p = f.split('/');
+                ts = new Date(p[2], p[1]-1, p[0]).getTime();
+              }
+              // Try ISO yyyy-mm-dd
+              else if (f.match(/^\d{4}-\d{2}-\d{2}/)) {
+                ts = new Date(f).getTime();
+              }
+              // Try Spanish locale: "30 mar 2026" or "1 abr 2026"
+              else {
+                const meses = {ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
+                const m = f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+                if (m && meses[m[2]] !== undefined) {
+                  ts = new Date(parseInt(m[3]), meses[m[2]], parseInt(m[1])).getTime();
+                } else {
+                  try { ts = new Date(f).getTime(); } catch(e) {}
+                }
+              }
             }
           }
           data._ts = ts || 0;
@@ -1395,10 +1410,11 @@ if (user && user.uid === MASTER_UID) {
         ${metricasTableHTML}
       </div>
 
-      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="document.getElementById('modal-detail').style.display='none'; document.getElementById('modal-detail').classList.remove('open'); openNotifyForMember('${uid}')">📣 Enviar aviso a este miembro</button>
+      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="closeModal('modal-detail'); openNotifyForMember('${uid}')">📣 Enviar aviso a este miembro</button>
 
       `;
 
+    document.getElementById('modal-detail').style.display = '';
     document.getElementById('modal-detail').classList.add('open');
   }
 
