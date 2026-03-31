@@ -289,6 +289,11 @@
           <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
         </div>
 
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px">
+          <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:8px">Mi Objetivo</div>
+          <div id="mi-meta-value" style="font-size:16px;font-weight:600;color:#fff;font-family:'DM Sans',sans-serif">Cargando...</div>
+        </div>
+
         <div class="sec-title">Mi progreso</div>
         <div id="bepwr-score-section">
           <!-- bePWR Score - full width -->
@@ -882,6 +887,7 @@
       // Objetivo
       const obj = data.objetivo || {};
       document.getElementById('prof-meta').textContent = obj.meta || 'Sin datos';
+      if (document.getElementById('mi-meta-value')) document.getElementById('mi-meta-value').textContent = obj.meta || 'Sin definir';
       document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : 'Sin datos';
       document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : 'Sin datos';
 
@@ -2222,6 +2228,11 @@ async function renderAnalisisCientifico(data, config) {
       } catch (e) {
         console.error('Error guardando análisis en Firestore:', e);
       }
+
+      // Actualizar cache en memoria
+      data.analisisIA = text;
+      data.analisisIA_fecha = hoy;
+      data.analisisIA_valFecha = valFechaActual || null;
 
       if (updatedEl) {
         updatedEl.textContent = 'Actualizado hoy · Se renueva con cada nueva valoración o cada semana';
