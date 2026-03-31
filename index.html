@@ -166,7 +166,7 @@
     .info-row:last-child{border-bottom:none}
     .info-key{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace}
     .info-val{font-size:13px;font-weight:500}
-    .logout-btn{width:100%;padding:17px;background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.25);border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:26px}
+    .logout-btn{width:auto;padding:10px 24px;background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.25);border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin:20px auto 26px;display:block}
     .logout-btn:active{opacity:.7}
 
     /* BOTTOM NAV */
@@ -813,6 +813,7 @@
 
   // &#x2500;&#x2500; LOGOUT &#x2500;&#x2500;
   window.doLogout = async () => {
+    if (!confirm('\u00BFEst\u00E1s seguro de que quieres cerrar sesi\u00F3n?')) return;
     await signOut(auth);
     window.location.reload();
   };
