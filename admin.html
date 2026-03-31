@@ -1222,6 +1222,114 @@ if (user && user.uid === MASTER_UID) {
   }
 
   // OPEN DETAIL
+  // --- Rutina Config (mirror of index.html OBJETIVO_CONFIG rutina data) ---
+  var RUTINA_CONFIG = {
+    'Bajar grasa / bajar de peso': {
+      sub30:{total:'3 clases/sem',clases:[{tipo:'FullBody',freq:'2/sem'},{tipo:'LowerBody',freq:'1/sem'}],complemento:'Cardio zona 2 (2/sem, 30-40 min)'},
+      mid:{total:'3 clases/sem',clases:[{tipo:'FullBody',freq:'2/sem'},{tipo:'LowerBody',freq:'1/sem'}],complemento:'Cardio zona 2 (1-2/sem, 30 min)'},
+      senior:{total:'3-4 clases/sem',clases:[{tipo:'50+',freq:'2/sem'},{tipo:'FullBody',freq:'1-2/sem'}],complemento:'Caminata diaria (30 min)'}
+    },
+    'Ganar m\u00FAsculo / recomposici\u00F3n': {
+      sub30:{total:'4-5 clases/sem',clases:[{tipo:'UpperBody',freq:'2/sem'},{tipo:'LowerBody',freq:'2/sem'},{tipo:'FullBody',freq:'1/sem (opcional)'}],complemento:null},
+      mid:{total:'3-4 clases/sem',clases:[{tipo:'UpperBody',freq:'1-2/sem'},{tipo:'LowerBody',freq:'1-2/sem'},{tipo:'FullBody',freq:'1/sem'}],complemento:null},
+      senior:{total:'3 clases/sem',clases:[{tipo:'50+',freq:'2/sem'},{tipo:'FullBody',freq:'1/sem'}],complemento:'Caminata suave (20-30 min)'}
+    },
+    'Salud metab\u00F3lica / salud general': {
+      sub30:{total:'3-4 clases/sem',clases:[{tipo:'FullBody',freq:'2-3/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Caminata diaria (30 min)'},
+      mid:{total:'3 clases/sem',clases:[{tipo:'FullBody',freq:'2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Caminata diaria (30 min)'},
+      senior:{total:'3 clases/sem',clases:[{tipo:'50+',freq:'2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Caminata diaria (20-30 min)'}
+    },
+    'Rendimiento funcional': {
+      sub30:{total:'4-5 clases/sem',clases:[{tipo:'FullBody',freq:'3-4/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:null},
+      mid:{total:'3-4 clases/sem',clases:[{tipo:'FullBody',freq:'2-3/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:null},
+      senior:{total:'3 clases/sem',clases:[{tipo:'FullBody',freq:'2/sem'},{tipo:'50+ o PWR Yoga',freq:'1/sem'}],complemento:null}
+    },
+    'Est\u00E9tica / composici\u00F3n equilibrada': {
+      sub30:{total:'4 clases/sem',clases:[{tipo:'UpperBody',freq:'1/sem'},{tipo:'LowerBody',freq:'1/sem'},{tipo:'FullBody',freq:'2/sem'}],complemento:'Cardio ligero (1-2/sem, 20-30 min)'},
+      mid:{total:'3-4 clases/sem',clases:[{tipo:'UpperBody',freq:'1/sem'},{tipo:'LowerBody',freq:'1/sem'},{tipo:'FullBody',freq:'1-2/sem'}],complemento:'Cardio ligero (1/sem, 20 min)'},
+      senior:{total:'3 clases/sem',clases:[{tipo:'50+',freq:'2/sem'},{tipo:'FullBody',freq:'1/sem'}],complemento:'Caminata diaria (30 min)'}
+    },
+    'Incrementar performance \u00B7 Ciclismo': {
+      sub30:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Ciclismo (3-5/sem)'},
+      mid:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Ciclismo (3-4/sem)'},
+      senior:{total:'1-2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem (opcional)'}],complemento:'Ciclismo (2-3/sem)'}
+    },
+    'Incrementar performance \u00B7 Correr': {
+      sub30:{total:'2-3 clases/sem',clases:[{tipo:'FullBody',freq:'1-2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Running (3-5/sem)'},
+      mid:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Running (3-4/sem)'},
+      senior:{total:'1-2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem (opcional)'}],complemento:'Caminata/trote (3/sem)'}
+    },
+    'Incrementar performance \u00B7 Nataci\u00F3n': {
+      sub30:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Nataci\u00F3n (3-5/sem)'},
+      mid:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Nataci\u00F3n (3-4/sem)'},
+      senior:{total:'1-2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem (opcional)'}],complemento:'Nataci\u00F3n (2-3/sem)'}
+    },
+    'Incrementar performance \u00B7 Golf': {
+      sub30:{total:'2-3 clases/sem',clases:[{tipo:'FullBody',freq:'1-2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Golf (2-3/sem)'},
+      mid:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Golf (2-3/sem)'},
+      senior:{total:'1-2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Golf (2/sem)'}
+    },
+    'Incrementar performance \u00B7 Padel': {
+      sub30:{total:'2-3 clases/sem',clases:[{tipo:'FullBody',freq:'1-2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Padel (3-4/sem)'},
+      mid:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Padel (2-3/sem)'},
+      senior:{total:'1-2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Padel (2/sem)'}
+    },
+    'Incrementar performance \u00B7 Tenis': {
+      sub30:{total:'2-3 clases/sem',clases:[{tipo:'FullBody',freq:'1-2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Tenis (3-4/sem)'},
+      mid:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Tenis (2-3/sem)'},
+      senior:{total:'1-2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Tenis (2/sem)'}
+    },
+    'Incrementar performance \u00B7 F\u00FAtbol': {
+      sub30:{total:'2-3 clases/sem',clases:[{tipo:'FullBody',freq:'1-2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'F\u00FAtbol (2-3/sem)'},
+      mid:{total:'2 clases/sem',clases:[{tipo:'FullBody',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'F\u00FAtbol (2/sem)'},
+      senior:{total:'1-2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'F\u00FAtbol (1-2/sem)'}
+    },
+    'Incrementar performance \u00B7 Otro': {
+      sub30:{total:'3 clases/sem',clases:[{tipo:'FullBody',freq:'2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Deporte principal (3-4/sem)'},
+      mid:{total:'2-3 clases/sem',clases:[{tipo:'FullBody',freq:'1-2/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Deporte principal (2-3/sem)'},
+      senior:{total:'2 clases/sem',clases:[{tipo:'50+',freq:'1/sem'},{tipo:'PWR Yoga',freq:'1/sem'}],complemento:'Deporte principal (2/sem)'}
+    }
+  };
+
+  function getRutinaHTML(meta, nacimiento, edad) {
+    if (!meta) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Sin rutina asignada (sin meta definida)</div>';
+    var config = RUTINA_CONFIG[meta];
+    if (!config) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Rutina no disponible para esta meta</div>';
+    var edadNum = null;
+    if (nacimiento) {
+      var nac = new Date(nacimiento);
+      var hoy = new Date();
+      edadNum = hoy.getFullYear() - nac.getFullYear();
+      var mm = hoy.getMonth() - nac.getMonth();
+      if (mm < 0 || (mm === 0 && hoy.getDate() < nac.getDate())) edadNum--;
+    } else if (edad) { edadNum = parseInt(edad); }
+    var bracket = 'mid';
+    if (edadNum !== null && !isNaN(edadNum)) {
+      if (edadNum < 30) bracket = 'sub30';
+      else if (edadNum >= 45) bracket = 'senior';
+    }
+    var plan = config[bracket];
+    if (!plan) return '';
+    var html = '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">';
+    html += '<div style="font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">Mi Rutina Semanal</div>';
+    html += '<div style="font-size:12px;color:var(--gray);margin-bottom:10px">Total recomendado: <span style="color:#fff;font-weight:600">' + plan.total + '</span></div>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--gray);font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:1px">FRECUENCIA</td><td style="padding:6px 8px;color:var(--gray);font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:1px">CLASE</td></tr>';
+    for (var i = 0; i < plan.clases.length; i++) {
+      var c = plan.clases[i];
+      html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">' + c.freq + '</td><td style="padding:8px;font-weight:600;color:#fff">' + c.tipo + '</td></tr>';
+    }
+    html += '</table>';
+    if (plan.complemento) {
+      html += '<div style="margin-top:10px;padding:8px 10px;border-radius:8px;background:#0a0a0a;border-left:3px solid var(--orange)">';
+      html += '<span style="font-size:9px;font-weight:700;color:var(--orange);font-family:\'Space Mono\',monospace;letter-spacing:1px">COMPLEMENTO</span>';
+      html += '<p style="margin:4px 0 0;font-size:12px;color:#fff">' + plan.complemento + '</p>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
   async function openDetail(uid) {
     window._detailUid = uid; window.currentDetailMemberUID = uid;
     var _m=(window._allMembers||[]).find(x=>x.uid===uid); window._detailNombre=_m?_m.nombre:'';
@@ -1397,6 +1505,8 @@ if (user && user.uid === MASTER_UID) {
           </div>
         </div>
       </div>
+
+      ${getRutinaHTML(m.objetivo?.meta || m.meta, m.nacimiento, m.edad)}
 
       <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración</button>
 
