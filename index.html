@@ -463,8 +463,6 @@
         <div class="sec-title">Mi objetivo</div>
         <div class="info-card">
           <div class="info-row"><div class="info-key">Meta principal</div><div class="info-val" id="prof-meta">...</div></div>
-          <div class="info-row"><div class="info-key">Peso inicial</div><div class="info-val" id="prof-peso-ini">...</div></div>
-          <div class="info-row"><div class="info-key">Peso meta</div><div class="info-val" id="prof-peso-meta">...</div></div>
         </div>
         <div class="sec-title">&#xDA;ltima valoraci&#xF3;n</div>
         <div class="info-card">
@@ -533,8 +531,6 @@
       <div style="text-align:right;margin-bottom:12px">
         <button onclick="confirmTelChange()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Cambiar tel&#xE9;fono</button>
       </div>
-
-      <div class="modal-field" style="margin-bottom:20px"><label style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--orange)">Mi objetivo</label><select id="edit-meta" style="width:100%;background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--white);outline:none;-webkit-appearance:none;margin-top:8px"><option value="Bajar grasa / bajar de peso">Bajar grasa / bajar de peso</option><option value="Ganar m&#xFA;sculo / recomposici&#xF3;n">Ganar m&#xFA;sculo / recomposici&#xF3;n</option><option value="Salud metab&#xF3;lica / salud general">Salud metab&#xF3;lica / salud general</option><option value="Rendimiento funcional">Rendimiento funcional</option><option value="Est&#xE9;tica / composici&#xF3;n equilibrada">Est&#xE9;tica / composici&#xF3;n equilibrada</option><optgroup label="Incrementar mi performance"><option value="Incrementar performance · Ciclismo">🚴 Ciclismo</option><option value="Incrementar performance · Correr">🏃 Correr</option><option value="Incrementar performance · Golf">⛳ Golf</option><option value="Incrementar performance · Natación">🏊 Natación</option><option value="Incrementar performance · Padel">🥎 Padel</option><option value="Incrementar performance · Tenis">🎾 Tenis</option><option value="Incrementar performance · Fútbol">⚽ Fútbol</option><option value="Incrementar performance · Otro">🏅 Otro</option></optgroup></select></div>      <hr class="modal-divider">
       <div style="background:linear-gradient(135deg,#1a1208,#1a0e00);border:1px solid rgba(255,92,26,.3);border-radius:16px;padding:16px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span style="font-size:18px">&#x1F510;</span>
@@ -888,9 +884,7 @@
       const obj = data.objetivo || {};
       document.getElementById('prof-meta').textContent = obj.meta || 'Sin datos';
       if (document.getElementById('mi-meta-value')) document.getElementById('mi-meta-value').textContent = obj.meta || 'Sin definir';
-      document.getElementById('prof-peso-ini').textContent = obj.pesoInicial ? obj.pesoInicial + ' kg' : 'Sin datos';
-      document.getElementById('prof-peso-meta').textContent = obj.pesoMeta ? obj.pesoMeta + ' kg' : 'Sin datos';
-
+      
       // M\u00E9tricas Sin datos leer historial
       const metRef = collection(db, 'usuarios', user.uid, 'metricas');
       const metQ   = query(metRef, orderBy('fecha', 'desc'), limit(50));
