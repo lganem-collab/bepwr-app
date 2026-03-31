@@ -2111,9 +2111,9 @@ function renderGuiaNutrimental(data, config) {
     unavail.style.display = 'block';
     return;
   }
-  const url = (data.guiaUrls && data.guiaUrls[config.pdfKey])
-    ? data.guiaUrls[config.pdfKey]
-    : '/pdfs/'+config.pdfKey+'.pdf';
+  const url = (data.guiaUrls && data.guiaUrls[config.pdf])
+    ? data.guiaUrls[config.pdf]
+    : '/pdfs/'+config.pdf+'.pdf';
   descEl.textContent    = 'Guia nutricional para tu objetivo: '+config.label;
   btn.href              = url;
   btn.style.display     = 'inline-flex';
