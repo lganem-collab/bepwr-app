@@ -519,14 +519,14 @@
   // Admin Maestro &#x2014; no puede ser desactivado ni degradado
   const MASTER_UID = '1zZIfBnLGqRiPKVRVfHxlt2O3Di2';
 
-  // Segunda instancia para crear usuarios sin afectar la sesi\\u00F3n del staff
+  // Segunda instancia para crear usuarios sin afectar la sesi\u00F3n del staff
   const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary');
   const secondaryAuth = secondaryApp.auth();
 
   // ROL ACTUAL DEL STAFF
   window.currentStaffRole = null;
 
-  // AUTH STATE &#x2014; con verificaci\\u00F3n de lista blanca
+  // AUTH STATE &#x2014; con verificaci\u00F3n de lista blanca
   auth.onAuthStateChanged(async user => {
     if (user) {
       try {
@@ -567,7 +567,7 @@ if (user && user.uid === MASTER_UID) {
         } catch(loadErr) { console.error('loadMembers error:', loadErr); }
       } catch(e) {
         console.error('Auth error:', e.code, e.message, e);
-        // Solo redirigir al login si es error de autenticaci\\u00F3n/permisos
+        // Solo redirigir al login si es error de autenticaci\u00F3n/permisos
         if (e.code && (e.code.startsWith('auth/') || e.code.startsWith('permission'))) {
           await auth.signOut();
           show('s-login'); hide('s-app');
@@ -604,11 +604,11 @@ if (user && user.uid === MASTER_UID) {
     if (!email || !pass) { errEl.textContent = 'Completa los campos'; return; }
     const btn = document.getElementById('adm-login-btn');
     btn.textContent = 'Verificando...'; btn.disabled = true;
-    // SESSION persistence: cada pesta\\u00F1a es independiente, no afecta la sesi\\u00F3n del miembro
+    // SESSION persistence: cada pesta\u00F1a es independiente, no afecta la sesi\u00F3n del miembro
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
       .then(() => auth.signInWithEmailAndPassword(email, pass))
       .catch(e => {
-        errEl.textContent = 'Email o contrase\\u00F1a incorrectos';
+        errEl.textContent = 'Email o contrase\u00F1a incorrectos';
         btn.textContent = 'Entrar al panel'; btn.disabled = false;
       });
   }
@@ -619,7 +619,7 @@ if (user && user.uid === MASTER_UID) {
   function doLogout() { auth.signOut().then(() => window.location.reload()); }
 
   // &#x2500;&#x2500; COACH AI MESSAGE &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
-    // &#x2500;&#x2500;&#x2500; VIGENCIA DE MEMBRES\\u00CDA &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    // &#x2500;&#x2500;&#x2500; VIGENCIA DE MEMBRES\u00CDA &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
   function calcVigenciaFecha(prefix) {
     const vigencia = document.getElementById(prefix + '-vigencia')?.value || 'permanente';
     const inicio = document.getElementById(prefix + '-inicio')?.value || '';
@@ -651,13 +651,13 @@ if (user && user.uid === MASTER_UID) {
         const ref = db.collection('usuarios').doc(m.uid);
         batch.update(ref, { activo: false });
         cambios++;
-        console.log(`Membres\\u00EDa vencida: ${m.nombre} (${m.vigenciaFecha})`);
+        console.log(`Membres\u00EDa vencida: ${m.nombre} (${m.vigenciaFecha})`);
       }
     }
     
     if (cambios > 0) {
       await batch.commit();
-      console.log(`${cambios} membres\\u00EDas vencidas marcadas como inactivas`);
+      console.log(`${cambios} membres\u00EDas vencidas marcadas como inactivas`);
       return true; // Indica que se deben recargar los datos
     }
     return false;
@@ -679,32 +679,32 @@ if (user && user.uid === MASTER_UID) {
     const el = document.getElementById('home-ai-message') || document.getElementById('coach-ai-message');
     if (!el) return;
 
-    // Cache: 1 mensaje por d\\u00EDa por coach
+    // Cache: 1 mensaje por d\u00EDa por coach
     const today = new Date().toISOString().slice(0,10);
     const cacheKey = 'bepwr_coach_msg_' + today;
     const cached = localStorage.getItem(cacheKey);
     if (cached && !cached.includes('&#xFFFD') && !cached.includes('=A') && cached.length > 50) { el.innerHTML = cached; return; }
 
     const hora = new Date().getHours();
-    const saludo = hora < 12 ? 'buenos d\\u00EDas' : hora < 19 ? 'buenas tardes' : 'buenas noches';
+    const saludo = hora < 12 ? 'buenos d\u00EDas' : hora < 19 ? 'buenas tardes' : 'buenas noches';
 
     const temas = [
-      't\\u00E9cnicas de correcci\\u00F3n de patrones de movimiento funcional (sentadilla, bisagra de cadera, empuje, jal\\u00F3n, carga)',
-      'programaci\\u00F3n de sesiones: periodizaci\\u00F3n, variedad de est\\u00EDmulos y progresi\\u00F3n de carga en entrenamiento funcional',
-      'fisiolog\\u00EDa del ejercicio aplicada: adaptaciones neuromusculares, metabolismo energ\\u00E9tico y recuperaci\\u00F3n',
-      'psicolog\\u00EDa del coaching: motivaci\\u00F3n, comunicaci\\u00F3n efectiva y manejo de diferentes perfiles de clientes',
-      'nutrici\\u00F3n deportiva b\\u00E1sica que todo coach funcional debe conocer: macros, timing y hidrataci\\u00F3n',
-      'movilidad y estabilidad: evaluaci\\u00F3n funcional y correcci\\u00F3n de limitaciones comunes',
-      'lesiones frecuentes en entrenamiento funcional: prevenci\\u00F3n, se\\u00F1ales de alerta y modificaciones',
-      'herramientas de evaluaci\\u00F3n: InBody, pruebas funcionales y c\\u00F3mo interpretar resultados con el cliente',
+      't\u00E9cnicas de correcci\u00F3n de patrones de movimiento funcional (sentadilla, bisagra de cadera, empuje, jal\u00F3n, carga)',
+      'programaci\u00F3n de sesiones: periodizaci\u00F3n, variedad de est\u00EDmulos y progresi\u00F3n de carga en entrenamiento funcional',
+      'fisiolog\u00EDa del ejercicio aplicada: adaptaciones neuromusculares, metabolismo energ\u00E9tico y recuperaci\u00F3n',
+      'psicolog\u00EDa del coaching: motivaci\u00F3n, comunicaci\u00F3n efectiva y manejo de diferentes perfiles de clientes',
+      'nutrici\u00F3n deportiva b\u00E1sica que todo coach funcional debe conocer: macros, timing y hidrataci\u00F3n',
+      'movilidad y estabilidad: evaluaci\u00F3n funcional y correcci\u00F3n de limitaciones comunes',
+      'lesiones frecuentes en entrenamiento funcional: prevenci\u00F3n, se\u00F1ales de alerta y modificaciones',
+      'herramientas de evaluaci\u00F3n: InBody, pruebas funcionales y c\u00F3mo interpretar resultados con el cliente',
       'variaciones avanzadas de ejercicios funcionales: TRX, kettlebell, bandas, peso corporal',
-      'c\\u00F3mo dise\\u00F1ar clases grupales efectivas: estructura, energ\\u00EDa, m\\u00FAsica y manejo del grupo',
-      'datos cient\\u00EDficos recientes sobre entrenamiento de fuerza funcional y longevidad',
-      'c\\u00F3mo trabajar con poblaciones especiales: adultos mayores, mujeres embarazadas, rehabilitaci\\u00F3n post-lesi\\u00F3n'
+      'c\u00F3mo dise\u00F1ar clases grupales efectivas: estructura, energ\u00EDa, m\u00FAsica y manejo del grupo',
+      'datos cient\u00EDficos recientes sobre entrenamiento de fuerza funcional y longevidad',
+      'c\u00F3mo trabajar con poblaciones especiales: adultos mayores, mujeres embarazadas, rehabilitaci\u00F3n post-lesi\u00F3n'
     ];
     const tema = temas[new Date().getDate() % temas.length];
 
-    const prompt = `Coach bePWR Quer\\u00E9taro. ${saludo}. Escribe un mensaje motivador y educativo del d\\u00EDa sobre: ${tema}. M\\u00E1ximo 3 p\\u00E1rrafos. Incluye un dato cient\\u00EDfico pr\\u00E1ctico. Espa\\u00F1ol, directo, sin clich\\u00E9s.`;
+    const prompt = `Coach bePWR Quer\u00E9taro. ${saludo}. Escribe un mensaje motivador y educativo del d\u00EDa sobre: ${tema}. M\u00E1ximo 3 p\u00E1rrafos. Incluye un dato cient\u00EDfico pr\u00E1ctico. Espa\u00F1ol, directo, sin clich\u00E9s.`;
 
     try {
       const res = await fetch('/api/chat', {
@@ -715,13 +715,13 @@ if (user && user.uid === MASTER_UID) {
       const data = await res.json();
       const msg = data.message || '';
       if (msg) {
-        const html = msg.replace(/\\*\\*(.*?)\\*\\*/g, '<b>$1</b>').replace(/\\n\\n/g, '</p><p style="margin-top:10px">').replace(/\\n/g, '<br>');
+        const html = msg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n\n/g, '</p><p style="margin-top:10px">').replace(/\n/g, '<br>');
         const htmlFinal = '<p>' + html + '</p>';
         el.innerHTML = htmlFinal;
         localStorage.setItem(cacheKey, htmlFinal);
       }
     } catch(e) {
-      el.innerHTML = '<span style="color:var(--gray);font-size:12px;font-family:Space Mono,monospace">Error al cargar el mensaje del d\\u00EDa.</span>';
+      el.innerHTML = '<span style="color:var(--gray);font-size:12px;font-family:Space Mono,monospace">Error al cargar el mensaje del d\u00EDa.</span>';
     }
   }
 
@@ -756,7 +756,7 @@ if (user && user.uid === MASTER_UID) {
     }
   });
 
-  // Guarda la notificaci\\u00F3n en Firestore de cada miembro destinatario
+  // Guarda la notificaci\u00F3n en Firestore de cada miembro destinatario
   async function saveNotificationsFirestore(title, body, target) {
     const fecha = new Date().toISOString();
     const notifData = { titulo: title, cuerpo: body, fecha, leida: false };
@@ -879,7 +879,7 @@ if (user && user.uid === MASTER_UID) {
     const btn = document.getElementById('btn-send-notif');
     errEl.textContent = '';
 
-    if (!title) { errEl.textContent = 'El t\\u00EDtulo es obligatorio'; return; }
+    if (!title) { errEl.textContent = 'El t\u00EDtulo es obligatorio'; return; }
     if (!body) { errEl.textContent = 'El mensaje es obligatorio'; return; }
 
     btn.textContent = 'Enviando...'; btn.disabled = true;
@@ -903,8 +903,8 @@ if (user && user.uid === MASTER_UID) {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast('\\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
-        logBitacora('envio_aviso', 'Aviso: \\"' + title + '\\" (' + data.sent + ' enviados)', '');
+        showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
+        logBitacora('envio_aviso', 'Aviso: \"' + title + '\" (' + data.sent + ' enviados)', '');
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
@@ -913,9 +913,9 @@ if (user && user.uid === MASTER_UID) {
         errEl.textContent = data.error || ('Enviado a ' + (data.sent||0) + ' miembros');
       }
     } catch(e) {
-      errEl.textContent = 'Error de conexi\\u00F3n: ' + e.message;
+      errEl.textContent = 'Error de conexi\u00F3n: ' + e.message;
     } finally {
-      btn.textContent = '\\u{1F4E3} Enviar notificaci\\u00F3n'; btn.disabled = false;
+      btn.textContent = '\u{1F4E3} Enviar notificaci\u00F3n'; btn.disabled = false;
     }
   }
 
@@ -931,7 +931,7 @@ if (user && user.uid === MASTER_UID) {
     auth.sendPasswordResetEmail(email)
       .then(() => {
         errEl.style.color = '#4ade80';
-        errEl.textContent = 'Te enviamos un correo para restablecer tu contrase\\u00F1a';
+        errEl.textContent = 'Te enviamos un correo para restablecer tu contrase\u00F1a';
         setTimeout(() => { errEl.style.color = '#f87171'; errEl.textContent = ''; }, 5000);
       })
       .catch(() => {
@@ -994,7 +994,7 @@ if (user && user.uid === MASTER_UID) {
       // Load valoraciones registered by this staff
       const metSnap = await db.collectionGroup('metricas').where('registradoPor', '==', uid).orderBy('fecha','desc').limit(20).get();
       if (metSnap.empty) {
-        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas a\\u00FAn';
+        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas a\u00FAn';
       } else {
         document.getElementById('sp-historial').innerHTML = metSnap.docs.map(d => {
           const m = d.data();
@@ -1023,11 +1023,11 @@ if (user && user.uid === MASTER_UID) {
     const tel = document.getElementById('sp-edit-tel').value.trim();
     const rol = document.getElementById('sp-edit-rol').value;
     if (!nombre) { errEl.textContent = 'El nombre es requerido'; return; }
-    if (!/^\\d{10}$/.test(tel)) { errEl.textContent = 'El tel\\u00E9fono debe tener exactamente 10 d\\u00EDgitos'; return; }
+    if (!/^\d{10}$/.test(tel)) { errEl.textContent = 'El tel\u00E9fono debe tener exactamente 10 d\u00EDgitos'; return; }
     try {
       await db.collection('staff').doc(currentStaffProfileUID).update({ nombre, telefono: tel, rol });
       errEl.style.color = '#4ade80';
-      errEl.textContent = '\\u00A1Datos actualizados!';
+      errEl.textContent = '\u00A1Datos actualizados!';
       document.getElementById('sp-nombre').textContent = nombre;
       document.getElementById('sp-tel').textContent = tel;
       setTimeout(() => loadStaffList(), 1000);
@@ -1041,22 +1041,22 @@ if (user && user.uid === MASTER_UID) {
     const newPass = document.getElementById('sp-new').value;
     const confirm = document.getElementById('sp-confirm').value;
     errEl.textContent = '';
-    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[.!*@#$%^&+=_\\-?])[A-Za-z\\d.!*@#$%^&+=_\\-?]{6,}$/;
-    if (!current) { errEl.textContent = 'Escribe tu contrase\\u00F1a actual'; return; }
-    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrase\\u00F1a no cumple los requisitos'; return; }
-    if (newPass !== confirm) { errEl.textContent = 'Las contrase\\u00F1as no coinciden'; return; }
+    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
+    if (!current) { errEl.textContent = 'Escribe tu contrase\u00F1a actual'; return; }
+    if (!passRegex.test(newPass)) { errEl.textContent = 'La contrase\u00F1a no cumple los requisitos'; return; }
+    if (newPass !== confirm) { errEl.textContent = 'Las contrase\u00F1as no coinciden'; return; }
     try {
       const user = auth.currentUser;
       const cred = firebase.auth.EmailAuthProvider.credential(user.email, current);
       await user.reauthenticateWithCredential(cred);
       await user.updatePassword(newPass);
       errEl.style.color = '#4ade80';
-      errEl.textContent = '\\u00A1Contrase\\u00F1a actualizada!';
+      errEl.textContent = '\u00A1Contrase\u00F1a actualizada!';
       setTimeout(closeChangePass, 1500);
     } catch(e) {
       errEl.style.color = '#f87171';
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-        errEl.textContent = 'Contrase\\u00F1a actual incorrecta';
+        errEl.textContent = 'Contrase\u00F1a actual incorrecta';
       } else {
         errEl.textContent = 'Error: ' + e.message;
       }
@@ -1075,7 +1075,7 @@ if (user && user.uid === MASTER_UID) {
   }
   function fmtDate(val) {
     if (!val) return '';
-    if (val.match(/^\\d{4}-\\d{2}-\\d{2}$/)) {
+    if (val.match(/^\d{4}-\d{2}-\d{2}$/)) {
       const [y,m,d] = val.split('-');
       const dt = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
       return dt.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}).replace('.','').replace(',','');
@@ -1086,9 +1086,9 @@ if (user && user.uid === MASTER_UID) {
   // Convert any date format to YYYY-MM-DD for <input type="date">
   function toDateInput(val) {
     if (!val) return '';
-    if (/^\\d{4}-\\d{2}-\\d{2}$/.test(val)) return val;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
     const months = {ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
-    const m = val.toLowerCase().match(/(\\d{1,2})\\s+([a-z]+)\\s+(\\d{4})/);
+    const m = val.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
     if (m) {
       return `${m[3]}-${String((months[m[2]]??0)+1).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
     }
@@ -1162,7 +1162,7 @@ if (user && user.uid === MASTER_UID) {
         <div style="display:flex;align-items:center;flex:1;min-width:0">${dot}<div><div style="font-size:14px;font-weight:600;color:${activo?'var(--white)':'#888'}">${displayName}${vBadge}</div><div style="font-size:12px;color:var(--gray);margin-top:2px">${m.email||''}</div></div></div>
         <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
           <button onclick="event.stopPropagation();openDetail('${m.uid}')" style="background:#FF5C1A;border:none;color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace">Ver</button>
-          <button onclick="event.stopPropagation();openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\\'")}')" style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80;font-size:10px;padding:5px 8px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace;white-space:nowrap">+ Valoración</button>
+          <button onclick="event.stopPropagation();openMetricsModal('${m.uid}','${(m.nombre||'').replace(/'/g,"\'")}')" style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80;font-size:10px;padding:5px 8px;border-radius:8px;cursor:pointer;font-family:Space Mono,monospace;white-space:nowrap">+ Valoración</button>
         </div>
         </div>`;
     }).join('');
@@ -1198,7 +1198,7 @@ if (user && user.uid === MASTER_UID) {
     const msg = document.getElementById('email-match-msg');
     if (!msg || !e2) return;
     if (e1 === e2) {
-      msg.textContent = '\\u2713 Emails coinciden';
+      msg.textContent = '\u2713 Emails coinciden';
       msg.style.color = '#4ade80';
     } else {
       msg.textContent = 'Los emails no coinciden';
@@ -1322,7 +1322,7 @@ if (user && user.uid === MASTER_UID) {
         </div>
       </div>
 
-      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\\'")}')">+ Nueva valoración</button>
+      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración</button>
 
       <div class="modal-section">Historial de valoraciones</div>
       <div style="font-size:10px;color:var(--gray);margin:-10px 0 12px;font-family:Space Mono,monospace">Haz clic en una valoración para consultarla o editarla</div>
@@ -1493,20 +1493,20 @@ if (user && user.uid === MASTER_UID) {
           imcMeta:      Number(document.getElementById('edit-imc-meta').value)||null,
         }
       });
-      showToast('Cambios guardados \\u2713', 'success');
+      showToast('Cambios guardados \u2713', 'success');
       var _mDiffs = [];
       var _newNombre2 = (document.getElementById('edit-nombre')||{}).value||'';
       var _vigNew = (document.getElementById('edit-vigencia')||{}).value||'';
       var _vigFechaNew = (document.getElementById('edit-vigencia-fecha')||{}).value||'';
       var _objNew = (document.getElementById('edit-meta')||{}).value||'';
       var _actNewVal = (document.getElementById('edit-activo')||{}).value;
-      if (_mOrig.nombre && _newNombre2 && _mOrig.nombre !== _newNombre2) _mDiffs.push('Nombre: '+_mOrig.nombre+' \\u2192 '+_newNombre2);
-      if (_actNewVal !== undefined && String(_mOrig.activo||'true') !== String(_actNewVal)) _mDiffs.push('Estado: '+(_mOrig.activo!==false?'Activo':'Inactivo')+' \\u2192 '+(_actNewVal==='false'?'Inactivo':'Activo'));
-      if (_vigNew && _mOrig.vigencia !== _vigNew) _mDiffs.push('Vigencia: '+(_mOrig.vigencia||'sin definir')+' \\u2192 '+_vigNew);
-      if (_vigFechaNew && _mOrig.vigenciaFecha !== _vigFechaNew) _mDiffs.push('Fecha vigencia: '+(_mOrig.vigenciaFecha||'-')+' \\u2192 '+_vigFechaNew);
-      if (_objNew && (_mOrig.objetivo||{}).meta !== _objNew) _mDiffs.push('Objetivo: '+((_mOrig.objetivo||{}).meta||'-')+' \\u2192 '+_objNew);
+      if (_mOrig.nombre && _newNombre2 && _mOrig.nombre !== _newNombre2) _mDiffs.push('Nombre: '+_mOrig.nombre+' \u2192 '+_newNombre2);
+      if (_actNewVal !== undefined && String(_mOrig.activo||'true') !== String(_actNewVal)) _mDiffs.push('Estado: '+(_mOrig.activo!==false?'Activo':'Inactivo')+' \u2192 '+(_actNewVal==='false'?'Inactivo':'Activo'));
+      if (_vigNew && _mOrig.vigencia !== _vigNew) _mDiffs.push('Vigencia: '+(_mOrig.vigencia||'sin definir')+' \u2192 '+_vigNew);
+      if (_vigFechaNew && _mOrig.vigenciaFecha !== _vigFechaNew) _mDiffs.push('Fecha vigencia: '+(_mOrig.vigenciaFecha||'-')+' \u2192 '+_vigFechaNew);
+      if (_objNew && (_mOrig.objetivo||{}).meta !== _objNew) _mDiffs.push('Objetivo: '+((_mOrig.objetivo||{}).meta||'-')+' \u2192 '+_objNew);
       var _mNombreFinal2 = _newNombre2 || _mOrig.nombre || uid;
-      logBitacora('modificacion_miembro', 'Modificaci\\u00F3n de '+_mNombreFinal2+(_mDiffs.length?' | '+_mDiffs.join(', '):''), _mNombreFinal2);
+      logBitacora('modificacion_miembro', 'Modificaci\u00F3n de '+_mNombreFinal2+(_mDiffs.length?' | '+_mDiffs.join(', '):''), _mNombreFinal2);
       closeModal('modal-detail');
       loadMembers();
     } catch(e) {
@@ -1664,9 +1664,9 @@ if (user && user.uid === MASTER_UID) {
     var el = document.getElementById('ns-email-match');
     if (!el || !e2) return;
     if (e1.toLowerCase() === e2.toLowerCase()) {
-      el.style.color = '#4ade80'; el.textContent = '\\u2713 Emails coinciden';
+      el.style.color = '#4ade80'; el.textContent = '\u2713 Emails coinciden';
     } else {
-      el.style.color = '#f87171'; el.textContent = '\\u2717 Los emails no coinciden';
+      el.style.color = '#f87171'; el.textContent = '\u2717 Los emails no coinciden';
     }
   };
 
@@ -1715,7 +1715,7 @@ if (user && user.uid === MASTER_UID) {
   };
 
   window.initDeleteBitacora = async function() {
-    var ok = await showConfirm('Se enviar\\u00E1 un c\\u00F3digo a tu email. \\u00BFDeseas continuar?');
+    var ok = await showConfirm('Se enviar\u00E1 un c\u00F3digo a tu email. \u00BFDeseas continuar?');
     if (!ok) return;
     var code = Math.floor(100000 + Math.random() * 900000).toString();
     window._delCode = code;
@@ -1725,14 +1725,14 @@ if (user && user.uid === MASTER_UID) {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({code: code, email: userEmail, secret: 'bepwr2026notify'})
       });
-      if (!resp.ok) throw new Error('Error al enviar c\\u00F3digo');
+      if (!resp.ok) throw new Error('Error al enviar c\u00F3digo');
       var ov = document.createElement('div');
       ov.id = 'del-bita-ov';
       ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
       var box = document.createElement('div');
       box.style.cssText = 'background:#1a1a1a;border:1px solid #f87171;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center';
-      var t = document.createElement('div'); t.style.cssText='font-size:15px;color:#fff;margin-bottom:8px;font-weight:600'; t.textContent='C\\u00F3digo de confirmaci\\u00F3n';
-      var s = document.createElement('div'); s.style.cssText='font-size:13px;color:#aaa;margin-bottom:20px'; s.textContent='Ingresa el c\\u00F3digo enviado a tu email';
+      var t = document.createElement('div'); t.style.cssText='font-size:15px;color:#fff;margin-bottom:8px;font-weight:600'; t.textContent='C\u00F3digo de confirmaci\u00F3n';
+      var s = document.createElement('div'); s.style.cssText='font-size:13px;color:#aaa;margin-bottom:20px'; s.textContent='Ingresa el c\u00F3digo enviado a tu email';
       var inp = document.createElement('input'); inp.id='del-bita-inp'; inp.type='text'; inp.maxLength=6; inp.placeholder='000000';
       inp.style.cssText='width:100%;background:#111;border:1px solid #444;color:#fff;font-size:24px;text-align:center;padding:12px;border-radius:10px;margin-bottom:12px;font-family:Space Mono,monospace;box-sizing:border-box';
       var err = document.createElement('div'); err.id='del-bita-err'; err.style.cssText='color:#f87171;font-size:12px;margin-bottom:12px;min-height:16px';
@@ -1832,7 +1832,7 @@ if (user && user.uid === MASTER_UID) {
     document.getElementById('m-calificacion').value = x.calificacion || '';
     document.getElementById('m-fecha').value = x.fecha || '';
     // Change title and save action
-    document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoraci\\u00F3n';
+    document.querySelector('#modal-metrics .modal-title').textContent = 'Editar Valoraci\u00F3n';
     window._editingMetricId = metricId;
     window._editingMetricOrig = x; // store original for diff
     document.getElementById('modal-metrics').style.display = 'flex';
@@ -1918,15 +1918,15 @@ for (const med of medidasVal) {
         // Confirm before editing past metric
         const fechaEdit = document.getElementById('m-fecha')?.value || 'esta fecha';
         const confirmed = await showConfirm(
-          '\\u00BFConfirmas que deseas modificar las m\\u00E9tricas de ' + fechaEdit + '?'
+          '\u00BFConfirmas que deseas modificar las m\u00E9tricas de ' + fechaEdit + '?'
         );
         if (!confirmed) return;
         await db.collection('usuarios').doc(uid).collection('metricas').doc(window._editingMetricId).update(metricData);
         window._editingMetricId = null;
-        document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\\u00F3n';
+        document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoraci\u00F3n';
         const _orig = window._editingMetricOrig || {};
         const _fields = [
-          {k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\\u00FAsc',u:'kg'},
+          {k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\u00FAsc',u:'kg'},
           {k:'grasaCorporal',l:'Grasa Corp',u:'kg'},{k:'imc',l:'IMC',u:''},
           {k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},
           {k:'calificacion',l:'Calif',u:''}
@@ -1934,20 +1934,20 @@ for (const med of medidasVal) {
         const _diffs = _fields.filter(f => {
           const ov = _orig[f.k]; const nv = metricData[f.k];
           return ov != null && nv != null && ov !== nv;
-        }).map(f => f.l+': '+_orig[f.k]+f.u+' \\u2192 '+metricData[f.k]+f.u);
+        }).map(f => f.l+': '+_orig[f.k]+f.u+' \u2192 '+metricData[f.k]+f.u);
         const _fecha = document.getElementById('m-fecha')?.value||'';
         const _mNombre = (window._allMembers||[]).find(x=>x.uid===uid)?.nombre||'';
-        const _detalle = 'Edici\\u00F3n m\\u00E9trica del '+_fecha+(_diffs.length?' | '+_diffs.join(', '):'');
+        const _detalle = 'Edici\u00F3n m\u00E9trica del '+_fecha+(_diffs.length?' | '+_diffs.join(', '):'');
         var _origVals = window._editingMetricOrig || {};
-        var _diffFields = [{k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\\u00FAsc',u:'kg'},{k:'grasaCorporal',l:'Grasa',u:'kg'},{k:'imc',l:'IMC',u:''},{k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},{k:'calificacion',l:'Calif',u:''}];
-        var _diffList = _diffFields.filter(function(f){ var ov=_origVals[f.k],nv=metricData[f.k]; return ov!=null&&nv!=null&&String(ov)!==String(nv); }).map(function(f){ return f.l+': '+_origVals[f.k]+f.u+' \\u2192 '+metricData[f.k]+f.u; });
+        var _diffFields = [{k:'peso',l:'Peso',u:'kg'},{k:'musculo',l:'M\u00FAsc',u:'kg'},{k:'grasaCorporal',l:'Grasa',u:'kg'},{k:'imc',l:'IMC',u:''},{k:'pgc',l:'PGC',u:'%'},{k:'grasaVisceral',l:'G.Visc',u:''},{k:'calificacion',l:'Calif',u:''}];
+        var _diffList = _diffFields.filter(function(f){ var ov=_origVals[f.k],nv=metricData[f.k]; return ov!=null&&nv!=null&&String(ov)!==String(nv); }).map(function(f){ return f.l+': '+_origVals[f.k]+f.u+' \u2192 '+metricData[f.k]+f.u; });
         var _editFechaVal = (document.getElementById('m-fecha')||{}).value||'';
         var _editMiembro = ((window._allMembers||[]).find(function(x){return x.uid===uid;})||{}).nombre||'';
-        var _editDetalle = 'Edici\\u00F3n m\\u00E9trica del '+_editFechaVal+(_diffList.length?' | '+_diffList.join(', '):'');
+        var _editDetalle = 'Edici\u00F3n m\u00E9trica del '+_editFechaVal+(_diffList.length?' | '+_diffList.join(', '):'');
         logBitacora('edicion_metrica', _editDetalle, _editMiembro);
         // Close metrics modal and refresh the detail panel
         closeModal('modal-metrics');
-        showToast('Valoraci\\u00F3n actualizada \\u2713', 'success');
+        showToast('Valoraci\u00F3n actualizada \u2713', 'success');
         loadMembers();
         setTimeout(() => openDetail(uid), 600);
         return;
@@ -1962,8 +1962,8 @@ for (const med of medidasVal) {
         await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
       }
       }
-      showToast('Valoraci\\u00F3n guardada \\u2713', 'success');
-      logBitacora('nueva_valoracion', 'Valoraci\\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
+      showToast('Valoraci\u00F3n guardada \u2713', 'success');
+      logBitacora('nueva_valoracion', 'Valoraci\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
       closeModal('modal-metrics');
       loadMembers();
     } catch(e) {
@@ -2131,7 +2131,7 @@ for (const med of medidasVal) {
     listEl.innerHTML = '<div style="color:var(--gray);font-size:13px">Cargando...</div>';
     try {
       const snap = await db.collection('staff').get();
-      if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado a\\u00FAn</div>'; return; }
+      if (snap.empty) { listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Sin staff registrado a\u00FAn</div>'; return; }
       const staffDocs = [...snap.docs].sort((a,b)=>{
         const getAp = d => { const parts=(d.data().nombre||'').trim().split(' '); return parts.length>1?parts.slice(1).join(' ').toLowerCase():parts[0].toLowerCase(); };
         return getAp(a).localeCompare(getAp(b),'es');
@@ -2168,10 +2168,10 @@ for (const med of medidasVal) {
   async function quickToggleMember(uid, currentActivo, nombre) {
     if (window.currentStaffRole !== 'admin') { showToast('Solo admin puede hacer esto', 'error'); return; }
     const action = currentActivo ? 'desactivar' : 'activar';
-    if (!confirm(`\\u00BF${action.charAt(0).toUpperCase()+action.slice(1)} a ${nombre}?`)) return;
+    if (!confirm(`\u00BF${action.charAt(0).toUpperCase()+action.slice(1)} a ${nombre}?`)) return;
     try {
       await db.collection('usuarios').doc(uid).update({ activo: !currentActivo });
-      logBitacora('cambio_estado', (!currentActivo?'Activaci\\u00F3n':'Desactivaci\\u00F3n') + ': ' + ((window._allMembers||[]).find(x=>x.uid===uid)?.nombre||uid), '');
+      logBitacora('cambio_estado', (!currentActivo?'Activaci\u00F3n':'Desactivaci\u00F3n') + ': ' + ((window._allMembers||[]).find(x=>x.uid===uid)?.nombre||uid), '');
       // Update local cache
       const m = (window._allMembers||[]).find(x => x.uid === uid);
       if (m) m.activo = !currentActivo;
@@ -2187,7 +2187,7 @@ for (const med of medidasVal) {
     if (window.currentStaffRole !== 'admin') { showToast('Solo un admin puede hacer esto', 'error'); return; }
     try {
       await db.collection('staff').doc(uid).update({ activo: !currentActivo });
-      showToast(currentActivo ? 'Staff desactivado' : 'Staff activado \\u2713', 'success');
+      showToast(currentActivo ? 'Staff desactivado' : 'Staff activado \u2713', 'success');
       loadStaffList();
     } catch(e) { showToast('Error: ' + e.message, 'error'); }
   }
@@ -2197,7 +2197,7 @@ for (const med of medidasVal) {
     if (window.currentStaffRole !== 'admin') { showToast('Solo un admin puede cambiar roles', 'error'); return; }
     try {
       await db.collection('staff').doc(uid).update({ rol: newRol });
-      showToast('Rol actualizado \\u2713', 'success');
+      showToast('Rol actualizado \u2713', 'success');
     } catch(e) { showToast('Error: ' + e.message, 'error'); }
   }
 
@@ -2237,7 +2237,7 @@ for (const med of medidasVal) {
         return;
       }
       logBitacora('alta_staff', 'Alta de staff: ' + nombreCompleto + ' | ' + rolVal, nombreCompleto);
-      showToast('\\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
+      showToast('\u2713 ' + nombreCompleto + ' creado. Email enviado a ' + eTrim, 'success');
       // Reset form
       ['ns-nombre','ns-apellido','ns-email','ns-email-confirm','ns-tel','ns-nacimiento'].forEach(function(id){
         var el = document.getElementById(id); if(el) el.value = '';
@@ -2272,24 +2272,24 @@ for (const med of medidasVal) {
     if (!docs || !docs[idx]) return;
     const x = docs[idx];
     const fecha = x.fecha ? new Date(x.fecha).toLocaleString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-    const LABELS = {alta_miembro:'Alta de miembro',nueva_valoracion:'Nueva valoraci\\u00F3n',
-      edicion_metrica:'Edici\\u00F3n de m\\u00E9trica',modificacion_miembro:'Modificaci\\u00F3n miembro',
-      cambio_estado:'Cambio de estado',alta_staff:'Alta de staff',baja_staff:'Baja staff',envio_aviso:'Env\\u00EDo de aviso'};
+    const LABELS = {alta_miembro:'Alta de miembro',nueva_valoracion:'Nueva valoraci\u00F3n',
+      edicion_metrica:'Edici\u00F3n de m\u00E9trica',modificacion_miembro:'Modificaci\u00F3n miembro',
+      cambio_estado:'Cambio de estado',alta_staff:'Alta de staff',baja_staff:'Baja staff',envio_aviso:'Env\u00EDo de aviso'};
     document.getElementById('bita-detail-title').textContent = LABELS[x.accion] || x.accion;
     document.getElementById('bita-detail-body').innerHTML =
       '<div style="display:grid;gap:14px">'
       +'<div style="background:#111;border-radius:12px;padding:16px">'
       +'<div style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:2px;margin-bottom:8px">DETALLE</div>'
-      +'<div style="font-size:14px;color:#fff;line-height:1.6">'+(x.detalle||'\\u2014')+'</div>'
+      +'<div style="font-size:14px;color:#fff;line-height:1.6">'+(x.detalle||'\u2014')+'</div>'
       +'</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
       +'<div style="background:#111;border-radius:12px;padding:14px">'
       +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">STAFF</div>'
-      +'<div style="font-size:13px;color:#ccc">'+(x.staffNombre||x.staffEmail||'\\u2014')+'</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.staffNombre||x.staffEmail||'\u2014')+'</div>'
       +'</div>'
       +'<div style="background:#111;border-radius:12px;padding:14px">'
       +'<div style="font-size:10px;color:#666;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">MIEMBRO</div>'
-      +'<div style="font-size:13px;color:#ccc">'+(x.miembroNombre||'\\u2014')+'</div>'
+      +'<div style="font-size:13px;color:#ccc">'+(x.miembroNombre||'\u2014')+'</div>'
       +'</div>'
       +'</div>'
       +'<div style="background:#111;border-radius:12px;padding:14px">'
@@ -2330,11 +2330,11 @@ for (const med of medidasVal) {
     var confirma = elconfirma.value;
     if (errEl) errEl.textContent = '';
     if (!nueva || nueva.length < 8) {
-      if(errEl) errEl.textContent = 'M\\u00EDnimo 8 caracteres';
+      if(errEl) errEl.textContent = 'M\u00EDnimo 8 caracteres';
       return;
     }
     if (nueva !== confirma) {
-      if(errEl) errEl.textContent = 'Las contrase\\u00F1as no coinciden (nueva: '+nueva.length+' chars, confirma: '+confirma.length+' chars)';
+      if(errEl) errEl.textContent = 'Las contrase\u00F1as no coinciden (nueva: '+nueva.length+' chars, confirma: '+confirma.length+' chars)';
       return;
     }
     try {
@@ -2343,7 +2343,7 @@ for (const med of medidasVal) {
       await db.collection('staff').doc(uid2).update({ primerIngreso: false });
       var modal = document.getElementById('modal-cambio-pass');
       if(modal){ modal.classList.remove('open'); setTimeout(function(){ modal.style.display='none'; },300); }
-      showToast('Contrase\\u00F1a actualizada \\u2713', 'success');
+      showToast('Contrase\u00F1a actualizada \u2713', 'success');
     } catch(e) {
       if(errEl) errEl.textContent = 'Error: ' + e.message;
     }
@@ -2355,15 +2355,15 @@ for (const med of medidasVal) {
     var nueva = (document.getElementById('cp-nueva')||{}).value||'';
     var confirma = (document.getElementById('cp-confirma')||{}).value||'';
     var errEl = document.getElementById('cp-error');
-    if (nueva.length < 8) { if(errEl) errEl.textContent='M\\u00EDnimo 8 caracteres'; return; }
-    if (nueva !== confirma) { if(errEl) errEl.textContent='Las contrase\\u00F1as no coinciden'; return; }
+    if (nueva.length < 8) { if(errEl) errEl.textContent='M\u00EDnimo 8 caracteres'; return; }
+    if (nueva !== confirma) { if(errEl) errEl.textContent='Las contrase\u00F1as no coinciden'; return; }
     try {
       await firebase.auth().currentUser.updatePassword(nueva);
       // Mark primerIngreso as done
       var uid2 = firebase.auth().currentUser.uid;
       await db.collection('staff').doc(uid2).update({ primerIngreso: false });
       document.getElementById('modal-cambio-pass').style.display = 'none';
-      showToast('Contrase\\u00F1a actualizada \\u2713', 'success');
+      showToast('Contrase\u00F1a actualizada \u2713', 'success');
     } catch(e) {
       if(errEl) errEl.textContent = 'Error: ' + e.message;
     }
@@ -2386,15 +2386,15 @@ for (const med of medidasVal) {
     var nueva = (document.getElementById("cp-nueva")||{}).value||"";
     var confirma = (document.getElementById("cp-confirma")||{}).value||"";
     var errEl = document.getElementById("cp-error");
-    if (nueva.length < 8) { if(errEl) errEl.textContent="M\\u00EDnimo 8 caracteres"; return; }
-    if (nueva !== confirma) { if(errEl) errEl.textContent="Las contrase\\u00F1as no coinciden"; return; }
+    if (nueva.length < 8) { if(errEl) errEl.textContent="M\u00EDnimo 8 caracteres"; return; }
+    if (nueva !== confirma) { if(errEl) errEl.textContent="Las contrase\u00F1as no coinciden"; return; }
     try {
       await firebase.auth().currentUser.updatePassword(nueva);
       var uid2 = firebase.auth().currentUser.uid;
       await db.collection("staff").doc(uid2).update({ primerIngreso: false });
       var modal = document.getElementById("modal-cambio-pass");
       if(modal){ modal.classList.remove("open"); setTimeout(function(){ modal.style.display="none"; },300); }
-      showToast("Contrase\\u00F1a actualizada \\u2713", "success");
+      showToast("Contrase\u00F1a actualizada \u2713", "success");
     } catch(e) { if(errEl) errEl.textContent="Error: "+e.message; }
   };
 
