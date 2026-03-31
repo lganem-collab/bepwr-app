@@ -342,7 +342,7 @@
         </div>
 
         <div class="sec-title">Acciones r&#xE1;pidas</div>
-        <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank')">&#x2192; Reservar una clase</button>
+        <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank');logEvento('reserva')">&#x2192; Reservar una clase</button>
         <button class="btn-secondary" onclick="navigate('profile')">Ver mi perfil completo</button>
       </div>
 
@@ -667,7 +667,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot, deleteDoc }
+  import { getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot, deleteDoc, addDoc }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
   import { getMessaging, getToken, onMessage }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
@@ -739,6 +739,7 @@
       loadNotifications(user.uid);
       startNotifListener(user.uid);
       if (navigator.clearAppBadge) navigator.clearAppBadge();
+      logEvento('visita');
       // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
       if (!cachedUserData.terminosAceptados) {
         const tModal = document.getElementById('modal-terminos');
@@ -932,6 +933,7 @@
   }
 
   function setGreeting(nombre, desde) {
+    window._nombreUsuario = nombre;
     const primerNombre = nombre.split(' ')[0];
     document.getElementById('greeting-name').innerHTML = primerNombre + '<br>' + (nombre.split(' ')[1] || '');
   }
@@ -1195,6 +1197,26 @@ function renderProfileMetrics(m) {
   const messaging = getMessaging(app);
   const VAPID_KEY = 'BO7GCvvD-fYQTApeCtt4eWPUuMBAOfMHAtF3B7htcrj8PA1k_19eutw1l4rQTTs-yZwD1lPrCXyqgdn-AJMjSUQ';
 
+  async function logEvento(tipo) {
+    try {
+      const uid = window._currentUid;
+      if (!uid) return;
+      const hoy = new Date().toISOString().slice(0,10);
+      // Para visita: solo 1 por día
+      if (tipo === 'visita') {
+        const key = 'bepwr_visita_' + hoy;
+        if (localStorage.getItem(key)) return;
+        localStorage.setItem(key, '1');
+      }
+      const nombre = window._nombreUsuario || '';
+      await addDoc(collection(db, 'eventos'), {
+        uid, nombre, tipo,
+        dia: hoy,
+        fecha: new Date().toISOString()
+      });
+    } catch(e) { console.log('logEvento:', e.message); }
+  }
+
   async function subscribeToPush(uid) {
     try {
       if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
@@ -1299,6 +1321,7 @@ function renderProfileMetrics(m) {
       });
       const aiData = await res.json();
       const msg = aiData.message || 'No se pudo generar el mensaje.';
+      logEvento('mensaje_ia');
 
       // Save to localStorage
       try {
@@ -2242,6 +2265,7 @@ async function renderAnalisisCientifico(data, config) {
     if (text && text.length >= 100) {
       output.textContent = text;
       output.style.opacity = '1';
+      logEvento('analisis_cientifico');
 
       var hoy = new Date().toISOString().slice(0, 10);
 
