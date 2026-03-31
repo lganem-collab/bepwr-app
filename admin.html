@@ -981,8 +981,8 @@ if (user && user.uid === MASTER_UID) {
       document.getElementById('sp-nombre').textContent = s.nombre || s.email;
       document.getElementById('sp-rol-badge').innerHTML = `<span style="color:${s.rol==='admin'?'var(--orange)':'#888'}">${s.rol||'coach'}${isMaster?' &#x2605; MAESTRO':''}</span>`;
       document.getElementById('sp-email').textContent = s.email || '&#x2014;';
-      document.getElementById('sp-tel').textContent = s.telefono || '&#x2014;';
-      document.getElementById('sp-fecha-alta').textContent = s.fechaAlta || '&#x2014;';
+      document.getElementById('sp-tel').textContent = s.telefono || '\u2014';
+      document.getElementById('sp-fecha-alta').textContent = s.fechaAlta || '\u2014';
       document.getElementById('sp-estado').innerHTML = s.activo !== false
         ? '<span style="color:#4ade80">Activo</span>'
         : '<span style="color:#f87171">Inactivo</span>';
@@ -1000,6 +1000,7 @@ if (user && user.uid === MASTER_UID) {
       });
 
       // Load valoraciones registered by this staff
+      try {
       const metSnap = await db.collectionGroup('metricas').where('registradoPor', '==', uid).orderBy('fecha','desc').limit(20).get();
       if (metSnap.empty) {
         document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas a\u00FAn';
@@ -1012,6 +1013,10 @@ if (user && user.uid === MASTER_UID) {
             <span style="margin-left:8px">Peso: ${m.peso||'&#x2014;'} kg &#xB7; Inbody: ${m.calificacion||'&#x2014;'}</span>
           </div>`;
         }).join('');
+      }
+      } catch(histErr) {
+        console.warn('No se pudieron cargar valoraciones del staff:', histErr.message);
+        document.getElementById('sp-historial').textContent = 'Sin valoraciones disponibles';
       }
     } catch(e) {
       console.error('openStaffProfile error:', e);
@@ -1801,10 +1806,20 @@ if (user && user.uid === MASTER_UID) {
       var snap = await q.get();
       var sel = document.getElementById('bita-filter-staff');
       if (sel && sel.options.length <= 1) {
-        var allNames = snap.docs.map(function(d){ return d.data().staffNombre; }).filter(Boolean);
-        allNames.filter(function(v,i,a){ return a.indexOf(v)===i; }).forEach(function(n){
-          var o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o);
-        });
+        try {
+          var staffSnap = await db.collection('staff').get();
+          staffSnap.docs.forEach(function(d) {
+            var s = d.data();
+            if (s.nombre) {
+              var o = document.createElement('option'); o.value = s.nombre; o.textContent = s.nombre; sel.appendChild(o);
+            }
+          });
+        } catch(e) {
+          var allNames = snap.docs.map(function(d){ return d.data().staffNombre; }).filter(Boolean);
+          allNames.filter(function(v,i,a){ return a.indexOf(v)===i; }).forEach(function(n){
+            var o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o);
+          });
+        }
       }
       var docs = snap.docs.map(function(d){ return d.data(); });
       if (fStaff)  docs = docs.filter(function(x){ return x.staffNombre === fStaff; });
@@ -2652,7 +2667,7 @@ window.filterNotifUsers = function (q) {
   <div style="max-width:480px;margin:0 auto;padding:24px 16px 60px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px">Perfil Staff</div>
-      <button onclick="closeStaffProfile()" style="background:#222;border:1px solid #333;color:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:13px">&#x2715; Cerrar</button>
+      
     </div>
     <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:20px;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
@@ -2696,7 +2711,8 @@ window.filterNotifUsers = function (q) {
     </div>
     <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:20px">
       <div style="font-family:Space Mono,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Valoraciones registradas</div>
-      <div id="sp-historial" style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Cargando...</div>
+      <div id="sp-historial" style="color:var(--gray);font-size:13px;font-family:Space Mono,monospace">Cargando...    <button onclick="closeStaffProfile()" style="width:100%;margin-top:16px;background:#222;border:1px solid #333;color:#fff;border-radius:10px;padding:12px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif">Cerrar</button>
+</div>
     </div>
   </div>
 </div>
