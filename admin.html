@@ -1229,8 +1229,28 @@ if (user && user.uid === MASTER_UID) {
 
     let metricsAll = [];
     try {
-      const mSnap = await db.collection('usuarios').doc(uid).collection('metricas').orderBy('fecha','desc').get();
-      if (!mSnap.empty) { metricsAll = mSnap.docs.map(d => ({ id: d.id, ...d.data() })); }
+      const mSnap = await db.collection('usuarios').doc(uid).collection('metricas').get();
+      if (!mSnap.empty) {
+        metricsAll = mSnap.docs.map(d => {
+          const data = { id: d.id, ...d.data() };
+          // Parse fecha to sortable timestamp
+          let ts = 0;
+          if (data.fecha) {
+            let f = data.fecha;
+            if (f.toDate) { ts = f.toDate().getTime(); }
+            else if (typeof f === 'string' && f.includes('/')) {
+              const p = f.split('/');
+              if (p.length === 3) ts = new Date(p[2], p[1]-1, p[0]).getTime();
+            } else {
+              try { ts = new Date(f).getTime(); } catch(e) {}
+            }
+          }
+          data._ts = ts || 0;
+          return data;
+        });
+        // Sort desc by parsed timestamp (newest first)
+        metricsAll.sort((a, b) => b._ts - a._ts);
+      }
     } catch(e) { console.error('Error cargando métricas:', e); }
 
     const ultima = metricsAll[0] || null;
@@ -2010,14 +2030,10 @@ for (const med of medidasVal) {
         return;
       } else {
         await db.collection('usuarios').doc(uid).collection('metricas').add(metricData);
-      // Actualizar pruebaPeso en documento del usuario
-      if (pruebaPeso) {
-        await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
-      }
         // Actualizar pruebaPeso en documento del usuario
-      if (pruebaPeso) {
-        await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
-      }
+        if (pruebaPeso) {
+          await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
+        }
       }
       showToast('Valoraci\u00F3n guardada \u2713', 'success');
       logBitacora('nueva_valoracion', 'Valoraci\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
