@@ -291,51 +291,48 @@
 
         <div class="sec-title">Mi progreso</div>
         <div id="bepwr-score-section">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-            <div class="m-card" style="text-align:center;padding:18px 14px">
-              <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:10px">bePWR Score</div>
-              <div style="position:relative;width:90px;height:90px;margin:0 auto 8px">
-                <svg width="90" height="90" viewBox="0 0 90 90">
-                  <circle cx="45" cy="45" r="38" fill="none" stroke="#2a2a2a" stroke-width="6"/>
-                  <circle id="bepwr-score-ring" cx="45" cy="45" r="38" fill="none" stroke="#FF5C1A" stroke-width="6"
-                    stroke-dasharray="0 239" stroke-linecap="round" transform="rotate(-90 45 45)"/>
-                </svg>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-                  <span id="bepwr-score-value" style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:#fff">\u2014</span>
-                </div>
+          <!-- bePWR Score - full width -->
+          <div class="m-card" style="text-align:center;padding:20px 14px;margin-bottom:10px">
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px"><span style="color:#fff">be</span><span style="color:#FF5C1A">PWR</span> Score</div>
+            <div style="position:relative;width:100px;height:100px;margin:0 auto 10px">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
+                <circle id="bepwr-score-ring" cx="50" cy="50" r="42" fill="none" stroke="#FF5C1A" stroke-width="7"
+                  stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                <span id="bepwr-score-value" style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:#fff">&#x2014;</span>
               </div>
-              <div id="bepwr-score-label" style="font-size:10px;color:var(--gray);font-family:'DM Sans',sans-serif">Cargando...</div>
             </div>
-            <div class="m-card" style="text-align:center;padding:18px 14px">
-              <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:10px">Calificaci\u00F3n InBody</div>
-              <div style="position:relative;width:90px;height:90px;margin:0 auto 8px">
-                <svg width="90" height="90" viewBox="0 0 90 90">
-                  <circle cx="45" cy="45" r="38" fill="none" stroke="#2a2a2a" stroke-width="6"/>
-                  <circle id="inbody-score-ring" cx="45" cy="45" r="38" fill="none" stroke="#4ade80" stroke-width="6"
-                    stroke-dasharray="0 239" stroke-linecap="round" transform="rotate(-90 45 45)"/>
-                </svg>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-                  <span id="inbody-score-value" style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:#fff">\u2014</span>
-                </div>
-              </div>
-              <div id="inbody-score-label" style="font-size:10px;color:var(--gray);font-family:'DM Sans',sans-serif">Cargando...</div>
-            </div>
+            <div id="bepwr-score-label" style="font-size:11px;color:var(--gray);font-family:'DM Sans',sans-serif">Cargando...</div>
           </div>
-          <div class="sec-title" style="margin-top:8px">M\u00E9tricas Iniciales vs. Actuales</div>
+
+          <!-- InBody Score - full width -->
+          <div class="m-card" style="text-align:center;padding:20px 14px;margin-bottom:16px">
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px">Calificaci&#xF3;n InBody</div>
+            <div style="position:relative;width:100px;height:100px;margin:0 auto 10px">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
+                <circle id="inbody-score-ring" cx="50" cy="50" r="42" fill="none" stroke="#4ade80" stroke-width="7"
+                  stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                <span id="inbody-score-value" style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:#fff">&#x2014;</span>
+              </div>
+            </div>
+            <div id="inbody-score-label" style="font-size:11px;color:var(--gray);font-family:'DM Sans',sans-serif">Cargando...</div>
+          </div>
+
+          <!-- M&#xE9;tricas Iniciales vs. Actuales -->
+          <div class="sec-title" style="margin-top:8px">M&#xE9;tricas Iniciales vs. Actuales</div>
           <div id="metricas-comparativa" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px">
             <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:4px;padding:10px 12px;background:#0f0f0f;font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
-              <div>M\u00E9trica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
+              <div>M&#xE9;trica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
             </div>
             <div id="metricas-comparativa-body" style="font-size:12px">
-              <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m\u00E9tricas...</div>
+              <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m&#xE9;tricas...</div>
             </div>
           </div>
-        </div>
-
-        <div class="sec-title">Historial de peso</div>
-        <div class="chart-card" id="chart-card">
-          <div class="skeleton" style="height:14px;width:50%;margin-bottom:16px"></div>
-          <div class="skeleton" style="height:55px"></div>
         </div>
 
         <div class="sec-title">Acciones r&#xE1;pidas</div>
@@ -975,7 +972,7 @@
   function renderMetrics(m, obj, inicial) {
     if (!inicial) inicial = m;
     var score = calcBePWRScore(inicial, m, obj);
-    var scoreCircum = 2 * Math.PI * 38;
+    var scoreCircum = 2 * Math.PI * 42;
     var scoreEl = document.getElementById('bepwr-score-value');
     var scoreRing = document.getElementById('bepwr-score-ring');
     var scoreLabel = document.getElementById('bepwr-score-label');
@@ -994,7 +991,7 @@
       }
     }
     var califPct = m.calificacion || 0;
-    var califCircum = 2 * Math.PI * 38;
+    var califCircum = 2 * Math.PI * 42;
     var califColor = califPct >= 90 ? '#a855f7' : califPct >= 80 ? '#60a5fa' : califPct >= 60 ? '#4ade80' : califPct >= 50 ? '#FF5C1A' : '#f87171';
     var inbodyEl = document.getElementById('inbody-score-value');
     var inbodyRing = document.getElementById('inbody-score-ring');
@@ -1023,7 +1020,7 @@
       return '<span style="color:' + color + '">' + signo + diff.toFixed(1) + '</span>';
     }
     var rows = [
-      { label:'Peso', ini:inicial.peso, act:m.peso, inv:false, unit:'kg' },
+      { label:'Peso', ini:inicial.peso, act:m.peso, inv:!['Ganar m\u00FAsculo / recomposici\u00F3n','Rendimiento funcional'].includes(obj?.meta||''), unit:'kg' },
       { label:'M\u00FAsculo Esq.', ini:inicial.musculo, act:m.musculo, inv:false, unit:'kg' },
       { label:'Grasa Corporal', ini:inicial.grasaCorporal, act:m.grasaCorporal, inv:true, unit:'kg' },
       { label:'IMC', ini:inicial.imc, act:m.imc, inv:true, unit:'' },
