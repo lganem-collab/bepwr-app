@@ -2141,42 +2141,58 @@ async function renderAnalisisCientifico(data, config) {
   if (!output) return;
 
   var uid = window._currentUid || 'anon';
-  var updateDoc = window.updateDoc;
-  var docRef = window.doc(window.db, 'usuarios', uid);
+  var cacheKey = 'ia-analisis-' + uid;
 
-  // Fecha de la última valoración actual
+  // Fecha de la ultima valoracion (con proteccion)
   var valFechaActual = null;
-  if (data.ultimaValoracion && data.ultimaValoracion.fecha) {
-    valFechaActual = data.ultimaValoracion.fecha instanceof Date
-      ? data.ultimaValoracion.fecha.toISOString().slice(0, 10)
-      : new Date(data.ultimaValoracion.fecha).toISOString().slice(0, 10);
-  }
-
-  // Verificar si el análisis guardado en Firestore está vigente
-  var needsRegen = true;
-  if (data.analisisIA && data.analisisIA_fecha) {
-    var genDate = new Date(data.analisisIA_fecha);
-    var diasPasados = Math.floor((Date.now() - genDate.getTime()) / (24 * 60 * 60 * 1000));
-    var valNoChanged = (!valFechaActual && !data.analisisIA_valFecha) ||
-                       (valFechaActual === data.analisisIA_valFecha);
-
-    if (diasPasados < 7 && valNoChanged && data.analisisIA.length >= 100) {
-      // Análisis vigente: mostrar desde Firestore
-      output.textContent = data.analisisIA;
-      output.style.opacity = '1';
-      if (updatedEl) {
-        updatedEl.textContent = 'Actualizado hace ' + diasPasados +
-          (diasPasados === 1 ? ' día' : ' días') +
-          ' · Se renueva con cada nueva valoración o cada semana';
-      }
-      needsRegen = false;
+  try {
+    if (data.ultimaValoracion && data.ultimaValoracion.fecha) {
+      var f = data.ultimaValoracion.fecha;
+      if (f instanceof Date) valFechaActual = f.toISOString().slice(0, 10);
+      else if (f.toDate) valFechaActual = f.toDate().toISOString().slice(0, 10);
+      else { var d = new Date(f); if (!isNaN(d.getTime())) valFechaActual = d.toISOString().slice(0, 10); }
     }
+  } catch(e) { console.warn('Error parseando fecha valoracion:', e); }
+
+  // --- Intentar cargar desde cache (Firestore data o localStorage) ---
+  var cachedText = data.analisisIA || null;
+  var cachedFecha = data.analisisIA_fecha || null;
+  var cachedValFecha = data.analisisIA_valFecha || null;
+
+  // Fallback: localStorage
+  if (!cachedText) {
+    try {
+      var ls = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+      if (ls.texto && ls.texto.length >= 100) {
+        cachedText = ls.texto;
+        cachedFecha = ls.fecha;
+        cachedValFecha = ls.valFecha || null;
+      }
+    } catch(e) {}
   }
 
-  if (!needsRegen) return;
+  // Verificar si el cache es vigente
+  if (cachedText && cachedFecha) {
+    try {
+      var genDate = new Date(cachedFecha);
+      var diasPasados = Math.floor((Date.now() - genDate.getTime()) / (24 * 60 * 60 * 1000));
+      var valNoChanged = (!valFechaActual && !cachedValFecha) || (valFechaActual === cachedValFecha);
 
-  // Necesita regenerar
-  output.textContent = 'Generando tu análisis personalizado...';
+      if (diasPasados < 7 && valNoChanged && cachedText.length >= 100) {
+        output.textContent = cachedText;
+        output.style.opacity = '1';
+        if (updatedEl) {
+          updatedEl.textContent = 'Actualizado hace ' + diasPasados +
+            (diasPasados === 1 ? ' d\u00EDa' : ' d\u00EDas') +
+            ' \u00B7 Se renueva con cada nueva valoraci\u00F3n o cada semana';
+        }
+        return; // Cache vigente, no regenerar
+      }
+    } catch(e) { console.warn('Error verificando cache analisis:', e); }
+  }
+
+  // --- Necesita regenerar ---
+  output.textContent = 'Generando tu an\u00E1lisis personalizado...';
   output.style.opacity = '0.5';
   if (updatedEl) updatedEl.textContent = '';
 
@@ -2184,7 +2200,7 @@ async function renderAnalisisCientifico(data, config) {
   var objLabel = config ? config.label : (data.objetivo || 'No definido');
   var lines = [];
   lines.push('- Objetivo: ' + objLabel);
-  if (data.edad) lines.push('- Edad: ' + data.edad + ' años');
+  if (data.edad) lines.push('- Edad: ' + data.edad + ' a\u00F1os');
   if (val.peso || data.peso) lines.push('- Peso corporal: ' + (val.peso || data.peso) + ' kg');
   if (val.musculo) lines.push('- Masa muscular: ' + val.musculo + ' kg');
   if (val.grasa) lines.push('- Grasa corporal: ' + val.grasa + '%');
@@ -2199,11 +2215,13 @@ async function renderAnalisisCientifico(data, config) {
     lines.push('- Peso Base Mancuernas: ' + pp);
   }
   if (val.fecha) {
-    var semanas = Math.floor((new Date() - new Date(val.fecha)) / (7*24*60*60*1000));
-    lines.push('- Tiempo desde última valoración: ' + semanas + ' semanas');
+    try {
+      var semanas = Math.floor((new Date() - new Date(val.fecha)) / (7*24*60*60*1000));
+      lines.push('- Tiempo desde \u00FAltima valoraci\u00F3n: ' + semanas + ' semanas');
+    } catch(e) {}
   }
 
-  var prompt = 'Eres un experto en ciencias del ejercicio, fisiología deportiva y nutrición deportiva. Trabajas en bePWR, un centro de entrenamiento funcional premium en Querétaro, México.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nGenera un análisis científico personalizado y detallado que incluya:\n1. Interpretación de sus métricas actuales\n2. Relación entre su composición corporal y su objetivo\n3. Recomendaciones específicas basadas en evidencia\n4. Proyección de progreso si mantiene consistencia\n\nTono científico pero accesible, motivador y directo. En español. Mínimo 500 caracteres. Sin títulos ni bullets, redacción fluida en párrafos. No uses asteriscos ni formato markdown.';
+  var prompt = 'Eres un experto en ciencias del ejercicio, fisiolog\u00EDa deportiva y nutrici\u00F3n deportiva. Trabajas en bePWR, un centro de entrenamiento funcional premium en Quer\u00E9taro, M\u00E9xico.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nGenera un an\u00E1lisis cient\u00EDfico personalizado y detallado que incluya:\n1. Interpretaci\u00F3n de sus m\u00E9tricas actuales\n2. Relaci\u00F3n entre su composici\u00F3n corporal y su objetivo\n3. Recomendaciones espec\u00EDficas basadas en evidencia\n4. Proyecci\u00F3n de progreso si mantiene consistencia\n\nTono cient\u00EDfico pero accesible, motivador y directo. En espa\u00F1ol. M\u00EDnimo 500 caracteres. Sin t\u00EDtulos ni bullets, redacci\u00F3n fluida en p\u00E1rrafos. No uses asteriscos ni formato markdown.';
 
   try {
     var resp = await fetch('/api/chat', {
@@ -2217,16 +2235,24 @@ async function renderAnalisisCientifico(data, config) {
       output.textContent = text;
       output.style.opacity = '1';
 
-      // Guardar en Firestore
       var hoy = new Date().toISOString().slice(0, 10);
+
+      // Guardar en localStorage (siempre funciona)
       try {
+        localStorage.setItem(cacheKey, JSON.stringify({ texto: text, fecha: hoy, valFecha: valFechaActual }));
+      } catch(e) {}
+
+      // Guardar en Firestore (puede fallar por permisos)
+      try {
+        var updateDoc = window.updateDoc;
+        var docRef = window.doc(window.db, 'usuarios', uid);
         await updateDoc(docRef, {
           analisisIA: text,
           analisisIA_fecha: hoy,
           analisisIA_valFecha: valFechaActual || null
         });
       } catch (e) {
-        console.error('Error guardando análisis en Firestore:', e);
+        console.warn('No se pudo guardar an\u00E1lisis en Firestore (usando localStorage):', e.message);
       }
 
       // Actualizar cache en memoria
@@ -2235,14 +2261,14 @@ async function renderAnalisisCientifico(data, config) {
       data.analisisIA_valFecha = valFechaActual || null;
 
       if (updatedEl) {
-        updatedEl.textContent = 'Actualizado hoy · Se renueva con cada nueva valoración o cada semana';
+        updatedEl.textContent = 'Actualizado hoy \u00B7 Se renueva con cada nueva valoraci\u00F3n o cada semana';
       }
     } else {
-      output.textContent = 'No se pudo generar el análisis. Intenta más tarde.';
+      output.textContent = 'No se pudo generar el an\u00E1lisis. Intenta m\u00E1s tarde.';
       output.style.opacity = '1';
     }
   } catch (e) {
-    output.textContent = 'Error al conectar. Verifica tu conexión.';
+    output.textContent = 'Error al conectar. Verifica tu conexi\u00F3n.';
     output.style.opacity = '1';
   }
 }
