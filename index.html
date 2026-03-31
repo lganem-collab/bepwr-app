@@ -28,7 +28,7 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--black:#0a0a0a;--card:#181818;--border:#2a2a2a;--orange:#FF5C1A;--white:#f5f5f5;--gray:#aaa;--safe-bottom:env(safe-area-inset-bottom,0px)}
-    html,body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;height:100%;overflow:hidden}
+    html,body{background:var(--black);color:var(--white);-webkit-text-size-adjust:100%;font-family:'DM Sans',sans-serif;height:100%;overflow:hidden}
     #app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--black)}
 
     /* SPLASH */
@@ -171,9 +171,9 @@
 
     /* BOTTOM NAV */
     .bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(12,12,12,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:10px 0;padding-bottom:calc(10px + var(--safe-bottom));z-index:100}
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#aaa;transition:color .2s;font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:4px 0;user-select:none}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#aaa;transition:color .2s;font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:4px 0;user-select:none;-webkit-text-size-adjust:100%;overflow:visible;line-height:1.3;min-height:44px;justify-content:center}
     .nav-item.on{color:var(--orange)}
-    .nav-item svg{width:22px;height:22px}
+    .nav-item svg{width:22px;height:22px;flex-shrink:0}
 
     /* SKELETON LOADER */
     .skeleton{background:linear-gradient(90deg,#1a1a1a 25%,#242424 50%,#1a1a1a 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;height:20px;margin-bottom:8px}
@@ -497,20 +497,20 @@
     <nav class="bottom-nav">
       <div class="nav-item on" id="nav-home" onclick="navigate('home')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Inicio
+        <span style="display:block">Inicio</span>
       </div>
       <div class="nav-item" id="nav-metodo" onclick="navigate('metodo')">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-  Método
+  <span style="display:block">Método</span>
 </div>
       <div class="nav-item" id="nav-notif" onclick="navigate('notif')" style="position:relative">
         <div id="notif-badge" style="display:none;position:absolute;top:2px;right:6px;background:#f87171;color:#fff;border-radius:99px;font-size:9px;font-weight:700;min-width:16px;height:16px;align-items:center;justify-content:center;padding:0 4px;font-family:Space Mono,monospace;line-height:1">0</div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        Avisos
+        <span style="display:block">Avisos</span>
       </div>
       <div class="nav-item" id="nav-profile" onclick="navigate('profile')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Perfil
+        <span style="display:block">Perfil</span>
       </div>
     </nav>
   </div><!-- screen-app -->
