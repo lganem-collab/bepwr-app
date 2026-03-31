@@ -438,6 +438,44 @@
   </div>
 </div>
 
+  <div id="tab-content-dashboard" style="display:none;padding:16px">
+  <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="font-family:'Space Mono',monospace;font-size:13px;color:#FF5C1A;letter-spacing:1px">DASHBOARD</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" id="dash-period-day" onclick="setDashPeriod('day')" style="font-size:11px;background:#FF5C1A;color:#fff;border:none">Diario</button>
+      <button class="btn btn-sm" id="dash-period-week" onclick="setDashPeriod('week')" style="font-size:11px;background:#222;color:#aaa;border:1px solid #333">Semanal</button>
+      <button class="btn btn-sm" id="dash-period-month" onclick="setDashPeriod('month')" style="font-size:11px;background:#222;color:#aaa;border:1px solid #333">Mensual</button>
+    </div>
+  </div>
+
+  <!-- STATS GENERALES -->
+  <div id="dash-stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
+
+  <!-- GRAFICA VISITAS -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">VISITAS A LA APP</div>
+    <div id="dash-chart-visitas" style="width:100%;overflow-x:auto"></div>
+  </div>
+
+  <!-- GRAFICA ALTAS -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ALTAS DE MIEMBROS</div>
+    <div id="dash-chart-altas" style="width:100%;overflow-x:auto"></div>
+  </div>
+
+  <!-- GRAFICA ACCIONES -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ACCIONES (RESERVAS · IA · AN&#xC1;LISIS · NOTIF)</div>
+    <div id="dash-chart-acciones" style="width:100%;overflow-x:auto"></div>
+  </div>
+
+  <!-- VISITAS POR MIEMBRO -->
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">VISITAS POR MIEMBRO</div>
+    <div id="dash-table-miembros"></div>
+  </div>
+</div>
+
 <!-- MODAL DETAIL -->
 <div class="modal-overlay" id="modal-detail">
   <div class="modal">
@@ -500,44 +538,6 @@
       <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-metrics')">Cancelar</button>
       <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoraci&#xF3;n</button>
     </div>
-  </div>
-</div>
-
-<div id="tab-content-dashboard" style="display:none;padding:16px">
-  <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-    <div style="font-family:'Space Mono',monospace;font-size:13px;color:#FF5C1A;letter-spacing:1px">DASHBOARD</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-sm" id="dash-period-day" onclick="setDashPeriod('day')" style="font-size:11px;background:#FF5C1A;color:#fff;border:none">Diario</button>
-      <button class="btn btn-sm" id="dash-period-week" onclick="setDashPeriod('week')" style="font-size:11px;background:#222;color:#aaa;border:1px solid #333">Semanal</button>
-      <button class="btn btn-sm" id="dash-period-month" onclick="setDashPeriod('month')" style="font-size:11px;background:#222;color:#aaa;border:1px solid #333">Mensual</button>
-    </div>
-  </div>
-
-  <!-- STATS GENERALES -->
-  <div id="dash-stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
-
-  <!-- GRAFICA VISITAS -->
-  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">VISITAS A LA APP</div>
-    <div id="dash-chart-visitas" style="width:100%;overflow-x:auto"></div>
-  </div>
-
-  <!-- GRAFICA ALTAS -->
-  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ALTAS DE MIEMBROS</div>
-    <div id="dash-chart-altas" style="width:100%;overflow-x:auto"></div>
-  </div>
-
-  <!-- GRAFICA ACCIONES -->
-  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">ACCIONES (RESERVAS · IA · AN&#xC1;LISIS · NOTIF)</div>
-    <div id="dash-chart-acciones" style="width:100%;overflow-x:auto"></div>
-  </div>
-
-  <!-- VISITAS POR MIEMBRO -->
-  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#aaa;margin-bottom:12px;letter-spacing:.5px">VISITAS POR MIEMBRO</div>
-    <div id="dash-table-miembros"></div>
   </div>
 </div>
 
@@ -2740,11 +2740,11 @@ window.filterNotifUsers = function (q) {
     const max = Math.max(...data.map(d => d.v), 1);
     const barW = Math.max(28, Math.min(48, Math.floor(280 / data.length)));
     const w = barW * data.length + 20;
-    const svgH = 90;
+    const svgH = 115;
     let bars = '', labels = '', vals = '';
     data.forEach((d, i) => {
       const x = 10 + i * barW;
-      const barH = Math.max(2, Math.round((d.v / max) * 60));
+      const barH = Math.max(2, Math.round((d.v / max) * 75));
       const y = svgH - 24 - barH;
       bars += `<rect x="${x+2}" y="${y}" width="${barW-6}" height="${barH}" rx="3" fill="${color}" opacity="0.85"/>`;
       vals += `<text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" font-size="9" fill="#ccc" font-family="Space Mono,monospace">${d.v > 0 ? d.v : ''}</text>`;
