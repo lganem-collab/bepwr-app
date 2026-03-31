@@ -913,6 +913,7 @@ if (user && user.uid === MASTER_UID) {
       if (res.ok) {
         showToast('\u2705 Enviado a ' + data.sent + ' miembro' + (data.sent !== 1 ? 's' : ''), 'success');
         logBitacora('envio_aviso', 'Aviso: \"' + title + '\" (' + data.sent + ' enviados)', '');
+        switchTab('members');
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-body').value = '';
         document.getElementById('notif-body-count').textContent = '0';
@@ -1513,7 +1514,7 @@ if (user && user.uid === MASTER_UID) {
 
       ${getRutinaHTML(m.objetivo?.meta || m.meta, m.nacimiento, m.edad)}
 
-      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="closeModal('modal-detail');openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración</button>
+      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px" onclick="openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración</button>
 
       <div class="modal-section">Historial de valoraciones</div>
       <div style="font-size:10px;color:var(--gray);margin:-10px 0 12px;font-family:Space Mono,monospace">Haz clic en una valoración para consultarla o editarla</div>
@@ -1811,7 +1812,7 @@ if (user && user.uid === MASTER_UID) {
           staffSnap.docs.forEach(function(d) {
             var s = d.data();
             if (s.nombre) {
-              var o = document.createElement('option'); o.value = s.nombre; o.textContent = s.nombre; sel.appendChild(o);
+              var o = document.createElement('option'); o.value = s.email || s.nombre; o.textContent = s.nombre || s.email; sel.appendChild(o);
             }
           });
         } catch(e) {
@@ -1822,7 +1823,7 @@ if (user && user.uid === MASTER_UID) {
         }
       }
       var docs = snap.docs.map(function(d){ return d.data(); });
-      if (fStaff)  docs = docs.filter(function(x){ return x.staffNombre === fStaff; });
+      if (fStaff)  docs = docs.filter(function(x){ return x.staffNombre === fStaff || x.staffEmail === fStaff; });
       if (fDesde)  docs = docs.filter(function(x){ return x.fecha && x.fecha >= fDesde; });
       if (fHasta)  docs = docs.filter(function(x){ return x.fecha && x.fecha <= fHasta + 'T23:59:59'; });
       window._bitaDocs = docs;
