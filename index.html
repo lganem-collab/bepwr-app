@@ -1737,8 +1737,10 @@ let cachedMetricas = [];
 
   function navigate(id, pushState = true) {
     views.forEach(v => {
-      document.getElementById('view-'+v).classList.toggle('active', v===id);
-      document.getElementById('nav-'+v).classList.toggle('on', v===id);
+      const viewEl = document.getElementById('view-'+v);
+      const navEl  = document.getElementById('nav-'+v);
+      if (viewEl) viewEl.classList.toggle('active', v===id);
+      if (navEl)  navEl.classList.toggle('on', v===id);
     });
     document.querySelector('.scroll-area').scrollTop = 0;
     if (pushState && id !== currentView) {
