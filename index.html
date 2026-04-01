@@ -299,7 +299,7 @@
         <div id="bepwr-score-section">
           <!-- bePWR Score - full width -->
           <div class="m-card" style="text-align:center;padding:20px 14px;margin-bottom:10px">
-            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px"><span style="color:#fff;text-transform:lowercase">be</span><span style="color:#FF5C1A">PWR</span> <span style="text-transform:none">Score</span></div>
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px"><span style="color:#fff;text-transform:lowercase">be</span><span style="color:#FF5C1A">PWR</span> <span style="text-transform:none">Score</span> <button onclick="document.getElementById('modal-bepwr-info').style.display='flex'" style="background:none;border:none;color:#FF5C1A;font-size:13px;cursor:pointer;padding:0 2px;vertical-align:middle;opacity:0.8">ⓘ</button></div>
             <div style="position:relative;width:100px;height:100px;margin:0 auto 10px">
               <svg width="100" height="100" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
@@ -2337,5 +2337,26 @@ async function renderAnalisisCientifico(data, config) {
       </div>
     </div>
   </div>
+
+<!-- Modal bePWR Score Info -->
+<div id="modal-bepwr-info" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px">
+  <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
+    <button onclick="document.getElementById('modal-bepwr-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;line-height:1">✕</button>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">¿QUÉ ES EL bePWR SCORE?</div>
+    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Es un índice de <strong style="color:#fff">progreso real</strong> calculado a partir de tus métricas corporales. Compara tu valoración inicial contra la más reciente y pondera cada métrica según tu objetivo.</p>
+    <div style="font-size:12px;color:#aaa;line-height:1.7;margin-bottom:16px">
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">CÓMO SE INTERPRETA</div>
+      <div>🔴 <strong style="color:#e74c3c">0–49</strong> — Aún en proceso. Es normal al inicio o si llevas poco tiempo.</div>
+      <div>🟡 <strong style="color:#f39c12">50–69</strong> — Progreso moderado. Vas por buen camino.</div>
+      <div>🟢 <strong style="color:#4ade80">70–89</strong> — Buen avance. Tus métricas mejoran consistentemente.</div>
+      <div>⭐ <strong style="color:#FF5C1A">90–100</strong> — Excelente. Resultados sobresalientes.</div>
+    </div>
+    <div style="font-size:12px;color:#aaa;line-height:1.6;margin-bottom:16px">
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">POR QUÉ PUEDE SER DISTINTO AL INBODY SCORE</div>
+      La Calificación InBody mide tu composición corporal en un momento específico (músculo, grasa, agua). El bePWR Score mide <em style="color:#ddd">cuánto has mejorado</em> desde que empezaste — por eso con una sola valoración puede aparecer bajo: aún no hay cambio que comparar.
+    </div>
+    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Con cada nueva valoración el score se actualiza.</div>
+  </div>
+</div>
 </body>
 </html>
