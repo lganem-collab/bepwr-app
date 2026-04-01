@@ -1986,7 +1986,7 @@ function renderObjetivo(data, config) {
   const desc  = document.getElementById('metodo-objetivo-desc');
   if (!data.objetivo) {
     badge.textContent = 'Sin definir';
-    desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
+    desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoración';
     return;
   }
   badge.textContent = config ? config.label : data.objetivo;
@@ -2003,7 +2003,7 @@ function renderObjetivo(data, config) {
   const desc  = document.getElementById('metodo-objetivo-desc');
   if (!data.objetivo) {
     badge.textContent = 'Sin definir';
-    desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoracion';
+    desc.textContent  = 'Tu coach asignara tu objetivo en la primera valoración';
     return;
   }
   badge.textContent = config ? config.label : data.objetivo;
@@ -2040,7 +2040,7 @@ function renderPruebaPeso(data) {
     minEl.textContent = data.pruebaPeso.min ?? '—';
     maxEl.textContent = data.pruebaPeso.max ?? '—';
   }
-  noteEl.textContent = 'Definido por tu coach en valoracion';
+  noteEl.textContent = 'Definido por tu coach en valoración';
 }
 
 function renderRutina(config, data) {
@@ -2096,7 +2096,7 @@ function renderProximaValoracion(data, config) {
   if (!data.ultimaValoracion) {
     fechaEl.textContent     = 'Por agendar';
     countdownEl.textContent = '';
-    noteEl.textContent      = 'Habla con tu coach para tu primera valoracion';
+    noteEl.textContent      = 'Habla con tu coach para tu primera valoración';
     return;
   }
   const intervalo = config?.intervalo ?? 14;
@@ -2197,7 +2197,7 @@ async function renderAnalisisCientifico(data, config) {
   var uid = window._currentUid || 'anon';
   var cacheKey = 'ia-analisis-' + uid;
 
-  // Fecha de la ultima valoracion (con proteccion)
+  // Fecha de la última valoración (con proteccion)
   var valFechaActual = null;
   try {
     if (data.ultimaValoracion && data.ultimaValoracion.fecha) {
@@ -2206,7 +2206,7 @@ async function renderAnalisisCientifico(data, config) {
       else if (f.toDate) valFechaActual = f.toDate().toISOString().slice(0, 10);
       else { var d = new Date(f); if (!isNaN(d.getTime())) valFechaActual = d.toISOString().slice(0, 10); }
     }
-  } catch(e) { console.warn('Error parseando fecha valoracion:', e); }
+  } catch(e) { console.warn('Error parseando fecha valoración:', e); }
 
   // --- Intentar cargar desde cache (Firestore data o localStorage) ---
   var cachedText = data.analisisIA || null;
@@ -2392,23 +2392,23 @@ if (config && config.rutina) {
       <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">73&#x2013;87</strong> &#x2014; Avanzado</div>
       <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">88&#x2013;100</strong> &#x2014; Destacado</div>
     </div>
-    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoracion.</div>
+    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
   </div>
 </div>
 
 <script>
 (function(){
 var FRASES_PROGRESO=[
-"!Felicidades! Tu cuerpo esta cambiando.",
-"!Genial! Los numeros hablan, vas bien.",
-"!Wooow! Cada sesion suma. Sigue asi.",
-"!Increible! Mejora real. Esto es bePWR.",
-"!Felicidades! Tu esfuerzo tiene resultados.",
-"!Genial! Vas en la direccion correcta.",
-"!Wooow! El trabajo esta dando frutos.",
-"!Excelente! Constancia que se nota.",
-"!Felicidades! Progreso real, resultados reales.",
-"!Increible! Tu mejor version esta llegando."
+"¡Felicidades! Tu cuerpo esta cambiando.",
+"¡Genial! Los numeros hablan, vas bien.",
+"¡Wooow! Cada sesion suma. Sigue asi.",
+"¡Increíble! Mejora real. Esto es bePWR.",
+"¡Felicidades! Tu esfuerzo tiene resultados.",
+"¡Genial! Vas en la direccion correcta.",
+"¡Wooow! El trabajo esta dando frutos.",
+"¡Excelente! Constancia que se nota.",
+"¡Felicidades! Progreso real, resultados reales.",
+"¡Increíble! Tu mejor version esta llegando."
 ];
 var FRASES_PROCESO=[
 "Tu cuerpo se esta adaptando.",
