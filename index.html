@@ -328,20 +328,25 @@
           </div>
 
           <!-- Tendencia de Valoracion -->
-          <div id="card-tendencia" class="m-card" style="padding:16px 18px;margin-bottom:16px;display:none">
-            <!-- Linea 1: TENDENCIA + info | badge -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div id="card-tendencia" class="m-card" style="padding:20px 18px;margin-bottom:16px;display:none">
+
+            <!-- Línea 1: TENDENCIA + ⓘ izquierda | badge derecha -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace" id="tendencia-header">TENDENCIA</div>
                 <button onclick="document.getElementById('modal-tendencia-info').style.display='flex'" style="background:none;border:none;font-size:13px;cursor:pointer;padding:0;opacity:0.7;line-height:1" id="tendencia-info-btn">&#x24D8;</button>
               </div>
               <div id="tendencia-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace"></div>
             </div>
-            <!-- Linea 2: circulo izquierda | frase derecha -->
-            <div style="display:flex;align-items:center;gap:14px">
-              <div id="tendencia-icon" style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Space Mono',monospace;font-size:18px;font-weight:500"><span id="tendencia-score-text">+0</span></div>
-              <div id="tendencia-frase" style="font-size:13px;line-height:1.4;flex:1"></div>
+
+            <!-- Línea 2: círculo centrado, mismo tamaño que bePWR Score -->
+            <div style="display:flex;justify-content:center;margin-bottom:14px">
+              <div id="tendencia-icon" style="width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:28px;font-weight:600"><span id="tendencia-score-text">+0</span></div>
             </div>
+
+            <!-- Línea 3: frase motivacional centrada -->
+            <div id="tendencia-frase" style="font-size:13px;line-height:1.5;text-align:center;color:var(--gray)"></div>
+
           </div>
 
 
