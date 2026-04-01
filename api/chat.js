@@ -12,15 +12,15 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: maxTokens || 500,
         messages: [{ role: 'user', content: prompt }]
       })
     });
     const data = await response.json();
-    return res.status(200).json({ 
-      message: data?.content?.[0]?.text || ''
-    });
+    const msg = data?.content?.[0]?.text || '';
+    if (!msg) console.error('Anthropic error:', JSON.stringify(data));
+    return res.status(200).json({ message: msg });
   } catch(e) {
     return res.status(500).json({ error: e.message });
   }
