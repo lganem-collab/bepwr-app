@@ -1051,25 +1051,16 @@ if (user && user.uid === MASTER_UID) {
         if (el) el.disabled = !canEdit;
       });
 
-      // Load valoraciones registered by this staff
-      try {
-      const metSnap = await db.collectionGroup('metricas').where('registradoPor', '==', uid).orderBy('fecha','desc').limit(20).get();
-      if (metSnap.empty) {
-        document.getElementById('sp-historial').textContent = 'Sin valoraciones registradas a\u00FAn';
-      } else {
-        document.getElementById('sp-historial').innerHTML = metSnap.docs.map(d => {
-          const m = d.data();
-          return `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px">
-            <span style="color:var(--orange)">${m.fecha||'&#x2014;'}</span>
-            <span style="color:#888;margin-left:8px">${m.miembroNombre||'Miembro'}</span>
-            <span style="margin-left:8px">Peso: ${m.peso||'&#x2014;'} kg &#xB7; Inbody: ${m.calificacion||'&#x2014;'}</span>
-          </div>`;
-        }).join('');
-      }
-      } catch(histErr) {
-        console.warn('No se pudieron cargar valoraciones del staff:', histErr.message);
-        document.getElementById('sp-historial').textContent = 'Sin valoraciones disponibles';
-      }
+      // Valoraciones registradas — leer del doc del staff (permisos OK)
+      const mes = new Date().toISOString().slice(0,7);
+      const sData = snap.exists ? snap.data() : {};
+      const totalVal = sData.valoracionesCount || 0;
+      const mesVal = (sData.valoracionesMes && sData.valoracionesMes[mes]) || 0;
+      document.getElementById('sp-historial').innerHTML =
+        '<div style="font-size:22px;font-weight:700;color:#fff;font-family:Bebas Neue,sans-serif;letter-spacing:1px">' + totalVal + '</div>' +
+        '<div style="font-size:12px;color:var(--gray);font-family:Space Mono,monospace;margin-top:4px">VALORACIONES TOTALES</div>' +
+        '<div style="font-size:16px;font-weight:600;color:#FF5C1A;margin-top:12px">' + mesVal + '</div>' +
+        '<div style="font-size:11px;color:var(--gray);font-family:Space Mono,monospace;margin-top:2px">ESTE MES</div>';
     } catch(e) {
       console.error('openStaffProfile error:', e);
     }
@@ -2224,7 +2215,19 @@ for (const med of medidasVal) {
         setTimeout(() => openDetail(uid), 600);
         return;
       } else {
-        await db.collection('usuarios').doc(uid).collection('metricas').add(metricData);
+        await db.collection('usuarios').doc(uid).collection('metricas').add(metricData)
+        // Incrementar contador de valoraciones del staff
+        try {
+          const sUid = auth.currentUser?.uid;
+          const mes = new Date().toISOString().slice(0,7);
+          if (sUid) {
+            const sRef = db.collection('staff').doc(sUid);
+            const sDoc = await sRef.get();
+            const prevCount = sDoc.exists ? (sDoc.data().valoracionesCount || 0) : 0;
+            const prevMes = sDoc.exists ? (sDoc.data().valoracionesMes?.[mes] || 0) : 0;
+            await sRef.update({ valoracionesCount: prevCount + 1, ['valoracionesMes.' + mes]: prevMes + 1 });
+          }
+        } catch(cErr) {};
         // Actualizar pruebaPeso en documento del usuario
         if (pruebaPeso) {
           await db.collection('usuarios').doc(uid).update({ pruebaPeso: pruebaPeso });
