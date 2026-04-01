@@ -2274,14 +2274,24 @@ async function renderAnalisisCientifico(data, config) {
       lines.push('- Tiempo desde \u00FAltima valoraci\u00F3n: ' + semanas + ' semanas');
     } catch(e) {}
   }
+if (config && config.rutina) {
+  var edad = data.edad || 30;
+  var ageKey = edad < 30 ? 'sub30' : edad < 50 ? 'mid' : 'senior';
+  var rutina = config.rutina[ageKey] || config.rutina['mid'];
+  if (rutina) {
+    lines.push('- Rutina semanal bePWR recomendada: ' + rutina.total);
+    if (rutina.clases) lines.push('- Clases: ' + rutina.clases.map(function(c){return c.tipo+' '+c.freq;}).join(', '));
+    if (rutina.complemento) lines.push('- Complemento: ' + rutina.complemento);
+  }
+}
 
-  var prompt = 'Eres un experto en ciencias del ejercicio, fisiolog\u00EDa deportiva y nutrici\u00F3n deportiva. Trabajas en bePWR, un centro de entrenamiento funcional premium en Quer\u00E9taro, M\u00E9xico.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nGenera un an\u00E1lisis cient\u00EDfico personalizado y detallado que incluya:\n1. Interpretaci\u00F3n de sus m\u00E9tricas actuales\n2. Relaci\u00F3n entre su composici\u00F3n corporal y su objetivo\n3. Recomendaciones espec\u00EDficas basadas en evidencia\n4. Proyecci\u00F3n de progreso si mantiene consistencia\n\nTono cient\u00EDfico pero accesible, motivador y directo. En espa\u00F1ol. M\u00EDnimo 500 caracteres. Sin t\u00EDtulos ni bullets, redacci\u00F3n fluida en p\u00E1rrafos. No uses asteriscos ni formato markdown.';
+  var prompt = 'Eres un experto en ciencias del ejercicio, fisiolog\u00EDa deportiva y nutrici\u00F3n deportiva. Trabajas en bePWR, un centro de entrenamiento funcional premium en Quer\u00E9taro, M\u00E9xico.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nGenera un an\u00E1lisis cient\u00EDfico personalizado y detallado que incluya:\n1. Interpretaci\u00F3n de sus m\u00E9tricas actuales\n2. Relaci\u00F3n entre su composici\u00F3n corporal y su objetivo\n3. Recomendaciones espec\u00EDficas basadas en evidencia\n4. Proyecci\u00F3n de progreso si mantiene consistencia\n\nTono cient\u00EDfico pero accesible, motivador y directo. En espa\u00F1ol. M\u00EDnimo 500 caracteres. Sin t\u00EDtulos ni bullets, redacci\u00F3n fluida en p\u00E1rrafos. No uses asteriscos ni formato markdown. IMPORTANTE: Usa exactamente las sesiones y clases del plan bePWR indicado arriba, no inventes otras recomendaciones. Termina siempre con una oraci\u00F3n completa, nunca dejes el texto cortado.';
 
   try {
     var resp = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt, maxTokens: 1000 })
+      body: JSON.stringify({ prompt: prompt, maxTokens: 1500 })
     });
     var json = await resp.json();
     console.log('analisis response:', JSON.stringify(json), 'text len:', json.message?.length);
