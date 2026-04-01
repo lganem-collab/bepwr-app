@@ -2752,7 +2752,7 @@ window.filterNotifUsers = function (q) {
       matches.push(m);
       const o = document.createElement('option');
       o.value = m.uid;
-      o.textContent = nombre + (email ? ' Â ' + email : '');
+      o.textContent = nombre + (email ? ' - ' + email : '');
       sel.appendChild(o);
     }
   });
