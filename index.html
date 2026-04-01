@@ -957,7 +957,7 @@
         renderProfileMetrics(ultima);
 
         // Generar mensaje IA
-        generateAIMessage(nombre, ultima, obj, calcBePWRScore(inicial, ultima, obj), calcTendencia(inicial, ultima, obj.meta||""));
+        generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? calcBePWRScore(inicial, ultima, obj) : null), null));
       } else {
         renderMetricsEmpty();
         document.getElementById('ai-message').innerHTML = '\u00A1Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci\u00F3n a\u00FAn no ha sido registrada. Habla con el staff para comenzar. &#x1F4AA;';
@@ -1355,10 +1355,12 @@ function renderProfileMetrics(m) {
 
     try {
       const pick = Math.floor(Date.now() / 86400000) % 3;
+      const tendDom = document.getElementById('tendencia-score-text');
+      const tendVal = tendDom ? parseInt(tendDom.textContent) : null;
       const extraMetrica = pick === 0 && bepwrScore !== null
         ? ' bePWR Score (metrica propia de bePWR que mide progreso integral): ' + bepwrScore + '/100.'
-        : pick === 1 && tendenciaScore !== null
-        ? ' Tendencia bePWR (metrica propia de bePWR que compara valoraciones): ' + (tendenciaScore > 0 ? '+' : '') + tendenciaScore + ' puntos.'
+        : pick === 1 && tendVal !== null && !isNaN(tendVal)
+        ? ' Tendencia bePWR (metrica propia de bePWR que compara valoraciones): ' + (tendVal > 0 ? '+' : '') + tendVal + ' puntos.'
         : '';
       const prompt = 'Genera un mensaje motivacional personalizado y breve (maximo 3 oraciones) para un miembro de un gimnasio de ejercicio funcional llamado ' + nombre + '. Sus metricas recientes: peso ' + (metrica.peso||'--') + 'kg, musculo ' + (metrica.musculo||'--') + 'kg, grasa ' + (metrica.grasaCorporal||'--') + 'kg, PGC ' + (metrica.pgc||'--') + '%, InBody ' + (metrica.calificacion||'--') + '/100.' + extraMetrica + ' Objetivo: ' + (objetivo.meta||'general') + '. Incluye: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comillas.';
 
