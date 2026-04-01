@@ -1056,7 +1056,7 @@
       { label:'Cintura', ini:inicial.cintura, act:m.cintura, inv:true, unit:'cm' },
       { label:'Cadera', ini:inicial.cadera, act:m.cadera, inv:true, unit:'cm' },
       { label:'Pantorrilla', ini:inicial.pantorrilla, act:m.pantorrilla, inv:false, unit:'cm' },
-{ label:'Mancuernas', ini:inicial.pruebaPeso||null, act:m.pruebaPeso||null, inv:false, unit:'lb' },
+{ label:'Mancuernas', ini:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(inicial.pruebaPeso), act:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(m.pruebaPeso), inv:false, unit:'lb' },
     ];
     var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
     var bodyEl = document.getElementById('metricas-comparativa-body');
@@ -1065,8 +1065,8 @@
         bodyEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Sin m\u00E9tricas registradas</div>';
       } else {
         bodyEl.innerHTML = visibleRows.map(function(r) {
-          var iniStr = (r.ini != null && !isNaN(r.ini)) ? r.ini + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">' + r.unit + '</span>' : '') : '\u2014';
-          var actStr = (r.act != null && !isNaN(r.act)) ? r.act + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">' + r.unit + '</span>' : '') : '\u2014';
+          var iniStr = (r.ini != null && (typeof r.ini === 'string' || !isNaN(r.ini))) ? r.ini + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">' + r.unit + '</span>' : '') : '\u2014';
+          var actStr = (r.act != null && (typeof r.act === 'string' || !isNaN(r.act))) ? r.act + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">' + r.unit + '</span>' : '') : '\u2014';
           return '<div class="comp-row"><div class="comp-label">' + r.label + '</div><div class="comp-val">' + iniStr + '</div><div class="comp-val">' + actStr + '</div><div class="comp-prog">' + prog(r.ini, r.act, r.inv) + '</div></div>';
         }).join('');
       }
