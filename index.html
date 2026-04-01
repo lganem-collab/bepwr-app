@@ -1057,7 +1057,7 @@
       { label:'Cintura', ini:inicial.cintura, act:m.cintura, inv:true, unit:'cm' },
       { label:'Cadera', ini:inicial.cadera, act:m.cadera, inv:true, unit:'cm' },
       { label:'Pantorrilla', ini:inicial.pantorrilla, act:m.pantorrilla, inv:false, unit:'cm' },
-{ label:'Mancuernas', ini:inicial.pruebaPeso, act:m.pruebaPeso, inv:false, unit:'lb', fmt:function(v){ if(!v) return null; if(typeof v==='string') return v; return (v.min||v)||v; } },
+{ label:'Mancuernas', ini:inicial.pruebaPeso||null, act:m.pruebaPeso||null, inv:false, unit:'lb' },
     ];
     var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
     var bodyEl = document.getElementById('metricas-comparativa-body');
