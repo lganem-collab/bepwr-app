@@ -450,6 +450,7 @@
       <div class="metodo-card-label">Análisis Científico</div>
       <div id="metodo-ia-output" style="font-size:.85rem;color:#fff;font-family:DM Sans,sans-serif;line-height:1.6;white-space:pre-wrap">Cargando análisis...</div>
       <div id="metodo-ia-updated" style="font-size:.7rem;color:#aaa;margin-top:8px;font-family:DM Sans,sans-serif"></div>
+      <button id="btn-regenerar-ia" onclick="window._regenerarAnalisis && window._regenerarAnalisis()" style="margin-top:10px;background:none;border:1px solid #FF5C1A;color:#FF5C1A;border-radius:8px;padding:4px 12px;font-size:11px;font-family:'Space Mono',monospace;cursor:pointer;letter-spacing:.5px">&#x21BB; Regenerar an&#xE1;lisis</button>
     </div>
 
   </div>
@@ -2190,6 +2191,7 @@ function renderHabitos(data) {
   el.textContent = 'Tomar ' + litros + ' litros de agua al día (' + ml + ' ml)';
 }
 async function renderAnalisisCientifico(data, config) {
+  window._lastAnalisisArgs = arguments;
   var output = document.getElementById('metodo-ia-output');
   var updatedEl = document.getElementById('metodo-ia-updated');
   if (!output) return;
@@ -2542,6 +2544,19 @@ lbl.textContent=ivfLabel(sc);
 lbl.style.color=col;
 }
 window._applyIVF=applyIVF;
+window._regenerarAnalisis = function(){
+  var uid = window._currentUid || 'anon';
+  var cacheKey = 'ia-analisis-' + uid;
+  try { localStorage.removeItem(cacheKey); } catch(e) {}
+  if(window.cachedUserData) { window.cachedUserData.analisisIA = null; window.cachedUserData.analisisIA_fecha = null; }
+  var out = document.getElementById('metodo-ia-output');
+  var upd = document.getElementById('metodo-ia-updated');
+  if(out) out.textContent = 'Generando tu an\u00E1lisis...';
+  if(upd) upd.textContent = '';
+  if(typeof window._lastAnalisisArgs !== 'undefined' && window._lastAnalisisArgs) {
+    renderAnalisisCientifico.apply(null, window._lastAnalisisArgs);
+  }
+};
 })();
 </script>
 </body>
