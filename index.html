@@ -2293,10 +2293,12 @@ if (config && config.rutina) {
     var resp = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt, maxTokens: 1500 })
+      body: JSON.stringify({ prompt: prompt, maxTokens: 700 })
     });
-    var json = await resp.json();
-    console.log('analisis response:', JSON.stringify(json), 'text len:', json.message?.length);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var respText = await resp.text();
+    var json = {};
+    try { json = JSON.parse(respText); } catch(e) { throw new Error('Respuesta invalida del servidor'); }
     var text = json.message || '';
     if (text && text.length >= 20) {
       output.textContent = text;
@@ -2337,7 +2339,7 @@ if (config && config.rutina) {
     }
   } catch (e) {
     console.error('analisis catch error:', e.message, e);
-    output.textContent = 'Tu analisis cientifico se genera automaticamente. Vuelve pronto.';
+    if (output) { output.textContent = 'El analisis tarda unos segundos. Intenta de nuevo en un momento.'; output.style.opacity = '0.7'; }
     output.style.opacity = '0.7';
   }
 }
