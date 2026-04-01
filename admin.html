@@ -2776,7 +2776,7 @@ window.filterNotifUsers = function (q) {
   }
 
   function dashGetKey(isoDate, period) {
-    const d = new Date(isoDate);
+    const d = new Date(isoDate.length === 10 ? isoDate + "T12:00:00" : isoDate);
     if (period === 'day') return isoDate.slice(0,10);
     if (period === 'month') return isoDate.slice(0,7);
     // week: lunes de la semana
@@ -2848,7 +2848,7 @@ window.filterNotifUsers = function (q) {
       }
     });
 
-    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;width:100%;height:160px">${yAxis}${bars}${vals}${labels}</svg>`;
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:auto">${yAxis}${bars}${vals}${labels}</svg>`;
   }
 
   async function loadDashboard() {
