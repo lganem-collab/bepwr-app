@@ -437,7 +437,6 @@
     </div>
 
   </div>
-</div>
 
 <div id="tab-content-dashboard" style="display:none;padding:16px;max-width:960px;margin:0 auto">
   <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
@@ -480,6 +479,7 @@
     <button class="btn btn-sm btn-primary" onclick="saveGuias()">Guardar cambios</button>
   </div>
   <div id="guias-msg" style="text-align:center;font-size:13px;margin-top:10px;color:var(--green)"></div>
+</div>
 </div>
 
 <!-- MODAL DETAIL -->
@@ -1582,7 +1582,7 @@ if (user && user.uid === MASTER_UID) {
         ${metricasTableHTML}
       </div>
 
-      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="closeModal('modal-detail'); openNotifyForMember('${uid}')">ð£ Enviar aviso a este miembro</button>
+      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%" onclick="closeModal('modal-detail'); openNotifyForMember('${uid}')">📣 Enviar aviso a este miembro</button>
 
       `;
 
