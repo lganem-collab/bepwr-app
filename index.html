@@ -2041,19 +2041,19 @@ function renderPruebaPeso(data) {
   }
   if(sep) sep.style.display = '';
   if(unit) unit.style.display = '';
-if (typeof data.pruebaPeso === 'string') {
-  const hasUnit = /lb|kg/i.test(data.pruebaPeso);
-  if (hasUnit) {
-    minEl.textContent = data.pruebaPeso;
-    maxEl.textContent = '';
-    if(sep) sep.style.display = 'none';
-    if(unit) unit.style.display = 'none';
+  if (typeof data.pruebaPeso === 'string') {
+    const hasUnit = /lb|kg/i.test(data.pruebaPeso);
+    if (hasUnit) {
+      minEl.textContent = data.pruebaPeso;
+      maxEl.textContent = '';
+      if(sep) sep.style.display = 'none';
+      if(unit) unit.style.display = 'none';
+    } else {
+      const parts = data.pruebaPeso.split('-');
+      minEl.textContent = parts[0]?.trim() || '—';
+      maxEl.textContent = parts[1]?.trim() || '—';
+    }
   } else {
-    maxEl.textContent = parts[1]?.trim() || '—';
-  } else {
-    minEl.textContent = data.pruebaPeso.min ?? '—';
-    maxEl.textContent = data.pruebaPeso.max ?? '—';
-  }
   noteEl.textContent = 'Definido por tu coach en valoración';
 }
 
