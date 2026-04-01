@@ -332,8 +332,8 @@
           <!-- Tendencia de Valoracion -->
           <div id="card-tendencia" class="m-card" style="padding:16px 18px;margin-bottom:16px;display:none">
             <div style="display:flex;align-items:center;gap:14px">
-              <div id="tendencia-icon" style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <svg width="32" height="32" viewBox="0 0 24 24" id="tendencia-svg"></svg>
+              <div id="tendencia-icon" style="display:flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px">
+                <svg width="40" height="40" viewBox="0 0 24 24" id="tendencia-svg"></svg>
               </div>
               <div style="flex:1">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
@@ -2463,8 +2463,8 @@ var c=cfg[tipo];
 card.style.display="block";
 card.style.background=c.bg;
 card.style.border="1px solid "+c.border;
-icon.style.background=c.iconBg;
-icon.style.border="2px solid "+c.color;
+
+
 header.style.color=c.color;
 header.textContent="TENDENCIA DE VALORACIÓN";
 badge.style.background=c.iconBg;
@@ -2474,13 +2474,12 @@ badge.textContent=c.label;
 frase.style.color=tipo==="progreso"?"#ffe0cc":tipo==="proceso"?"#e8f5e8":"#fef9cc";
 frase.textContent=c.frase;
 if(tipo==="proceso"){
-svg.innerHTML="<line x1='3' y1='12' x2='21' y2='12' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/>";
+svg.innerHTML="<line x1='2' y1='12' x2='20' y2='12' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/><polyline points='14,6 20,12 14,18' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
+}else if(tipo==="progreso"){
+svg.innerHTML="<line x1='3' y1='19' x2='19' y2='5' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/><polyline points='11,5 19,5 19,12' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
 }else{
-var p="<polyline points='"+c.path+"' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
-if(c.arrow)p+="<polyline points='"+c.arrow+"' fill='none' stroke='"+c.color+"' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>";
-svg.innerHTML=p;
-}
-};
+svg.innerHTML="<line x1='3' y1='5' x2='19' y2='19' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/><polyline points='11,19 19,19 19,12' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
+}};
 })();
 </script>
 
