@@ -2284,8 +2284,9 @@ async function renderAnalisisCientifico(data, config) {
       body: JSON.stringify({ prompt: prompt, maxTokens: 1000 })
     });
     var json = await resp.json();
+    console.log('analisis response:', JSON.stringify(json), 'text len:', json.message?.length);
     var text = json.message || '';
-    if (text && text.length >= 100) {
+    if (text && text.length >= 20) {
       output.textContent = text;
       output.style.opacity = '1';
       logEvento('analisis_cientifico');
@@ -2319,12 +2320,13 @@ async function renderAnalisisCientifico(data, config) {
         updatedEl.textContent = 'Actualizado hoy \u00B7 Se renueva con cada nueva valoraci\u00F3n o cada semana';
       }
     } else {
-      output.textContent = 'No se pudo generar el an\u00E1lisis. Intenta m\u00E1s tarde.';
+    output.textContent = 'Tu analisis se esta preparando. Vuelve en un momento.';
       output.style.opacity = '1';
     }
   } catch (e) {
-    output.textContent = 'Error al conectar. Verifica tu conexi\u00F3n.';
-    output.style.opacity = '1';
+    console.error('analisis catch error:', e.message, e);
+    output.textContent = 'Tu analisis cientifico se genera automaticamente. Vuelve pronto.';
+    output.style.opacity = '0.7';
   }
 }
 </script>
