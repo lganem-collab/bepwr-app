@@ -1,4 +1,5 @@
-
+    maxEl.textContent = parts[1]?.trim() || '—';
+  }
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1056,6 +1057,7 @@
       { label:'Cintura', ini:inicial.cintura, act:m.cintura, inv:true, unit:'cm' },
       { label:'Cadera', ini:inicial.cadera, act:m.cadera, inv:true, unit:'cm' },
       { label:'Pantorrilla', ini:inicial.pantorrilla, act:m.pantorrilla, inv:false, unit:'cm' },
+{ label:'Mancuernas', ini:inicial.pruebaPeso, act:m.pruebaPeso, inv:false, unit:'lb', fmt:function(v){ if(!v) return null; if(typeof v==='string') return v; return (v.min||v)||v; } },
     ];
     var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
     var bodyEl = document.getElementById('metricas-comparativa-body');
@@ -1590,14 +1592,21 @@ let cachedMetricas = [];
       list.innerHTML = [...cachedMetricas].reverse().map(m => `
         <div class="hist-row" style="flex-direction:column">
           <div class="hist-date">${m.fecha || 'Sin datos'}</div>
-          <div class="hist-metrics">
-            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : 'Sin datos'}</span></div>
-            <div class="hist-metric">IMC <span>${m.imc || 'Sin datos'}</span></div>
-            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
-            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
-            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
+<div class="hist-metrics">
+<div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : 'Sin datos'}</span></div>
+<div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : 'Sin datos'}</span></div>
+<div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : 'Sin datos'}</span></div>
+<div class="hist-metric">IMC <span>${m.imc || 'Sin datos'}</span></div>
+<div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
+<div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
+<div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
+<div class="hist-metric">Brazo <span>${m.brazo ? m.brazo+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Abdomen <span>${m.abdomen ? m.abdomen+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Cintura <span>${m.cintura ? m.cintura+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Cadera <span>${m.cadera ? m.cadera+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Pantorrilla <span>${m.pantorrilla ? m.pantorrilla+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Mancuernas <span>${m.pruebaPeso || 'Sin datos'}</span></div>
+</div>
           </div>
         </div>`).join('');
     }
@@ -2032,9 +2041,14 @@ function renderPruebaPeso(data) {
   }
   if(sep) sep.style.display = '';
   if(unit) unit.style.display = '';
-  if (typeof data.pruebaPeso === 'string') {
-    const parts = data.pruebaPeso.split('-');
-    minEl.textContent = parts[0]?.trim() || '—';
+if (typeof data.pruebaPeso === 'string') {
+  const hasUnit = /lb|kg/i.test(data.pruebaPeso);
+  if (hasUnit) {
+    minEl.textContent = data.pruebaPeso;
+    maxEl.textContent = '';
+    if(sep) sep.style.display = 'none';
+    if(unit) unit.style.display = 'none';
+  } else {
     maxEl.textContent = parts[1]?.trim() || '—';
   } else {
     minEl.textContent = data.pruebaPeso.min ?? '—';
@@ -2447,6 +2461,7 @@ var dpeso=dif(ini.peso,act.peso);if(dpeso!==null&&Math.abs(dpeso)>=um){
 var ganar=meta&&meta.includes("músculo");
 s+=ganar?(dpeso>0?2:-1):(dpeso<0?2:-1);}
 var db=dif(ini.brazo,act.brazo);if(db!==null&&Math.abs(db)>=um)s+=db>0?2:0;
+var dpp=dif(ini.pruebaPeso,act.pruebaPeso);if(dpp!==null&&Math.abs(dpp)>=um)s+=dpp>0?2:0;
 var dpt=dif(ini.pantorrilla,act.pantorrilla);if(dpt!==null&&Math.abs(dpt)>=um)s+=dpt>0?2:0;
 var dci=dif(ini.cintura,act.cintura);if(dci!==null&&Math.abs(dci)>=um)s+=dci<0?1:-1;
 var dab=dif(ini.abdomen,act.abdomen);if(dab!==null&&Math.abs(dab)>=um)s+=dab<0?1:-1;
