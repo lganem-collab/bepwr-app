@@ -941,71 +941,36 @@
   function calcProgreso(meta,m,obj){const cl=v=>(isNaN(v)||!isFinite(v))?null:Math.max(0,Math.min(100,v));const wavg=pairs=>{const ok=pairs.filter(([v])=>v!==null);if(!ok.length)return null;const tw=ok.reduce((s,[,w])=>s+w,0);return Math.round(ok.reduce((s,[v,w])=>s+v*(w/tw),0));};const pgcP=(obj.pgcInicial!=null&&obj.pgcMeta!=null&&m.pgc!=null&&obj.pgcInicial!==obj.pgcMeta)?cl(((obj.pgcInicial-m.pgc)/(obj.pgcInicial-obj.pgcMeta))*100):null;const gvP=(obj.gvInicial!=null&&obj.gvMeta!=null&&m.grasaVisceral!=null&&obj.gvInicial!==obj.gvMeta)?cl(((obj.gvInicial-m.grasaVisceral)/(obj.gvInicial-obj.gvMeta))*100):null;const mmP=(obj.mmInicial!=null&&obj.mmMeta!=null&&m.musculo!=null&&obj.mmInicial!==obj.mmMeta)?cl(((m.musculo-obj.mmInicial)/(obj.mmMeta-obj.mmInicial))*100):null;const ibP=(obj.inbodyInicial!=null&&obj.inbodyMeta!=null&&m.calificacion!=null&&obj.inbodyInicial!==obj.inbodyMeta)?cl(((m.calificacion-obj.inbodyInicial)/(obj.inbodyMeta-obj.inbodyInicial))*100):null;const imcP=(obj.imcInicial!=null&&obj.imcMeta!=null&&m.imc!=null&&Math.abs(obj.imcInicial-obj.imcMeta)>0)?cl(((Math.abs(obj.imcInicial-obj.imcMeta)-Math.abs(m.imc-obj.imcMeta))/Math.abs(obj.imcInicial-obj.imcMeta))*100):null;const mt=(meta||'').toLowerCase();if(mt.includes('grasa')||mt.includes('peso'))return wavg([[pgcP,0.4],[gvP,0.3],[ibP,0.3]]);if(mt.includes('m\u00FAsculo')||mt.includes('recomposici'))return wavg([[mmP,0.4],[pgcP,0.3],[ibP,0.3]]);if(mt.includes('salud')||mt.includes('metab'))return wavg([[pgcP,0.3],[gvP,0.3],[imcP,0.2],[ibP,0.2]]);if(mt.includes('rendimiento')||mt.includes('funcional'))return wavg([[mmP,0.5],[pgcP,0.2],[ibP,0.3]]);if(mt.includes('est\u00E9tica')||mt.includes('composici'))return wavg([[mmP,0.3],[pgcP,0.3],[imcP,0.2],[ibP,0.2]]);return null;}
 
   function calcBePWRScore(inicial, actual, obj) {
-    var meta = (obj && obj.meta) || '';
     var genero = (window.cachedUserData && window.cachedUserData.genero) || '';
     var score = 0, totalW = 0;
-
-    // COMPONENTE 1: Calificación InBody (35 pts)
     var inbody = parseFloat(actual.calificacion);
-    if (!isNaN(inbody) && inbody > 0) {
-      score += (inbody / 100) * 35;
-      totalW += 35;
-    }
-
-    // COMPONENTE 2: % Grasa corporal vs rangos saludables por género (25 pts)
+    if (!isNaN(inbody) && inbody > 0) { score += (inbody/100)*35; totalW += 35; }
     var pgc = parseFloat(actual.pgc);
     if (!isNaN(pgc) && pgc > 0) {
       var esMujer = genero === 'Femenino';
-      // Rangos saludables ACSM: Hombre 10-20%, Mujer 18-28%
-      var optMin = esMujer ? 18 : 10;
-      var optMax = esMujer ? 28 : 20;
-      var warnMax = esMujer ? 38 : 30;
-      var pgcPts;
-      if (pgc >= optMin && pgc <= optMax) pgcPts = 25;
-      else if (pgc < optMin) pgcPts = Math.max(5, 25 - (optMin - pgc) * 1.5);
-      else if (pgc <= warnMax) pgcPts = Math.max(5, 25 - (pgc - optMax) * 1.2);
-      else pgcPts = 5;
+      var optMin = esMujer?18:10, optMax = esMujer?28:20, warnMax = esMujer?38:30;
+      var pgcPts = pgc>=optMin&&pgc<=optMax ? 25 : pgc<optMin ? Math.max(5,25-(optMin-pgc)*1.5) : pgc<=warnMax ? Math.max(5,25-(pgc-optMax)*1.2) : 5;
       score += pgcPts; totalW += 25;
     }
-
-    // COMPONENTE 3: Grasa visceral (20 pts) — <9 óptimo, >15 bajo
     var gv = parseFloat(actual.grasaVisceral);
     if (!isNaN(gv) && gv > 0) {
-      var gvPts;
-      if (gv <= 9) gvPts = 20;
-      else if (gv <= 12) gvPts = Math.round(20 - (gv - 9) * 2.5);
-      else if (gv <= 15) gvPts = Math.round(12.5 - (gv - 12) * 2);
-      else gvPts = Math.max(2, Math.round(6.5 - (gv - 15)));
+      var gvPts = gv<=9?20:gv<=12?Math.round(20-(gv-9)*2.5):gv<=15?Math.round(12.5-(gv-12)*2):Math.max(2,Math.round(6.5-(gv-15)));
       score += gvPts; totalW += 20;
     }
-
-    // COMPONENTE 4: Capacidad funcional — pruebaPeso/peso corporal (10 pts)
     var pp = parseFloat(actual.pruebaPeso), peso = parseFloat(actual.peso);
-    if (!isNaN(pp) && !isNaN(peso) && peso > 0 && pp > 0) {
-      var ratio = pp / peso;
-      var esMujer2 = genero === 'Femenino';
-      var ppPts;
-      if (esMujer2) ppPts = ratio >= 0.7 ? 10 : ratio >= 0.5 ? 7 : ratio >= 0.35 ? 4 : 2;
-      else ppPts = ratio >= 1.0 ? 10 : ratio >= 0.7 ? 7 : ratio >= 0.5 ? 4 : 2;
+    if (!isNaN(pp)&&!isNaN(peso)&&peso>0&&pp>0) {
+      var ratio = pp/peso, esM = genero==='Femenino';
+      var ppPts = esM?(ratio>=0.7?10:ratio>=0.5?7:ratio>=0.35?4:2):(ratio>=1.0?10:ratio>=0.7?7:ratio>=0.5?4:2);
       score += ppPts; totalW += 10;
     }
-
-    // COMPONENTE 5: Cintura (10 pts) — referencia OMS
     var cintura = parseFloat(actual.cintura);
     if (!isNaN(cintura) && cintura > 0) {
-      var esMujer3 = genero === 'Femenino';
-      var cOk = esMujer3 ? 80 : 94, cAlto = esMujer3 ? 88 : 102;
-      var cPts;
-      if (cintura <= cOk) cPts = 10;
-      else if (cintura <= cAlto) cPts = Math.round(10 - (cintura - cOk) / (cAlto - cOk) * 5);
-      else cPts = Math.max(1, Math.round(5 - (cintura - cAlto) * 0.3));
+      var esM2 = genero==='Femenino', cOk = esM2?80:94, cAlto = esM2?88:102;
+      var cPts = cintura<=cOk?10:cintura<=cAlto?Math.round(10-(cintura-cOk)/(cAlto-cOk)*5):Math.max(1,Math.round(5-(cintura-cAlto)*0.3));
       score += cPts; totalW += 10;
     }
-
     if (totalW === 0) return null;
-    // Normalizar a 0-100 y convertir a escala 0-10
-    var normalized = Math.round((score / totalW) * 100);
-    return normalized;
+    return Math.round((score/totalW)*100);
   }
     if (used < 2) return null;
     return Math.round(Math.max(0, Math.min(100, ws / tw)));
@@ -2380,25 +2345,24 @@ async function renderAnalisisCientifico(data, config) {
   <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
     <button onclick="document.getElementById('modal-bepwr-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;line-height:1">✕</button>
     <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">¿QUÉ ES EL bePWR SCORE?</div>
-    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Es tu <strong style="color:#fff">Índice de Vitalidad Funcional</strong> — una calificación de 0 a 100 que refleja tu estado físico actual basado en métricas objetivas de composición corporal, salud metabólica y capacidad funcional.</p>
-    <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:16px">
+    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Es tu <strong style="color:#fff">Índice de Vitalidad Funcional</strong> — calificación de 0 a 100 basada en métricas objetivas de composición corporal, salud metabólica y capacidad funcional.</p>
+    <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:14px">
       <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">CÓMO SE CONSTRUYE</div>
       <div>📊 <span style="color:#ddd">Calificación InBody</span> — 35%</div>
       <div>🔥 <span style="color:#ddd">% Grasa corporal vs rangos saludables</span> — 25%</div>
       <div>💧 <span style="color:#ddd">Grasa visceral</span> — 20%</div>
-      <div>💪 <span style="color:#ddd">Fuerza funcional (peso mancuernas/peso corporal)</span> — 10%</div>
+      <div>💪 <span style="color:#ddd">Fuerza funcional (mancuernas / peso corporal)</span> — 10%</div>
       <div>📏 <span style="color:#ddd">Cintura vs referencia OMS</span> — 10%</div>
     </div>
-    <div style="font-size:12px;line-height:1.8;margin-bottom:16px">
+    <div style="font-size:12px;line-height:1.8;margin-bottom:14px">
       <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">CÓMO SE INTERPRETA</div>
-      <div><span style="color:#60a5fa">●</span> <strong style="color:#60a5fa">0–45</strong> — En Proceso · estás construyendo tu base</div>
-      <div><span style="color:#facc15">●</span> <strong style="color:#facc15">46–65</strong> — Óptimo · buena condición general</div>
-      <div><span style="color:#4ade80">●</span> <strong style="color:#4ade80">66–85</strong> — Avanzado · métricas sólidas y consistentes</div>
-      <div><span style="color:#FF5C1A">●</span> <strong style="color:#FF5C1A">86–100</strong> — Destacado · máxima vitalidad funcional</div>
+      <div><span style="color:#60a5fa">●</span> <strong style="color:#60a5fa">0–45</strong> — En Proceso</div>
+      <div><span style="color:#facc15">●</span> <strong style="color:#facc15">46–65</strong> — Óptimo</div>
+      <div><span style="color:#4ade80">●</span> <strong style="color:#4ade80">66–85</strong> — Avanzado</div>
+      <div><span style="color:#FF5C1A">●</span> <strong style="color:#FF5C1A">86–100</strong> — Destacado</div>
     </div>
     <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
   </div>
-</div>
 </div>
 </body>
 </html>
