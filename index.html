@@ -329,6 +329,23 @@
             <div id="inbody-score-label" style="font-size:11px;color:var(--gray);font-family:'DM Sans',sans-serif">Cargando...</div>
           </div>
 
+          <!-- Tendencia de Valoracion -->
+          <div id="card-tendencia" class="m-card" style="padding:16px 18px;margin-bottom:16px;display:none">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div id="tendencia-icon" style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="20" height="20" viewBox="0 0 20 20" id="tendencia-svg"></svg>
+              </div>
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+                  <div style="font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px" id="tendencia-header">TENDENCIA</div>
+                  <div id="tendencia-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace"></div>
+                </div>
+                <div id="tendencia-frase" style="font-size:14px;line-height:1.4"></div>
+              </div>
+            </div>
+          </div>
+
+
           <!-- M&#xE9;tricas Iniciales vs. Actuales -->
           <div class="sec-title" style="margin-top:8px">M&#xE9;tricas Iniciales vs. Actuales</div>
           <div id="metricas-comparativa" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px">
@@ -917,6 +934,7 @@
         const ultima = metricas[metricas.length - 1];
         renderMetrics(ultima, obj, inicial);
         if(window._applyIVF) window._applyIVF(ultima, inicial);
+        if(window._applyTendencia) window._applyTendencia(ultima, inicial);
         renderChart(metricas);
         renderProfileMetrics(ultima);
 
@@ -2363,6 +2381,108 @@ async function renderAnalisisCientifico(data, config) {
     <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoracion.</div>
   </div>
 </div>
+
+<script>
+(function(){
+var FRASES_PROGRESO=[
+"!Felicidades! Tu cuerpo esta cambiando.",
+"!Genial! Los numeros hablan, vas bien.",
+"!Wooow! Cada sesion suma. Sigue asi.",
+"!Increible! Mejora real. Esto es bePWR.",
+"!Felicidades! Tu esfuerzo tiene resultados.",
+"!Genial! Vas en la direccion correcta.",
+"!Wooow! El trabajo esta dando frutos.",
+"!Excelente! Constancia que se nota.",
+"!Felicidades! Progreso real, resultados reales.",
+"!Increible! Tu mejor version esta llegando."
+];
+var FRASES_PROCESO=[
+"Tu cuerpo se esta adaptando.",
+"Los grandes cambios toman tiempo.",
+"Cada entrenamiento cuenta.",
+"Confia en el proceso.",
+"Estas construyendo tu base.",
+"La consistencia es el camino.",
+"Sigue moviendote, el cambio viene.",
+"Tu esfuerzo ya esta trabajando.",
+"Hoy es mejor que ayer.",
+"El proceso es parte del resultado."
+];
+var FRASES_RETROCESO=[
+"El cuerpo tiene altibajos, tu tambien puedes.",
+"Un paso atras para tomar impulso.",
+"Esto es informacion, usala a tu favor.",
+"Los mejores tambien tienen semanas dificiles.",
+"Tu esfuerzo sigue valiendo.",
+"Vuelve, tu mejor version te espera.",
+"Cada regreso es mas fuerte.",
+"El cambio real es lineal, sigue!",
+"Hoy te levantas y sigues.",
+"bePWR es constancia, es perfeccion en proceso."
+];
+function calcTendencia(ini, act, meta){
+var s=0;
+var um=0.5;
+function dif(a,b){if(isNaN(a)||isNaN(b)||!a||!b)return null;return parseFloat(b)-parseFloat(a);}
+function chk(d,inv){if(d===null)return;var real=inv?-d:d;if(Math.abs(d)<um)return;s+=real>0?arguments[2]:arguments[3];}
+var dm=dif(ini.musculo,act.musculo);if(dm!==null&&Math.abs(dm)>=um)s+=dm>0?4:-1;
+var dgv=dif(ini.grasaVisceral,act.grasaVisceral);if(dgv!==null&&Math.abs(dgv)>=um)s+=dgv<0?3:-3;
+var dc=dif(ini.calificacion,act.calificacion);if(dc!==null&&Math.abs(dc)>=1)s+=dc>0?3:-2;
+var dp=dif(ini.pgc,act.pgc);if(dp!==null&&Math.abs(dp)>=um)s+=dp<0?2:-2;
+var dpeso=dif(ini.peso,act.peso);if(dpeso!==null&&Math.abs(dpeso)>=um){
+var ganar=meta&&meta.includes("músculo");
+s+=ganar?(dpeso>0?2:-1):(dpeso<0?2:-1);}
+var db=dif(ini.brazo,act.brazo);if(db!==null&&Math.abs(db)>=um)s+=db>0?2:0;
+var dpt=dif(ini.pantorrilla,act.pantorrilla);if(dpt!==null&&Math.abs(dpt)>=um)s+=dpt>0?2:0;
+var dci=dif(ini.cintura,act.cintura);if(dci!==null&&Math.abs(dci)>=um)s+=dci<0?1:-1;
+var dab=dif(ini.abdomen,act.abdomen);if(dab!==null&&Math.abs(dab)>=um)s+=dab<0?1:-1;
+return s;
+}
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+window._applyTendencia=function(act,ini){
+if(!ini||ini===act)return;
+var card=document.getElementById("card-tendencia");
+var badge=document.getElementById("tendencia-badge");
+var frase=document.getElementById("tendencia-frase");
+var icon=document.getElementById("tendencia-icon");
+var header=document.getElementById("tendencia-header");
+var svg=document.getElementById("tendencia-svg");
+if(!card)return;
+var meta=(window.cachedUserData&&window.cachedUserData.meta)||"";
+var score=calcTendencia(ini,act,meta);
+var tipo=score>0?"progreso":score===0?"proceso":"retroceso";
+var cfg={
+progreso:{color:"#FF5C1A",bg:"#1a0e00",border:"#7c3a00",iconBg:"#FF5C1A22",label:"PROGRESO",
+  path:"M3,13 8,7 12,10 17,4",arrow:"M14,4 17,4 17,7",frase:rand(FRASES_PROGRESO)},
+proceso:{color:"#4ade80",bg:"#0a150a",border:"#1d3a1d",iconBg:"#4ade8022",label:"EN PROCESO",
+  path:null,line:true,frase:rand(FRASES_PROCESO)},
+retroceso:{color:"#facc15",bg:"#1a1500",border:"#3a3000",iconBg:"#facc1522",label:"RETROCESO",
+  path:"M3,7 8,13 12,10 17,16",arrow:null,frase:rand(FRASES_RETROCESO)}
+};
+var c=cfg[tipo];
+card.style.display="block";
+card.style.background=c.bg;
+card.style.border="1px solid "+c.border;
+icon.style.background=c.iconBg;
+icon.style.border="2px solid "+c.color;
+header.style.color=c.color;
+header.textContent="TENDENCIA DE VALORACIÓN";
+badge.style.background=c.iconBg;
+badge.style.border="1px solid "+c.color.replace(")",",0.4)").replace("rgb","rgba");
+badge.style.color=c.color;
+badge.textContent=c.label;
+frase.style.color=tipo==="progreso"?"#ffe0cc":tipo==="proceso"?"#e8f5e8":"#fef9cc";
+frase.textContent=c.frase;
+if(tipo==="proceso"){
+svg.innerHTML="<line x1='4' y1='10' x2='16' y2='10' stroke='"+c.color+"' stroke-width='2.5' stroke-linecap='round'/>";
+}else{
+var p="<polyline points='"+c.path+"' fill='none' stroke='"+c.color+"' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>";
+if(c.arrow)p+="<polyline points='"+c.arrow+"' fill='none' stroke='"+c.color+"' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/>";
+svg.innerHTML=p;
+}
+};
+})();
+</script>
 
 <script>
 (function(){
