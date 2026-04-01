@@ -2793,21 +2793,46 @@ window.filterNotifUsers = function (q) {
     if (!el) return;
     if (!data.length) { el.innerHTML = '<div style="color:#555;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin datos</div>'; return; }
     const max = Math.max(...data.map(d => d.v), 1);
-    const W = el.offsetWidth || 400;
-    const H = 130;
-    const padL = 28, padB = 22, padT = 16;
+    const W = 460; // fixed viewBox width — scales with CSS width:100%
+    const H = 140;
+    const padL = 28, padB = 28, padT = 16;
     const n = data.length;
     const barW = Math.floor((W - padL) / n);
     const chartH = H - padB - padT;
     let bars = '', labels = '', vals = '', yAxis = '';
 
-    // Y axis guides
+    // Y axis guides (0, mid, max)
     [0, 0.5, 1].forEach(pct => {
       const y = padT + chartH * (1 - pct);
       const val = Math.round(max * pct);
       yAxis += `<line x1="${padL}" y1="${y}" x2="${W}" y2="${y}" stroke="#222" stroke-width="1"/>
-        <text x="${padL - 4}" y="${y + 4}" text-anchor="end" font-size="8" fill="#444" font-family="Space Mono,monospace">${val}</text>`;
+        <text x="${padL - 4}" y="${y + 4}" text-anchor="end" font-size="9" fill="#444" font-family="Space Mono,monospace">${val}</text>`;
     });
+
+    // Format label based on key format
+    function fmtLabel(k) {
+      if (!k) return '';
+      // daily: 2026-03-31 → "Lun\n31"
+      if (k.length === 10 && k[4] === '-' && k[7] === '-') {
+        const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        const [,, dd] = k.split('-');
+        const d = new Date(k + 'T12:00:00');
+        return days[d.getDay()] + ' ' + dd;
+      }
+      // weekly: 2026-03-23 → "23 Mar"
+      if (k.length === 10) {
+        const [, mm, dd] = k.split('-');
+        const months = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        return dd + ' ' + months[parseInt(mm)];
+      }
+      // monthly: 2026-03 → "Mar 26"
+      if (k.length === 7) {
+        const [yy, mm] = k.split('-');
+        const months = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        return months[parseInt(mm)] + ' ' + yy.slice(2);
+      }
+      return k.slice(-5);
+    }
 
     data.forEach((d, i) => {
       const x = padL + i * barW;
@@ -2815,10 +2840,18 @@ window.filterNotifUsers = function (q) {
       const y = padT + chartH - barH;
       bars += `<rect x="${x + 2}" y="${y}" width="${barW - 4}" height="${barH}" rx="3" fill="${color}" opacity="0.85"/>`;
       if (d.v > 0) vals += `<text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" font-size="9" fill="#ccc" font-family="Space Mono,monospace">${d.v}</text>`;
-      const lbl = d.k.length > 5 ? d.k.slice(5) : d.k;
-      labels += `<text x="${x + barW/2}" y="${H - 5}" text-anchor="middle" font-size="8" fill="#555" font-family="Space Mono,monospace">${lbl}</text>`;
+      const lbl = fmtLabel(d.k);
+      // Split label at space for two lines
+      const parts = lbl.split(' ');
+      if (parts.length === 2) {
+        labels += `<text x="${x + barW/2}" y="${H - 14}" text-anchor="middle" font-size="8" fill="#666" font-family="Space Mono,monospace">${parts[0]}</text>`;
+        labels += `<text x="${x + barW/2}" y="${H - 4}" text-anchor="middle" font-size="8" fill="#888" font-family="Space Mono,monospace">${parts[1]}</text>`;
+      } else {
+        labels += `<text x="${x + barW/2}" y="${H - 6}" text-anchor="middle" font-size="8" fill="#666" font-family="Space Mono,monospace">${lbl}</text>`;
+      }
     });
-    el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;width:100%">${yAxis}${bars}${vals}${labels}</svg>`;
+
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:auto">${yAxis}${bars}${vals}${labels}</svg>`;
   }
 
   async function loadDashboard() {
