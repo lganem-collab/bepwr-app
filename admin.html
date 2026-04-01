@@ -2874,7 +2874,7 @@ window.filterNotifUsers = function (q) {
       const eventos = evSnap.docs.map(d => d.data());
 
       // Filtrar por rango
-      const enRango = eventos.filter(e => e.dia && keySet.has(dashGetKey(e.fecha || e.dia, period)));
+      const enRango = eventos.filter(e => e.dia && keySet.has(dashGetKey(e.dia, period)));
 
       // Agrupar visitas
       const visitasMap = {}; keys.forEach(k => visitasMap[k] = 0);
@@ -2884,7 +2884,7 @@ window.filterNotifUsers = function (q) {
       const notifMap = {}; keys.forEach(k => notifMap[k] = 0);
 
       enRango.forEach(e => {
-        const k = dashGetKey(e.fecha || e.dia, period);
+        const k = dashGetKey(e.dia, period);
         if (!keySet.has(k)) return;
         if (e.tipo === 'visita') visitasMap[k]++;
         if (e.tipo === 'reserva') reservasMap[k]++;
