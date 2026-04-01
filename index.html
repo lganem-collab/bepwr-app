@@ -332,12 +332,10 @@
           <!-- Tendencia de Valoracion -->
           <div id="card-tendencia" class="m-card" style="padding:16px 18px;margin-bottom:16px;display:none">
             <div style="display:flex;align-items:center;gap:14px">
-              <div id="tendencia-icon" style="display:flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px">
-                <svg width="40" height="40" viewBox="0 0 24 24" id="tendencia-svg"></svg>
-              </div>
+              <div id="tendencia-icon" style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Space Mono',monospace;font-size:15px;font-weight:500" id="tendencia-circle"><span id="tendencia-score-text">+0</span></div>
               <div style="flex:1">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-                  <div style="font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px" id="tendencia-header">TENDENCIA</div>
+                  <div style="display:flex;align-items:center;gap:6px"><div style="font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px" id="tendencia-header">TENDENCIA</div><button onclick="document.getElementById('modal-tendencia-info').style.display='flex'" style="background:none;border:none;font-size:12px;cursor:pointer;padding:0;opacity:0.7;line-height:1" id="tendencia-info-btn">&#x24D8;</button></div>
                   <div id="tendencia-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace"></div>
                 </div>
                 <div id="tendencia-frase" style="font-size:14px;line-height:1.4"></div>
@@ -2471,11 +2469,13 @@ function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
 window._applyTendencia=function(act,ini,valFecha){
 if(!ini||ini===act)return;
 var card=document.getElementById("card-tendencia");
+var circle=document.getElementById("tendencia-icon");
+var scoreText=document.getElementById("tendencia-score-text");
 var badge=document.getElementById("tendencia-badge");
 var frase=document.getElementById("tendencia-frase");
 var icon=document.getElementById("tendencia-icon");
 var header=document.getElementById("tendencia-header");
-var svg=document.getElementById("tendencia-svg");
+
 if(!card)return;
 var meta=(window.cachedUserData&&window.cachedUserData.meta)||"";
 var score=calcTendencia(ini,act,meta);
@@ -2502,6 +2502,7 @@ card.style.border="1px solid "+c.border;
 
 
 header.style.color=c.color;
+var infoBtn=document.getElementById('tendencia-info-btn');if(infoBtn)infoBtn.style.color=c.color;
 header.textContent="TENDENCIA DE VALORACIÓN";
 badge.style.background=c.iconBg;
 badge.style.border="1px solid "+c.color.replace(")",",0.4)").replace("rgb","rgba");
@@ -2510,13 +2511,8 @@ badge.textContent=c.label;
 frase.style.color=tipo==="progreso"?"#ffe0cc":tipo==="proceso"?"#e8f5e8":"#fef9cc";
 frase.textContent=c.frase;
 try{localStorage.setItem(tCacheKey,JSON.stringify({tipo:tipo,frase:c.frase,valFecha:valFecha||""}));}catch(e){}
-if(tipo==="proceso"){
-svg.innerHTML="<line x1='2' y1='12' x2='20' y2='12' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/><polyline points='14,6 20,12 14,18' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
-}else if(tipo==="progreso"){
-svg.innerHTML="<line x1='3' y1='19' x2='19' y2='5' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/><polyline points='11,5 19,5 19,12' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
-}else{
-svg.innerHTML="<line x1='3' y1='5' x2='19' y2='19' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/><polyline points='11,19 19,19 19,12' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
-}};
+if(circle){circle.style.background=c.iconBg;circle.style.border="2px solid "+c.color;circle.style.color=c.color;}
+if(scoreText){scoreText.textContent=(score>0?"+":"")+score;}};
 })();
 </script>
 
@@ -2569,5 +2565,31 @@ lbl.style.color=col;
 window._applyIVF=applyIVF;
 })();
 </script>
+
+<div id="modal-tendencia-info" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px">
+  <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
+    <button onclick="document.getElementById('modal-tendencia-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer">&#x2715;</button>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">TENDENCIA DE VALORACI&#xD3;N</div>
+    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Compara tus m&#xe9;tricas actuales contra tu valoraci&#xf3;n anterior y calcula un puntaje de cambio real.</p>
+    <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:12px">
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">C&#xD3;MO SE CALCULA</div>
+      <div>&#x1F4AA; Masa muscular &#x2014; +4 si mejora</div>
+      <div>&#x1F4A7; Grasa visceral &#x2014; +3 si baja</div>
+      <div>&#x1F4CA; Calificaci&#xf3;n InBody &#x2014; +3 si sube</div>
+      <div>&#x1F525; % Grasa corporal &#x2014; +2 si baja</div>
+      <div>&#x2696; Peso (seg&#xfa;n objetivo) &#x2014; +2</div>
+      <div>&#x1F4CF; Brazo / Pantorrilla &#x2014; +2 cada una</div>
+      <div>&#x1F3CB; Mancuernas &#x2014; +2 si mejora</div>
+      <div>&#x1F4CD; Cintura / Abdomen &#x2014; +1 cada una</div>
+    </div>
+    <div style="font-size:12px;line-height:1.8;margin-bottom:12px">
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">C&#xD3;MO SE INTERPRETA</div>
+      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">+4 o m&#xe1;s</strong> &#x2014; Progreso</div>
+      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">-3 a +3</strong> &#x2014; En Proceso</div>
+      <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">-4 o menos</strong> &#x2014; Retroceso</div>
+    </div>
+    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Requiere al menos 2 valoraciones.</div>
+  </div>
+</div>
 </body>
 </html>
