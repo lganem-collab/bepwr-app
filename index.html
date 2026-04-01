@@ -2342,21 +2342,25 @@ async function renderAnalisisCientifico(data, config) {
 <!-- Modal bePWR Score Info -->
 <div id="modal-bepwr-info" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px">
   <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
-    <button onclick="document.getElementById('modal-bepwr-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;line-height:1">✕</button>
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">¿QUÉ ES EL bePWR SCORE?</div>
-    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Es un índice de <strong style="color:#fff">progreso real</strong> calculado a partir de tus métricas corporales. Compara tu valoración inicial contra la más reciente y pondera cada métrica según tu objetivo.</p>
-    <div style="font-size:12px;color:#aaa;line-height:1.7;margin-bottom:16px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">CÓMO SE INTERPRETA</div>
-      <div>🔴 <strong style="color:#e74c3c">0–49</strong> — Aún en proceso. Es normal al inicio o si llevas poco tiempo.</div>
-      <div>🟡 <strong style="color:#f39c12">50–69</strong> — Progreso moderado. Vas por buen camino.</div>
-      <div>🟢 <strong style="color:#4ade80">70–89</strong> — Buen avance. Tus métricas mejoran consistentemente.</div>
-      <div>⭐ <strong style="color:#FF5C1A">90–100</strong> — Excelente. Resultados sobresalientes.</div>
+    <button onclick="document.getElementById('modal-bepwr-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer">&#x2715;</button>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">bePWR SCORE</div>
+    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Tu <strong style="color:#fff">Indice de Vitalidad Funcional</strong> &#x2014; calificacion de 0 a 100 que refleja tu estado fisico actual basado en metricas objetivas.</p>
+    <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:12px">
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">COMO SE CONSTRUYE</div>
+      <div>&#x1F4CA; Calificacion InBody &#x2014; 35%</div>
+      <div>&#x1F525; % Grasa corporal vs rangos saludables &#x2014; 25%</div>
+      <div>&#x1F4A7; Grasa visceral &#x2014; 20%</div>
+      <div>&#x1F4AA; Fuerza funcional (mancuernas / peso) &#x2014; 10%</div>
+      <div>&#x1F4CF; Cintura vs referencia OMS &#x2014; 10%</div>
     </div>
-    <div style="font-size:12px;color:#aaa;line-height:1.6;margin-bottom:16px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">POR QUÉ PUEDE SER DISTINTO AL INBODY SCORE</div>
-      La Calificación InBody mide tu composición corporal en un momento específico (músculo, grasa, agua). El bePWR Score mide <em style="color:#ddd">cuánto has mejorado</em> desde que empezaste — por eso con una sola valoración puede aparecer bajo: aún no hay cambio que comparar.
+    <div style="font-size:12px;line-height:1.8;margin-bottom:12px">
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">COMO SE INTERPRETA</div>
+      <div><span style="color:#60a5fa">&#x25CF;</span> <strong style="color:#60a5fa">0&#x2013;45</strong> &#x2014; En Proceso</div>
+      <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">46&#x2013;65</strong> &#x2014; Optimo</div>
+      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">66&#x2013;85</strong> &#x2014; Avanzado</div>
+      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">86&#x2013;100</strong> &#x2014; Destacado</div>
     </div>
-    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Con cada nueva valoración el score se actualiza.</div>
+    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoracion.</div>
   </div>
 </div>
 
