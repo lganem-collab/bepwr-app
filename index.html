@@ -934,7 +934,7 @@
         const ultima = metricas[metricas.length - 1];
         renderMetrics(ultima, obj, inicial);
         if(window._applyIVF) window._applyIVF(ultima, inicial);
-        if(window._applyTendencia) window._applyTendencia(ultima, inicial);
+        if(window._applyTendencia) window._applyTendencia(ultima, inicial, ultima.fecha || '');
         renderChart(metricas);
         renderProfileMetrics(ultima);
 
@@ -2453,7 +2453,7 @@ var dab=dif(ini.abdomen,act.abdomen);if(dab!==null&&Math.abs(dab)>=um)s+=dab<0?1
 return s;
 }
 function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
-window._applyTendencia=function(act,ini){
+window._applyTendencia=function(act,ini,valFecha){
 if(!ini||ini===act)return;
 var card=document.getElementById("card-tendencia");
 var badge=document.getElementById("tendencia-badge");
@@ -2465,13 +2465,20 @@ if(!card)return;
 var meta=(window.cachedUserData&&window.cachedUserData.meta)||"";
 var score=calcTendencia(ini,act,meta);
 var tipo=score>3?"progreso":score>=-3?"proceso":"retroceso";
+var uid=window._currentUid||"anon";
+var tCacheKey="tendencia-frase-"+uid;
+var cachedFrase=null;
+try{
+  var tc=JSON.parse(localStorage.getItem(tCacheKey)||"{}");
+  if(tc.tipo===tipo && tc.valFecha && tc.valFecha===valFecha) cachedFrase=tc.frase;
+}catch(e){}
 var cfg={
 progreso:{color:"#FF5C1A",bg:"#1a0e00",border:"#7c3a00",iconBg:"#FF5C1A22",label:"PROGRESO",
-  path:"M3,17 8,11 13,14 21,5",arrow:"M17,5 21,5 21,9",frase:rand(FRASES_PROGRESO)},
+  path:"M3,17 8,11 13,14 21,5",arrow:"M17,5 21,5 21,9",frase:tipo==="progreso"&&cachedFrase?cachedFrase:rand(FRASES_PROGRESO)},
 proceso:{color:"#4ade80",bg:"#0a150a",border:"#1d3a1d",iconBg:"#4ade8022",label:"EN PROCESO",
-  path:null,line:true,frase:rand(FRASES_PROCESO)},
+  path:null,line:true,frase:tipo==="proceso"&&cachedFrase?cachedFrase:rand(FRASES_PROCESO)},
 retroceso:{color:"#facc15",bg:"#1a1500",border:"#3a3000",iconBg:"#facc1522",label:"RETROCESO",
-  path:"M3,7 8,13 13,10 21,19",arrow:null,frase:rand(FRASES_RETROCESO)}
+  path:"M3,7 8,13 13,10 21,19",arrow:null,frase:tipo==="retroceso"&&cachedFrase?cachedFrase:rand(FRASES_RETROCESO)}
 };
 var c=cfg[tipo];
 card.style.display="block";
@@ -2487,6 +2494,7 @@ badge.style.color=c.color;
 badge.textContent=c.label;
 frase.style.color=tipo==="progreso"?"#ffe0cc":tipo==="proceso"?"#e8f5e8":"#fef9cc";
 frase.textContent=c.frase;
+try{localStorage.setItem(tCacheKey,JSON.stringify({tipo:tipo,frase:c.frase,valFecha:valFecha||""}));}catch(e){}
 if(tipo==="proceso"){
 svg.innerHTML="<line x1='2' y1='12' x2='20' y2='12' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round'/><polyline points='14,6 20,12 14,18' fill='none' stroke='"+c.color+"' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/>";
 }else if(tipo==="progreso"){
