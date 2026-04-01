@@ -941,35 +941,72 @@
   function calcProgreso(meta,m,obj){const cl=v=>(isNaN(v)||!isFinite(v))?null:Math.max(0,Math.min(100,v));const wavg=pairs=>{const ok=pairs.filter(([v])=>v!==null);if(!ok.length)return null;const tw=ok.reduce((s,[,w])=>s+w,0);return Math.round(ok.reduce((s,[v,w])=>s+v*(w/tw),0));};const pgcP=(obj.pgcInicial!=null&&obj.pgcMeta!=null&&m.pgc!=null&&obj.pgcInicial!==obj.pgcMeta)?cl(((obj.pgcInicial-m.pgc)/(obj.pgcInicial-obj.pgcMeta))*100):null;const gvP=(obj.gvInicial!=null&&obj.gvMeta!=null&&m.grasaVisceral!=null&&obj.gvInicial!==obj.gvMeta)?cl(((obj.gvInicial-m.grasaVisceral)/(obj.gvInicial-obj.gvMeta))*100):null;const mmP=(obj.mmInicial!=null&&obj.mmMeta!=null&&m.musculo!=null&&obj.mmInicial!==obj.mmMeta)?cl(((m.musculo-obj.mmInicial)/(obj.mmMeta-obj.mmInicial))*100):null;const ibP=(obj.inbodyInicial!=null&&obj.inbodyMeta!=null&&m.calificacion!=null&&obj.inbodyInicial!==obj.inbodyMeta)?cl(((m.calificacion-obj.inbodyInicial)/(obj.inbodyMeta-obj.inbodyInicial))*100):null;const imcP=(obj.imcInicial!=null&&obj.imcMeta!=null&&m.imc!=null&&Math.abs(obj.imcInicial-obj.imcMeta)>0)?cl(((Math.abs(obj.imcInicial-obj.imcMeta)-Math.abs(m.imc-obj.imcMeta))/Math.abs(obj.imcInicial-obj.imcMeta))*100):null;const mt=(meta||'').toLowerCase();if(mt.includes('grasa')||mt.includes('peso'))return wavg([[pgcP,0.4],[gvP,0.3],[ibP,0.3]]);if(mt.includes('m\u00FAsculo')||mt.includes('recomposici'))return wavg([[mmP,0.4],[pgcP,0.3],[ibP,0.3]]);if(mt.includes('salud')||mt.includes('metab'))return wavg([[pgcP,0.3],[gvP,0.3],[imcP,0.2],[ibP,0.2]]);if(mt.includes('rendimiento')||mt.includes('funcional'))return wavg([[mmP,0.5],[pgcP,0.2],[ibP,0.3]]);if(mt.includes('est\u00E9tica')||mt.includes('composici'))return wavg([[mmP,0.3],[pgcP,0.3],[imcP,0.2],[ibP,0.2]]);return null;}
 
   function calcBePWRScore(inicial, actual, obj) {
-    const meta = obj?.meta || '';
-    const metricDefs = [
-      { ini: 'peso', act: 'peso', inv: true, key: 'peso' },
-      { ini: 'musculo', act: 'musculo', inv: false, key: 'musculo' },
-      { ini: 'grasaCorporal', act: 'grasaCorporal', inv: true, key: 'grasa' },
-      { ini: 'pgc', act: 'pgc', inv: true, key: 'pgc' },
-      { ini: 'grasaVisceral', act: 'grasaVisceral', inv: true, key: 'gvisc' },
-      { ini: 'calificacion', act: 'calificacion', inv: false, key: 'inbody' },
-    ];
-    const WEIGHTS = {
-      'Bajar grasa / bajar de peso': { pgc:30, grasa:20, peso:15, gvisc:15, musculo:10, inbody:10 },
-      'Ganar m\u00FAsculo / recomposici\u00F3n': { musculo:30, inbody:20, peso:5, pgc:15, grasa:15, gvisc:15 },
-      'Salud metab\u00F3lica / salud general': { gvisc:25, pgc:20, inbody:20, grasa:15, musculo:10, peso:10 },
-      'Rendimiento funcional': { musculo:25, inbody:25, pgc:15, grasa:10, gvisc:10, peso:15 },
-      'Est\u00E9tica / composici\u00F3n equilibrada': { pgc:25, musculo:20, grasa:15, gvisc:15, inbody:15, peso:10 },
-    };
-    const pesoInv = { 'Ganar m\u00FAsculo / recomposici\u00F3n': false, 'Rendimiento funcional': false };
-    const defaultW = { musculo:25, inbody:20, pgc:15, grasa:15, gvisc:15, peso:10 };
-    const weights = WEIGHTS[meta] || defaultW;
-    if (pesoInv[meta] === false) { const pd = metricDefs.find(d => d.key === 'peso'); if (pd) pd.inv = false; }
-    let tw = 0, ws = 0, used = 0;
-    for (const def of metricDefs) {
-      const iv = parseFloat(inicial[def.ini]), av = parseFloat(actual[def.act]), w = weights[def.key] || 0;
-      if (isNaN(iv) || isNaN(av) || w === 0 || iv === 0) continue;
-      let cp = ((av - iv) / Math.abs(iv)) * 100;
-      if (def.inv) cp = -cp;
-      let ms = 50 + Math.max(-50, Math.min(50, cp * 2));
-      ws += ms * w; tw += w; used++;
+    var meta = (obj && obj.meta) || '';
+    var genero = (window.cachedUserData && window.cachedUserData.genero) || '';
+    var score = 0, totalW = 0;
+
+    // COMPONENTE 1: Calificación InBody (35 pts)
+    var inbody = parseFloat(actual.calificacion);
+    if (!isNaN(inbody) && inbody > 0) {
+      score += (inbody / 100) * 35;
+      totalW += 35;
     }
+
+    // COMPONENTE 2: % Grasa corporal vs rangos saludables por género (25 pts)
+    var pgc = parseFloat(actual.pgc);
+    if (!isNaN(pgc) && pgc > 0) {
+      var esMujer = genero === 'Femenino';
+      // Rangos saludables ACSM: Hombre 10-20%, Mujer 18-28%
+      var optMin = esMujer ? 18 : 10;
+      var optMax = esMujer ? 28 : 20;
+      var warnMax = esMujer ? 38 : 30;
+      var pgcPts;
+      if (pgc >= optMin && pgc <= optMax) pgcPts = 25;
+      else if (pgc < optMin) pgcPts = Math.max(5, 25 - (optMin - pgc) * 1.5);
+      else if (pgc <= warnMax) pgcPts = Math.max(5, 25 - (pgc - optMax) * 1.2);
+      else pgcPts = 5;
+      score += pgcPts; totalW += 25;
+    }
+
+    // COMPONENTE 3: Grasa visceral (20 pts) — <9 óptimo, >15 bajo
+    var gv = parseFloat(actual.grasaVisceral);
+    if (!isNaN(gv) && gv > 0) {
+      var gvPts;
+      if (gv <= 9) gvPts = 20;
+      else if (gv <= 12) gvPts = Math.round(20 - (gv - 9) * 2.5);
+      else if (gv <= 15) gvPts = Math.round(12.5 - (gv - 12) * 2);
+      else gvPts = Math.max(2, Math.round(6.5 - (gv - 15)));
+      score += gvPts; totalW += 20;
+    }
+
+    // COMPONENTE 4: Capacidad funcional — pruebaPeso/peso corporal (10 pts)
+    var pp = parseFloat(actual.pruebaPeso), peso = parseFloat(actual.peso);
+    if (!isNaN(pp) && !isNaN(peso) && peso > 0 && pp > 0) {
+      var ratio = pp / peso;
+      var esMujer2 = genero === 'Femenino';
+      var ppPts;
+      if (esMujer2) ppPts = ratio >= 0.7 ? 10 : ratio >= 0.5 ? 7 : ratio >= 0.35 ? 4 : 2;
+      else ppPts = ratio >= 1.0 ? 10 : ratio >= 0.7 ? 7 : ratio >= 0.5 ? 4 : 2;
+      score += ppPts; totalW += 10;
+    }
+
+    // COMPONENTE 5: Cintura (10 pts) — referencia OMS
+    var cintura = parseFloat(actual.cintura);
+    if (!isNaN(cintura) && cintura > 0) {
+      var esMujer3 = genero === 'Femenino';
+      var cOk = esMujer3 ? 80 : 94, cAlto = esMujer3 ? 88 : 102;
+      var cPts;
+      if (cintura <= cOk) cPts = 10;
+      else if (cintura <= cAlto) cPts = Math.round(10 - (cintura - cOk) / (cAlto - cOk) * 5);
+      else cPts = Math.max(1, Math.round(5 - (cintura - cAlto) * 0.3));
+      score += cPts; totalW += 10;
+    }
+
+    if (totalW === 0) return null;
+    // Normalizar a 0-100 y convertir a escala 0-10
+    var normalized = Math.round((score / totalW) * 100);
+    return normalized;
+  }
     if (used < 2) return null;
     return Math.round(Math.max(0, Math.min(100, ws / tw)));
   }
@@ -984,10 +1021,10 @@
     if (scoreEl) {
       if (score !== null) {
         scoreEl.textContent = score;
-        var scoreColor = score >= 70 ? '#4ade80' : score >= 50 ? '#FF5C1A' : '#f87171';
+        var scoreColor = score >= 86 ? '#FF5C1A' : score >= 66 ? '#4ade80' : score >= 46 ? '#facc15' : '#60a5fa';
         scoreRing.setAttribute('stroke', scoreColor);
         scoreRing.setAttribute('stroke-dasharray', (scoreCircum * score / 100) + ' ' + scoreCircum);
-        scoreLabel.textContent = score >= 70 ? 'Excelente progreso' : score >= 50 ? 'Buen progreso' : 'Necesita mejorar';
+        scoreLabel.textContent = score >= 86 ? 'Destacado' : score >= 66 ? 'Avanzado' : score >= 46 ? 'Óptimo' : 'En Proceso';
         scoreLabel.style.color = scoreColor;
       } else {
         scoreEl.textContent = '\u2014';
@@ -2343,20 +2380,25 @@ async function renderAnalisisCientifico(data, config) {
   <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
     <button onclick="document.getElementById('modal-bepwr-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;line-height:1">✕</button>
     <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">¿QUÉ ES EL bePWR SCORE?</div>
-    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Es un índice de <strong style="color:#fff">progreso real</strong> calculado a partir de tus métricas corporales. Compara tu valoración inicial contra la más reciente y pondera cada métrica según tu objetivo.</p>
-    <div style="font-size:12px;color:#aaa;line-height:1.7;margin-bottom:16px">
+    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Es tu <strong style="color:#fff">Índice de Vitalidad Funcional</strong> — una calificación de 0 a 100 que refleja tu estado físico actual basado en métricas objetivas de composición corporal, salud metabólica y capacidad funcional.</p>
+    <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:16px">
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">CÓMO SE CONSTRUYE</div>
+      <div>📊 <span style="color:#ddd">Calificación InBody</span> — 35%</div>
+      <div>🔥 <span style="color:#ddd">% Grasa corporal vs rangos saludables</span> — 25%</div>
+      <div>💧 <span style="color:#ddd">Grasa visceral</span> — 20%</div>
+      <div>💪 <span style="color:#ddd">Fuerza funcional (peso mancuernas/peso corporal)</span> — 10%</div>
+      <div>📏 <span style="color:#ddd">Cintura vs referencia OMS</span> — 10%</div>
+    </div>
+    <div style="font-size:12px;line-height:1.8;margin-bottom:16px">
       <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">CÓMO SE INTERPRETA</div>
-      <div>🔴 <strong style="color:#e74c3c">0–49</strong> — Aún en proceso. Es normal al inicio o si llevas poco tiempo.</div>
-      <div>🟡 <strong style="color:#f39c12">50–69</strong> — Progreso moderado. Vas por buen camino.</div>
-      <div>🟢 <strong style="color:#4ade80">70–89</strong> — Buen avance. Tus métricas mejoran consistentemente.</div>
-      <div>⭐ <strong style="color:#FF5C1A">90–100</strong> — Excelente. Resultados sobresalientes.</div>
+      <div><span style="color:#60a5fa">●</span> <strong style="color:#60a5fa">0–45</strong> — En Proceso · estás construyendo tu base</div>
+      <div><span style="color:#facc15">●</span> <strong style="color:#facc15">46–65</strong> — Óptimo · buena condición general</div>
+      <div><span style="color:#4ade80">●</span> <strong style="color:#4ade80">66–85</strong> — Avanzado · métricas sólidas y consistentes</div>
+      <div><span style="color:#FF5C1A">●</span> <strong style="color:#FF5C1A">86–100</strong> — Destacado · máxima vitalidad funcional</div>
     </div>
-    <div style="font-size:12px;color:#aaa;line-height:1.6;margin-bottom:16px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:8px">POR QUÉ PUEDE SER DISTINTO AL INBODY SCORE</div>
-      La Calificación InBody mide tu composición corporal en un momento específico (músculo, grasa, agua). El bePWR Score mide <em style="color:#ddd">cuánto has mejorado</em> desde que empezaste — por eso con una sola valoración puede aparecer bajo: aún no hay cambio que comparar.
-    </div>
-    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Con cada nueva valoración el score se actualiza.</div>
+    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
   </div>
+</div>
 </div>
 </body>
 </html>
