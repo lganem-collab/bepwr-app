@@ -2289,7 +2289,7 @@ async function renderAnalisisCientifico(data, config) {
     if (text && text.length >= 20) {
       output.textContent = text;
       output.style.opacity = '1';
-      logEvento('analisis_cientifico');
+    try { if(typeof logEvento === 'function') logEvento('analisis_cientifico'); } catch(e) {}
 
       var hoy = new Date().toISOString().slice(0, 10);
 
