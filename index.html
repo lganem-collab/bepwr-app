@@ -1025,7 +1025,7 @@
       return '<span style="color:' + color + '">' + signo + diff.toFixed(1) + '</span>';
     }
     var rows = [
-      { label:'Peso', ini:inicial.peso, act:m.peso, inv:!['Ganar m\u00FAsculo / recomposici\u00F3n','Rendimiento funcional'].includes(obj?.meta||''), unit:'kg' },
+      { label:'Peso', ini:inicial.peso, act:m.peso, inv:(function(){var meta=(obj&&obj.meta)||'',imc=parseFloat(m.imc);if(!isNaN(imc)&&imc<18.5)return false;if(!isNaN(imc)&&imc>25)return true;return meta!=='Ganar músculo / recomposición';})(), unit:'kg' },
       { label:'M\u00FAsculo Esq.', ini:inicial.musculo, act:m.musculo, inv:false, unit:'kg' },
       { label:'Grasa Corporal', ini:inicial.grasaCorporal, act:m.grasaCorporal, inv:true, unit:'kg' },
       { label:'IMC', ini:inicial.imc, act:m.imc, inv:true, unit:'' },
