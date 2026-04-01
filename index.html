@@ -2355,10 +2355,10 @@ async function renderAnalisisCientifico(data, config) {
     </div>
     <div style="font-size:12px;line-height:1.8;margin-bottom:12px">
       <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">COMO SE INTERPRETA</div>
-      <div><span style="color:#60a5fa">&#x25CF;</span> <strong style="color:#60a5fa">0&#x2013;45</strong> &#x2014; En Proceso</div>
-      <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">46&#x2013;65</strong> &#x2014; Optimo</div>
-      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">66&#x2013;85</strong> &#x2014; Avanzado</div>
-      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">86&#x2013;100</strong> &#x2014; Destacado</div>
+      <div><span style="color:#60a5fa">&#x25CF;</span> <strong style="color:#60a5fa">0&#x2013;55</strong> &#x2014; En Proceso</div>
+      <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">56&#x2013;72</strong> &#x2014; Optimo</div>
+      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">73&#x2013;87</strong> &#x2014; Avanzado</div>
+      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">88&#x2013;100</strong> &#x2014; Destacado</div>
     </div>
     <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoracion.</div>
   </div>
@@ -2392,8 +2392,8 @@ s+=cp;w+=10;}
 if(w===0)return null;
 return Math.round((s/w)*100);
 }
-function ivfColor(s){return s>=86?'#FF5C1A':s>=66?'#4ade80':s>=46?'#facc15':'#60a5fa';}
-function ivfLabel(s){return s>=86?'Destacado':s>=66?'Avanzado':s>=46?'\u00d3ptimo':'En Proceso';}
+function ivfColor(s){return s>=88?'#FF5C1A':s>=73?'#4ade80':s>=56?'#facc15':'#60a5fa';}
+function ivfLabel(s){return s>=88?'Destacado':s>=73?'Avanzado':s>=56?'\u00d3ptimo':'En Proceso';}
 function applyIVF(m,ini){
 var gen=(window.cachedUserData&&window.cachedUserData.genero)||'';
 var sc=ivfScore(ini||m,m,gen);
