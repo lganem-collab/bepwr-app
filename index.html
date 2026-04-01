@@ -470,7 +470,7 @@
               <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m&#xE9;tricas...</div>
             </div>
           </div>
-          <button class="btn-secondary" onclick="abrirHistorialModal()" style="width:100%;margin-top:4px">&#x1F4CB; Ver historial completo</button>
+          <button class="btn-secondary" onclick="openHistorialModal()" style="width:100%;margin-top:4px">&#x1F4CB; Ver historial completo</button>
         </div>
       </div>
 
@@ -1722,7 +1722,7 @@ let cachedMetricas = [];
 
 <script>
   // Navigation (global)
-  const views = ['home','metodo','metricas','notif'];
+  const views = ['home','metodo','metricas','notif','profile'];
   let currentView = 'home';
 
   // Magic link: auto-login from email (params already cleaned in <head>)
