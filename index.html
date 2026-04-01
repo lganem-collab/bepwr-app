@@ -957,7 +957,7 @@
         renderProfileMetrics(ultima);
 
         // Generar mensaje IA
-        generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? calcBePWRScore(inicial, ultima, obj) : null), null));
+        generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? calcBePWRScore(inicial, ultima, obj) : null), null);
       } else {
         renderMetricsEmpty();
         document.getElementById('ai-message').innerHTML = '\u00A1Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci\u00F3n a\u00FAn no ha sido registrada. Habla con el staff para comenzar. &#x1F4AA;';
