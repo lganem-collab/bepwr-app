@@ -22,7 +22,7 @@
     .screen{display:none}
     .screen.active{display:block}
     #s-app.active{display:flex}
-    #s-login{align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    #s-login{align-items:center;justify-content:center;min-height:100vh;padding:24px;position:fixed;inset:0;z-index:100;background:#0a0a0a}
     #s-login.active{display:flex}
     .login-box{width:100%;max-width:400px}
     .login-logo{font-size:52px;font-weight:900;letter-spacing:-1px;line-height:1;text-align:center;margin-bottom:4px}
@@ -115,7 +115,7 @@
 <body>
 
 <!-- LOGIN -->
-<div id="s-login" class="screen active">
+<div id="s-login" class="screen" style="display:none">
   <div class="login-box">
     <div class="login-logo"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
     <div class="login-sub">Panel de Administraci&#xF3;n</div>
