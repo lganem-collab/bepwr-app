@@ -1,5 +1,4 @@
-    maxEl.textContent = parts[1]?.trim() || '—';
-  }
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1592,21 +1591,20 @@ let cachedMetricas = [];
       list.innerHTML = [...cachedMetricas].reverse().map(m => `
         <div class="hist-row" style="flex-direction:column">
           <div class="hist-date">${m.fecha || 'Sin datos'}</div>
-<div class="hist-metrics">
-<div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : 'Sin datos'}</span></div>
-<div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : 'Sin datos'}</span></div>
-<div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : 'Sin datos'}</span></div>
-<div class="hist-metric">IMC <span>${m.imc || 'Sin datos'}</span></div>
-<div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
-<div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
-<div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
+          <div class="hist-metrics">
+            <div class="hist-metric">Peso <span>${m.peso ? m.peso+' kg' : 'Sin datos'}</span></div>
+            <div class="hist-metric">M\u00FAsculo <span>${m.musculo ? m.musculo+' kg' : 'Sin datos'}</span></div>
+            <div class="hist-metric">Grasa Corp. <span>${m.grasaCorporal ? m.grasaCorporal+' kg' : 'Sin datos'}</span></div>
+            <div class="hist-metric">IMC <span>${m.imc || 'Sin datos'}</span></div>
+            <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
+            <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
+            <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
 <div class="hist-metric">Brazo <span>${m.brazo ? m.brazo+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Abdomen <span>${m.abdomen ? m.abdomen+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Cintura <span>${m.cintura ? m.cintura+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Cadera <span>${m.cadera ? m.cadera+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Pantorrilla <span>${m.pantorrilla ? m.pantorrilla+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Mancuernas <span>${m.pruebaPeso || 'Sin datos'}</span></div>
-</div>
           </div>
         </div>`).join('');
     }
@@ -2042,8 +2040,7 @@ function renderPruebaPeso(data) {
   if(sep) sep.style.display = '';
   if(unit) unit.style.display = '';
   if (typeof data.pruebaPeso === 'string') {
-    const hasUnit = /lb|kg/i.test(data.pruebaPeso);
-    if (hasUnit) {
+    if (/lb|kg/i.test(data.pruebaPeso)) {
       minEl.textContent = data.pruebaPeso;
       maxEl.textContent = '';
       if(sep) sep.style.display = 'none';
@@ -2054,6 +2051,9 @@ function renderPruebaPeso(data) {
       maxEl.textContent = parts[1]?.trim() || '—';
     }
   } else {
+    minEl.textContent = data.pruebaPeso.min ?? '—';
+    maxEl.textContent = data.pruebaPeso.max ?? '—';
+  }
   noteEl.textContent = 'Definido por tu coach en valoración';
 }
 
