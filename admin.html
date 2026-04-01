@@ -2120,7 +2120,7 @@ var miembro = String(x.miembroNombre || '').replace(/</g,'&lt;');
     const pgc        = parseFloat(document.getElementById('m-pgc').value);
     const grasaVisc  = parseFloat(document.getElementById('m-grasa-visc').value);
     const calific    = parseFloat(document.getElementById('m-calificacion').value);
-    const fecha      = fmtDate(document.getElementById('m-fecha').value.trim());
+    const fecha      = document.getElementById('m-fecha').value.trim();
     const brazo      = parseFloat(document.getElementById('m-brazo').value);
     const abdomen    = parseFloat(document.getElementById('m-abdomen').value);
     const cintura    = parseFloat(document.getElementById('m-cintura').value);
@@ -2144,8 +2144,8 @@ for (const med of medidasVal) {
 }
     if (!peso || !fecha) { errEl.textContent = 'Peso y fecha son obligatorios'; return; }
     try {
-      const miembroDoc = await db.collection('usuarios').doc(uid).get();
-      const miembroNombre = miembroDoc.exists ? (miembroDoc.data().nombre || '') : '';
+      const _m = (window._allMembers || []).find(m => m.uid === uid);
+      const miembroNombre = _m ? (_m.nombre || '') : '';
       // --- Modo valoración inicial (nuevo miembro) ---
     if (window._initialMetricsMode) {
       window._initialMetricsMode = false;
