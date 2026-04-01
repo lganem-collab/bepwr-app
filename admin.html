@@ -360,7 +360,8 @@
         <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:130px">
           <label style="font-size:11px;color:var(--gray);font-family:Space Mono,monospace;white-space:nowrap">HASTA</label>
           <input type="date" id="bita-filter-hasta" onchange="loadBitacora()" style="flex:1;background:#181818;border:1px solid var(--border);border-radius:10px;padding:9px 10px;color:#fff;font-size:13px;outline:none"/>
-        </div>
+        </div><input type="text" id="bita-filter-miembro" oninput="loadBitacora()" placeholder="Buscar por miembro..." style="flex:1;min-width:160px;background:#181818;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none"/>
+        
         <button onclick="window.clearBitaFilters()" style="background:#2a2a2a;border:1px solid #444;color:#aaa;font-size:12px;padding:9px 12px;border-radius:10px;cursor:pointer;white-space:nowrap">Limpiar</button>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
@@ -1821,11 +1822,11 @@ if (user && user.uid === MASTER_UID) {
   }
 
   // Edit past metric (admin only)
-  async function logBitacora(accion, detalle, miembroNombre) {
+  async function logBitacora(accion, detalle, miembroNombre, miembroUid) {
     try {
       if (!auth.currentUser) return;
       await db.collection('bitacora').add({
-        accion, detalle, miembroNombre: miembroNombre || '',
+        accion, detalle, miembroNombre: miembroNombre || '', miembroUid: miembroUid || '',
         staffUid: auth.currentUser.uid,
         staffNombre: window._staffNombre || auth.currentUser.email,
         staffEmail: auth.currentUser.email,
@@ -1840,6 +1841,7 @@ if (user && user.uid === MASTER_UID) {
     listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#666;font-family:Space Mono,monospace;font-size:13px">Cargando...</div>';
     try {
       var fStaff  = (document.getElementById('bita-filter-staff')  || {}).value || '';
+      var fMiembro = (document.getElementById('bita-filter-miembro') || {}).value || '';
       var fAccion = (document.getElementById('bita-filter-accion') || {}).value || '';
       var fDesde  = (document.getElementById('bita-filter-desde')  || {}).value || '';
       var fHasta  = (document.getElementById('bita-filter-hasta')  || {}).value || '';
@@ -1866,6 +1868,7 @@ if (user && user.uid === MASTER_UID) {
       }
       var docs = snap.docs.map(function(d){ return d.data(); });
       if (fStaff)  docs = docs.filter(function(x){ return x.staffNombre === fStaff || x.staffEmail === fStaff; });
+      if (fMiembro) docs = docs.filter(function(x){ return (x.miembroNombre||'').toLowerCase().includes(fMiembro.toLowerCase()); });
       if (fDesde)  docs = docs.filter(function(x){ return x.fecha && x.fecha >= fDesde; });
       if (fHasta)  docs = docs.filter(function(x){ return x.fecha && x.fecha <= fHasta + 'T23:59:59'; });
       window._bitaDocs = docs;
@@ -1884,12 +1887,16 @@ if (user && user.uid === MASTER_UID) {
         var label  = LBL[x.accion] || x.accion;
         var staff  = String(x.staffNombre || x.staffEmail || '').replace(/</g,'&lt;');
         var detail = String(x.detalle || '').replace(/</g,'&lt;');
-        return '<div onclick="window.openBitaDetail(' + i + ')" style="border-bottom:1px solid var(--border);padding:14px 0;cursor:pointer">'
+var miembro = String(x.miembroNombre || '').replace(/</g,'&lt;');
+                return '<div onclick="window.openBitaDetail(' + i + ')" style="border-bottom:1px solid var(--border);padding:14px 0;cursor:pointer">'
           + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
           + '<div>'
           + '<div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">' + label + '</div>'
           + '<div style="font-size:13px;color:#ccc;margin-bottom:4px">' + detail + '</div>'
-          + '<div style="font-size:11px;color:#666;font-family:Space Mono,monospace">' + staff + '</div>'
+          + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px">'
+          + '<span style="font-size:11px;color:#666;font-family:Space Mono,monospace">' + staff + '</span>'
+          + (miembro ? '<span style="font-size:11px;color:#FF5C1A;font-family:Space Mono,monospace">👤 ' + miembro + '</span>' : '')
+          + '</div>'
           + '</div>'
           + '<div style="font-size:11px;color:#666;font-family:Space Mono,monospace;white-space:nowrap">' + fecha + '</div>'
           + '</div></div>';
