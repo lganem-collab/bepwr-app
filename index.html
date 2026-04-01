@@ -274,20 +274,15 @@
       <!-- HOME VIEW -->
       <div class="view active" id="view-home">
         <div class="greeting">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div>
+          <div>
               <div class="greeting-sub">Bienvenida de vuelta</div>
               <div class="greeting-name" id="greeting-name">...</div>
             </div>
-            <button id="refresh-btn" onclick="window.doRefresh()" title="Actualizar"
-              style="background:none;border:1.5px solid #FF5C1A;color:#FF5C1A;font-size:16px;
-              width:36px;height:36px;border-radius:10px;cursor:pointer;flex-shrink:0;
-              display:flex;align-items:center;justify-content:center">&#x21BB;</button>
-          </div>
         </div>
 
         <div class="ai-card">
           <div class="ai-message" id="ai-message"><span class="ai-loading">Generando tu mensaje personalizado...</span></div>
+        <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank');logEvento('reserva')" style="margin-bottom:16px">&#x2192; Reservar una clase</button>
         </div>
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px">
@@ -299,7 +294,7 @@
         <div id="bepwr-score-section">
           <!-- bePWR Score - full width -->
           <div class="m-card" style="text-align:center;padding:20px 14px;margin-bottom:10px">
-            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px"><span style="color:#fff;text-transform:lowercase">be</span><span style="color:#FF5C1A">PWR</span> <span style="text-transform:none">Score</span> <button onclick="document.getElementById('modal-bepwr-info').style.display='flex'" style="background:none;border:none;color:#FF5C1A;font-size:13px;cursor:pointer;padding:0 2px;vertical-align:middle;opacity:0.8">ⓘ</button></div>
+            <div style="font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px"><span style="color:#fff;text-transform:lowercase">be</span><span style="color:#FF5C1A">PWR</span> <span style="text-transform:none">Score</span> <button onclick="document.getElementById('modal-bepwr-info').style.display='flex'" style="background:none;border:none;color:#FF5C1A;font-size:16px;cursor:pointer;padding:0 2px;vertical-align:middle;opacity:0.8">&#x24D8;</button></div>
             <div style="position:relative;width:100px;height:100px;margin:0 auto 10px">
               <svg width="100" height="100" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
@@ -330,17 +325,11 @@
           </div>
 
           <!-- Tendencia de Valoracion -->
-          <div id="card-tendencia" class="m-card" style="padding:16px 18px;margin-bottom:16px;display:none">
-            <div style="display:flex;align-items:center;gap:14px">
-              <div id="tendencia-icon" style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Space Mono',monospace;font-size:15px;font-weight:500" id="tendencia-circle"><span id="tendencia-score-text">+0</span></div>
-              <div style="flex:1">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-                  <div style="display:flex;align-items:center;gap:6px"><div style="font-size:9px;font-family:'Space Mono',monospace;letter-spacing:1px" id="tendencia-header">TENDENCIA</div><button onclick="document.getElementById('modal-tendencia-info').style.display='flex'" style="background:none;border:none;font-size:12px;cursor:pointer;padding:0;opacity:0.7;line-height:1" id="tendencia-info-btn">&#x24D8;</button></div>
-                  <div id="tendencia-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace"></div>
-                </div>
-                <div id="tendencia-frase" style="font-size:14px;line-height:1.4"></div>
-              </div>
-            </div>
+          <div id="card-tendencia" class="m-card" style="text-align:center;padding:20px 14px;margin-bottom:16px;display:none">
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px"><span id="tendencia-header">TENDENCIA</span> <button onclick="document.getElementById('modal-tendencia-info').style.display='flex'" style="background:none;border:none;font-size:13px;cursor:pointer;padding:0 2px;vertical-align:middle;opacity:0.7;line-height:1" id="tendencia-info-btn">&#x24D8;</button></div>
+            <div id="tendencia-icon" style="width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-family:'Space Mono',monospace;font-size:22px;font-weight:500"><span id="tendencia-score-text">+0</span></div>
+            <div id="tendencia-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace;display:inline-block;margin-bottom:8px"></div>
+            <div id="tendencia-frase" style="font-size:13px;line-height:1.4;color:var(--gray)"></div>
           </div>
 
 
@@ -356,8 +345,7 @@
           </div>
         </div>
 
-        <div class="sec-title">Acciones r&#xE1;pidas</div>
-        <button class="btn-primary" onclick="window.open('https://bepwr.com/classes','_blank');logEvento('reserva')">&#x2192; Reservar una clase</button>
+        
         <button class="btn-secondary" onclick="navigate('profile')">Ver mi perfil completo</button>
       </div>
 
