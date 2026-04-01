@@ -916,6 +916,7 @@
         const inicial = metricas[0];
         const ultima = metricas[metricas.length - 1];
         renderMetrics(ultima, obj, inicial);
+        if(window._applyIVF) window._applyIVF(ultima, inicial);
         renderChart(metricas);
         renderProfileMetrics(ultima);
 
@@ -2358,5 +2359,55 @@ async function renderAnalisisCientifico(data, config) {
     <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Con cada nueva valoración el score se actualiza.</div>
   </div>
 </div>
+
+<script>
+(function(){
+function ivfScore(ini,act,gen){
+var s=0,w=0;
+var ib=parseFloat(act.calificacion);
+if(!isNaN(ib)&&ib>0){s+=(ib/100)*35;w+=35;}
+var pgc=parseFloat(act.pgc);
+if(!isNaN(pgc)&&pgc>0){
+var f=gen==='Femenino',lo=f?18:10,hi=f?28:20,wn=f?38:30;
+var p=pgc>=lo&&pgc<=hi?25:pgc<lo?Math.max(5,25-(lo-pgc)*1.5):pgc<=wn?Math.max(5,25-(pgc-hi)*1.2):5;
+s+=p;w+=25;}
+var gv=parseFloat(act.grasaVisceral);
+if(!isNaN(gv)&&gv>0){
+var gp=gv<=9?20:gv<=12?Math.round(20-(gv-9)*2.5):gv<=15?Math.round(12.5-(gv-12)*2):Math.max(2,Math.round(6.5-(gv-15)));
+s+=gp;w+=20;}
+var pp=parseFloat(act.pruebaPeso),pe=parseFloat(act.peso);
+if(!isNaN(pp)&&!isNaN(pe)&&pe>0&&pp>0){
+var r=pp/pe,em=gen==='Femenino';
+var rp=em?(r>=0.7?10:r>=0.5?7:r>=0.35?4:2):(r>=1.0?10:r>=0.7?7:r>=0.5?4:2);
+s+=rp;w+=10;}
+var ci=parseFloat(act.cintura);
+if(!isNaN(ci)&&ci>0){
+var em2=gen==='Femenino',cok=em2?80:94,chi=em2?88:102;
+var cp=ci<=cok?10:ci<=chi?Math.round(10-(ci-cok)/(chi-cok)*5):Math.max(1,Math.round(5-(ci-chi)*0.3));
+s+=cp;w+=10;}
+if(w===0)return null;
+return Math.round((s/w)*100);
+}
+function ivfColor(s){return s>=86?'#FF5C1A':s>=66?'#4ade80':s>=46?'#facc15':'#60a5fa';}
+function ivfLabel(s){return s>=86?'Destacado':s>=66?'Avanzado':s>=46?'\u00d3ptimo':'En Proceso';}
+function applyIVF(m,ini){
+var gen=(window.cachedUserData&&window.cachedUserData.genero)||'';
+var sc=ivfScore(ini||m,m,gen);
+if(sc===null)return;
+var circ=2*Math.PI*42;
+var el=document.getElementById('bepwr-score-value');
+var ring=document.getElementById('bepwr-score-ring');
+var lbl=document.getElementById('bepwr-score-label');
+if(!el)return;
+el.textContent=sc;
+var col=ivfColor(sc);
+ring.setAttribute('stroke',col);
+ring.setAttribute('stroke-dasharray',(circ*sc/100)+' '+circ);
+lbl.textContent=ivfLabel(sc);
+lbl.style.color=col;
+}
+window._applyIVF=applyIVF;
+})();
+</script>
 </body>
 </html>
