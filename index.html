@@ -350,7 +350,7 @@
           </div>
 
 
-          <!-- M&#xE9;tricas Iniciales vs. Actuales -->
+          <!-- Valoraci&#xF3;n Anterior vs. Actual -->
           
         </div>
 
@@ -464,7 +464,7 @@
           <div class="sec-title" style="margin-top:8px">M&#xE9;tricas Iniciales vs. Actuales</div>
           <div id="metricas-comparativa" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px">
             <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:4px;padding:10px 12px;background:#0f0f0f;font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
-              <div>M&#xE9;trica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
+              <div>M&#xE9;trica</div><div style="text-align:center">Anterior</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
             </div>
             <div id="metricas-comparativa-body" style="font-size:12px">
               <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m&#xE9;tricas...</div>
@@ -948,16 +948,16 @@
       cachedMetricas = metricas;
 
       if (metricas.length > 0) {
-        const inicial = metricas[0];
+        const anterior = metricas.length >= 2 ? metricas[metricas.length - 2] : metricas[0];
         const ultima = metricas[metricas.length - 1];
-        renderMetrics(ultima, obj, inicial);
-        if(window._applyIVF) window._applyIVF(ultima, inicial);
-        if(window._applyTendencia) window._applyTendencia(ultima, inicial, ultima.fecha || '');
+        renderMetrics(ultima, obj, anterior);
+        if(window._applyIVF) window._applyIVF(ultima, anterior);
+        if(window._applyTendencia) window._applyTendencia(ultima, anterior, ultima.fecha || '');
         renderChart(metricas);
         renderProfileMetrics(ultima);
 
         // Generar mensaje IA
-        generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? calcBePWRScore(inicial, ultima, obj) : null), null);
+generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? calcBePWRScore(anterior, ultima, obj) : null), null)), null);
       } else {
         renderMetricsEmpty();
         document.getElementById('ai-message').innerHTML = '\u00A1Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci\u00F3n a\u00FAn no ha sido registrada. Habla con el staff para comenzar. &#x1F4AA;';
