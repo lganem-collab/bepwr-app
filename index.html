@@ -2212,7 +2212,7 @@ async function renderAnalisisCientifico(data, config) {
     try {
       var genDate = new Date(cachedFecha);
       var diasPasados = Math.floor((Date.now() - genDate.getTime()) / (24 * 60 * 60 * 1000));
-      var valNoChanged = (!valFechaActual && !cachedValFecha) || (valFechaActual === cachedValFecha);
+      var valNoChanged = cachedValFecha && valFechaActual && (valFechaActual === cachedValFecha);
 
       if (diasPasados < 7 && valNoChanged && cachedText.length >= 100) {
         output.textContent = cachedText;
