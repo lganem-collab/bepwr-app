@@ -158,6 +158,7 @@
     <div class="tab" id="tab-bitacora" onclick="switchTab('bitacora')" style="display:none">&#x1F4CB; Bit&#xE1;cora</div>
     <div class="tab" id="tab-dashboard" onclick="switchTab('dashboard')" style="display:none">&#x1F4CA; Dashboard</div>
     <div class="tab" id="tab-guias" onclick="switchTab('guias')" style="display:none">&#x1F4C4; Guías</div>
+    <div class="tab" id="tab-citas" onclick="switchTab('citas')" style="display:none">&#x1F4C5; Citas Val</div>
   </div>
   <div class="content">
 
@@ -477,6 +478,76 @@
   </div>
   <div id="guias-msg" style="text-align:center;font-size:13px;margin-top:10px;color:var(--green)"></div>
 </div>
+
+    <!-- CITAS VAL TAB -->
+    <div id="tab-content-citas" style="display:none;max-width:700px;margin:0 auto;padding:16px">
+
+      <!-- Configuracion -->
+      <div style="margin-bottom:28px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:4px">&#x1F4C5; Configuraci&#xF3;n de Disponibilidad</div>
+        <div style="color:var(--gray);font-size:13px;margin-bottom:16px">Define los rangos de fechas, d&#xED;as y horarios para valoraciones.</div>
+        <div style="background:#111;border-radius:14px;padding:16px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--orange)">Agregar rango de disponibilidad</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div>
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">FECHA INICIO</label>
+              <input type="date" id="citas-fecha-inicio" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-size:14px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">FECHA FIN</label>
+              <input type="date" id="citas-fecha-fin" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-size:14px">
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:8px">D&#xCD;AS DISPONIBLES</label>
+            <div style="display:flex;flex-wrap:wrap;gap:10px">
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="lunes" class="citas-dia-cb"> Lun</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="martes" class="citas-dia-cb"> Mar</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="miercoles" class="citas-dia-cb"> Mi&#xE9;</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="jueves" class="citas-dia-cb"> Jue</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="viernes" class="citas-dia-cb"> Vie</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="sabado" class="citas-dia-cb"> S&#xE1;b</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="domingo" class="citas-dia-cb"> Dom</label>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+            <div>
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">HORA INICIO</label>
+              <input type="time" id="citas-hora-inicio" value="06:00" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-size:14px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">HORA FIN</label>
+              <input type="time" id="citas-hora-fin" value="10:00" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-size:14px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">DURACI&#xD3;N (MIN)</label>
+              <select id="citas-duracion" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:#fff;font-size:14px">
+                <option value="15" selected>15 min</option>
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="addRangoCitas()">+ Agregar rango</button>
+        </div>
+        <div id="citas-rangos-list"></div>
+        <div id="citas-config-msg" style="text-align:center;font-size:13px;margin-top:8px;color:var(--green)"></div>
+      </div>
+
+      <!-- Proximas citas -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:17px;font-weight:700">&#x1F4CB; Pr&#xF3;ximas Citas</div>
+          <button class="btn btn-sm" onclick="enviarReporteCitas()" style="background:#222;font-size:12px">&#x1F4E7; Enviar reporte</button>
+        </div>
+        <div id="citas-proximas-list">
+          <div style="text-align:center;color:var(--gray);padding:24px;font-size:13px">Cargando citas...</div>
+        </div>
+        <div id="citas-report-msg" style="text-align:center;font-size:13px;margin-top:8px;color:var(--green)"></div>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -601,6 +672,8 @@
   const tabNotify = document.getElementById('tab-notify');
   if (tabStaff)  tabStaff.style.display  = 'inline-block';
   if (tabNotify) tabNotify.style.display = 'inline-block';
+  const tabCitas = document.getElementById('tab-citas');
+  if (tabCitas) tabCitas.style.display = 'inline-block';;
 }
 
 // Solo Admin Maestro ve la bitácora
@@ -2381,7 +2454,7 @@ for (const med of medidasVal) {
   }
 
   function switchTab(tab) {
-    const tabs = ['home','members','new','staff','notify','bitacora','dashboard','guias'];
+    const tabs = ['home','members','new','staff','notify','bitacora','dashboard','guias','citas'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
       const contentEl = document.getElementById('tab-content-'+t);
@@ -2392,6 +2465,7 @@ for (const med of medidasVal) {
     if (tab === 'bitacora') loadBitacora();
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'guias') loadGuias();
+    if (tab === 'citas') loadCitasTab();;
     if (auth?.currentUser?.uid === MASTER_UID) {
       const _bt = document.getElementById('tab-bitacora');
       if (_bt) _bt.style.display = 'inline-block';
@@ -2967,6 +3041,137 @@ window.filterNotifUsers = function (q) {
     }
   }
 
+
+
+  // ==================== CITAS VAL ====================
+  window._citasRangos = [];
+
+  async function loadCitasTab() {
+    await loadCitasConfig();
+    await loadCitasProximas();
+  }
+
+  async function loadCitasConfig() {
+    try {
+      const doc = await db.collection('config').doc('citasConfig').get();
+      window._citasRangos = doc.exists ? (doc.data().rangos || []) : [];
+      renderRangosCitas();
+    } catch(e) { console.error('loadCitasConfig:', e); }
+  }
+
+  function renderRangosCitas() {
+    const el = document.getElementById('citas-rangos-list');
+    if (!el) return;
+    if (!window._citasRangos.length) {
+      el.innerHTML = '<div style="text-align:center;color:var(--gray);font-size:13px;padding:12px">Sin rangos configurados.</div>';
+      return;
+    }
+    const dL = {lunes:'Lun',martes:'Mar',miercoles:'Mi\u00E9',jueves:'Jue',viernes:'Vie',sabado:'S\u00E1b',domingo:'Dom'};
+    el.innerHTML = window._citasRangos.map((r,i) => `
+      <div style="background:#111;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:13px;font-weight:600">${r.fechaInicio} &#x2192; ${r.fechaFin}</div>
+          <div style="font-size:12px;color:var(--gray);margin-top:2px">${(r.dias||[]).map(d=>dL[d]||d).join(', ')} &middot; ${r.horaInicio}&#x2013;${r.horaFin} &middot; ${r.duracion} min</div>
+        </div>
+        <button class="btn btn-sm" onclick="removeRangoCitas(${i})" style="background:#2a1010;color:#f55;font-size:12px">Eliminar</button>
+      </div>
+    `).join('');
+  }
+
+  async function addRangoCitas() {
+    const fi = document.getElementById('citas-fecha-inicio').value;
+    const ff = document.getElementById('citas-fecha-fin').value;
+    const hi = document.getElementById('citas-hora-inicio').value;
+    const hf = document.getElementById('citas-hora-fin').value;
+    const dur = parseInt(document.getElementById('citas-duracion').value);
+    const dias = [...document.querySelectorAll('.citas-dia-cb:checked')].map(cb => cb.value);
+    const msg = document.getElementById('citas-config-msg');
+    if (!fi || !ff || !hi || !hf || !dias.length) {
+      msg.style.color='#f55'; msg.textContent='Completa todos los campos y selecciona al menos un d\u00EDa.'; return;
+    }
+    if (fi > ff) { msg.style.color='#f55'; msg.textContent='La fecha inicio debe ser antes que la fecha fin.'; return; }
+    window._citasRangos.push({ id: Date.now().toString(), fechaInicio:fi, fechaFin:ff, dias, horaInicio:hi, horaFin:hf, duracion:dur });
+    await saveCitasConfig();
+    document.getElementById('citas-fecha-inicio').value='';
+    document.getElementById('citas-fecha-fin').value='';
+    document.querySelectorAll('.citas-dia-cb').forEach(cb => cb.checked=false);
+    msg.style.color='var(--green)'; msg.textContent='Rango guardado.';
+    setTimeout(()=>msg.textContent='',2500);
+  }
+
+  async function removeRangoCitas(idx) {
+    if (!confirm('\u00BFEliminar este rango de disponibilidad?')) return;
+    window._citasRangos.splice(idx,1);
+    await saveCitasConfig();
+    const msg = document.getElementById('citas-config-msg');
+    msg.style.color='var(--green)'; msg.textContent='Rango eliminado.';
+    setTimeout(()=>msg.textContent='',2000);
+  }
+
+  async function saveCitasConfig() {
+    await db.collection('config').doc('citasConfig').set({ rangos: window._citasRangos },{ merge:true });
+    renderRangosCitas();
+  }
+
+  async function loadCitasProximas() {
+    const el = document.getElementById('citas-proximas-list');
+    if (!el) return;
+    try {
+      const hoy = new Date().toISOString().split('T')[0];
+      const snap = await db.collection('citas')
+        .where('fecha','>=',hoy)
+        .where('estado','==','confirmada')
+        .orderBy('fecha').orderBy('hora').get();
+      if (snap.empty) {
+        el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:24px">No hay citas pr\u00F3ximas agendadas.</div>';
+        return;
+      }
+      const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mi\u00E9',4:'Jue',5:'Vie',6:'S\u00E1b'};
+      el.innerHTML = `<div style="background:#111;border-radius:12px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:2fr 1fr 2fr 1fr;gap:4px;padding:10px 14px;background:#0f0f0f;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
+          <div>Fecha</div><div>Hora</div><div>Miembro</div><div></div>
+        </div>
+        ${snap.docs.map(doc=>{
+          const c=doc.data();
+          const [y,m,d]=c.fecha.split('-');
+          const fObj=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+          const fLbl=`${dS[fObj.getDay()]} ${d}/${m}/${y}`;
+          return `<div style="display:grid;grid-template-columns:2fr 1fr 2fr 1fr;gap:4px;padding:10px 14px;border-top:1px solid var(--border);align-items:center">
+            <div style="font-size:13px">${fLbl}</div>
+            <div style="font-size:13px;font-family:'Space Mono',monospace">${c.hora}</div>
+            <div style="font-size:13px">${c.nombre||'&#x2014;'}</div>
+            <div><button class="btn btn-sm" onclick="cancelarCitaAdmin('${doc.id}','${c.nombre||''}')" style="background:#2a1010;color:#f55;font-size:11px;padding:4px 8px">Cancelar</button></div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    } catch(e) {
+      console.error('loadCitasProximas:',e);
+      el.innerHTML='<div style="text-align:center;color:#f55;font-size:13px;padding:24px">Error cargando citas. Puede necesitar \u00EDndice compuesto en Firestore.</div>';
+    }
+  }
+
+  async function cancelarCitaAdmin(citaId, nombre) {
+    if (!confirm('\u00BFCancelar la cita de '+nombre+'? Se liberar\u00E1 el horario.')) return;
+    try {
+      await db.collection('citas').doc(citaId).update({
+        estado:'cancelada', canceladaPor:'admin',
+        canceladaEn: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await loadCitasProximas();
+    } catch(e){ alert('Error: '+e.message); }
+  }
+
+  async function enviarReporteCitas() {
+    const msg = document.getElementById('citas-report-msg');
+    msg.style.color='var(--gray)'; msg.textContent='Enviando reporte...';
+    try {
+      const res = await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trigger:'manual'})});
+      const data = await res.json();
+      if (res.ok){ msg.style.color='var(--green)'; msg.textContent='Reporte enviado exitosamente.'; }
+      else { msg.style.color='#f55'; msg.textContent=data.error||'Error al enviar.'; }
+    } catch(e){ msg.style.color='#f55'; msg.textContent='Error de red.'; }
+    setTimeout(()=>msg.textContent='',4000);
+  }
 
 </script>
 <!-- MODAL PERFIL STAFF -->
