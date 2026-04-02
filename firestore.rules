@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /bitacora/{docId} {
+      allow read: if request.auth.uid == '1zZIfBnLGqRiPKVRVfHxlt2O3Di2';
+      allow write: if isStaff();
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isStaff() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /usuarios/{uid} {
+      allow read: if isOwner(uid) || isStaff() || request.auth == null;
+
+      allow update: if isOwner(uid) &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['activo','rol','fechaInicio','nombre']);
+
+      allow create, update: if isStaff();
+      allow delete: if false;
+
+      match /notificaciones/{notifId} {
+        allow read: if request.auth.uid == uid;
+        allow write: if request.auth.uid == uid || isStaff();
+      }
+
+      match /metricas/{metricId} {
+        allow read: if isOwner(uid) || isStaff();
+        allow create, update: if isStaff();
+        allow delete: if false;
+      }
+    }
+
+    match /staff/{uid} {
+      allow read: if isStaff();
+      allow create, update: if isStaff();
+      allow delete: if false;
+    }
+
+    match /eventos/{eventoId} {
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow read: if request.auth != null;
+    }
+
+    match /visitas/{docId} {
+      allow read: if true;
+      allow create: if true;
+    }
+
+    // ── Citas de valoracion ──────────────────────────────────────────────
+    match /citas/{citaId} {
+      // Staff puede leer y escribir todas las citas
+      allow read, write: if isStaff();
+      // Miembro autenticado puede crear su propia cita
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      // Miembro puede leer sus propias citas
+      allow read: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+      // Miembro puede cancelar solo su propia cita
+      allow update: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    // ── Configuracion global (citasConfig, guias) ────────────────────────
+    match /config/{docId} {
+      // Staff puede leer y escribir toda la config
+      allow read, write: if isStaff();
+      // Miembros autenticados pueden leer (para ver slots disponibles)
+      allow read: if request.auth != null;
+    }
+
+  }
+}
