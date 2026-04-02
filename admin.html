@@ -3126,6 +3126,7 @@ window.filterNotifUsers = function (q) {
         el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:24px">No hay citas pr\u00F3ximas agendadas.</div>';
         return;
       }
+      window._citasProximas = snap.docs.map(d => {const c=d.data(); return {nombre:c.nombre,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
       const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mi\u00E9',4:'Jue',5:'Vie',6:'S\u00E1b'};
       el.innerHTML = `<div style="background:#111;border-radius:12px;overflow:hidden">
         <div style="display:grid;grid-template-columns:2fr 1fr 2fr 1fr;gap:4px;padding:10px 14px;background:#0f0f0f;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
@@ -3165,7 +3166,7 @@ window.filterNotifUsers = function (q) {
     const msg = document.getElementById('citas-report-msg');
     msg.style.color='var(--gray)'; msg.textContent='Enviando reporte...';
     try {
-      const res = await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trigger:'manual'})});
+      const res = await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trigger:'manual',citas:window._citasProximas||[]})});
       const data = await res.json();
       if (res.ok){ msg.style.color='var(--green)'; msg.textContent='Reporte enviado exitosamente.'; }
       else { msg.style.color='#f55'; msg.textContent=data.error||'Error al enviar.'; }
