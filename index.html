@@ -499,6 +499,7 @@
               <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m&#xE9;tricas...</div>
             </div>
           </div>
+          <button class="btn-secondary" onclick="openAgendarModal()" style="width:100%;margin-top:4px;background:var(--orange);color:#fff;border-color:var(--orange);font-weight:600">&#x1F4C5; Agendar Valoraci&#xF3;n</button>
           <button class="btn-secondary" onclick="openHistorialModal()" style="width:100%;margin-top:4px">&#x1F4CB; Ver historial completo</button>
         </div>
       </div>
@@ -654,6 +655,51 @@
     </div>
   </div>
 
+  <!-- MODAL AGENDAR VALORACIÓN -->
+  <div class="modal-overlay" id="modal-agendar">
+    <div class="modal-sheet" style="max-height:90vh;display:flex;flex-direction:column">
+      <div class="modal-handle"></div>
+      <div class="modal-title">&#x1F4C5; Agendar Valoraci&#xF3;n</div>
+      <div id="agendar-loading" style="text-align:center;padding:32px;color:var(--gray);font-size:14px">Verificando disponibilidad&#x2026;</div>
+      <div id="agendar-mi-cita" style="display:none;padding:4px 0">
+        <div style="background:#111;border-radius:14px;padding:16px;text-align:center;margin-bottom:16px">
+          <div style="font-size:13px;color:var(--gray);margin-bottom:6px">Tu valoraci&#xF3;n est&#xE1; agendada para:</div>
+          <div id="mi-cita-info" style="font-size:17px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--orange)"></div>
+        </div>
+        <div style="font-size:12px;color:var(--gray);text-align:center;margin-bottom:16px">Si necesitas cambiarla, cancela y elige un nuevo horario.</div>
+        <button class="btn-secondary" onclick="cancelarMiCita()" style="width:100%;background:#2a1010;color:#f77;border-color:#f55">&#x26A0;&#xFE0F; Cancelar mi cita</button>
+        <button class="btn-secondary" onclick="closeModal('modal-agendar')" style="width:100%;margin-top:8px">Cerrar</button>
+      </div>
+      <div id="agendar-step1" style="display:none;overflow-y:auto;flex:1;padding-bottom:8px">
+        <div id="agendar-no-config" style="display:none;text-align:center;padding:24px;color:var(--gray);font-size:13px">No hay fechas disponibles. Cont&#xE1;ctanos para agendar.</div>
+        <div id="agendar-fecha-picker" style="display:none">
+          <div style="margin-bottom:14px">
+            <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:6px;letter-spacing:1px">SELECCIONA FECHA</label>
+            <input type="date" id="agendar-fecha" onchange="onFechaAgendarChange()" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:15px">
+          </div>
+          <div style="margin-bottom:8px">
+            <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:8px;letter-spacing:1px">HORARIO DISPONIBLE</label>
+            <div id="agendar-slots"></div>
+          </div>
+          <div id="agendar-btn-confirm" style="display:none;background:#111;border-radius:12px;padding:14px;margin-top:4px">
+            <div style="font-size:12px;color:var(--gray);margin-bottom:4px">Confirmar cita:</div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:12px"><span id="agendar-confirm-fecha"></span> &middot; <span id="agendar-confirm-hora" style="color:var(--orange)"></span></div>
+            <button class="btn btn-primary" onclick="confirmarCita()" style="width:100%">&#x2714;&#xFE0F; Confirmar cita</button>
+          </div>
+        </div>
+        <div id="agendar-msg" style="text-align:center;font-size:13px;margin-top:10px;min-height:18px;color:#f55"></div>
+        <button class="btn-secondary" onclick="closeModal('modal-agendar')" style="width:100%;margin-top:12px">Cancelar</button>
+      </div>
+      <div id="agendar-step2" style="display:none;text-align:center;padding:8px 0 16px">
+        <div style="font-size:48px;margin-bottom:12px">&#x2705;</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:8px">&#xA1;Cita Agendada!</div>
+        <div id="cita-confirmada-info" style="font-size:16px;color:var(--orange);font-weight:600;margin-bottom:8px"></div>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:24px">Recibir&#xE1;s un recordatorio antes de tu cita. &#x1F4AA;</div>
+        <button class="btn-secondary" onclick="closeModal('modal-agendar')" style="width:100%">Listo</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL T&#xC9;RMINOS Y PRIVACIDAD -->
   <div class="modal-overlay" id="modal-terminos" style="display:none;z-index:950">
     <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column">
@@ -746,7 +792,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-  import { where, getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot, deleteDoc, addDoc }
+  import { where, getFirestore, doc, getDoc, collection, getDocs, orderBy, query, limit, updateDoc, onSnapshot, deleteDoc, addDoc, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
   import { getMessaging, getToken, onMessage }
     from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
@@ -2899,6 +2945,207 @@ lbl.style.color=col;
 }
 window._applyIVF=applyIVF;
 })();
+
+  // ==================== CITAS - AGENDAR VALORACIÓN ====================
+  window._miCitaActiva = null;
+  window._citasConfigRangos = [];
+  window._citasFechaSeleccionada = null;
+  window._slotSeleccionado = null;
+
+  async function openAgendarModal() {
+    openModal('modal-agendar');
+    const loading = document.getElementById('agendar-loading');
+    const step1  = document.getElementById('agendar-step1');
+    const step2  = document.getElementById('agendar-step2');
+    const miCita = document.getElementById('agendar-mi-cita');
+    if(loading) loading.style.display='block';
+    if(step1)  step1.style.display='none';
+    if(step2)  step2.style.display='none';
+    if(miCita) miCita.style.display='none';
+    document.getElementById('agendar-msg').textContent='';
+
+    try {
+      const hoy = new Date().toISOString().split('T')[0];
+      const q = query(collection(db,'citas'),
+        where('uid','==',window._currentUid),
+        where('estado','==','confirmada'),
+        where('fecha','>=',hoy));
+      const snap = await getDocs(q);
+      if(loading) loading.style.display='none';
+      if(!snap.empty) {
+        const cita = snap.docs[0].data();
+        window._miCitaActiva = { id:snap.docs[0].id, ...cita };
+        const [y,m,d] = cita.fecha.split('-');
+        const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        const fLbl=`${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y}`;
+        document.getElementById('mi-cita-info').textContent=`${fLbl} a las ${cita.hora}`;
+        if(miCita) miCita.style.display='block';
+      } else {
+        window._miCitaActiva=null;
+        await loadConfigCitasParaMiembro();
+        if(step1) step1.style.display='block';
+      }
+    } catch(e) {
+      console.error('openAgendarModal:',e);
+      if(loading) loading.style.display='none';
+      await loadConfigCitasParaMiembro();
+      if(step1) step1.style.display='block';
+    }
+  }
+
+  async function loadConfigCitasParaMiembro() {
+    try {
+      const cfgDoc = await getDoc(doc(db,'config','citasConfig'));
+      window._citasConfigRangos = cfgDoc.exists() ? (cfgDoc.data().rangos||[]) : [];
+      const noConf = document.getElementById('agendar-no-config');
+      const picker = document.getElementById('agendar-fecha-picker');
+      if(!window._citasConfigRangos.length) {
+        if(noConf) noConf.style.display='block';
+        if(picker) picker.style.display='none';
+        return;
+      }
+      if(noConf) noConf.style.display='none';
+      if(picker) picker.style.display='block';
+      const fechaInput = document.getElementById('agendar-fecha');
+      const hoy = new Date().toISOString().split('T')[0];
+      const maxF = window._citasConfigRangos.map(r=>r.fechaFin).sort().reverse()[0];
+      fechaInput.min=hoy; fechaInput.max=maxF; fechaInput.value='';
+      document.getElementById('agendar-slots').innerHTML='';
+      document.getElementById('agendar-btn-confirm').style.display='none';
+    } catch(e){ console.error('loadConfigCitasParaMiembro:',e); }
+  }
+
+  function getCitaRango(fecha) {
+    const dm={0:'domingo',1:'lunes',2:'martes',3:'miercoles',4:'jueves',5:'viernes',6:'sabado'};
+    const [y,m,d]=fecha.split('-');
+    const dia=dm[new Date(+y,+m-1,+d).getDay()];
+    return window._citasConfigRangos.find(r=>fecha>=r.fechaInicio&&fecha<=r.fechaFin&&r.dias.includes(dia))||null;
+  }
+
+  async function onFechaAgendarChange() {
+    const fecha=document.getElementById('agendar-fecha').value;
+    window._citasFechaSeleccionada=fecha;
+    window._slotSeleccionado=null;
+    const slotsEl=document.getElementById('agendar-slots');
+    document.getElementById('agendar-btn-confirm').style.display='none';
+    if(!fecha){ slotsEl.innerHTML=''; return; }
+    const rango=getCitaRango(fecha);
+    if(!rango){
+      slotsEl.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:12px">No hay disponibilidad para esta fecha. Elige otro día.</div>';
+      return;
+    }
+    slotsEl.innerHTML='<div style="text-align:center;color:var(--gray);font-size:12px;padding:8px">Cargando horarios…</div>';
+    const slots=generarSlotsHorario(rango.horaInicio,rango.horaFin,rango.duracion);
+    const snap=await getDocs(query(collection(db,'citas'),where('fecha','==',fecha),where('estado','==','confirmada')));
+    const ocupadas=snap.docs.map(d=>d.data().hora);
+    if(!slots.length){ slotsEl.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:12px">Sin horarios disponibles.</div>'; return; }
+    slotsEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 0">
+      ${slots.map(s=>{
+        const ok=!ocupadas.includes(s);
+        return `<button onclick="${ok?'selectSlotCita(\''+s+'\')':''}" id="slot-${s.replace(':','-')}"
+          style="padding:10px 6px;border-radius:10px;border:1px solid ${ok?'var(--border)':'#222'};
+          background:${ok?'#1a1a1a':'#111'};color:${ok?'#fff':'#3a3a3a'};
+          font-size:13px;font-family:'Space Mono',monospace;cursor:${ok?'pointer':'default'};transition:all 0.15s">
+          ${s}${!ok?'<br><span style=\"font-size:9px\">ocupado</span>':''}
+        </button>`;
+      }).join('')}
+    </div>`;
+  }
+
+  function generarSlotsHorario(hi,hf,dur) {
+    const slots=[];
+    const [hI,mI]=hi.split(':').map(Number);
+    const [hF,mF]=hf.split(':').map(Number);
+    let min=hI*60+mI;
+    const minFin=hF*60+mF;
+    while(min+dur<=minFin){
+      slots.push(String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0'));
+      min+=dur;
+    }
+    return slots;
+  }
+
+  function selectSlotCita(hora) {
+    if(window._slotSeleccionado){
+      const prev=document.getElementById('slot-'+window._slotSeleccionado.replace(':','-'));
+      if(prev){prev.style.background='#1a1a1a';prev.style.borderColor='var(--border)';prev.style.color='#fff';}
+    }
+    window._slotSeleccionado=hora;
+    const el=document.getElementById('slot-'+hora.replace(':','-'));
+    if(el){el.style.background='var(--orange)';el.style.borderColor='var(--orange)';}
+    const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const [y,m,d]=window._citasFechaSeleccionada.split('-');
+    const fLbl=`${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y}`;
+    document.getElementById('agendar-confirm-fecha').textContent=fLbl;
+    document.getElementById('agendar-confirm-hora').textContent=hora;
+    document.getElementById('agendar-btn-confirm').style.display='block';
+  }
+
+  async function confirmarCita() {
+    const btn=document.getElementById('agendar-btn-confirm');
+    const msgEl=document.getElementById('agendar-msg');
+    if(!window._slotSeleccionado||!window._citasFechaSeleccionada) return;
+    btn.disabled=true; btn.textContent='Agendando…'; msgEl.textContent='';
+    try {
+      // Verificar que no se haya reservado en este momento
+      const snap=await getDocs(query(collection(db,'citas'),
+        where('fecha','==',window._citasFechaSeleccionada),
+        where('hora','==',window._slotSeleccionado),
+        where('estado','==','confirmada')));
+      if(!snap.empty){
+        msgEl.style.color='#f55'; msgEl.textContent='Este horario ya fue reservado. Elige otro.';
+        btn.disabled=false; btn.textContent='Confirmar cita';
+        await onFechaAgendarChange(); return;
+      }
+      const userDoc=await getDoc(doc(db,'usuarios',window._currentUid));
+      const nombre=userDoc.data()?.nombre||'Miembro';
+      const rango=getCitaRango(window._citasFechaSeleccionada);
+      const citaRef=await addDoc(collection(db,'citas'),{
+        uid:window._currentUid, nombre,
+        fecha:window._citasFechaSeleccionada,
+        hora:window._slotSeleccionado,
+        duracion:rango?.duracion||15,
+        estado:'confirmada',
+        recordatorioEnviado:false,
+        creadaEn:serverTimestamp()
+      });
+      try {
+        await fetch('/api/notify-cita',{method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({nombre,fecha:window._citasFechaSeleccionada,
+            hora:window._slotSeleccionado,duracion:rango?.duracion||15,citaId:citaRef.id})});
+      } catch(e){ console.warn('notify-cita:',e); }
+      // Mostrar confirmacion
+      document.getElementById('agendar-step1').style.display='none';
+      document.getElementById('agendar-step2').style.display='block';
+      const [y,m,d]=window._citasFechaSeleccionada.split('-');
+      const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      document.getElementById('cita-confirmada-info').textContent=
+        `${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y} · ${window._slotSeleccionado}`;
+    } catch(e){
+      console.error('confirmarCita:',e);
+      msgEl.style.color='#f55'; msgEl.textContent='Error al agendar: '+e.message;
+      btn.disabled=false; btn.textContent='Confirmar cita';
+    }
+  }
+
+  async function cancelarMiCita() {
+    if(!window._miCitaActiva) return;
+    const [y,m,d]=window._miCitaActiva.fecha.split('-');
+    const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const fLbl=`${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y} a las ${window._miCitaActiva.hora}`;
+    if(!confirm('¿Cancelar tu cita del '+fLbl+'?')) return;
+    try {
+      await updateDoc(doc(db,'citas',window._miCitaActiva.id),{
+        estado:'cancelada',canceladaPor:'miembro',canceladaEn:serverTimestamp()
+      });
+      window._miCitaActiva=null;
+      document.getElementById('agendar-mi-cita').style.display='none';
+      await loadConfigCitasParaMiembro();
+      document.getElementById('agendar-step1').style.display='block';
+    } catch(e){ alert('Error al cancelar: '+e.message); }
+  }
+
 </script>
 
 <div id="modal-tendencia-info" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px">
