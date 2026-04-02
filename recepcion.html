@@ -10,7 +10,7 @@
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js';
-    import { getFirestore, collection, addDoc, query, where, getDocs, Timestamp }
+    import { getFirestore, collection, addDoc, query, where, getDocs, getDoc, doc as firestoreDoc, Timestamp }
       from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js';
 
     const firebaseConfig = {
@@ -25,7 +25,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
     window._db = db;
-    window._Firestore = { collection, addDoc, query, where, getDocs, Timestamp };
+    window._Firestore = { collection, addDoc, query, where, getDocs, getDoc, docRef: firestoreDoc, Timestamp };
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebase-ready'));
   </script>
@@ -273,26 +273,31 @@
     async function processCheckin(uid) {
       if (!window._db) return showError('Firebase no disponible');
       var F = window._Firestore, db = window._db;
-      var snap = await F.getDocs(F.query(F.collection(db, 'usuarios'), F.where('__name__', '==', uid)));
-      if (snap.empty) return showError('Miembro no encontrado');
-      var userData = snap.docs[0].data();
+
+      // Usar getDoc directo por UID (mas confiable que query por __name__)
+      var userDoc = await F.getDoc(F.docRef(db, 'usuarios', uid));
+      if (!userDoc.exists()) return showError('Miembro no encontrado');
+
+      var userData = userDoc.data();
       var nombre = userData.nombre || userData.displayName || 'Miembro';
       var meta = userData.meta || '';
+
+      // Contar visitas totales
       var totalSnap = await F.getDocs(F.query(F.collection(db, 'visitas'), F.where('uid', '==', uid)));
       var totalVisitas = totalSnap.size + 1;
+
+      // Contar visitas esta semana
       var weekKey = getWeekKey();
       var weekSnap = await F.getDocs(F.query(F.collection(db, 'visitas'), F.where('uid', '==', uid), F.where('semana', '==', weekKey)));
       var weekVisitas = weekSnap.size + 1;
+
+      // Registrar visita
       await F.addDoc(F.collection(db, 'visitas'), {
         uid: uid, nombre: nombre, timestamp: F.Timestamp.now(),
         semana: weekKey, semanaNum: getISOWeek(), anio: new Date().getFullYear()
       });
       showCard({ nombre: nombre, meta: meta, totalVisitas: totalVisitas, weekVisitas: weekVisitas });
     }
-
-    var physicalBuffer = '', physicalTimer = null;
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
         var uid = physicalBuffer.trim(); physicalBuffer = '';
         if (uid.length > 10 && !cooldown) { cooldown = true; scanning = false; processCheckin(uid).catch(function(){ showError('Error al registrar'); }); }
       } else if (e.key.length === 1) {
@@ -303,7 +308,7 @@
 
     var video = document.getElementById('camera-video');
     var canvas = document.getElementById('camera-canvas');
-    var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     async function startCamera() {
       try {
