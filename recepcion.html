@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>bePWR · Recepcion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js';
+    import { getFirestore, collection, addDoc, query, where, getDocs, Timestamp }
+      from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCB_t4CtXh1G70t9gHuvQkckwdm4U5pv2k",
+      authDomain:        "bepwr-app.firebaseapp.com",
+      projectId:         "bepwr-app",
+      storageBucket:     "bepwr-app.firebasestorage.app",
+      messagingSenderId: "756758426621",
+      appId:             "1:756758426621:web:82d199589ec839a809df94"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    window._db = db;
+    window._Firestore = { collection, addDoc, query, where, getDocs, Timestamp };
+    window._firebaseReady = true;
+    document.dispatchEvent(new Event('firebase-ready'));
+  </script>
+
+  <!-- jsQR (escaneo desde camara) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0d0d;
+      --surface:  #161616;
+      --border:   #2a2a2a;
+      --accent:   #e8ff47;
+      --text:     #f0f0f0;
+      --muted:    #888;
+      --success:  #4ade80;
+      --error:    #f87171;
+      --radius:   20px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    header {
+      width: 100%;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo span { color: var(--accent); }
+    .status-dot { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    main {
+      flex: 1; width: 100%; max-width: 520px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px 24px; gap: 28px;
+    }
+
+    .scanner-wrap {
+      position: relative; width: 100%; max-width: 360px; aspect-ratio: 1;
+      border-radius: var(--radius); overflow: hidden; background: #000; border: 1px solid var(--border);
+    }
+    #camera-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #camera-canvas { display: none; }
+
+    .corner { position: absolute; width: 28px; height: 28px; border-color: var(--accent); border-style: solid; border-width: 0; }
+    .corner.tl { top: 16px; left: 16px; border-top-width: 3px; border-left-width: 3px; border-radius: 4px 0 0 0; }
+    .corner.tr { top: 16px; right: 16px; border-top-width: 3px; border-right-width: 3px; border-radius: 0 4px 0 0; }
+    .corner.bl { bottom: 16px; left: 16px; border-bottom-width: 3px; border-left-width: 3px; border-radius: 0 0 0 4px; }
+    .corner.br { bottom: 16px; right: 16px; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 4px 0; }
+
+    .scan-line {
+      position: absolute; left: 16px; right: 16px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      top: 16px; animation: scan 2.4s ease-in-out infinite;
+    }
+    @keyframes scan {
+      0%   { top: 16px; opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { top: calc(100% - 18px); opacity: 0; }
+    }
+
+    .scanner-flash { position: absolute; inset: 0; background: var(--success); opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+    .scanner-flash.active { opacity: 0.25; }
+    .scanner-label { font-size: 14px; color: var(--muted); text-align: center; }
+
+    .member-card {
+      width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; display: none; flex-direction: column; gap: 16px;
+      animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .member-card.visible { display: flex; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .member-header { display: flex; align-items: center; gap: 14px; }
+    .member-avatar {
+      width: 52px; height: 52px; border-radius: 50%; background: var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 700; color: var(--accent); flex-shrink: 0; border: 2px solid var(--accent);
+    }
+    .member-name { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    .member-meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .member-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .stat-value { font-size: 22px; font-weight: 700; color: var(--accent); line-height: 1; }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .check-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25);
+      color: var(--success); border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 500;
+    }
+
+    .error-card {
+      width: 100%; max-width: 360px; background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.25); border-radius: var(--radius);
+      padding: 20px 24px; display: none; align-items: center; gap: 12px; font-size: 14px; color: var(--error);
+    }
+    .error-card.visible { display: flex; }
+
+    .no-camera {
+      width: 100%; max-width: 360px; aspect-ratio: 1; background: var(--surface);
+      border: 1px dashed var(--border); border-radius: var(--radius);
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; color: var(--muted); font-size: 14px; text-align: center; padding: 24px;
+    }
+    .no-camera.visible { display: flex; }
+    .no-camera svg { opacity: 0.3; }
+
+    footer { padding: 16px 24px; font-size: 12px; color: var(--border); letter-spacing: 0.3px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">be<span>PWR</span></div>
+    <div class="status-dot">
+      <div class="dot"></div>
+      <span id="status-text">Listo para escanear</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="scanner-wrap" id="scanner-wrap">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <canvas id="camera-canvas"></canvas>
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="scan-line"></div>
+      <div class="scanner-flash" id="scanner-flash"></div>
+    </div>
+
+    <div class="no-camera" id="no-camera">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <path d="M14 14h2v2h-2zM18 14h3M18 18v3M14 18h2v3M20 18h1"/>
+      </svg>
+      <p>Lector fisico activo<br/>Apunta el QR al lector</p>
+    </div>
+
+    <p class="scanner-label" id="scanner-label">Apunta la camara al codigo QR del miembro</p>
+
+    <div class="member-card" id="member-card">
+      <div class="member-header">
+        <div class="member-avatar" id="member-avatar">?</div>
+        <div>
+          <div class="member-name" id="member-name">-</div>
+          <div class="member-meta" id="member-meta">-</div>
+        </div>
+      </div>
+      <div class="member-stats">
+        <div class="stat-box">
+          <div class="stat-label">Visitas totales</div>
+          <div class="stat-value" id="stat-total">-</div>
+          <div class="stat-sub">en bePWR</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Esta semana</div>
+          <div class="stat-value" id="stat-week">-</div>
+          <div class="stat-sub" id="stat-week-label">-</div>
+        </div>
+      </div>
+      <div class="check-badge">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        Entrada registrada
+      </div>
+    </div>
+
+    <div class="error-card" id="error-card">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="error-msg">Miembro no encontrado</span>
+    </div>
+  </main>
+
+  <footer>bePWR - Sistema de acceso</footer>
+
+  <script>
+    function getISOWeek(date) {
+      date = date || new Date();
+      var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+      var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    }
+    function getWeekKey(date) {
+      date = date || new Date();
+      return date.getFullYear() + '-W' + String(getISOWeek(date)).padStart(2,'0');
+    }
+
+    var scanning = true, lastScanned = '', cooldown = false;
+
+    function showCard(data) {
+      var initials = data.nombre.trim().split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+      document.getElementById('member-avatar').textContent = initials;
+      document.getElementById('member-name').textContent   = data.nombre;
+      document.getElementById('member-meta').textContent   = data.meta || 'Sin objetivo definido';
+      document.getElementById('stat-total').textContent    = data.totalVisitas;
+      document.getElementById('stat-week').textContent     = data.weekVisitas;
+      document.getElementById('stat-week-label').textContent = 'Semana ' + getISOWeek();
+      document.getElementById('member-card').classList.add('visible');
+      document.getElementById('error-card').classList.remove('visible');
+      var flash = document.getElementById('scanner-flash');
+      flash.classList.add('active');
+      setTimeout(function(){ flash.classList.remove('active'); }, 300);
+      setTimeout(hideCard, 6000);
+    }
+
+    function showError(msg) {
+      document.getElementById('error-msg').textContent = msg;
+      document.getElementById('error-card').classList.add('visible');
+      document.getElementById('member-card').classList.remove('visible');
+      setTimeout(function(){ document.getElementById('error-card').classList.remove('visible'); cooldown = false; scanning = true; }, 3000);
+    }
+
+    function hideCard() {
+      document.getElementById('member-card').classList.remove('visible');
+      cooldown = false; scanning = true;
+    }
+
+    async function processCheckin(uid) {
+      if (!window._db) return showError('Firebase no disponible');
+      var F = window._Firestore, db = window._db;
+      var snap = await F.getDocs(F.query(F.collection(db, 'usuarios'), F.where('__name__', '==', uid)));
+      if (snap.empty) return showError('Miembro no encontrado');
+      var userData = snap.docs[0].data();
+      var nombre = userData.nombre || userData.displayName || 'Miembro';
+      var meta = userData.meta || '';
+      var totalSnap = await F.getDocs(F.query(F.collection(db, 'visitas'), F.where('uid', '==', uid)));
+      var totalVisitas = totalSnap.size + 1;
+      var weekKey = getWeekKey();
+      var weekSnap = await F.getDocs(F.query(F.collection(db, 'visitas'), F.where('uid', '==', uid), F.where('semana', '==', weekKey)));
+      var weekVisitas = weekSnap.size + 1;
+      await F.addDoc(F.collection(db, 'visitas'), {
+        uid: uid, nombre: nombre, timestamp: F.Timestamp.now(),
+        semana: weekKey, semanaNum: getISOWeek(), anio: new Date().getFullYear()
+      });
+      showCard({ nombre: nombre, meta: meta, totalVisitas: totalVisitas, weekVisitas: weekVisitas });
+    }
+
+    var physicalBuffer = '', physicalTimer = null;
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var uid = physicalBuffer.trim(); physicalBuffer = '';
+        if (uid.length > 10 && !cooldown) { cooldown = true; scanning = false; processCheckin(uid).catch(function(){ showError('Error al registrar'); }); }
+      } else if (e.key.length === 1) {
+        physicalBuffer += e.key; clearTimeout(physicalTimer);
+        physicalTimer = setTimeout(function(){ physicalBuffer = ''; }, 300);
+      }
+    });
+
+    var video = document.getElementById('camera-video');
+    var canvas = document.getElementById('camera-canvas');
+    var ctx = canvas.getContext('2d');
+
+    async function startCamera() {
+      try {
+        var stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } } });
+        video.srcObject = stream; video.play();
+        requestAnimationFrame(scanLoop);
+      } catch(e) {
+        document.getElementById('scanner-wrap').style.display = 'none';
+        document.getElementById('no-camera').classList.add('visible');
+        document.getElementById('scanner-label').textContent = 'Usa el lector QR para registrar la entrada';
+        document.getElementById('status-text').textContent = 'Lector fisico activo';
+      }
+    }
+
+    function scanLoop() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+        if (code && scanning && !cooldown && code.data !== lastScanned) {
+          lastScanned = code.data; cooldown = true; scanning = false;
+          document.getElementById('status-text').textContent = 'Procesando...';
+          processCheckin(code.data.trim()).then(function(){ document.getElementById('status-text').textContent = 'Listo para escanear'; lastScanned = ''; }).catch(function(){ showError('Error al registrar'); lastScanned = ''; });
+        }
+      }
+      requestAnimationFrame(scanLoop);
+    }
+
+    if (window._firebaseReady) { startCamera(); }
+    else { document.addEventListener('firebase-ready', function(){ startCamera(); }); }
+  </script>
+</body>
+</html>
