@@ -1343,7 +1343,8 @@ function renderProfileMetrics(m) {
     // Check 3/day limit via localStorage
     const uid = window._currentUid || '';
     const today = new Date().toISOString().slice(0, 10);
-    const storageKey = 'ai_usage_' + uid + '_' + today;
+    const valFecha = (metrica && metrica.fecha ? String(metrica.fecha).slice(0,10) : '');
+    const storageKey = 'ai_usage_' + uid + '_' + today + '_' + valFecha;
     let usage = {};
     try { usage = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
     const count = usage.count || 0;
@@ -2243,7 +2244,7 @@ async function renderAnalisisCientifico(data, config) {
   if (!output) return;
 
   var uid = window._currentUid || 'anon';
-  var cacheKey = 'ia-analisis-' + uid;
+  var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha');
 
   // Fecha de la última valoración (con proteccion)
   var valFechaActual = null;
