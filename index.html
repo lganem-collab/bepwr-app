@@ -2953,7 +2953,7 @@ window._applyIVF=applyIVF;
   window._slotSeleccionado = null;
 
   async function openAgendarModal() {
-    openModal('modal-agendar');
+    document.getElementById('modal-agendar').classList.add('active');
     const loading = document.getElementById('agendar-loading');
     const step1  = document.getElementById('agendar-step1');
     const step2  = document.getElementById('agendar-step2');
