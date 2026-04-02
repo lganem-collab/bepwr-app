@@ -528,6 +528,15 @@
       <div class="install-close" onclick="this.parentElement.classList.add('hidden')">&#x2715;</div>
     </div>
 
+        <div class="view" id="view-qr">
+          <div class="view-header"><span class="view-title">Mi QR</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;gap:24px">
+            <p style="font-size:13px;color:var(--gray);text-align:center">Mu&#233;stralo al llegar a bePWR</p>
+            <div id="qr-container" style="background:#fff;padding:16px;border-radius:16px;min-width:200px;min-height:200px;display:flex;align-items:center;justify-content:center"></div>
+            <p style="font-size:11px;color:var(--gray);text-align:center;letter-spacing:0.3px;text-transform:uppercase">Tu c&#243;digo personal de acceso</p>
+          </div>
+        </div>
+
     <nav class="bottom-nav">
       <div class="nav-item on" id="nav-home" onclick="navigate('home')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -546,6 +555,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
         <span class="nav-label">Avisos</span>
       </div>
+        <div class="nav-item" id="nav-qr" onclick="navigate('qr')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2h-2zM18 14h3M18 18v3M14 18h2v3M20 18h1"/></svg>
+          <span class="nav-label">Mi QR</span>
+        </div>
     </nav>
   </div><!-- screen-app -->
 
@@ -1770,7 +1783,7 @@ let cachedMetricas = [];
 
 <script>
   // Navigation (global)
-  const views = ['home','metodo','metricas','notif','profile'];
+    const views = ['home','metodo','metricas','notif','profile','qr'];
   let currentView = 'home';
 
   // Magic link: auto-login from email (params already cleaned in <head>)
@@ -1801,7 +1814,41 @@ let cachedMetricas = [];
     currentView = id;
     if(id==='notif'&&window._currentUid&&window.loadNotifications)window.loadNotifications(window._currentUid);
     if(id==='metodo') initMetodoTab();
+    if(id==='qr') generateQR();
   }
+
+    // ── Mi QR ──────────────────────────────────────────────────────────────────
+    let _qrGenerated = false;
+    function generateQR() {
+      if (!window._currentUid) return;
+      const container = document.getElementById('qr-container');
+      if (!container) return;
+      if (_qrGenerated) return;
+      _qrGenerated = false;
+      container.innerHTML = '';
+      if (window.QRCode) {
+        new QRCode(container, {
+          text: window._currentUid,
+          width: 200, height: 200,
+          colorDark: '#000000', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        _qrGenerated = true;
+      } else {
+        var s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+        s.onload = function() {
+          new QRCode(container, {
+            text: window._currentUid,
+            width: 200, height: 200,
+            colorDark: '#000000', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          _qrGenerated = true;
+        };
+        document.head.appendChild(s);
+      }
+    }
 
   window.addEventListener('popstate', (e) => {
     // If a modal is open, close it instead of navigating
