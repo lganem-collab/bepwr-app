@@ -1405,7 +1405,7 @@ if (user && user.uid === MASTER_UID) {
               }
               // Try ISO yyyy-mm-dd
               else if (f.match(/^\d{4}-\d{2}-\d{2}/)) {
-                ts = new Date(f).getTime();
+                ts = new Date(f.length === 10 ? f + 'T12:00:00' : f).getTime();
               }
               // Try Spanish locale: "30 mar 2026" or "1 abr 2026"
               else {
@@ -1434,8 +1434,14 @@ if (user && user.uid === MASTER_UID) {
       if (!f) return '\u2014';
       if (f.toDate) f = f.toDate();
       if (typeof f === 'string' && f.includes('/')) return f;
-      try { const d = new Date(f); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
-      catch(e) { return f; }
+      try {
+        // Fix timezone: YYYY-MM-DD se parsea UTC, agregar T12:00:00 para evitar día anterior
+        const fStr = (typeof f === 'string' && f.match(/^\d{4}-\d{2}-\d{2}$/)) ? f + 'T12:00:00' : f;
+        const d = new Date(fStr);
+        return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+      }
+      catch(e) { return String(f); }
+    }
     }
     function v(val) { return (val != null && val !== '' && val !== 'NaN') ? val : '\u2014'; }
     function progreso(ini, act, invertir) {
@@ -2244,6 +2250,7 @@ for (const med of medidasVal) {
       logBitacora('nueva_valoracion', 'Valoraci\u00F3n del ' + fecha + ' | Peso: ' + (isNaN(peso)?'-':peso+'kg'), miembroNombre);
       closeModal('modal-metrics');
       loadMembers();
+      setTimeout(() => { if(window._detailUid) openDetail(window._detailUid); }, 800)
     } catch(e) {
       errEl.textContent = 'Error: ' + e.message;
     }
