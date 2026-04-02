@@ -1,0 +1,78 @@
+name: Recordatorio de Citas
+
+on:
+  schedule:
+    # 8:00 AM hora Mexico (UTC-6) = 14:00 UTC
+    - cron: '0 14 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install firebase-admin
+
+      - name: Enviar recordatorios de citas de manana
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          node -e "
+          const admin = require('firebase-admin');
+          const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+          admin.initializeApp({ credential: admin.credential.cert(sa) });
+          const db = admin.firestore();
+          const messaging = admin.messaging();
+
+          async function main() {
+            const manana = new Date();
+            manana.setDate(manana.getDate() + 1);
+            const mananaStr = manana.toISOString().split('T')[0];
+            console.log('Buscando citas para:', mananaStr);
+
+            const snap = await db.collection('citas')
+              .where('fecha', '==', mananaStr)
+              .where('estado', '==', 'confirmada')
+              .where('recordatorioEnviado', '==', false)
+              .get();
+
+            if (snap.empty) { console.log('Sin citas manana.'); return; }
+            console.log('Citas encontradas:', snap.size);
+
+            const dias = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+            const [y, m, d] = mananaStr.split('-');
+            const fLbl = dias[new Date(+y,+m-1,+d).getDay()] + ' ' + d + '/' + m + '/' + y;
+
+            let ok = 0, err = 0;
+            for (const doc of snap.docs) {
+              const c = doc.data();
+              try {
+                const uDoc = await db.collection('usuarios').doc(c.uid).get();
+                const token = uDoc.data()?.fcmToken;
+                if (!token) { console.log('Sin token:', c.nombre); continue; }
+
+                await messaging.send({
+                  token,
+                  notification: {
+                    title: 'Tu valoracion es manana',
+                    body: c.nombre.split(' ')[0] + ', te esperamos el ' + fLbl + ' a las ' + c.hora + '. No olvides!'
+                  },
+                  data: { type: 'recordatorio_cita', fecha: mananaStr, hora: c.hora },
+                  android: { priority: 'high' },
+                  apns: { payload: { aps: { sound: 'default', badge: 1 } } }
+                });
+                await doc.ref.update({ recordatorioEnviado: true });
+                console.log('Enviado a:', c.nombre, c.hora);
+                ok++;
+              } catch(e) { console.error('Error:', c.nombre, e.message); err++; }
+            }
+            console.log('Recordatorios:', ok, 'ok |', err, 'errores');
+          }
+
+          main().catch(e => { console.error(e); process.exit(1); });
+          "
