@@ -812,6 +812,7 @@
       }
       loginScr.classList.remove('active');
       appScr.classList.add('active');
+        loadAsistencias(user.uid);
       window._currentUid = user.uid;
       authReady = true;
       // Suscribir push notifications
