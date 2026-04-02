@@ -298,6 +298,10 @@
       });
       showCard({ nombre: nombre, meta: meta, totalVisitas: totalVisitas, weekVisitas: weekVisitas });
     }
+
+    var physicalBuffer = '', physicalTimer = null;
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
         var uid = physicalBuffer.trim(); physicalBuffer = '';
         if (uid.length > 10 && !cooldown) { cooldown = true; scanning = false; processCheckin(uid).catch(function(){ showError('Error al registrar'); }); }
       } else if (e.key.length === 1) {
