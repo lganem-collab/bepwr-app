@@ -2350,12 +2350,22 @@ async function renderAnalisisCientifico(data, config) {
     } catch(e) {}
   }
 if (config && config.rutina) {
-  var edad = data.edad || 30;
-  var ageKey = edad < 30 ? 'sub30' : edad < 50 ? 'mid' : 'senior';
+  // Calcular edad real desde nacimiento, con fallback a data.edad
+  var edadReal = data.edad || 30;
+  if (data.nacimiento) {
+    try {
+      var nacDate = new Date(data.nacimiento);
+      var hoyDate = new Date();
+      edadReal = hoyDate.getFullYear() - nacDate.getFullYear();
+      if (hoyDate.getMonth() < nacDate.getMonth() ||
+         (hoyDate.getMonth() === nacDate.getMonth() && hoyDate.getDate() < nacDate.getDate())) edadReal--;
+    } catch(e) {}
+  }
+  var ageKey = edadReal < 30 ? 'sub30' : edadReal < 50 ? 'mid' : 'senior';
   var rutina = config.rutina[ageKey] || config.rutina['mid'];
   if (rutina) {
-    lines.push('- Rutina semanal bePWR recomendada: ' + rutina.total);
-    if (rutina.clases) lines.push('- Clases: ' + rutina.clases.map(function(c){return c.tipo+' '+c.freq;}).join(', '));
+    lines.push('- Rutina semanal bePWR: ' + rutina.total);
+    if (rutina.clases) lines.push('- Clases: ' + rutina.clases.map(function(c){ return c.tipo + ' ' + c.freq; }).join(', '));
     if (rutina.complemento) lines.push('- Complemento: ' + rutina.complemento);
   }
 }
