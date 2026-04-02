@@ -528,11 +528,13 @@
       <div class="install-close" onclick="this.parentElement.classList.add('hidden')">&#x2715;</div>
     </div>
 
-        <div class="view" id="view-qr" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100dvh - 120px);padding:24px;gap:20px">
-          <p style="font-size:22px;font-weight:700;letter-spacing:-0.5px;margin:0">Mi QR</p>
-          <p style="font-size:13px;color:var(--gray);text-align:center;margin:0">Mu&#233;stralo al llegar a bePWR</p>
-          <div id="qr-container" style="background:#fff;padding:16px;border-radius:16px;display:flex;align-items:center;justify-content:center;min-width:200px;min-height:200px"></div>
-          <p style="font-size:11px;color:var(--gray);text-align:center;letter-spacing:0.5px;text-transform:uppercase;margin:0">Tu c&#243;digo personal de acceso</p>
+        <div class="view" id="view-qr">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100dvh - 120px);padding:24px;gap:20px">
+            <p style="font-size:22px;font-weight:700;letter-spacing:-0.5px;margin:0">Mi QR</p>
+            <p style="font-size:13px;color:var(--gray);text-align:center;margin:0">Mu&#233;stralo al llegar a bePWR</p>
+            <div id="qr-container" style="background:#fff;padding:16px;border-radius:16px;display:flex;align-items:center;justify-content:center;min-width:200px;min-height:200px"></div>
+            <p style="font-size:11px;color:var(--gray);text-align:center;letter-spacing:0.5px;text-transform:uppercase;margin:0">Tu c&#243;digo personal de acceso</p>
+          </div>
         </div>
 
     <nav class="bottom-nav">
