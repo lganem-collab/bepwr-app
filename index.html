@@ -2009,6 +2009,7 @@ return {
   edad: d.edad || null,
   nacimiento: d.nacimiento || null,
   genero: d.genero || null,
+  altura: d.altura || null,
   peso: d.peso || null,
   pruebaPeso: d.pruebaPeso || null,
   medidas: d.medidas || null,
@@ -2508,24 +2509,148 @@ var FRASES_RETROCESO=[
 "Hoy te levantas y sigues.",
 "bePWR es constancia, es perfeccion en proceso."
 ];
-function calcTendencia(ini, act, meta){
-var s=0;
-var um=0.5;
-function dif(a,b){if(isNaN(a)||isNaN(b)||!a||!b)return null;return parseFloat(b)-parseFloat(a);}
-function chk(d,inv){if(d===null)return;var real=inv?-d:d;if(Math.abs(d)<um)return;s+=real>0?arguments[2]:arguments[3];}
-var dm=dif(ini.musculo,act.musculo);if(dm!==null&&Math.abs(dm)>=um)s+=dm>0?4:-1;
-var dgv=dif(ini.grasaVisceral,act.grasaVisceral);if(dgv!==null&&Math.abs(dgv)>=um)s+=dgv<0?3:-3;
-var dc=dif(ini.calificacion,act.calificacion);if(dc!==null&&Math.abs(dc)>=1)s+=dc>0?3:-2;
-var dp=dif(ini.pgc,act.pgc);if(dp!==null&&Math.abs(dp)>=um)s+=dp<0?2:-2;
-var dpeso=dif(ini.peso,act.peso);if(dpeso!==null&&Math.abs(dpeso)>=um){
-var ganar=meta&&meta.includes("músculo");
-s+=ganar?(dpeso>0?2:-1):(dpeso<0?2:-1);}
-var db=dif(ini.brazo,act.brazo);if(db!==null&&Math.abs(db)>=um)s+=db>0?2:0;
-var dpp=dif(ini.pruebaPeso,act.pruebaPeso);if(dpp!==null&&Math.abs(dpp)>=um)s+=dpp>0?2:0;
-var dpt=dif(ini.pantorrilla,act.pantorrilla);if(dpt!==null&&Math.abs(dpt)>=um)s+=dpt>0?2:0;
-var dci=dif(ini.cintura,act.cintura);if(dci!==null&&Math.abs(dci)>=um)s+=dci<0?1:-1;
-var dab=dif(ini.abdomen,act.abdomen);if(dab!==null&&Math.abs(dab)>=um)s+=dab<0?1:-1;
-return s;
+function calcTendencia(ini, act, meta, du) {
+  if (!ini || !act || ini === act) return 0;
+
+  // ── Datos biométricos del usuario
+  du = du || {};
+  var edadU = du.edad || null;
+  if (!edadU && du.nacimiento) {
+    try {
+      var nac = new Date(du.nacimiento);
+      var hoy = new Date();
+      edadU = hoy.getFullYear() - nac.getFullYear();
+      if (hoy.getMonth() < nac.getMonth() || (hoy.getMonth() === nac.getMonth() && hoy.getDate() < nac.getDate())) edadU--;
+    } catch(e) {}
+  }
+  var edad  = edadU || 35;
+  var genStr = (du.genero || '').toLowerCase();
+  var esH   = genStr.includes('masculino');
+  var esM   = genStr.includes('femenino');
+  var altCm = parseFloat(du.altura) || 170;
+  var altM  = altCm / 100;
+
+  // ── CAPA 1: Rangos normativos biométricos
+  // IMC saludable (OMS, ajustado por edad >50)
+  var imcMin = edad >= 50 ? (esH?23:esM?22:22.5) : (esH?22:esM?21:21.5);
+  var imcMax = edad >= 50 ? (esH?27:esM?26:26.5) : (esH?25:esM?24:24.5);
+
+  // Peso saludable (kg)
+  var pesoMin = imcMin * altM * altM;
+  var pesoMax = imcMax * altM * altM;
+
+  // SMM — Músculo Esquelético (Lee et al. 2000)
+  var pesoIdeal = ((imcMin+imcMax)/2) * altM * altM;
+  var smmOff = esH ? 6.6 : esM ? -2.5 : 2.05;
+  var smmRef = 0.244*pesoIdeal + 7.8*altM - 0.098*edad + smmOff;
+  var smmMin = smmRef * 0.88;
+  var smmMax = smmRef * 1.18;
+
+  // % Grasa corporal (ACSM 2018)
+  var gRng;
+  if (esH) {
+    gRng = edad<30?[11,20]:edad<40?[12,21]:edad<50?[14,23]:edad<60?[15,24]:[16,25];
+  } else if (esM) {
+    gRng = edad<30?[16,23]:edad<40?[17,24]:edad<50?[19,26]:edad<60?[21,28]:[22,29];
+  } else {
+    gRng = edad<30?[13.5,21.5]:edad<40?[14.5,22.5]:edad<50?[16.5,24.5]:edad<60?[18,26]:[19,27];
+  }
+
+  // Grasa visceral (InBody scale)
+  var gvRng = [1, 9];
+
+  // Abdomen (cm)
+  var abdRng = esH ? [75,94] : esM ? [65,80] : [70,87];
+
+  // InBody Score
+  var ibRng = [70, 100];
+
+  // Mancuernas — fuerza funcional de referencia (kg)
+  var mancRng = esH ? [20,60] : esM ? [10,35] : [15,47];
+
+  // ── Función de dirección hacia la norma (-1 a +1)
+  // invertido=true: más bajo es mejor (grasa, gv, abdomen)
+  function dirNorma(vA, vB, rMin, rMax, invertido) {
+    vA = parseFloat(vA); vB = parseFloat(vB);
+    if (isNaN(vA) || isNaN(vB)) return null;
+    if (vA === vB) return 0;
+
+    var enA = vA >= rMin && vA <= rMax;
+    var enB = vB >= rMin && vB <= rMax;
+    var rango = rMax - rMin || 1;
+    var dA = vA < rMin ? rMin-vA : vA > rMax ? vA-rMax : 0;
+    var dB = vB < rMin ? rMin-vB : vB > rMax ? vB-rMax : 0;
+    var dir;
+
+    if (!enA && enB)  dir = 1.0;           // Entró al rango: muy positivo
+    else if (enA && !enB) dir = -1.0;      // Salió del rango: muy negativo
+    else if (enA && enB) {
+      // Ambos en rango: evaluar acercamiento al centro óptimo
+      var centro = (rMin+rMax)/2;
+      var dcA = Math.abs(vA-centro), dcB = Math.abs(vB-centro);
+      dir = dcB < dcA ? 0.25 : dcB > dcA ? -0.15 : 0;
+    } else {
+      // Ambos fuera: positivo si se acercó
+      dir = Math.max(-1, Math.min(1, (dA-dB)/rango*2));
+    }
+
+    // Para métricas invertidas: si está SOBRE el máximo, bajar es positivo
+    // si está BAJO el mínimo (ej. muy delgado), subir un poco también es positivo
+    if (invertido) {
+      if (vA > rMax && vB > rMax) dir = vB < vA ? Math.min(1,(vA-vB)/rango*2) : -Math.min(1,(vB-vA)/rango*2);
+      else if (vA < rMin && vB < rMin) dir = vB > vA ? 0.3 : -0.3; // muy delgado: subir levemente es ok
+    }
+
+    return Math.max(-1, Math.min(1, dir));
+  }
+
+  function parseMancuernas(v) {
+    if (!v) return null;
+    if (typeof v === 'number') return v;
+    if (typeof v === 'string') return parseFloat(v) || null;
+    return parseFloat(v.min) || parseFloat(v.max) || null;
+  }
+
+  // ── CAPA 2: Score por métrica
+  var dirs = {
+    peso:       dirNorma(ini.peso, act.peso, pesoMin, pesoMax, false),
+    musculo:    dirNorma(ini.musculo, act.musculo, smmMin, smmMax, false),
+    grasa:      dirNorma(ini.grasaCorporal, act.grasaCorporal, gRng[0], gRng[1], true),
+    gv:         dirNorma(ini.grasaVisceral, act.grasaVisceral, gvRng[0], gvRng[1], true),
+    pgc:        dirNorma(ini.pgc, act.pgc, gRng[0], gRng[1], true),
+    imc:        dirNorma(ini.imc, act.imc, imcMin, imcMax, false),
+    inbody:     dirNorma(ini.calificacion, act.calificacion, ibRng[0], ibRng[1], false),
+    abdomen:    dirNorma(ini.abdomen, act.abdomen, abdRng[0], abdRng[1], true),
+    mancuernas: dirNorma(parseMancuernas(ini.pruebaPeso), parseMancuernas(act.pruebaPeso), mancRng[0], mancRng[1], false)
+  };
+
+  // ── CAPA 3: Pesos por objetivo
+  var P = {
+    'Bajar grasa / bajar de peso':
+      {peso:0.18,musculo:0.15,grasa:0.25,gv:0.14,pgc:0.13,imc:0.05,inbody:0.05,abdomen:0.05,mancuernas:0},
+    'Ganar músculo / recomposición':
+      {peso:0.08,musculo:0.32,grasa:0.12,gv:0.08,pgc:0.07,imc:0.06,inbody:0.12,abdomen:0.05,mancuernas:0.10},
+    'Salud metabólica / salud general':
+      {peso:0.08,musculo:0.15,grasa:0.18,gv:0.26,pgc:0.17,imc:0.04,inbody:0.06,abdomen:0.06,mancuernas:0},
+    'Rendimiento funcional':
+      {peso:0.03,musculo:0.28,grasa:0.12,gv:0.08,pgc:0.09,imc:0.06,inbody:0.22,abdomen:0.05,mancuernas:0.07},
+    'Estética / composición equilibrada':
+      {peso:0.10,musculo:0.20,grasa:0.28,gv:0.12,pgc:0.14,imc:0.06,inbody:0.05,abdomen:0.05,mancuernas:0}
+  };
+  var pDeporte = {peso:0.02,musculo:0.25,grasa:0.10,gv:0.08,pgc:0.08,imc:0.05,inbody:0.27,abdomen:0.05,mancuernas:0.10};
+
+  var pesos = P[meta] || (meta && meta.includes('Incrementar performance') ? pDeporte : P['Salud metabólica / salud general']);
+
+  // ── Score final: suma ponderada → escalar a -10..+10
+  var score = 0, pesoAcum = 0;
+  ['peso','musculo','grasa','gv','pgc','imc','inbody','abdomen','mancuernas'].forEach(function(k){
+    var d = dirs[k], p = pesos[k]||0;
+    if (d !== null && p > 0) { score += d*p; pesoAcum += p; }
+  });
+
+  if (pesoAcum > 0 && pesoAcum < 0.85) score = score / pesoAcum; // Normalizar si hay gaps
+
+  return Math.max(-10, Math.min(10, Math.round(score * 10)));
 }
 function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
 window._applyTendencia=function(act,ini,valFecha){
@@ -2540,7 +2665,7 @@ var header=document.getElementById("tendencia-header");
 
 if(!card)return;
 var meta=(window.cachedUserData&&window.cachedUserData.meta)||"";
-var score=calcTendencia(ini,act,meta);
+var score=calcTendencia(ini,act,meta,window.cachedUserData||{});
 var tipo=score>3?"progreso":score>=-3?"proceso":"retroceso";
 var uid=window._currentUid||"anon";
 var tCacheKey="tendencia-frase-"+uid;
