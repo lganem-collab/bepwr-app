@@ -40,7 +40,7 @@
       --bg:       #0d0d0d;
       --surface:  #161616;
       --border:   #2a2a2a;
-      --accent:   #e8ff47;
+      --accent:   #FF5C1A;
       --text:     #f0f0f0;
       --muted:    #888;
       --success:  #4ade80;
@@ -74,9 +74,15 @@
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
     main {
-      flex: 1; width: 100%; max-width: 520px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 32px 24px; gap: 28px;
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 40px;
+      padding: 32px 48px;
     }
 
     .scanner-wrap {
@@ -154,6 +160,46 @@
     .no-camera svg { opacity: 0.3; }
 
     footer { padding: 16px 24px; font-size: 12px; color: var(--border); letter-spacing: 0.3px; }
+
+    /* ── COLUMNAS ── */
+    .col-scanner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .col-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+      min-height: 400px;
+    }
+    .member-card  { width: 100%; max-width: none; }
+    .error-card   { width: 100%; max-width: none; }
+    .scanner-wrap { width: 100%; max-width: 100%; }
+    .waiting-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+    /* Ocultar waiting cuando hay card o error */
+    .member-card.visible ~ * .waiting-info,
+    #member-card.visible + * { display: none; }
+
+    @media (max-width: 700px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 24px 16px;
+        gap: 24px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -167,62 +213,71 @@
   </header>
 
   <main>
-    <div class="scanner-wrap" id="scanner-wrap">
-      <video id="camera-video" autoplay playsinline muted></video>
-      <canvas id="camera-canvas"></canvas>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-      <div class="scan-line"></div>
-      <div class="scanner-flash" id="scanner-flash"></div>
-    </div>
 
-    <div class="no-camera" id="no-camera">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-        <rect x="3" y="14" width="7" height="7" rx="1"/>
-        <path d="M14 14h2v2h-2zM18 14h3M18 18v3M14 18h2v3M20 18h1"/>
-      </svg>
-      <p>Lector fisico activo<br/>Apunta el QR al lector</p>
-    </div>
-
-    <p class="scanner-label" id="scanner-label">Apunta la camara al codigo QR del miembro</p>
-
-    <div class="member-card" id="member-card">
-      <div class="member-header">
-        <div class="member-avatar" id="member-avatar">?</div>
-        <div>
-          <div class="member-name" id="member-name">-</div>
-          <div class="member-meta" id="member-meta">-</div>
-        </div>
+    <!-- COLUMNA IZQUIERDA: Scanner -->
+    <div class="col-scanner">
+      <div class="scanner-wrap" id="scanner-wrap">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="camera-canvas"></canvas>
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <div class="scan-line"></div>
+        <div class="scanner-flash" id="scanner-flash"></div>
       </div>
-      <div class="member-stats">
-        <div class="stat-box">
-          <div class="stat-label">Visitas totales</div>
-          <div class="stat-value" id="stat-total">-</div>
-          <div class="stat-sub">en bePWR</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Esta semana</div>
-          <div class="stat-value" id="stat-week">-</div>
-          <div class="stat-sub" id="stat-week-label">-</div>
-        </div>
-      </div>
-      <div class="check-badge">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M20 6L9 17l-5-5"/>
+      <div class="no-camera" id="no-camera">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <path d="M14 14h2v2h-2zM18 14h3M18 18v3M14 18h2v3M20 18h1"/>
         </svg>
-        Entrada registrada
+        <p>Lector fisico activo<br/>Apunta el QR al lector</p>
+      </div>
+      <p class="scanner-label" id="scanner-label">Apunta la camara al codigo QR del miembro</p>
+    </div>
+
+    <!-- COLUMNA DERECHA: Datos del miembro -->
+    <div class="col-info">
+      <div class="member-card" id="member-card">
+        <div class="member-header">
+          <div class="member-avatar" id="member-avatar">?</div>
+          <div>
+            <div class="member-name" id="member-name">-</div>
+            <div class="member-meta" id="member-meta">-</div>
+          </div>
+        </div>
+        <div class="member-stats">
+          <div class="stat-box">
+            <div class="stat-label">Visitas totales</div>
+            <div class="stat-value" id="stat-total">-</div>
+            <div class="stat-sub">en bePWR</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Esta semana</div>
+            <div class="stat-value" id="stat-week">-</div>
+            <div class="stat-sub" id="stat-week-label">-</div>
+          </div>
+        </div>
+        <div class="check-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          Entrada registrada
+        </div>
+      </div>
+      <div class="error-card" id="error-card">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="error-msg">Miembro no encontrado</span>
+      </div>
+      <div class="waiting-info" id="waiting-info">
+        <p style="font-size:18px;font-weight:600;color:var(--muted);text-align:center">Esperando escaneo...</p>
+        <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:8px">Muestra el QR de bePWR al lector</p>
       </div>
     </div>
 
-    <div class="error-card" id="error-card">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-      <span id="error-msg">Miembro no encontrado</span>
-    </div>
   </main>
 
   <footer>bePWR - Sistema de acceso</footer>
