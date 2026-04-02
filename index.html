@@ -194,6 +194,15 @@
     .comp-label{font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:.5px}
     .comp-val{text-align:center;font-size:13px;font-family:'DM Sans',sans-serif}
     .comp-prog{text-align:center;font-size:12px;font-weight:600}
+    /* ── Card Asistencias ── */
+    .asist-dia { display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
+    .asist-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--border); display: block; transition: background 0.2s;
+    }
+    .asist-dot.on { background: var(--orange); }
+    .asist-label { font-size: 10px; color: var(--gray); font-weight: 500; }
+
   </style>
 </head>
 <body>
@@ -356,6 +365,25 @@
 
         
         
+
+          <!-- Card Asistencias Semanales -->
+          <div id="card-asistencias" style="background:var(--card);border-radius:16px;padding:16px 18px;margin-bottom:12px;border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--gray);font-weight:600">Asistencias</span>
+              <span id="asist-semana-label" style="font-size:11px;color:var(--gray)">Semana --</span>
+            </div>
+            <div id="asist-mensaje" style="font-size:22px;font-weight:700;color:var(--orange);margin-bottom:10px">Tu meta te est&#225; esperando &#x1F4AA;</div>
+            <div id="asist-dias" style="display:flex;gap:6px;justify-content:space-between">
+              <div class="asist-dia" data-dia="0"><span class="asist-dot"></span><span class="asist-label">L</span></div>
+              <div class="asist-dia" data-dia="1"><span class="asist-dot"></span><span class="asist-label">M</span></div>
+              <div class="asist-dia" data-dia="2"><span class="asist-dot"></span><span class="asist-label">X</span></div>
+              <div class="asist-dia" data-dia="3"><span class="asist-dot"></span><span class="asist-label">J</span></div>
+              <div class="asist-dia" data-dia="4"><span class="asist-dot"></span><span class="asist-label">V</span></div>
+              <div class="asist-dia" data-dia="5"><span class="asist-dot"></span><span class="asist-label">S</span></div>
+              <div class="asist-dia" data-dia="6"><span class="asist-dot"></span><span class="asist-label">D</span></div>
+            </div>
+          </div>
+
       </div>
 
       <!-- NOTIFICATIONS VIEW -->
@@ -1816,6 +1844,7 @@ let cachedMetricas = [];
     currentView = id;
     if(id==='notif'&&window._currentUid&&window.loadNotifications)window.loadNotifications(window._currentUid);
     if(id==='metodo') initMetodoTab();
+    if(id==='home') loadAsistencias(window._currentUid);
     if(id==='qr') generateQR();
   }
 
@@ -2075,6 +2104,63 @@ return {
     return null;
   }
 }
+
+    // ── Asistencias semanales ──────────────────────────────────────────────────
+    function getISOWeek(d) {
+      d = d || new Date();
+      var date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+      var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+      return Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
+    }
+    function getWeekKey(d) {
+      d = d || new Date();
+      return d.getFullYear() + '-W' + String(getISOWeek(d)).padStart(2,'0');
+    }
+
+    async function loadAsistencias(uid) {
+      if(!uid) return;
+      try {
+        var weekKey = getWeekKey();
+        var weekNum = getISOWeek();
+        var now = new Date();
+        // Dias con visita esta semana (0=Dom,1=Lun...6=Sab)
+        var visitSnap = await window.getDocs(window.query(
+          window.collection(window.db, 'visitas'),
+          window.where('uid', '==', uid),
+          window.where('semana', '==', weekKey)
+        ));
+        var diasConVisita = new Set();
+        visitSnap.forEach(function(d) {
+          var ts = d.data().timestamp;
+          if(ts) {
+            var fecha = ts.toDate ? ts.toDate() : new Date(ts);
+            // JS: 0=Dom, 1=Lun ... convertir a L=0,M=1,X=2,J=3,V=4,S=5,D=6
+            var jsDay = fecha.getDay(); // 0=Dom
+            var idx = jsDay === 0 ? 6 : jsDay - 1;
+            diasConVisita.add(idx);
+          }
+        });
+        var total = diasConVisita.size;
+        // Actualizar UI
+        var semLabel = document.getElementById('asist-semana-label');
+        var mensaje  = document.getElementById('asist-mensaje');
+        var dots     = document.querySelectorAll('.asist-dot');
+        if(semLabel) semLabel.textContent = 'Semana ' + weekNum;
+        dots.forEach(function(dot, i) {
+          dot.classList.toggle('on', diasConVisita.has(i));
+        });
+        if(mensaje) {
+          if(total === 0) {
+            mensaje.textContent = 'Tu meta te está esperando 💪';
+            mensaje.style.color = 'var(--gray)';
+          } else {
+            mensaje.textContent = total + (total === 1 ? ' visita' : ' visitas') + ' esta semana';
+            mensaje.style.color = 'var(--orange)';
+          }
+        }
+      } catch(e) { console.warn('asistencias:', e); }
+    }
 
 async function initMetodoTab() {
   if (_metodoData) { renderMetodo(_metodoData); return; }
