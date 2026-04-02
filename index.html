@@ -770,6 +770,7 @@
   window.query = query;
   window.orderBy = orderBy;
   window.limit = limit;
+      window.where = where;
   window.updateDoc = updateDoc;
 
   import('https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js').then(m=>m.setPersistence(auth,m.indexedDbLocalPersistence||m.browserLocalPersistence)).catch(()=>{});
