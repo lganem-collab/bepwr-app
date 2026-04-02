@@ -819,6 +819,8 @@
   window.limit = limit;
       window.where = where;
   window.updateDoc = updateDoc;
+  window.addDoc = addDoc;
+  window.serverTimestamp = serverTimestamp;
 
   import('https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js').then(m=>m.setPersistence(auth,m.indexedDbLocalPersistence||m.browserLocalPersistence)).catch(()=>{});
 
@@ -3012,7 +3014,13 @@ window._applyIVF=applyIVF;
       fechaInput.min=hoy; fechaInput.max=maxF; fechaInput.value='';
       document.getElementById('agendar-slots').innerHTML='';
       document.getElementById('agendar-btn-confirm').style.display='none';
-    } catch(e){ console.error('loadConfigCitasParaMiembro:',e); }
+    } catch(e){
+      console.error('loadConfigCitasParaMiembro error:', e.code, e.message);
+      const noConf2 = document.getElementById('agendar-no-config');
+      const picker2 = document.getElementById('agendar-fecha-picker');
+      if(noConf2){ noConf2.style.display='block'; noConf2.textContent = e.code === 'permission-denied' ? 'Sin permisos. Contacta al staff.' : 'Error al cargar: ' + e.message; }
+      if(picker2) picker2.style.display='none';
+    }
   }
 
   function getCitaRango(fecha) {
