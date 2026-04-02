@@ -773,6 +773,7 @@
       subscribeToPush(user.uid);
       loadNotifications(user.uid);
       startNotifListener(user.uid);
+      startMetricasListener(user.uid, user);
       if (navigator.clearAppBadge) navigator.clearAppBadge();
       logEvento('visita');
       // Mostrar t\u00E9rminos si no han sido aceptados a\u00FAn
@@ -1229,6 +1230,30 @@ function renderProfileMetrics(m) {
         const sa2=document.querySelector('.scroll-area');if(sa2)sa2.style.paddingTop='';
       },6000);
       loadNotifications(uid);
+    });
+  }
+
+  function startMetricasListener(uid, user) {
+    const colRef = collection(db, 'usuarios', uid, 'metricas');
+    let firstLoad = true;
+    onSnapshot(colRef, snap => {
+      if (firstLoad) { firstLoad = false; return; }
+      // Solo reaccionar si se agregó una nueva métrica
+      const added = snap.docChanges().filter(ch => ch.type === 'added');
+      if (!added.length) return;
+      // Resetear cachés para que todo se regenere con datos nuevos
+      _metodoData = null;
+      cachedMetricas = [];
+      const uid2 = window._currentUid || '';
+      if (uid2) {
+        // Limpiar caché del análisis IA en localStorage
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('ia-analisis-' + uid2));
+        keys.forEach(k => localStorage.removeItem(k));
+      }
+      // Recargar datos del usuario
+      try {
+        loadUserData(user);
+      } catch(e) { console.warn('startMetricasListener reload error:', e); }
     });
   }
 
