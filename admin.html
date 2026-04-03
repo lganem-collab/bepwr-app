@@ -3114,25 +3114,26 @@ window.filterNotifUsers = function (q) {
     renderRangosCitas();
   }
 
-  async function loadCitasProximas() {
+  function loadCitasProximas() {
     const el = document.getElementById('citas-proximas-list');
     if (!el) return;
-    try {
-      const hoy = new Date().toISOString().split('T')[0];
-      const snap = await db.collection('citas')
-        .where('fecha','>=',hoy)
-        .orderBy('fecha').get();
-      if (snap.empty) {
-        el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:24px">No hay citas pr\u00F3ximas agendadas.</div>';
-        return;
+    if (window._citasProximasUnsub) { try{window._citasProximasUnsub();}catch(e){} }
+    const hoy = new Date().toISOString().split('T')[0];
+    const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb'};
+    el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:12px;padding:12px;font-family:Space Mono,monospace">Cargando…</div>';
+    function _renderSnap(snap){
+      const activas=snap.docs.filter(d=>d.data().estado!=='cancelada');
+      if(!activas.length){
+        el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:24px">No hay citas próximas agendadas.</div>';
+        window._citasProximas=[];return;
       }
-      window._citasProximas = snap.docs.filter(d=>d.data().estado!=='cancelada').sort((a,b)=>{const da=a.data(),db=b.data();return (da.fecha+da.hora).localeCompare(db.fecha+db.hora);}).map(d => {const c=d.data(); return {nombre:c.nombre,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
-      const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mi\u00E9',4:'Jue',5:'Vie',6:'S\u00E1b'};
-      el.innerHTML = `<div style="background:#111;border-radius:12px;overflow:hidden">
+      activas.sort((a,b)=>{const da=a.data(),db=b.data();return(da.fecha+da.hora).localeCompare(db.fecha+db.hora);});
+      window._citasProximas=activas.map(d=>{const c=d.data();return{nombre:c.nombre,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
+      el.innerHTML=`<div style="background:#111;border-radius:12px;overflow:hidden">
         <div style="display:grid;grid-template-columns:2fr 1fr 2fr 1fr;gap:4px;padding:10px 14px;background:#0f0f0f;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
           <div>Fecha</div><div>Hora</div><div>Miembro</div><div></div>
         </div>
-        ${snap.docs.map(doc=>{
+        ${activas.map(doc=>{
           const c=doc.data();
           const [y,m,d]=c.fecha.split('-');
           const fObj=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
@@ -3145,9 +3146,16 @@ window.filterNotifUsers = function (q) {
           </div>`;
         }).join('')}
       </div>`;
-    } catch(e) {
-      console.error('loadCitasProximas:',e);
-      el.innerHTML='<div style="text-align:center;color:#f55;font-size:13px;padding:24px">Error cargando citas. Puede necesitar \u00EDndice compuesto en Firestore.</div>';
+    }
+    try{
+      window._citasProximasUnsub=db.collection('citas').where('fecha','>=',hoy).orderBy('fecha')
+        .onSnapshot(_renderSnap, err=>{
+          console.error('loadCitasProximas:',err);
+          el.innerHTML='<div style="text-align:center;color:#f55;font-size:13px;padding:24px">Error cargando citas.</div>';
+        });
+    }catch(e){
+      console.error('loadCitasProximas setup:',e);
+      el.innerHTML='<div style="text-align:center;color:#f55;font-size:13px;padding:24px">Error: '+e.message+'</div>';
     }
   }
 
