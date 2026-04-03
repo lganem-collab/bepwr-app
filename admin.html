@@ -3128,24 +3128,34 @@ window.filterNotifUsers = function (q) {
         window._citasProximas=[];return;
       }
       activas.sort((a,b)=>{const da=a.data(),db=b.data();return(da.fecha+da.hora).localeCompare(db.fecha+db.hora);});
-      window._citasProximas=activas.map(d=>{const c=d.data();return{nombre:c.nombre,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
-      el.innerHTML=`<div style="background:#111;border-radius:12px;overflow:hidden">
-        <div style="display:grid;grid-template-columns:2fr 1fr 2fr 1fr;gap:4px;padding:10px 14px;background:#0f0f0f;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
-          <div>Fecha</div><div>Hora</div><div>Miembro</div><div></div>
-        </div>
-        ${activas.map(doc=>{
-          const c=doc.data();
-          const [y,m,d]=c.fecha.split('-');
-          const fObj=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
-          const fLbl=`${dS[fObj.getDay()]} ${d}/${m}/${y}`;
-          return `<div style="display:grid;grid-template-columns:2fr 1fr 2fr 1fr;gap:4px;padding:10px 14px;border-top:1px solid var(--border);align-items:center">
-            <div style="font-size:13px">${fLbl}</div>
-            <div style="font-size:13px;font-family:'Space Mono',monospace">${c.hora}</div>
-            <div style="font-size:13px">${c.nombre||'&#x2014;'}</div>
-            <div><button class="btn btn-sm" onclick="cancelarCitaAdmin('${doc.id}','${c.nombre||''}')" style="background:#2a1010;color:#f55;font-size:11px;padding:4px 8px">Cancelar</button></div>
+      window._citasProximas=activas.map(d=>{const c=d.data();return{nombre:c.nombre,uid:c.uid,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
+      const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb'};
+      const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      // Agrupar por fecha
+      const grupos={};
+      activas.forEach(doc=>{
+        const c=doc.data();
+        if(!grupos[c.fecha]) grupos[c.fecha]=[];
+        grupos[c.fecha].push({doc,c});
+      });
+      let html='<div style="background:#111;border-radius:12px;overflow:hidden">';
+      Object.keys(grupos).sort().forEach(fecha=>{
+        const [y,m,d]=fecha.split('-');
+        const fObj=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+        const fLbl=`${dS[fObj.getDay()]} ${parseInt(d)} de ${MESES[parseInt(m)-1]} ${y}`;
+        html+=`<div style="padding:8px 14px;background:#1a1a1a;font-size:11px;color:var(--orange);font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase">${fLbl}</div>`;
+        grupos[fecha].forEach(({doc,c})=>{
+          const member=(window._allMembers||[]).find(mb=>mb.uid===c.uid);
+          const nombre=c.nombre&&c.nombre!=='Miembro'?c.nombre:(member&&member.nombre)||c.nombre||'—';
+          html+=`<div style="display:grid;grid-template-columns:80px 1fr auto;gap:4px;padding:10px 14px;border-top:1px solid var(--border);align-items:center">
+            <div style="font-size:13px;font-family:'Space Mono',monospace;color:var(--orange)">${c.hora}</div>
+            <div style="font-size:13px;color:#eee">${nombre}</div>
+            <button class="btn btn-sm" onclick="cancelarCitaAdmin('${doc.id}','${nombre}')" style="background:#2a1010;color:#f55;font-size:11px;padding:4px 8px">Cancelar</button>
           </div>`;
-        }).join('')}
-      </div>`;
+        });
+      });
+      html+='</div>';
+      el.innerHTML=html;
     }
     try{
       window._citasProximasUnsub=db.collection('citas').where('fecha','>=',hoy).orderBy('fecha')
