@@ -1,4 +1,4 @@
-// api/cron/notify-morning.js — Lunes y Viernes 6am (UTC-6 → 12:00 UTC)
+// api/cron/notify-morning.js — Lunes y Viernes 6am QRO (12:00 UTC)
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
@@ -12,14 +12,6 @@ if (!getApps().length) {
 }
 const db = getFirestore();
 const messaging = getMessaging();
-
-async function sendPush(token, title, body) {
-  if (!token) return;
-  try {
-    await messaging.send({ token, notification: { title, body },
-      webpush: { notification: { icon: 'https://bepwr-app.vercel.app/icons/icon-192.png' } } });
-  } catch (e) { console.warn('FCM:', e.message); }
-}
 
 export default async function handler(req, res) {
   const day = new Date().getDay();
@@ -35,16 +27,42 @@ export default async function handler(req, res) {
   }
   try {
     const snap = await db.collection('usuarios').get();
-    let count = 0;
-    for (const doc of snap.docs) {
-      const data = doc.data();
-      if (data.activo === false || !data.fcmToken) continue;
-      await sendPush(data.fcmToken, title, body);
-      count++;
-    }
-    return res.status(200).json({ ok: true, day, count });
+    const tokens = snap.docs
+      .map(d => d.data())
+      .filter(d => d.activo !== false && d.fcmToken && d.fcmToken.length > 10)
+      .map(d => d.fcmToken);
+
+    if (!tokens.length) return res.status(200).json({ ok: true, sent: 0, message: 'Sin tokens' });
+
+    const response = await messaging.sendEachForMulticast({
+      tokens,
+      notification: { title, body },
+      webpush: {
+        notification: {
+          title, body,
+          icon: 'https://bepwr-app.vercel.app/icons/icon-192.png',
+          badge: 'https://bepwr-app.vercel.app/icons/icon-192.png',
+          requireInteraction: false,
+        },
+        fcmOptions: { link: 'https://bepwr-app.vercel.app' }
+      }
+    });
+
+    // Log individual results for debugging
+    response.responses.forEach((r, i) => {
+      if (!r.success) {
+        console.warn('FCM fail token', i, ':', r.error?.code, r.error?.message);
+      }
+    });
+
+    return res.status(200).json({
+      ok: true, day,
+      sent: response.successCount,
+      failed: response.failureCount,
+      total: tokens.length
+    });
   } catch (e) {
-    console.error('notify-morning:', e);
+    console.error('notify-morning:', e.message);
     return res.status(500).json({ error: e.message });
   }
 }
