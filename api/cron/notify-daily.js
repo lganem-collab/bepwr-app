@@ -117,7 +117,7 @@ export default async function handler(req, res) {
             headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
               from: 'bePWR <citas@bepwr.vip>',
-              to: [mEmail, 'lganem@gmail.com'],
+              to: [mEmail],
               subject: '\u23F0 Recordatorio: Tu valoraci\u00F3n es ma\u00F1ana \u00B7 bePWR',
               html: `<div style="font-family:sans-serif;max-width:500px;margin:0 auto">
                 <div style="background:#fff;padding:20px;border-radius:12px 12px 0 0;text-align:center;border-bottom:1px solid #e0e0e0">
