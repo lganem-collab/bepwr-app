@@ -1899,7 +1899,7 @@ let cachedMetricas = [];
     }
     currentView = id;
     if(id==='notif'&&window._currentUid&&window.loadNotifications)window.loadNotifications(window._currentUid);
-    if(id==='metodo') initMetodoTab();
+    if(id==='metodo'){initMetodoTab();setTimeout(()=>window.cargarProximaCita&&window.cargarProximaCita(),600);}
     if(id==='home') loadAsistencias(window._currentUid);
     if(id==='qr') generateQR();
   }
@@ -3409,6 +3409,13 @@ window._applyIVF=applyIVF;
       var uid=window._currentUid; if(!uid) throw new Error('Sin sesión');
       var nombre=(window._userData&&window._userData.nombre)?window._userData.nombre:'Miembro';
       var email=(window._userData&&window._userData.email)?window._userData.email:'';
+      // Cancelar citas previas confirmadas del mismo usuario
+      try{
+        var prevSnap=await window.getDocs(window.query(window.collection(window.db,'citas'),window.where('uid','==',uid),window.where('estado','==','confirmada')));
+        for(var pDoc of prevSnap.docs){
+          await window.updateDoc(window.doc(window.db,'citas',pDoc.id),{estado:'cancelada',canceladoEn:window.serverTimestamp()});
+        }
+      }catch(pe){console.log('no prev citas:',pe.message);}
       var ref=await window.addDoc(window.collection(window.db,'citas'),{
         uid:uid,nombre:nombre,fecha:_selDia,hora:_selHora,
         tipo:'valoracion',estado:'confirmada',creadoEn:window.serverTimestamp()
@@ -3416,6 +3423,15 @@ window._applyIVF=applyIVF;
       _proximaCitaId=ref.id;
       var cita={uid,nombre,fecha:_selDia,hora:_selHora,tipo:'valoracion',estado:'confirmada'};
       _mostrarCardCita(cita); _actualizarMetodo(cita);
+      // Guardar notificación en avisos del miembro
+      try{
+        await window.addDoc(window.collection(window.db,'usuarios',uid,'notificaciones'),{
+          titulo:'Cita confirmada ✅',
+          cuerpo:'Tu valoración está agendada para el '+_labelCita(cita),
+          tipo:'cita',fecha:window.serverTimestamp(),leida:false
+        });
+        if(typeof loadNotifications==='function') loadNotifications(uid);
+      }catch(ne){console.log('notif err',ne);}
       // Mostrar confirmación
       var p=_selDia.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
       document.getElementById('citas-ok-msg').textContent=DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()]+' a las '+_selHora;
