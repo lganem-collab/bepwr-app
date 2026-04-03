@@ -3425,7 +3425,7 @@ window._applyIVF=applyIVF;
     btn.disabled=true;btn.textContent='Guardando...';
     try{
       var uid=window._currentUid; if(!uid) throw new Error('Sin sesión');
-      var nombre=(window._userData&&window._userData.nombre)?window._userData.nombre:'Miembro';
+      var nombre=((window._userData&&window._userData.nombre)?window._userData.nombre:(window._authUser&&window._authUser.displayName)?window._authUser.displayName:(window._authUser&&window._authUser.email)?window._authUser.email.split('@')[0]:'Miembro');
       var email=(window._userData&&window._userData.email)?window._userData.email:
                 (window._authUser&&window._authUser.email)?window._authUser.email:'';
       // Cancelar citas previas confirmadas
@@ -3515,8 +3515,7 @@ window._applyIVF=applyIVF;
         }
       }catch(pe){}
       // Email de cancelación
-      var nombre=(window._userData&&window._userData.nombre)?window._userData.nombre:
-                 (window._authUser&&window._authUser.email)?window._authUser.email:'Miembro';
+      var nombre=((window._userData&&window._userData.nombre)?window._userData.nombre:(window._authUser&&window._authUser.displayName)?window._authUser.displayName:(window._authUser&&window._authUser.email)?window._authUser.email.split('@')[0]:'Miembro');
       var email=(window._userData&&window._userData.email)?window._userData.email:
                 (window._authUser&&window._authUser.email)?window._authUser.email:'';
       if(cita.fecha&&cita.hora){
