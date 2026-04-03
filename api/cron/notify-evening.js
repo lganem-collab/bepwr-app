@@ -1,27 +1,64 @@
-// api/cron/notify-evening.js — Miércoles y Domingo 7pm (hora Querétaro = UTC-6 → 01:00 UTC siguiente día)
+// api/cron/notify-evening.js — Miércoles y Domingo 7pm QRO (01:00 UTC)
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { getMessaging } from 'firebase-admin/messaging';
+
+if (!getApps().length) {
+  initializeApp({ credential: cert({
+    projectId: process.env.FCM_PROJECT_ID,
+    clientEmail: process.env.FCM_CLIENT_EMAIL,
+    privateKey: process.env.FCM_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  }) });
+}
+const db = getFirestore();
+const messaging = getMessaging();
+
 export default async function handler(req, res) {
   const day = new Date().getDay();
-
   let title, body;
   if (day === 3) {
-    title = '🌆 ¡Tarde perfecta para entrenar';
-    body = 'Mitad de semana — ¼ya tienes tus sesiones programadas? Reserva tu clase de hoy o mañana en bePWR.';
+    title = '\uD83C\uDF06 \u00A1Tarde perfecta para entrenar!';
+    body = 'Mitad de semana \u2014 \u00BFya tienes tus sesiones programadas? Reserva tu clase de hoy o ma\u00F1ana en bePWR.';
   } else if (day === 0) {
-    title = '📅 Planea tu semana desde hoy';
-    body = 'Mañana empieza una nueva semana. Reserva ya tus 2-4 sesiones y llega a tus metas.';
+    title = '\uD83D\uDCC5 Planea tu semana desde hoy';
+    body = 'Ma\u00F1ana empieza una nueva semana. Reserva ya tus 2-4 sesiones y llega a tus metas.';
   } else {
     return res.status(200).json({ skipped: true, day });
   }
-
   try {
-    const response = await fetch(`${process.env.VERCEL_URL ? 'https://'+process.env.VERCEL_URL : 'https://bepwr-app.vercel.app'}/api/notify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, body, url: 'https://bepwr-app.vercel.app', target: 'all', secret: process.env.NOTIFY_SECRET })
+    const snap = await db.collection('usuarios').get();
+    const tokens = snap.docs
+      .map(d => d.data())
+      .filter(d => d.activo !== false && d.fcmToken && d.fcmToken.length > 10)
+      .map(d => d.fcmToken);
+
+    if (!tokens.length) return res.status(200).json({ ok: true, sent: 0, message: 'Sin tokens' });
+
+    const response = await messaging.sendEachForMulticast({
+      tokens,
+      notification: { title, body },
+      webpush: {
+        notification: {
+          title, body,
+          icon: 'https://bepwr-app.vercel.app/icons/icon-192.png',
+          badge: 'https://bepwr-app.vercel.app/icons/icon-192.png',
+        },
+        fcmOptions: { link: 'https://bepwr-app.vercel.app' }
+      }
     });
-    const data = await response.json();
-    return res.status(200).json({ ok: true, day, ...data });
+
+    response.responses.forEach((r, i) => {
+      if (!r.success) console.warn('FCM fail token', i, ':', r.error?.code, r.error?.message);
+    });
+
+    return res.status(200).json({
+      ok: true, day,
+      sent: response.successCount,
+      failed: response.failureCount,
+      total: tokens.length
+    });
   } catch (e) {
+    console.error('notify-evening:', e.message);
     return res.status(500).json({ error: e.message });
   }
 }
