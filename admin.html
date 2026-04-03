@@ -3049,6 +3049,7 @@ window.filterNotifUsers = function (q) {
   async function loadCitasTab() {
     await loadCitasConfig();
     await loadCitasProximas();
+    await loadCitasHistorial();
   }
 
   async function loadCitasConfig() {
@@ -3120,12 +3121,12 @@ window.filterNotifUsers = function (q) {
       const hoy = new Date().toISOString().split('T')[0];
       const snap = await db.collection('citas')
         .where('fecha','>=',hoy)
-        .orderBy('fecha').orderBy('hora').get();
+        .orderBy('fecha').get();
       if (snap.empty) {
         el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:24px">No hay citas pr\u00F3ximas agendadas.</div>';
         return;
       }
-      window._citasProximas = snap.docs.filter(d=>d.data().estado!=='cancelada').map(d => {const c=d.data(); return {nombre:c.nombre,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
+      window._citasProximas = snap.docs.filter(d=>d.data().estado!=='cancelada').sort((a,b)=>{const da=a.data(),db=b.data();return (da.fecha+da.hora).localeCompare(db.fecha+db.hora);}).map(d => {const c=d.data(); return {nombre:c.nombre,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
       const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mi\u00E9',4:'Jue',5:'Vie',6:'S\u00E1b'};
       el.innerHTML = `<div style="background:#111;border-radius:12px;overflow:hidden">
         <div style="display:grid;grid-template-columns:2fr 1fr 2fr 1fr;gap:4px;padding:10px 14px;background:#0f0f0f;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border)">
@@ -3149,6 +3150,52 @@ window.filterNotifUsers = function (q) {
       el.innerHTML='<div style="text-align:center;color:#f55;font-size:13px;padding:24px">Error cargando citas. Puede necesitar \u00EDndice compuesto en Firestore.</div>';
     }
   }
+
+  async function loadCitasHistorial() {
+    const el = document.getElementById('citas-historial-list');
+    if (!el) return;
+    try {
+      const hoy = new Date().toISOString().split('T')[0];
+      const snap = await db.collection('citas')
+        .where('fecha', '<', hoy)
+        .orderBy('fecha', 'desc')
+        .get();
+      const todas = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      if (!todas.length) { el.innerHTML = '<div style="text-align:center;color:#555;font-size:13px;padding:20px">Sin historial de citas</div>'; return; }
+      // Agrupar por mes
+      const grupos = {};
+      todas.forEach(c => {
+        const [y,m] = c.fecha.split('-');
+        const key = y+'-'+m;
+        if (!grupos[key]) grupos[key] = [];
+        grupos[key].push(c);
+      });
+      const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      let html = '';
+      Object.keys(grupos).sort().reverse().forEach(key => {
+        const [y,m] = key.split('-');
+        html += `<div style="font-size:11px;font-weight:600;color:#888;letter-spacing:.5px;padding:12px 14px 4px;text-transform:uppercase">${meses[parseInt(m)-1]} ${y}</div>`;
+        grupos[key].forEach(c => {
+          const fd = new Date(parseInt(c.fecha.split('-')[0]), parseInt(c.fecha.split('-')[1])-1, parseInt(c.fecha.split('-')[2]));
+          const label = dias[fd.getDay()]+' '+parseInt(c.fecha.split('-')[2])+', '+c.hora;
+          const isCanceled = c.estado === 'cancelada';
+          html += `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:10px 14px;border-bottom:1px solid #1a1a1a">
+            <div>
+              <div style="font-size:13px;color:#eee;font-weight:500">${c.nombre||'Miembro'}</div>
+              <div style="font-size:11px;color:#888;margin-top:1px">${label}</div>
+            </div>
+            <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:${isCanceled?'#3a1a1a':'#1a3a2a'};color:${isCanceled?'#e74c3c':'#2ecc71'}">${isCanceled?'Cancelada':'Completada'}</span>
+          </div>`;
+        });
+      });
+      el.innerHTML = `<div style="background:#111;border-radius:12px;overflow:hidden">${html}</div>`;
+    } catch(e) {
+      console.error('loadCitasHistorial:', e);
+      el.innerHTML = '<div style="text-align:center;color:#555;font-size:13px;padding:20px">Error cargando historial</div>';
+    }
+  }
+
 
   async function cancelarCitaAdmin(citaId, nombre) {
     if (!confirm('\u00BFCancelar la cita de '+nombre+'? Se liberar\u00E1 el horario.')) return;
