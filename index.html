@@ -51,7 +51,7 @@
     .field-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:7px;display:block}
     .field-input{width:100%;background:#141414;border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
     .field-input:focus{border-color:var(--orange)}
-    .field-input::placeholder{color:#333}
+    .field-input::placeholder{color:#666}
     .login-btn{width:100%;padding:18px;background:var(--orange);color:white;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;transition:opacity .2s,transform .1s}
     .login-btn:active{opacity:.85;transform:scale(.98)}
     .login-btn:disabled{opacity:.5;cursor:not-allowed}
@@ -89,7 +89,7 @@
     .modal-field label{font-size:11px;color:var(--gray);letter-spacing:1px;font-family:'Space Mono',monospace;text-transform:uppercase;display:block;margin-bottom:6px}
     .modal-field input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;box-sizing:border-box}
     .modal-field input:focus{outline:none;border-color:var(--orange)}
-    .modal-field input[type="date"]{background:#f0f0f0;color:#111;border-color:#ccc;color-scheme:light}
+    .modal-field input[type="date"]{background:#f0f0f0;color:#666;border-color:#ccc;color-scheme:light}
     .modal-field input[type="date"]::-webkit-calendar-picker-indicator{filter:none;cursor:pointer}
     .modal-field input[type="date"]:focus{border-color:var(--orange)}
     .modal-divider{border:none;border-top:1px solid #222;margin:20px 0}
@@ -245,7 +245,7 @@
         Tu membres&#xED;a en bePWR est&#xE1; actualmente pausada. Para volver a acceder a tus m&#xE9;tricas, historial y reservas, renueva con nosotros.
       </div>
       <a href="https://bepwr.com" target="_blank" style="display:block;padding:17px;background:#FF5C1A;color:white;border-radius:14px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;text-align:center;margin-bottom:12px">&#x1F513; Renovar membres&#xED;a</a>
-      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#555;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesi&#xF3;n</button>
+      <button onclick="doLogout()" style="width:100%;padding:17px;background:transparent;color:#666;border:1px solid #222;border-radius:14px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Cerrar sesi&#xF3;n</button>
     </div>
   </div>
 
@@ -764,7 +764,7 @@
           <input type="checkbox" id="terminos-check" onchange="toggleTerminosBtn()" style="margin-top:3px;accent-color:#FF5C1A;width:18px;height:18px;flex-shrink:0">
           <span style="font-size:13px;color:#ccc;line-height:1.5">He le&#xED;do y acepto los T&#xE9;rminos y Condiciones y el Aviso de Privacidad de OPERADORA FIT TERRASOLA</span>
         </label>
-        <button class="btn-primary" id="terminos-btn" disabled onclick="aceptarTerminos()" style="opacity:0.4">Aceptar y continuar</button>
+        <button class="btn-primary" id="terminos-btn" disabled onclick="aceptarTerminos()" style="opacity:0.55">Aceptar y continuar</button>
       </div>
     </div>
   </div>
@@ -2687,7 +2687,7 @@ if (config && config.rutina) {
       <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">73&#x2013;87</strong> &#x2014; Avanzado</div>
       <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">88&#x2013;100</strong> &#x2014; Destacado</div>
     </div>
-    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
+    <div style="font-size:11px;color:#666;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
   </div>
 </div>
 
@@ -3202,7 +3202,7 @@ window._applyIVF=applyIVF;
       <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">-3 a +3</strong> &#x2014; En Proceso</div>
       <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">-4 o menos</strong> &#x2014; Retroceso</div>
     </div>
-    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Requiere al menos 2 valoraciones.</div>
+    <div style="font-size:11px;color:#666;font-family:'Space Mono',monospace">Requiere al menos 2 valoraciones.</div>
   </div>
 </div>
 
@@ -3221,7 +3221,7 @@ window._applyIVF=applyIVF;
       <!-- Nav mes -->
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 8px">
         <button onclick="navMesCitas(-1)" style="background:none;border:none;font-size:20px;color:#1D9E75;cursor:pointer;padding:4px 8px">‹</button>
-        <span id="citas-mes-label" style="font-size:14px;font-weight:500;color:#333"></span>
+        <span id="citas-mes-label" style="font-size:14px;font-weight:500;color:#666"></span>
         <button onclick="navMesCitas(1)" style="background:none;border:none;font-size:20px;color:#1D9E75;cursor:pointer;padding:4px 8px">›</button>
       </div>
       <!-- Grid semana headers -->
@@ -3252,7 +3252,7 @@ window._applyIVF=applyIVF;
     <div id="citas-step-ok" style="display:none;text-align:center;padding:30px 20px">
       <div style="font-size:48px;margin-bottom:16px">✅</div>
       <h3 style="font-size:18px;font-weight:600;color:#1D9E75;margin:0 0 8px">Cita agendada</h3>
-      <p id="citas-ok-msg" style="color:#555;font-size:14px;margin:0 0 24px"></p>
+      <p id="citas-ok-msg" style="color:#666;font-size:14px;margin:0 0 24px"></p>
       <button onclick="cerrarModalCitas()" style="padding:12px 32px;background:#1D9E75;color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer">Listo</button>
     </div>
   </div>
@@ -3569,7 +3569,7 @@ window._applyIVF=applyIVF;
       <div style="background:#EAF3DE;border-radius:12px;padding:14px;margin-bottom:16px">
         <div style="font-size:11px;color:#3B6D11;margin-bottom:4px;font-weight:500">Fecha y hora</div>
         <div id="detalle-cita-fecha" style="font-size:18px;font-weight:600;color:#1D9E75;margin-bottom:10px"></div>
-        <div style="font-size:12px;color:#444;line-height:1.6">
+        <div style="font-size:12px;color:#666;line-height:1.6">
           <div style="font-weight:600;margin-bottom:5px">Recomendaciones para tu valoración:</div>
           <div>• Ayuno de 2 a 4 horas (sin alimentos ni líquidos)</div>
           <div>• Evita ejercicio intenso 12 horas antes</div>
@@ -3603,7 +3603,7 @@ window._applyIVF=applyIVF;
       <button onclick="cerrarMisLogros()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer">&#x2715;</button>
     </div>
     <div id="logros-grid" style="padding:8px 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div style="text-align:center;color:#555;font-size:13px;padding:40px 0;grid-column:1/-1">Cargando logros...</div>
+      <div style="text-align:center;color:#666;font-size:13px;padding:40px 0;grid-column:1/-1">Cargando logros...</div>
     </div>
   </div>
 </div>
@@ -3617,17 +3617,17 @@ function abrirMisLogros(){
   m.style.display='flex';
   const uid=window._currentUid; if(!uid) return;
   const grid=document.getElementById('logros-grid');
-  grid.innerHTML='<div style="text-align:center;color:#555;font-size:13px;padding:40px 0;grid-column:1/-1">Cargando logros...</div>';
+  grid.innerHTML='<div style="text-align:center;color:#666;font-size:13px;padding:40px 0;grid-column:1/-1">Cargando logros...</div>';
   (async()=>{
     try{
       const snap=await window.getDocs(window.collection(window.db,'usuarios',uid,'logros'));
       const desbloqueados={};
       snap.forEach(d=>{ desbloqueados[d.id]=d.data(); });
-      if(!window._LOGROS_DEF.length){ grid.innerHTML='<div style="color:#555;text-align:center;padding:40px 0;grid-column:1/-1">Sin logros disponibles</div>'; return; }
+      if(!window._LOGROS_DEF.length){ grid.innerHTML='<div style="color:#666;text-align:center;padding:40px 0;grid-column:1/-1">Sin logros disponibles</div>'; return; }
       grid.innerHTML=window._LOGROS_DEF.map(l=>{
         const tiene=!!desbloqueados[l.id];
         const fecha=tiene&&desbloqueados[l.id].fecha?new Date(desbloqueados[l.id].fecha.toDate?desbloqueados[l.id].fecha.toDate():desbloqueados[l.id].fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):'';
-        return `<div style="background:#1a1a1a;border-radius:16px;padding:16px;text-align:center;border:1px solid ${tiene?'#D4A017':'#222'};${!tiene?'opacity:0.45':''}">
+        return `<div style="background:#1a1a1a;border-radius:16px;padding:16px;text-align:center;border:1px solid ${tiene?'#D4A017':'#222'};${!tiene?'opacity:0.6':''}">
           <img src="${l.img}" style="width:100%;max-width:130px;${!tiene?'filter:grayscale(100%) brightness(0.4)':''}" onerror="this.style.display='none'" />
           <div style="font-size:13px;font-weight:600;color:${tiene?'#fff':'#555'};margin-top:8px">${l.titulo}</div>
           <div style="font-size:11px;color:${tiene?'#D4A017':'#444'};margin-top:3px">${tiene?fecha:l.desc}</div>
