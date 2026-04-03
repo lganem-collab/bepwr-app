@@ -439,6 +439,10 @@
     <div class="metodo-card" id="card-guia">
       <div class="metodo-card-label">Guía Nutrimental</div>
       <p class="guia-desc" id="metodo-guia-desc" style="font-size:13px;color:#aaa;margin:0 0 12px">Guía personalizada para tu objetivo</p>
+      <button id="btn-reservar-val" onclick="abrirModalCitas()" style="width:100%;padding:13px 16px;background:#1D9E75;color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Reservar Valoración
+      </button>
       <button id="metodo-guia-btn" class="metodo-btn metodo-btn--outline" style="display:none;color:#fff;background:none;border:1.5px solid currentColor;border-radius:10px;padding:10px 20px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Ver Guía Nutrimental</button>
       <p id="metodo-guia-unavailable" class="metodo-note" style="display:none">PDF no disponible aún</p>
     </div>
@@ -3181,5 +3185,283 @@ window._applyIVF=applyIVF;
     <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Requiere al menos 2 valoraciones.</div>
   </div>
 </div>
+
+<!-- MODAL CITAS -->
+<div id="modal-citas" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;align-items:flex-end;justify-content:center;" onclick="cerrarModalCitas(event)">
+  <div id="modal-citas-sheet" style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:0 0 32px;max-height:92vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <!-- Handle -->
+    <div style="display:flex;justify-content:center;padding:12px 0 0"><div style="width:36px;height:4px;background:#ddd;border-radius:2px"></div></div>
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px 0">
+      <h3 id="citas-step-title" style="font-size:16px;font-weight:600;color:#1a1a1a;margin:0">Elige un día</h3>
+      <button onclick="cerrarModalCitas()" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;padding:0 4px">×</button>
+    </div>
+    <!-- Step 1: Calendario -->
+    <div id="citas-step-cal">
+      <!-- Nav mes -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 8px">
+        <button onclick="navMesCitas(-1)" style="background:none;border:none;font-size:20px;color:#1D9E75;cursor:pointer;padding:4px 8px">‹</button>
+        <span id="citas-mes-label" style="font-size:14px;font-weight:500;color:#333"></span>
+        <button onclick="navMesCitas(1)" style="background:none;border:none;font-size:20px;color:#1D9E75;cursor:pointer;padding:4px 8px">›</button>
+      </div>
+      <!-- Grid semana headers -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:0 16px;margin-bottom:4px">
+        <div style="text-align:center;font-size:11px;color:#999;font-weight:500">L</div>
+        <div style="text-align:center;font-size:11px;color:#999;font-weight:500">M</div>
+        <div style="text-align:center;font-size:11px;color:#999;font-weight:500">X</div>
+        <div style="text-align:center;font-size:11px;color:#999;font-weight:500">J</div>
+        <div style="text-align:center;font-size:11px;color:#999;font-weight:500">V</div>
+        <div style="text-align:center;font-size:11px;color:#aaa;font-weight:500">S</div>
+        <div style="text-align:center;font-size:11px;color:#aaa;font-weight:500">D</div>
+      </div>
+      <!-- Grid días -->
+      <div id="citas-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);padding:0 16px;gap:3px"></div>
+      <!-- Leyenda -->
+      <div style="display:flex;gap:14px;justify-content:center;padding:12px 0 4px">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;border-radius:4px;background:#EAF3DE"></div><span style="font-size:11px;color:#888">Disponible</span></div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;border-radius:4px;background:#FCEBEB"></div><span style="font-size:11px;color:#888">Sin lugares</span></div>
+      </div>
+    </div>
+    <!-- Step 2: Horarios -->
+    <div id="citas-step-hora" style="display:none;padding:0 20px">
+      <div id="citas-dia-badge" style="display:inline-block;background:#EAF3DE;color:#3B6D11;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:500;margin-bottom:14px"></div>
+      <div id="citas-horas-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px"></div>
+      <button id="btn-confirmar-cita" onclick="confirmarCita()" disabled style="width:100%;padding:14px;background:#ccc;color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:not-allowed;transition:all .2s">Selecciona un horario</button>
+    </div>
+    <!-- Resultado OK -->
+    <div id="citas-step-ok" style="display:none;text-align:center;padding:30px 20px">
+      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <h3 style="font-size:18px;font-weight:600;color:#1D9E75;margin:0 0 8px">Cita agendada</h3>
+      <p id="citas-ok-msg" style="color:#555;font-size:14px;margin:0 0 24px"></p>
+      <button onclick="cerrarModalCitas()" style="padding:12px 32px;background:#1D9E75;color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer">Listo</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ============================================================
+// SISTEMA DE CITAS
+// ============================================================
+(function(){
+  var _citasCfg = { diasSemana:[1,2,3,4,5], horarios:['07:00','08:00','09:00','10:00'], capacidad:1 };
+  var _citasMes = { year: new Date().getFullYear(), month: new Date().getMonth() };
+  var _citasDiasOcupados = {};   // { 'YYYY-MM-DD': count }
+  var _citaSelDia = null;
+  var _citaSelHora = null;
+
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  window.abrirModalCitas = async function() {
+    var m = document.getElementById('modal-citas');
+    m.style.display = 'flex';
+    document.getElementById('citas-step-cal').style.display = 'block';
+    document.getElementById('citas-step-hora').style.display = 'none';
+    document.getElementById('citas-step-ok').style.display = 'none';
+    document.getElementById('citas-step-title').textContent = 'Elige un día';
+    _citaSelDia = null; _citaSelHora = null;
+    // Cargar config y citas del mes
+    await _cargarConfigCitas();
+    await _cargarCitasMes(_citasMes.year, _citasMes.month);
+    _renderCalendario();
+  };
+
+  window.cerrarModalCitas = function(e) {
+    if (!e || e.target === document.getElementById('modal-citas')) {
+      document.getElementById('modal-citas').style.display = 'none';
+    }
+  };
+
+  window.navMesCitas = async function(dir) {
+    _citasMes.month += dir;
+    if (_citasMes.month < 0) { _citasMes.month = 11; _citasMes.year--; }
+    if (_citasMes.month > 11) { _citasMes.month = 0; _citasMes.year++; }
+    await _cargarCitasMes(_citasMes.year, _citasMes.month);
+    _renderCalendario();
+  };
+
+  async function _cargarConfigCitas() {
+    try {
+      var snap = await db.collection('config').doc('slots').get();
+      if (snap.exists) {
+        var d = snap.data();
+        if (d.diasSemana) _citasCfg.diasSemana = d.diasSemana;
+        if (d.horarios) _citasCfg.horarios = d.horarios;
+        if (d.capacidad) _citasCfg.capacidad = d.capacidad;
+      }
+    } catch(e) { console.log('cfg citas default'); }
+  }
+
+  async function _cargarCitasMes(year, month) {
+    _citasDiasOcupados = {};
+    try {
+      var inicio = new Date(year, month, 1).toISOString().split('T')[0];
+      var fin = new Date(year, month+1, 0).toISOString().split('T')[0];
+      var snap = await db.collection('citas')
+        .where('fecha', '>=', inicio)
+        .where('fecha', '<=', fin)
+        .where('estado', '!=', 'cancelada')
+        .get();
+      snap.forEach(function(doc) {
+        var f = doc.data().fecha + '_' + doc.data().hora;
+        _citasDiasOcupados[f] = (_citasDiasOcupados[f] || 0) + 1;
+      });
+    } catch(e) { console.log('err citas mes', e); }
+  }
+
+  function _slotsFull(fechaStr) {
+    // Un día está "lleno" si TODOS sus horarios tienen >= capacidad citas
+    var llenos = 0;
+    _citasCfg.horarios.forEach(function(h) {
+      var key = fechaStr + '_' + h;
+      if ((_citasDiasOcupados[key] || 0) >= _citasCfg.capacidad) llenos++;
+    });
+    return llenos >= _citasCfg.horarios.length;
+  }
+
+  function _renderCalendario() {
+    var y = _citasMes.year, mo = _citasMes.month;
+    document.getElementById('citas-mes-label').textContent = MESES[mo] + ' ' + y;
+    var grid = document.getElementById('citas-cal-grid');
+    grid.innerHTML = '';
+    var hoy = new Date(); hoy.setHours(0,0,0,0);
+    // Día 1 de este mes — lunes=1 ... domingo=0 => necesitamos offset para lunes
+    var primerDia = new Date(y, mo, 1).getDay(); // 0=dom,1=lun,...
+    var offset = primerDia === 0 ? 6 : primerDia - 1; // offset para que semana empiece en L
+    var diasEnMes = new Date(y, mo+1, 0).getDate();
+    // Celdas vacías
+    for (var i = 0; i < offset; i++) {
+      var empty = document.createElement('div');
+      empty.style.cssText = 'height:34px';
+      grid.appendChild(empty);
+    }
+    // Días
+    for (var d = 1; d <= diasEnMes; d++) {
+      var fecha = new Date(y, mo, d);
+      var cell = document.createElement('div');
+      var dow = fecha.getDay(); // 0=dom, 6=sab
+      var fechaStr = y + '-' + String(mo+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      var isPasado = fecha < hoy;
+      var isFinSemana = dow === 0 || dow === 6;
+      var isDiaActivo = _citasCfg.diasSemana.indexOf(dow === 0 ? 7 : dow) >= 0;
+      cell.style.cssText = 'height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:500;cursor:default;';
+      if (isPasado || isFinSemana || !isDiaActivo) {
+        cell.style.color = '#ccc';
+        cell.textContent = d;
+      } else if (_slotsFull(fechaStr)) {
+        cell.style.cssText += 'background:#FCEBEB;color:#A32D2D;cursor:not-allowed;';
+        cell.textContent = d;
+      } else {
+        cell.style.cssText += 'background:#EAF3DE;color:#3B6D11;cursor:pointer;';
+        cell.textContent = d;
+        cell.setAttribute('data-fecha', fechaStr);
+        cell.onclick = function() { seleccionarDiaCita(this.getAttribute('data-fecha')); };
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  window.seleccionarDiaCita = function(fechaStr) {
+    _citaSelDia = fechaStr;
+    _citaSelHora = null;
+    // Formatear fecha legible
+    var parts = fechaStr.split('-');
+    var diaNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    var label = diaNames[fd.getDay()] + ' ' + parseInt(parts[2]) + ' de ' + MESES[fd.getMonth()];
+    document.getElementById('citas-dia-badge').textContent = label;
+    // Render horarios
+    var grid = document.getElementById('citas-horas-grid');
+    grid.innerHTML = '';
+    _citasCfg.horarios.forEach(function(hora) {
+      var key = fechaStr + '_' + hora;
+      var count = _citasDiasOcupados[key] || 0;
+      var libre = count < _citasCfg.capacidad;
+      var cell = document.createElement('div');
+      cell.style.cssText = 'border-radius:10px;padding:12px;text-align:center;' + (libre ? 'border:1.5px solid #e0e0d8;cursor:pointer;' : 'background:#f5f5f5;border:1.5px solid #eee;cursor:not-allowed;opacity:.5;');
+      cell.innerHTML = '<div style="font-size:15px;font-weight:500;color:' + (libre?'#222':'#bbb') + '">' + hora + '</div><div style="font-size:10px;color:#888">' + (libre?'disponible':'ocupado') + '</div>';
+      if (libre) {
+        cell.setAttribute('data-hora', hora);
+        cell.onclick = function() { seleccionarHoraCita(this.getAttribute('data-hora')); };
+      }
+      grid.appendChild(cell);
+    });
+    // Mostrar step 2
+    document.getElementById('citas-step-cal').style.display = 'none';
+    document.getElementById('citas-step-hora').style.display = 'block';
+    document.getElementById('citas-step-title').textContent = 'Elige un horario';
+    var btnConf = document.getElementById('btn-confirmar-cita');
+    btnConf.disabled = true;
+    btnConf.style.background = '#ccc';
+    btnConf.style.cursor = 'not-allowed';
+    btnConf.textContent = 'Selecciona un horario';
+  };
+
+  window.seleccionarHoraCita = function(hora) {
+    _citaSelHora = hora;
+    // Highlight seleccionado
+    document.querySelectorAll('#citas-horas-grid > div').forEach(function(el) {
+      if (el.getAttribute('data-hora') === hora) {
+        el.style.border = '2px solid #1D9E75';
+        el.querySelector('div').style.color = '#1D9E75';
+      } else if (el.getAttribute('data-hora')) {
+        el.style.border = '1.5px solid #e0e0d8';
+        el.querySelector('div').style.color = '#222';
+      }
+    });
+    var btnConf = document.getElementById('btn-confirmar-cita');
+    var parts = _citaSelDia.split('-');
+    var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    var diaNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var label = diaNames[fd.getDay()] + ' ' + parseInt(parts[2]) + ' de ' + MESES[fd.getMonth()];
+    btnConf.textContent = 'Confirmar — ' + label + ', ' + hora;
+    btnConf.disabled = false;
+    btnConf.style.background = '#1D9E75';
+    btnConf.style.cursor = 'pointer';
+  };
+
+  window.confirmarCita = async function() {
+    if (!_citaSelDia || !_citaSelHora) return;
+    var btnConf = document.getElementById('btn-confirmar-cita');
+    btnConf.disabled = true;
+    btnConf.textContent = 'Guardando...';
+    try {
+      var user = firebase.auth().currentUser;
+      var nombre = (window._userData && window._userData.nombre) ? window._userData.nombre : (user ? user.email : 'Miembro');
+      await db.collection('citas').add({
+        uid: user.uid,
+        nombre: nombre,
+        fecha: _citaSelDia,
+        hora: _citaSelHora,
+        tipo: 'valoracion',
+        estado: 'pendiente',
+        creadoEn: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      // Actualizar UI card
+      var parts = _citaSelDia.split('-');
+      var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+      var diaNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      var labelOk = diaNames[fd.getDay()] + ' ' + parseInt(parts[2]) + ' de ' + MESES[fd.getMonth()] + ' a las ' + _citaSelHora;
+      document.getElementById('citas-step-hora').style.display = 'none';
+      document.getElementById('citas-step-ok').style.display = 'block';
+      document.getElementById('citas-ok-msg').textContent = labelOk;
+      document.getElementById('citas-step-title').textContent = '¡Listo!';
+      // Actualizar texto en card
+      var proxEl = document.getElementById('proxima-cita-texto');
+      if (proxEl) proxEl.textContent = labelOk;
+      // Cambiar botón
+      var btnRes = document.getElementById('btn-reservar-val');
+      if (btnRes) { btnRes.textContent = 'Modificar cita'; }
+    } catch(err) {
+      console.error('Error guardando cita:', err);
+      btnConf.disabled = false;
+      btnConf.textContent = 'Error, intenta de nuevo';
+      btnConf.style.background = '#e74c3c';
+    }
+  };
+
+})();
+</script>
+
 </body>
 </html>
