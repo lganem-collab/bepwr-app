@@ -3426,7 +3426,7 @@ window._applyIVF=applyIVF;
     btn.disabled=true;btn.textContent='Guardando...';
     try{
       var uid=window._currentUid; if(!uid) throw new Error('Sin sesión');
-      var nombre=((window.cachedUserData&&window.cachedUserData.nombre)?window.cachedUserData.nombre:(window._authUser&&window._authUser.displayName)?window._authUser.displayName:(window._authUser&&window._authUser.email)?window._authUser.email.split('@')[0]:'Miembro');
+      var _ud=await window.getDoc(window.doc(window.db,'usuarios',uid));var nombre=(_ud.exists()&&_ud.data().nombre)?_ud.data().nombre:'Miembro';
       var email=(window.cachedUserData&&window.cachedUserData.email)?window.cachedUserData.email:
                 (window._authUser&&window._authUser.email)?window._authUser.email:'';
       // Cancelar citas previas confirmadas
@@ -3516,7 +3516,7 @@ window._applyIVF=applyIVF;
         }
       }catch(pe){}
       // Email de cancelación
-      var nombre=((window.cachedUserData&&window.cachedUserData.nombre)?window.cachedUserData.nombre:(window._authUser&&window._authUser.displayName)?window._authUser.displayName:(window._authUser&&window._authUser.email)?window._authUser.email.split('@')[0]:'Miembro');
+      var uid2=window._currentUid;var _ud2=await window.getDoc(window.doc(window.db,'usuarios',uid2));var nombre=(_ud2.exists()&&_ud2.data().nombre)?_ud2.data().nombre:'Miembro';
       var email=(window.cachedUserData&&window.cachedUserData.email)?window.cachedUserData.email:
                 (window._authUser&&window._authUser.email)?window._authUser.email:'';
       if(cita.fecha&&cita.hora){
