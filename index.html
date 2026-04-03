@@ -500,6 +500,11 @@
             </div>
           </div>
           <button class="btn-secondary" onclick="abrirModalCitas()" style="width:100%;margin-top:4px;background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600">&#x1F4C5; Agendar Valoraci&#xF3;n</button>
+      <div id="proxima-cita-card" style="display:none;margin-top:10px;background:#EAF3DE;border-radius:12px;padding:12px 14px;cursor:pointer;" onclick="window.verDetalleCita()">
+        <div style="font-size:11px;color:#3B6D11;font-weight:500;margin-bottom:3px;">PRÓXIMA CITA</div>
+        <div id="proxima-cita-info" style="font-size:14px;color:#1D9E75;font-weight:600;"></div>
+        <div style="font-size:11px;color:#3B6D11;margin-top:2px;">Toca para ver detalles ›</div>
+      </div>
           <button class="btn-secondary" onclick="openHistorialModal()" style="width:100%;margin-top:4px">&#x1F4CB; Ver historial completo</button>
         </div>
       </div>
@@ -3237,184 +3242,265 @@ window._applyIVF=applyIVF;
 
 <script>
 // ============================================================
-// SISTEMA DE CITAS
+// SISTEMA DE CITAS v2
 // ============================================================
 (function(){
-  var _cfg = { diasSemana:[1,2,3,4,5], horarios:['07:00','07:15','07:30','07:45','08:00','08:15','08:30','08:45','09:00','09:15','09:30','09:45','10:00','10:15','10:30','10:45'], capacidad:1 };
-  var _mes = { year: new Date().getFullYear(), month: new Date().getMonth() };
-  var _ocupados = {};
-  var _selDia = null, _selHora = null;
-  var MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  var DIA = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var _cfg={diasSemana:[1,2,3,4,5],horarios:['07:00','07:15','07:30','07:45','08:00','08:15','08:30','08:45','09:00','09:15','09:30','09:45','10:00','10:15','10:30','10:45'],capacidad:1};
+  var _mes={year:new Date().getFullYear(),month:new Date().getMonth()};
+  var _ocupados={};
+  var _selDia=null,_selHora=null;
+  var _proximaCitaId=null;
+  var MES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var DIA=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-  window.abrirModalCitas = async function() {
-    document.getElementById('modal-citas').style.display = 'flex';
-    _showStep('cal');
-    _selDia = null; _selHora = null;
-    await _loadCfg();
-    await _loadMes(_mes.year, _mes.month);
-    _renderCal();
-  };
-
-  window.cerrarModalCitas = function(e) {
-    if (!e || e.target === document.getElementById('modal-citas'))
-      document.getElementById('modal-citas').style.display = 'none';
-  };
-
-  window.volverCalendarioCitas = function() {
-    _selDia = null; _selHora = null;
-    _showStep('cal');
-  };
-
-  window.navMesCitas = async function(dir) {
-    _mes.month += dir;
-    if (_mes.month < 0)  { _mes.month = 11; _mes.year--; }
-    if (_mes.month > 11) { _mes.month = 0;  _mes.year++; }
-    await _loadMes(_mes.year, _mes.month);
-    _renderCal();
-  };
-
-  function _showStep(step) {
-    document.getElementById('citas-step-cal').style.display  = step==='cal'  ? 'block' : 'none';
-    document.getElementById('citas-step-hora').style.display = step==='hora' ? 'block' : 'none';
-    document.getElementById('citas-step-ok').style.display   = step==='ok'   ? 'block' : 'none';
-    var titles = { cal:'Elige un día', hora:'Elige un horario', ok:'¡Cita agendada!' };
-    document.getElementById('citas-step-title').textContent = titles[step] || '';
-  }
-
-  async function _loadCfg() {
+  // ─── Cargar próxima cita pendiente ───
+  window.cargarProximaCita = async function() {
+    var uid = window._currentUid; if(!uid) return;
     try {
-      var snap = await window.getDoc(window.doc(window.db, 'config', 'slots'));
-      if (snap.exists()) {
-        var d = snap.data();
-        if (d.diasSemana) _cfg.diasSemana = d.diasSemana;
-        if (d.horarios)   _cfg.horarios   = d.horarios;
-        if (d.capacidad)  _cfg.capacidad  = d.capacidad;
-      }
-    } catch(e) {}
-  }
-
-  async function _loadMes(y, mo) {
-    _ocupados = {};
-    try {
-      var ini = y+'-'+String(mo+1).padStart(2,'0')+'-01';
-      var fin = y+'-'+String(mo+1).padStart(2,'0')+'-'+String(new Date(y,mo+1,0).getDate()).padStart(2,'0');
+      var hoy = new Date().toISOString().split('T')[0];
       var snap = await window.getDocs(window.query(
         window.collection(window.db,'citas'),
-        window.where('fecha','>=',ini),
-        window.where('fecha','<=',fin)
+        window.where('uid','==',uid),
+        window.where('fecha','>=',hoy),
+        window.where('estado','==','pendiente'),
+        window.orderBy('fecha'), window.orderBy('hora'), window.limit(1)
       ));
-      snap.forEach(function(d){
-        var dat = d.data();
-        if (dat.estado==='cancelada') return;
-        var k = dat.fecha+'_'+dat.hora;
-        _ocupados[k] = (_ocupados[k]||0)+1;
-      });
-    } catch(e) { console.log('err loadMes',e); }
-  }
-
-  function _slotsFull(f) {
-    return _cfg.horarios.every(function(h){ return (_ocupados[f+'_'+h]||0) >= _cfg.capacidad; });
-  }
-
-  function _slotsLibresHoy(f) {
-    var ahora = new Date(), hMin = ahora.getHours()*60+ahora.getMinutes();
-    return _cfg.horarios.filter(function(h){
-      var p=h.split(':'), sMin=parseInt(p[0])*60+parseInt(p[1]);
-      return sMin > hMin && (_ocupados[f+'_'+h]||0) < _cfg.capacidad;
-    }).length;
-  }
-
-  function _renderCal() {
-    var y=_mes.year, mo=_mes.month;
-    document.getElementById('citas-mes-label').textContent = MES[mo]+' '+y;
-    var grid = document.getElementById('citas-cal-grid');
-    grid.innerHTML = '';
-    var hoy = new Date(); hoy.setHours(0,0,0,0);
-    var offset = (new Date(y,mo,1).getDay()||7)-1;
-    for (var i=0;i<offset;i++){ var e=document.createElement('div');e.style.height='36px';grid.appendChild(e); }
-    for (var d=1;d<=new Date(y,mo+1,0).getDate();d++) {
-      var fecha=new Date(y,mo,d), dow=fecha.getDay();
-      var fStr=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-      var cell=document.createElement('div');
-      cell.style.cssText='height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:500;';
-      var pasado=fecha<hoy, hoyFlag=fecha.getTime()===hoy.getTime();
-      var finSem=dow===0||dow===6, diaActivo=_cfg.diasSemana.indexOf(dow===0?7:dow)>=0;
-      if (pasado||finSem||!diaActivo) {
-        cell.style.color='#ccc'; cell.textContent=d;
-      } else if (hoyFlag&&_slotsLibresHoy(fStr)===0) {
-        cell.style.cssText+='background:#FCEBEB;color:#A32D2D;'; cell.textContent=d;
-      } else if (!hoyFlag&&_slotsFull(fStr)) {
-        cell.style.cssText+='background:#FCEBEB;color:#A32D2D;'; cell.textContent=d;
+      if(!snap.empty){
+        var doc=snap.docs[0]; _proximaCitaId=doc.id;
+        _mostrarCardCita(doc.data()); _actualizarMetodo(doc.data());
       } else {
-        cell.style.cssText+='background:#EAF3DE;color:#3B6D11;cursor:pointer;'; cell.textContent=d;
-        cell.setAttribute('data-fecha',fStr);
-        cell.onclick=function(){ window.seleccionarDiaCita(this.getAttribute('data-fecha')); };
+        _proximaCitaId=null; _ocultarCardCita(); _actualizarMetodo(null);
       }
-      grid.appendChild(cell);
+    } catch(e){console.log('err cargarProximaCita',e);}
+  };
+
+  function _labelCita(cita) {
+    var p=cita.fecha.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+    return DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()]+' a las '+cita.hora;
+  }
+
+  function _mostrarCardCita(cita) {
+    window._citaPendiente=cita;
+    var card=document.getElementById('proxima-cita-card'),info=document.getElementById('proxima-cita-info');
+    if(card&&info){info.textContent=_labelCita(cita);card.style.display='block';}
+  }
+  function _ocultarCardCita() {
+    window._citaPendiente=null;
+    var card=document.getElementById('proxima-cita-card');
+    if(card) card.style.display='none';
+  }
+  function _actualizarMetodo(cita) {
+    var fechaEl=document.getElementById('metodo-valoracion-fecha');
+    var cdEl=document.getElementById('metodo-valoracion-countdown');
+    var noteEl=document.getElementById('metodo-valoracion-note');
+    if(!fechaEl) return;
+    if(cita){
+      var p=cita.fecha.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+      fechaEl.textContent=DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()]+', '+cita.hora;
+      var diff=Math.ceil((fd-new Date().setHours(0,0,0,0))/(864e5));
+      if(cdEl) cdEl.textContent=diff>0?'En '+diff+' días':diff===0?'Hoy':'Hace '+Math.abs(diff)+' días';
+      if(noteEl) noteEl.textContent='Cita agendada';
+    } else {
+      // Restaurar cálculo por defecto (ya lo maneja renderProximaValoracion)
+      if(typeof window._renderMetodoCompleto==='function') window._renderMetodoCompleto();
     }
   }
 
-  window.seleccionarDiaCita = function(fStr) {
-    _selDia=fStr; _selHora=null;
-    var p=fStr.split('-'), fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
-    document.getElementById('citas-dia-badge').textContent = DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()];
-    var ahora=new Date(), hMin=ahora.getHours()*60+ahora.getMinutes();
-    var esHoy = fStr===ahora.getFullYear()+'-'+String(ahora.getMonth()+1).padStart(2,'0')+'-'+String(ahora.getDate()).padStart(2,'0');
-    var grid=document.getElementById('citas-horas-grid'); grid.innerHTML='';
+  // ─── Abrir modal de reserva ───
+  window.abrirModalCitas = async function() {
+    document.getElementById('modal-citas').style.display='flex';
+    _showStep('cal'); _selDia=null; _selHora=null;
+    await _loadCfg(); await _loadMes(_mes.year,_mes.month); _renderCal();
+  };
+  window.cerrarModalCitas = function(e) {
+    if(!e||e.target===document.getElementById('modal-citas'))
+      document.getElementById('modal-citas').style.display='none';
+  };
+  window.volverCalendarioCitas = function() {
+    _selDia=null;_selHora=null;_showStep('cal');
+  };
+  window.navMesCitas = async function(dir) {
+    _mes.month+=dir;
+    if(_mes.month<0){_mes.month=11;_mes.year--;}
+    if(_mes.month>11){_mes.month=0;_mes.year++;}
+    await _loadMes(_mes.year,_mes.month);_renderCal();
+  };
+  function _showStep(step){
+    document.getElementById('citas-step-cal').style.display=step==='cal'?'block':'none';
+    document.getElementById('citas-step-hora').style.display=step==='hora'?'block':'none';
+    document.getElementById('citas-step-ok').style.display=step==='ok'?'block':'none';
+    var t={cal:'Elige un día',hora:'Elige un horario',ok:'¡Cita agendada!'};
+    document.getElementById('citas-step-title').textContent=t[step]||'';
+  }
+  async function _loadCfg(){
+    try{var s=await window.getDoc(window.doc(window.db,'config','slots'));if(s.exists()){var d=s.data();if(d.diasSemana)_cfg.diasSemana=d.diasSemana;if(d.horarios)_cfg.horarios=d.horarios;if(d.capacidad)_cfg.capacidad=d.capacidad;}}catch(e){}
+  }
+  async function _loadMes(y,mo){
+    _ocupados={};
+    try{
+      var ini=y+'-'+String(mo+1).padStart(2,'0')+'-01';
+      var fin=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(new Date(y,mo+1,0).getDate()).padStart(2,'0');
+      var snap=await window.getDocs(window.query(window.collection(window.db,'citas'),window.where('fecha','>=',ini),window.where('fecha','<=',fin)));
+      snap.forEach(function(d){var dat=d.data();if(dat.estado==='cancelada')return;var k=dat.fecha+'_'+dat.hora;_ocupados[k]=(_ocupados[k]||0)+1;});
+    }catch(e){console.log('err loadMes',e);}
+  }
+  function _slotsFull(f){return _cfg.horarios.every(function(h){return(_ocupados[f+'_'+h]||0)>=_cfg.capacidad;});}
+  function _slotsLibresHoy(f){var a=new Date(),hm=a.getHours()*60+a.getMinutes();return _cfg.horarios.filter(function(h){var p=h.split(':'),sm=parseInt(p[0])*60+parseInt(p[1]);return sm>hm&&(_ocupados[f+'_'+h]||0)<_cfg.capacidad;}).length;}
+  function _renderCal(){
+    var y=_mes.year,mo=_mes.month;
+    document.getElementById('citas-mes-label').textContent=MES[mo]+' '+y;
+    var grid=document.getElementById('citas-cal-grid');grid.innerHTML='';
+    var hoy=new Date();hoy.setHours(0,0,0,0);
+    var offset=(new Date(y,mo,1).getDay()||7)-1;
+    for(var i=0;i<offset;i++){var e=document.createElement('div');e.style.height='36px';grid.appendChild(e);}
+    for(var d=1;d<=new Date(y,mo+1,0).getDate();d++){
+      var fecha=new Date(y,mo,d),dow=fecha.getDay();
+      var fStr=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      var cell=document.createElement('div');
+      cell.style.cssText='height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:500;';
+      var pasado=fecha<hoy,hoyF=fecha.getTime()===hoy.getTime();
+      var finSem=dow===0||dow===6,diaActivo=_cfg.diasSemana.indexOf(dow===0?7:dow)>=0;
+      if(pasado||finSem||!diaActivo){cell.style.color='#ccc';cell.textContent=d;}
+      else if(hoyF&&_slotsLibresHoy(fStr)===0){cell.style.cssText+='background:#FCEBEB;color:#A32D2D;';cell.textContent=d;}
+      else if(!hoyF&&_slotsFull(fStr)){cell.style.cssText+='background:#FCEBEB;color:#A32D2D;';cell.textContent=d;}
+      else{cell.style.cssText+='background:#EAF3DE;color:#3B6D11;cursor:pointer;';cell.textContent=d;cell.setAttribute('data-fecha',fStr);cell.onclick=function(){window.seleccionarDiaCita(this.getAttribute('data-fecha'));} ;}
+      grid.appendChild(cell);
+    }
+  }
+  window.seleccionarDiaCita = function(fStr){
+    _selDia=fStr;_selHora=null;
+    var p=fStr.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+    document.getElementById('citas-dia-badge').textContent=DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()];
+    var a=new Date(),hm=a.getHours()*60+a.getMinutes();
+    var esHoy=fStr===a.getFullYear()+'-'+String(a.getMonth()+1).padStart(2,'0')+'-'+String(a.getDate()).padStart(2,'0');
+    var grid=document.getElementById('citas-horas-grid');grid.innerHTML='';
     _cfg.horarios.forEach(function(hora){
-      var q=hora.split(':'), sMin=parseInt(q[0])*60+parseInt(q[1]);
-      var yaPaso=esHoy&&sMin<=hMin, ocupado=(_ocupados[fStr+'_'+hora]||0)>=_cfg.capacidad;
+      var q=hora.split(':'),sm=parseInt(q[0])*60+parseInt(q[1]);
+      var yaPaso=esHoy&&sm<=hm,ocupado=(_ocupados[fStr+'_'+hora]||0)>=_cfg.capacidad;
       var libre=!yaPaso&&!ocupado;
       var cell=document.createElement('div');
       cell.style.cssText='border-radius:10px;padding:10px;text-align:center;'+(libre?'border:1.5px solid #e0e0d8;cursor:pointer;':'background:#f5f5f5;border:1.5px solid #eee;cursor:not-allowed;opacity:.4;');
       cell.innerHTML='<div style="font-size:14px;font-weight:500;color:'+(libre?'#222':'#bbb')+'">'+hora+'</div><div style="font-size:10px;color:#888">'+(yaPaso?'ya pasó':ocupado?'ocupado':'disponible')+'</div>';
-      if(libre){ cell.setAttribute('data-hora',hora); cell.onclick=function(){ window.seleccionarHoraCita(this.getAttribute('data-hora')); }; }
+      if(libre){cell.setAttribute('data-hora',hora);cell.onclick=function(){window.seleccionarHoraCita(this.getAttribute('data-hora'));};}
       grid.appendChild(cell);
     });
     var btn=document.getElementById('btn-confirmar-cita');
-    btn.disabled=true; btn.style.background='#ccc'; btn.style.cursor='not-allowed'; btn.textContent='Selecciona un horario';
+    btn.disabled=true;btn.style.background='#ccc';btn.style.cursor='not-allowed';btn.textContent='Selecciona un horario';
     _showStep('hora');
   };
-
-  window.seleccionarHoraCita = function(hora) {
+  window.seleccionarHoraCita = function(hora){
     _selHora=hora;
     document.querySelectorAll('#citas-horas-grid > div[data-hora]').forEach(function(el){
       var sel=el.getAttribute('data-hora')===hora;
       el.style.border=sel?'2px solid #1D9E75':'1.5px solid #e0e0d8';
       el.querySelector('div').style.color=sel?'#1D9E75':'#222';
     });
-    var p=_selDia.split('-'), fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+    var p=_selDia.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
     var lbl=DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()];
     var btn=document.getElementById('btn-confirmar-cita');
     btn.textContent='Confirmar — '+lbl+', '+hora;
-    btn.disabled=false; btn.style.background='#1D9E75'; btn.style.cursor='pointer';
+    btn.disabled=false;btn.style.background='#1D9E75';btn.style.cursor='pointer';
   };
-
-  window.confirmarCita = async function() {
+  window.confirmarCita = async function(){
     if(!_selDia||!_selHora) return;
     var btn=document.getElementById('btn-confirmar-cita');
-    btn.disabled=true; btn.textContent='Guardando...';
-    try {
-      var uid=window._currentUid;
-      if(!uid) throw new Error('Sin sesión');
+    btn.disabled=true;btn.textContent='Guardando...';
+    try{
+      var uid=window._currentUid; if(!uid) throw new Error('Sin sesión');
       var nombre=(window._userData&&window._userData.nombre)?window._userData.nombre:'Miembro';
-      await window.addDoc(window.collection(window.db,'citas'),{
-        uid:uid, nombre:nombre, fecha:_selDia, hora:_selHora,
-        tipo:'valoracion', estado:'pendiente',
-        creadoEn:window.serverTimestamp()
+      var email=(window._userData&&window._userData.email)?window._userData.email:'';
+      var ref=await window.addDoc(window.collection(window.db,'citas'),{
+        uid:uid,nombre:nombre,fecha:_selDia,hora:_selHora,
+        tipo:'valoracion',estado:'pendiente',creadoEn:window.serverTimestamp()
       });
-      var p=_selDia.split('-'), fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
-      document.getElementById('citas-ok-msg').textContent = DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()]+' a las '+_selHora;
+      _proximaCitaId=ref.id;
+      var cita={uid,nombre,fecha:_selDia,hora:_selHora,tipo:'valoracion',estado:'pendiente'};
+      _mostrarCardCita(cita); _actualizarMetodo(cita);
+      // Mostrar confirmación
+      var p=_selDia.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+      document.getElementById('citas-ok-msg').textContent=DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()]+' a las '+_selHora;
       _showStep('ok');
-    } catch(err) {
+      // Email de confirmación (temporal a lganem@gmail.com)
+      fetch('/api/send-cita',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({nombre,fecha:_selDia,hora:_selHora,email:'lganem@gmail.com',emailMiembro:email})
+      }).catch(e=>console.log('email err',e));
+    } catch(err){
       console.error('Error cita:',err);
-      btn.disabled=false; btn.style.background='#e74c3c'; btn.style.cursor='pointer';
+      btn.disabled=false;btn.style.background='#e74c3c';btn.style.cursor='pointer';
       btn.textContent='Error — intenta de nuevo';
     }
   };
+  // ─── Detalle y cancelación ───
+  window.verDetalleCita = function(){
+    if(!window._citaPendiente) return;
+    document.getElementById('detalle-cita-fecha').textContent=_labelCita(window._citaPendiente);
+    document.getElementById('modal-detalle-cita').style.display='flex';
+  };
+  window.cerrarDetalleCita = function(e){
+    if(!e||e.target===document.getElementById('modal-detalle-cita'))
+      document.getElementById('modal-detalle-cita').style.display='none';
+  };
+  window.solicitarCancelacion = function(){
+    document.getElementById('modal-confirmar-cancel').style.display='flex';
+  };
+  window.ejecutarCancelacion = async function(){
+    if(!_proximaCitaId) return;
+    var btn=document.getElementById('btn-ejecutar-cancel');
+    btn.textContent='Cancelando...';btn.disabled=true;
+    try{
+      await window.updateDoc(window.doc(window.db,'citas',_proximaCitaId),
+        {estado:'cancelada',canceladoEn:window.serverTimestamp()});
+      document.getElementById('modal-confirmar-cancel').style.display='none';
+      document.getElementById('modal-detalle-cita').style.display='none';
+      _proximaCitaId=null;_ocultarCardCita();_actualizarMetodo(null);
+      btn.textContent='Sí, cancelar';btn.disabled=false;
+    } catch(e){
+      console.error('err cancel',e);btn.textContent='Error';btn.disabled=false;
+    }
+  };
+  // ─── Auto-inicializar cuando auth esté listo ───
+  var _initInterval=setInterval(function(){
+    if(window._currentUid){clearInterval(_initInterval);window.cargarProximaCita();}
+  },800);
 })();
 </script>
 
+
+<!-- MODAL DETALLE CITA -->
+<div id="modal-detalle-cita" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3001;align-items:flex-end;justify-content:center;" onclick="cerrarDetalleCita(event)">
+  <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:0 0 32px;" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:center;padding:12px 0 0"><div style="width:36px;height:4px;background:#ddd;border-radius:2px"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px 4px">
+      <h3 style="font-size:16px;font-weight:600;color:#1a1a1a;margin:0">Mi Valoración</h3>
+      <button onclick="cerrarDetalleCita()" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;">×</button>
+    </div>
+    <div style="padding:0 20px 16px">
+      <div style="background:#EAF3DE;border-radius:12px;padding:14px;margin-bottom:16px">
+        <div style="font-size:11px;color:#3B6D11;margin-bottom:4px;font-weight:500">Fecha y hora</div>
+        <div id="detalle-cita-fecha" style="font-size:18px;font-weight:600;color:#1D9E75;margin-bottom:10px"></div>
+        <div style="font-size:12px;color:#444;line-height:1.6">
+          <div style="font-weight:600;margin-bottom:5px">Recomendaciones para tu valoración:</div>
+          <div>• Ayuno de 2 a 4 horas (sin alimentos ni líquidos)</div>
+          <div>• Evita ejercicio intenso 12 horas antes</div>
+          <div>• Ve al baño antes de la medición</div>
+          <div>• Usa ropa ligera, sin accesorios metálicos</div>
+        </div>
+      </div>
+      <button onclick="window.solicitarCancelacion()" style="width:100%;padding:13px;background:none;border:1.5px solid #e74c3c;border-radius:12px;color:#e74c3c;font-size:14px;font-weight:500;cursor:pointer;">Cancelar cita</button>
+    </div>
+  </div>
+</div>
+<!-- MODAL CONFIRMAR CANCELACION -->
+<div id="modal-confirmar-cancel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:3002;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:16px;width:85%;max-width:340px;padding:24px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:12px">⚠️</div>
+    <h3 style="font-size:16px;font-weight:600;margin:0 0 8px">¿Cancelar cita?</h3>
+    <p style="font-size:13px;color:#666;margin:0 0 20px">Se cancelará tu valoración agendada. Podrás agendar una nueva cuando quieras.</p>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('modal-confirmar-cancel').style.display='none'" style="flex:1;padding:12px;background:#f5f5f5;border:none;border-radius:10px;font-size:14px;cursor:pointer;">No, regresar</button>
+      <button onclick="window.ejecutarCancelacion()" id="btn-ejecutar-cancel" style="flex:1;padding:12px;background:#e74c3c;color:white;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;">Sí, cancelar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
