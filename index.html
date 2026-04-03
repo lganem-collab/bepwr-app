@@ -2359,6 +2359,20 @@ function renderProximaValoracion(data, config) {
   const fechaEl     = document.getElementById('metodo-valoracion-fecha');
   const countdownEl = document.getElementById('metodo-valoracion-countdown');
   const noteEl      = document.getElementById('metodo-valoracion-note');
+  if (!fechaEl) return;
+  // Si hay cita confirmada activa, mostrarla en lugar del cálculo por defecto
+  if (window._citaPendiente) {
+    const cita = window._citaPendiente;
+    const MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const DN=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const p=cita.fecha.split('-');
+    const fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+    fechaEl.textContent=DN[fd.getDay()]+' '+parseInt(p[2])+' de '+MN[fd.getMonth()]+', '+cita.hora;
+    const diff=Math.ceil((fd.getTime()-new Date().setHours(0,0,0,0))/(864e5));
+    if(countdownEl) countdownEl.textContent=diff>0?'En '+diff+' días':diff===0?'Hoy':'Esta semana';
+    if(noteEl) noteEl.textContent='Cita agendada';
+    return;
+  }
   if (!data.ultimaValoracion) {
     fechaEl.textContent     = 'Por agendar';
     countdownEl.textContent = '';
@@ -3258,20 +3272,24 @@ window._applyIVF=applyIVF;
     var uid = window._currentUid; if(!uid) return;
     try {
       var hoy = new Date().toISOString().split('T')[0];
+      // Sin orderBy para no requerir índice compuesto en Firestore
       var snap = await window.getDocs(window.query(
         window.collection(window.db,'citas'),
         window.where('uid','==',uid),
-        window.where('fecha','>=',hoy),
-        window.where('estado','==','confirmada'),
-        window.orderBy('fecha'), window.limit(1)
+        window.where('estado','==','confirmada')
       ));
-      if(!snap.empty){
-        var doc=snap.docs[0]; _proximaCitaId=doc.id;
-        _mostrarCardCita(doc.data()); _actualizarMetodo(doc.data());
+      var futuras=snap.docs.filter(function(d){return d.data().fecha>=hoy;});
+      futuras.sort(function(a,b){
+        var da=a.data(),db=b.data();
+        return (da.fecha+da.hora).localeCompare(db.fecha+db.hora);
+      });
+      if(futuras.length){
+        var d=futuras[0]; _proximaCitaId=d.id;
+        _mostrarCardCita(d.data()); _actualizarMetodo(d.data());
       } else {
         _proximaCitaId=null; _ocultarCardCita(); _actualizarMetodo(null);
       }
-    } catch(e){console.log('err cargarProximaCita',e);}
+    } catch(e){console.log('err cargarProximaCita',e.code||e.message);}
   };
 
   function _labelCita(cita) {
@@ -3408,8 +3426,9 @@ window._applyIVF=applyIVF;
     try{
       var uid=window._currentUid; if(!uid) throw new Error('Sin sesión');
       var nombre=(window._userData&&window._userData.nombre)?window._userData.nombre:'Miembro';
-      var email=(window._userData&&window._userData.email)?window._userData.email:'';
-      // Cancelar citas previas confirmadas del mismo usuario
+      var email=(window._userData&&window._userData.email)?window._userData.email:
+                (window._authUser&&window._authUser.email)?window._authUser.email:'';
+      // Cancelar citas previas confirmadas
       try{
         var prevSnap=await window.getDocs(window.query(window.collection(window.db,'citas'),window.where('uid','==',uid),window.where('estado','==','confirmada')));
         for(var pDoc of prevSnap.docs){
@@ -3421,9 +3440,18 @@ window._applyIVF=applyIVF;
         tipo:'valoracion',estado:'confirmada',creadoEn:window.serverTimestamp()
       });
       _proximaCitaId=ref.id;
-      var cita={uid,nombre,fecha:_selDia,hora:_selHora,tipo:'valoracion',estado:'confirmada'};
+      var cita={uid:uid,nombre:nombre,fecha:_selDia,hora:_selHora,tipo:'valoracion',estado:'confirmada'};
       _mostrarCardCita(cita); _actualizarMetodo(cita);
-      // Guardar notificación en avisos del miembro
+      // Notificación push local al miembro
+      try{
+        if('Notification' in window && Notification.permission==='granted'){
+          new Notification('bePWR — Cita confirmada ✅',{
+            body:'Tu valoración: '+_labelCita(cita)+'. Recuerda: ayuno 2-4h, sin ejercicio intenso 12h antes.',
+            icon:'/icons/icon-192.png',tag:'cita-confirmada'
+          });
+        }
+      }catch(ne){console.log('notif push err',ne);}
+      // Guardar aviso en Firestore
       try{
         await window.addDoc(window.collection(window.db,'usuarios',uid,'notificaciones'),{
           titulo:'Cita confirmada ✅',
@@ -3432,13 +3460,13 @@ window._applyIVF=applyIVF;
         });
         if(typeof loadNotifications==='function') loadNotifications(uid);
       }catch(ne){console.log('notif err',ne);}
-      // Mostrar confirmación
+      // Mostrar paso de éxito
       var p=_selDia.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
       document.getElementById('citas-ok-msg').textContent=DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()]+' a las '+_selHora;
       _showStep('ok');
-      // Email de confirmación (temporal a lganem@gmail.com)
+      // Email de confirmación al miembro vía Resend
       fetch('/api/send-cita',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({nombre,fecha:_selDia,hora:_selHora,email:'lganem@gmail.com',emailMiembro:email})
+        body:JSON.stringify({nombre:nombre,fecha:_selDia,hora:_selHora,emailMiembro:email})
       }).catch(e=>console.log('email err',e));
     } catch(err){
       console.error('Error cita:',err);
@@ -3475,9 +3503,12 @@ window._applyIVF=applyIVF;
     }
   };
   // ─── Auto-inicializar cuando auth esté listo ───
+  // ─── Auto-inicializar cuando auth y Firestore estén listos ───
   var _initInterval=setInterval(function(){
-    if(window._currentUid){clearInterval(_initInterval);window.cargarProximaCita();}
-  },800);
+    if(window._currentUid&&window.db&&window.getDocs&&window.collection&&window.where){
+      clearInterval(_initInterval);window.cargarProximaCita();
+    }
+  },500);
 })();
 </script>
 
