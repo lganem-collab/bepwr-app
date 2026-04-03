@@ -523,6 +523,7 @@
           <div class="info-row"><div class="info-key">Altura</div><div class="info-val" id="prof-altura">Sin datos</div></div>
         </div>
         <button class="btn-secondary" onclick="openEditModal()">&#x270F;&#xFE0F; Editar informaci&#xF3;n</button>
+<button onclick="abrirMisLogros()" style="width:100%;padding:13px;border-radius:14px;border:none;background:linear-gradient(135deg,#c8960c,#D4A017,#f0c040);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:.3px;box-shadow:0 3px 12px rgba(212,160,23,0.4)">&#x1F3C5; Mis Logros</button>
         <button class="logout-btn" onclick="doLogout()">Cerrar sesi&#xF3;n</button>
       <!-- elementos ocultos requeridos por JS -->
       <div style="display:none">
@@ -3589,5 +3590,59 @@ window._applyIVF=applyIVF;
     </div>
   </div>
 </div>
+
+<!-- MODAL MIS LOGROS -->
+<div id="modal-mis-logros" style="display:none;position:fixed;inset:0;z-index:3100;background:rgba(0,0,0,0.85);align-items:flex-end;justify-content:center" onclick="if(event.target===this)cerrarMisLogros()">
+  <div style="background:#141414;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:0 0 40px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;justify-content:center;padding:12px 0 4px"><div style="width:36px;height:4px;background:#333;border-radius:2px"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px 8px">
+      <div style="font-family:'Space Mono',monospace;font-size:13px;color:#FF5C1A;letter-spacing:1px">MIS LOGROS</div>
+      <button onclick="cerrarMisLogros()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer">&#x2715;</button>
+    </div>
+    <div id="logros-grid" style="padding:8px 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="text-align:center;color:#555;font-size:13px;padding:40px 0;grid-column:1/-1">Cargando logros...</div>
+    </div>
+  </div>
+</div>
+<script>
+// Definición de todos los logros posibles
+window._LOGROS_DEF = [
+  { id:'primera-valoracion', titulo:'1era Valoración', desc:'Completaste tu primera valoración', img:'/medals/primera-valoracion.svg' },
+];
+function abrirMisLogros(){
+  const m=document.getElementById('modal-mis-logros');
+  m.style.display='flex';
+  const uid=window._currentUid; if(!uid) return;
+  const grid=document.getElementById('logros-grid');
+  grid.innerHTML='<div style="text-align:center;color:#555;font-size:13px;padding:40px 0;grid-column:1/-1">Cargando logros...</div>';
+  (async()=>{
+    try{
+      const snap=await window.getDocs(window.collection(window.db,'usuarios',uid,'logros'));
+      const desbloqueados={};
+      snap.forEach(d=>{ desbloqueados[d.id]=d.data(); });
+      if(!window._LOGROS_DEF.length){ grid.innerHTML='<div style="color:#555;text-align:center;padding:40px 0;grid-column:1/-1">Sin logros disponibles</div>'; return; }
+      grid.innerHTML=window._LOGROS_DEF.map(l=>{
+        const tiene=!!desbloqueados[l.id];
+        const fecha=tiene&&desbloqueados[l.id].fecha?new Date(desbloqueados[l.id].fecha.toDate?desbloqueados[l.id].fecha.toDate():desbloqueados[l.id].fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):'';
+        return `<div style="background:#1a1a1a;border-radius:16px;padding:16px;text-align:center;border:1px solid ${tiene?'#D4A017':'#222'};${!tiene?'opacity:0.45':''}">
+          <img src="${l.img}" style="width:100%;max-width:130px;${!tiene?'filter:grayscale(100%) brightness(0.4)':''}" onerror="this.style.display='none'" />
+          <div style="font-size:13px;font-weight:600;color:${tiene?'#fff':'#555'};margin-top:8px">${l.titulo}</div>
+          <div style="font-size:11px;color:${tiene?'#D4A017':'#444'};margin-top:3px">${tiene?fecha:l.desc}</div>
+          ${tiene?'<div style="font-size:10px;color:#D4A017;margin-top:4px">&#x2713; Desbloqueada</div>':'<div style="font-size:18px;margin-top:4px">&#x1F512;</div>'}
+        </div>`;
+      }).join('');
+    }catch(e){ grid.innerHTML='<div style="color:#f55;text-align:center;padding:40px 0;grid-column:1/-1">Error al cargar</div>'; }
+  })();
+}
+function cerrarMisLogros(){ document.getElementById('modal-mis-logros').style.display='none'; }
+// Función para desbloquear un logro (llamar desde admin o cron)
+window.desbloquearLogro = async function(uid, logroId){
+  try{
+    await window.setDoc(window.doc(window.db,'usuarios',uid,'logros',logroId),{
+      fecha: window.serverTimestamp(), desbloqueado:true
+    });
+  }catch(e){ console.error('desbloquearLogro:',e); }
+};
+</script>
 </body>
 </html>
