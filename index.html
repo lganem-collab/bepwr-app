@@ -3426,7 +3426,12 @@ window._applyIVF=applyIVF;
     btn.disabled=true;btn.textContent='Guardando...';
     try{
       var uid=window._currentUid; if(!uid) throw new Error('Sin sesión');
-      var _ud=await window.getDoc(window.doc(window.db,'usuarios',uid));var nombre=(_ud.exists()&&_ud.data().nombre)?_ud.data().nombre:'Miembro';
+      var _ud=await window.getDoc(window.doc(window.db,'usuarios',uid));
+      var _d=_ud.exists()?_ud.data():{};
+      var nombre=(_d.nombre&&_d.nombre.trim()&&_d.nombre!=='Miembro')?_d.nombre:
+                 (_d.name&&_d.name.trim())?_d.name:
+                 (window._authUser&&window._authUser.displayName&&window._authUser.displayName.trim())?window._authUser.displayName:
+                 (window._authUser&&window._authUser.email)?window._authUser.email.split('@')[0]:'Miembro';
       var email=(window.cachedUserData&&window.cachedUserData.email)?window.cachedUserData.email:
                 (window._authUser&&window._authUser.email)?window._authUser.email:'';
       // Cancelar citas previas confirmadas
@@ -3516,7 +3521,12 @@ window._applyIVF=applyIVF;
         }
       }catch(pe){}
       // Email de cancelación
-      var uid2=window._currentUid;var _ud2=await window.getDoc(window.doc(window.db,'usuarios',uid2));var nombre=(_ud2.exists()&&_ud2.data().nombre)?_ud2.data().nombre:'Miembro';
+      var uid2=window._currentUid;var _ud2=await window.getDoc(window.doc(window.db,'usuarios',uid2));
+      var _d2=_ud2.exists()?_ud2.data():{};
+      var nombre=(_d2.nombre&&_d2.nombre.trim()&&_d2.nombre!=='Miembro')?_d2.nombre:
+                 (_d2.name&&_d2.name.trim())?_d2.name:
+                 (window._authUser&&window._authUser.displayName&&window._authUser.displayName.trim())?window._authUser.displayName:
+                 (window._authUser&&window._authUser.email)?window._authUser.email.split('@')[0]:'Miembro';
       var email=(window.cachedUserData&&window.cachedUserData.email)?window.cachedUserData.email:
                 (window._authUser&&window._authUser.email)?window._authUser.email:'';
       if(cita.fecha&&cita.hora){
