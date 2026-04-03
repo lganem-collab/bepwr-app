@@ -3263,7 +3263,7 @@ window._applyIVF=applyIVF;
         window.where('uid','==',uid),
         window.where('fecha','>=',hoy),
         window.where('estado','==','confirmada'),
-        window.orderBy('fecha'), window.orderBy('hora'), window.limit(1)
+        window.orderBy('fecha'), window.limit(1)
       ));
       if(!snap.empty){
         var doc=snap.docs[0]; _proximaCitaId=doc.id;
