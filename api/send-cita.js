@@ -5,6 +5,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { tipo = 'confirmacion', nombre, fecha, hora, emailMiembro, citas } = req.body || {};
+  console.log('SEND_CITA_BODY:', JSON.stringify({tipo,nombre,fecha,hora,emailMiembro}));
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
   if (!RESEND_API_KEY) return res.status(500).json({ error: 'RESEND_API_KEY no configurado' });
 
