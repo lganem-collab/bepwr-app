@@ -499,7 +499,7 @@
               <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m&#xE9;tricas...</div>
             </div>
           </div>
-          <button class="btn-secondary" onclick="abrirModalCitas()" style="width:100%;margin-top:4px;background:var(--orange);color:#fff;border-color:var(--orange);font-weight:600">&#x1F4C5; Agendar Valoraci&#xF3;n</button>
+          <button class="btn-secondary" onclick="abrirModalCitas()" style="width:100%;margin-top:4px;background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600">&#x1F4C5; Agendar Valoraci&#xF3;n</button>
           <button class="btn-secondary" onclick="openHistorialModal()" style="width:100%;margin-top:4px">&#x1F4CB; Ver historial completo</button>
         </div>
       </div>
@@ -3219,7 +3219,7 @@ window._applyIVF=applyIVF;
       </div>
     </div>
     <!-- Step 2: Horarios -->
-    <div id="citas-step-hora" style="display:none;padding:0 20px">
+    <div id="citas-step-hora" style="display:none;padding:0 20px"><button onclick="window.volverCalendarioCitas()" style="background:none;border:none;color:#1D9E75;font-size:13px;cursor:pointer;padding:0 0 12px;display:flex;align-items:center;gap:4px;">← Volver al calendario</button>
       <div id="citas-dia-badge" style="display:inline-block;background:#EAF3DE;color:#3B6D11;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:500;margin-bottom:14px"></div>
       <div id="citas-horas-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px"></div>
       <button id="btn-confirmar-cita" onclick="confirmarCita()" disabled style="width:100%;padding:14px;background:#ccc;color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:not-allowed;transition:all .2s">Selecciona un horario</button>
@@ -3240,222 +3240,179 @@ window._applyIVF=applyIVF;
 // SISTEMA DE CITAS
 // ============================================================
 (function(){
-  var _citasCfg = { diasSemana:[1,2,3,4,5], horarios:['07:00','07:15','07:30','07:45','08:00','08:15','08:30','08:45','09:00','09:15','09:30','09:45','10:00','10:15','10:30','10:45'], capacidad:1 };
-  var _citasMes = { year: new Date().getFullYear(), month: new Date().getMonth() };
-  var _citasDiasOcupados = {};   // { 'YYYY-MM-DD': count }
-  var _citaSelDia = null;
-  var _citaSelHora = null;
-
-  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var _cfg = { diasSemana:[1,2,3,4,5], horarios:['07:00','07:15','07:30','07:45','08:00','08:15','08:30','08:45','09:00','09:15','09:30','09:45','10:00','10:15','10:30','10:45'], capacidad:1 };
+  var _mes = { year: new Date().getFullYear(), month: new Date().getMonth() };
+  var _ocupados = {};
+  var _selDia = null, _selHora = null;
+  var MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var DIA = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
   window.abrirModalCitas = async function() {
-    var m = document.getElementById('modal-citas');
-    m.style.display = 'flex';
-    document.getElementById('citas-step-cal').style.display = 'block';
-    document.getElementById('citas-step-hora').style.display = 'none';
-    document.getElementById('citas-step-ok').style.display = 'none';
-    document.getElementById('citas-step-title').textContent = 'Elige un día';
-    _citaSelDia = null; _citaSelHora = null;
-    // Cargar config y citas del mes
-    await _cargarConfigCitas();
-    await _cargarCitasMes(_citasMes.year, _citasMes.month);
-    _renderCalendario();
+    document.getElementById('modal-citas').style.display = 'flex';
+    _showStep('cal');
+    _selDia = null; _selHora = null;
+    await _loadCfg();
+    await _loadMes(_mes.year, _mes.month);
+    _renderCal();
   };
 
   window.cerrarModalCitas = function(e) {
-    if (!e || e.target === document.getElementById('modal-citas')) {
+    if (!e || e.target === document.getElementById('modal-citas'))
       document.getElementById('modal-citas').style.display = 'none';
-    }
+  };
+
+  window.volverCalendarioCitas = function() {
+    _selDia = null; _selHora = null;
+    _showStep('cal');
   };
 
   window.navMesCitas = async function(dir) {
-    _citasMes.month += dir;
-    if (_citasMes.month < 0) { _citasMes.month = 11; _citasMes.year--; }
-    if (_citasMes.month > 11) { _citasMes.month = 0; _citasMes.year++; }
-    await _cargarCitasMes(_citasMes.year, _citasMes.month);
-    _renderCalendario();
+    _mes.month += dir;
+    if (_mes.month < 0)  { _mes.month = 11; _mes.year--; }
+    if (_mes.month > 11) { _mes.month = 0;  _mes.year++; }
+    await _loadMes(_mes.year, _mes.month);
+    _renderCal();
   };
 
-  async function _cargarConfigCitas() {
+  function _showStep(step) {
+    document.getElementById('citas-step-cal').style.display  = step==='cal'  ? 'block' : 'none';
+    document.getElementById('citas-step-hora').style.display = step==='hora' ? 'block' : 'none';
+    document.getElementById('citas-step-ok').style.display   = step==='ok'   ? 'block' : 'none';
+    var titles = { cal:'Elige un día', hora:'Elige un horario', ok:'¡Cita agendada!' };
+    document.getElementById('citas-step-title').textContent = titles[step] || '';
+  }
+
+  async function _loadCfg() {
     try {
-      var snap = await window.db.collection('config').doc('slots').get();
-      if (snap.exists) {
+      var snap = await window.getDoc(window.doc(window.db, 'config', 'slots'));
+      if (snap.exists()) {
         var d = snap.data();
-        if (d.diasSemana) _citasCfg.diasSemana = d.diasSemana;
-        if (d.horarios) _citasCfg.horarios = d.horarios;
-        if (d.capacidad) _citasCfg.capacidad = d.capacidad;
+        if (d.diasSemana) _cfg.diasSemana = d.diasSemana;
+        if (d.horarios)   _cfg.horarios   = d.horarios;
+        if (d.capacidad)  _cfg.capacidad  = d.capacidad;
       }
-    } catch(e) { console.log('cfg citas default'); }
+    } catch(e) {}
   }
 
-  async function _cargarCitasMes(year, month) {
-    _citasDiasOcupados = {};
+  async function _loadMes(y, mo) {
+    _ocupados = {};
     try {
-      var inicio = new Date(year, month, 1).toISOString().split('T')[0];
-      var fin = new Date(year, month+1, 0).toISOString().split('T')[0];
-      var snap = await window.db.collection('citas')
-        .where('fecha', '>=', inicio)
-        .where('fecha', '<=', fin)
-        .where('estado', '!=', 'cancelada')
-        .get();
-      snap.forEach(function(doc) {
-        var f = doc.data().fecha + '_' + doc.data().hora;
-        _citasDiasOcupados[f] = (_citasDiasOcupados[f] || 0) + 1;
+      var ini = y+'-'+String(mo+1).padStart(2,'0')+'-01';
+      var fin = y+'-'+String(mo+1).padStart(2,'0')+'-'+String(new Date(y,mo+1,0).getDate()).padStart(2,'0');
+      var snap = await window.getDocs(window.query(
+        window.collection(window.db,'citas'),
+        window.where('fecha','>=',ini),
+        window.where('fecha','<=',fin)
+      ));
+      snap.forEach(function(d){
+        var dat = d.data();
+        if (dat.estado==='cancelada') return;
+        var k = dat.fecha+'_'+dat.hora;
+        _ocupados[k] = (_ocupados[k]||0)+1;
       });
-    } catch(e) { console.log('err citas mes', e); }
+    } catch(e) { console.log('err loadMes',e); }
   }
 
-  function _slotsFull(fechaStr) {
-    // Un día está "lleno" si TODOS sus horarios tienen >= capacidad citas
-    var llenos = 0;
-    _citasCfg.horarios.forEach(function(h) {
-      var key = fechaStr + '_' + h;
-      if ((_citasDiasOcupados[key] || 0) >= _citasCfg.capacidad) llenos++;
-    });
-    return llenos >= _citasCfg.horarios.length;
+  function _slotsFull(f) {
+    return _cfg.horarios.every(function(h){ return (_ocupados[f+'_'+h]||0) >= _cfg.capacidad; });
   }
 
-  function _renderCalendario() {
-    var y = _citasMes.year, mo = _citasMes.month;
-    document.getElementById('citas-mes-label').textContent = MESES[mo] + ' ' + y;
+  function _slotsLibresHoy(f) {
+    var ahora = new Date(), hMin = ahora.getHours()*60+ahora.getMinutes();
+    return _cfg.horarios.filter(function(h){
+      var p=h.split(':'), sMin=parseInt(p[0])*60+parseInt(p[1]);
+      return sMin > hMin && (_ocupados[f+'_'+h]||0) < _cfg.capacidad;
+    }).length;
+  }
+
+  function _renderCal() {
+    var y=_mes.year, mo=_mes.month;
+    document.getElementById('citas-mes-label').textContent = MES[mo]+' '+y;
     var grid = document.getElementById('citas-cal-grid');
     grid.innerHTML = '';
     var hoy = new Date(); hoy.setHours(0,0,0,0);
-    // Día 1 de este mes — lunes=1 ... domingo=0 => necesitamos offset para lunes
-    var primerDia = new Date(y, mo, 1).getDay(); // 0=dom,1=lun,...
-    var offset = primerDia === 0 ? 6 : primerDia - 1; // offset para que semana empiece en L
-    var diasEnMes = new Date(y, mo+1, 0).getDate();
-    // Celdas vacías
-    for (var i = 0; i < offset; i++) {
-      var empty = document.createElement('div');
-      empty.style.cssText = 'height:34px';
-      grid.appendChild(empty);
-    }
-    // Días
-    for (var d = 1; d <= diasEnMes; d++) {
-      var fecha = new Date(y, mo, d);
-      var cell = document.createElement('div');
-      var dow = fecha.getDay(); // 0=dom, 6=sab
-      var fechaStr = y + '-' + String(mo+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-      var isPasado = fecha < hoy;
-      var isFinSemana = dow === 0 || dow === 6;
-      var isDiaActivo = _citasCfg.diasSemana.indexOf(dow === 0 ? 7 : dow) >= 0;
-      cell.style.cssText = 'height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:500;cursor:default;';
-      if (isPasado || isFinSemana || !isDiaActivo) {
-        cell.style.color = '#ccc';
-        cell.textContent = d;
-      } else if (_slotsFull(fechaStr)) {
-        cell.style.cssText += 'background:#FCEBEB;color:#A32D2D;cursor:not-allowed;';
-        cell.textContent = d;
+    var offset = (new Date(y,mo,1).getDay()||7)-1;
+    for (var i=0;i<offset;i++){ var e=document.createElement('div');e.style.height='36px';grid.appendChild(e); }
+    for (var d=1;d<=new Date(y,mo+1,0).getDate();d++) {
+      var fecha=new Date(y,mo,d), dow=fecha.getDay();
+      var fStr=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      var cell=document.createElement('div');
+      cell.style.cssText='height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:500;';
+      var pasado=fecha<hoy, hoyFlag=fecha.getTime()===hoy.getTime();
+      var finSem=dow===0||dow===6, diaActivo=_cfg.diasSemana.indexOf(dow===0?7:dow)>=0;
+      if (pasado||finSem||!diaActivo) {
+        cell.style.color='#ccc'; cell.textContent=d;
+      } else if (hoyFlag&&_slotsLibresHoy(fStr)===0) {
+        cell.style.cssText+='background:#FCEBEB;color:#A32D2D;'; cell.textContent=d;
+      } else if (!hoyFlag&&_slotsFull(fStr)) {
+        cell.style.cssText+='background:#FCEBEB;color:#A32D2D;'; cell.textContent=d;
       } else {
-        cell.style.cssText += 'background:#EAF3DE;color:#3B6D11;cursor:pointer;';
-        cell.textContent = d;
-        cell.setAttribute('data-fecha', fechaStr);
-        cell.onclick = function() { seleccionarDiaCita(this.getAttribute('data-fecha')); };
+        cell.style.cssText+='background:#EAF3DE;color:#3B6D11;cursor:pointer;'; cell.textContent=d;
+        cell.setAttribute('data-fecha',fStr);
+        cell.onclick=function(){ window.seleccionarDiaCita(this.getAttribute('data-fecha')); };
       }
       grid.appendChild(cell);
     }
   }
 
-  window.seleccionarDiaCita = function(fechaStr) {
-    _citaSelDia = fechaStr;
-    _citaSelHora = null;
-    // Formatear fecha legible
-    var parts = fechaStr.split('-');
-    var diaNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-    var label = diaNames[fd.getDay()] + ' ' + parseInt(parts[2]) + ' de ' + MESES[fd.getMonth()];
-    document.getElementById('citas-dia-badge').textContent = label;
-    // Render horarios
-    var grid = document.getElementById('citas-horas-grid');
-    grid.innerHTML = '';
-    _citasCfg.horarios.forEach(function(hora) {
-      var key = fechaStr + '_' + hora;
-      var count = _citasDiasOcupados[key] || 0;
-      var libre = count < _citasCfg.capacidad;
-      var cell = document.createElement('div');
-      cell.style.cssText = 'border-radius:10px;padding:12px;text-align:center;' + (libre ? 'border:1.5px solid #e0e0d8;cursor:pointer;' : 'background:#f5f5f5;border:1.5px solid #eee;cursor:not-allowed;opacity:.5;');
-      cell.innerHTML = '<div style="font-size:15px;font-weight:500;color:' + (libre?'#222':'#bbb') + '">' + hora + '</div><div style="font-size:10px;color:#888">' + (libre?'disponible':'ocupado') + '</div>';
-      if (libre) {
-        cell.setAttribute('data-hora', hora);
-        cell.onclick = function() { seleccionarHoraCita(this.getAttribute('data-hora')); };
-      }
+  window.seleccionarDiaCita = function(fStr) {
+    _selDia=fStr; _selHora=null;
+    var p=fStr.split('-'), fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+    document.getElementById('citas-dia-badge').textContent = DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()];
+    var ahora=new Date(), hMin=ahora.getHours()*60+ahora.getMinutes();
+    var esHoy = fStr===ahora.getFullYear()+'-'+String(ahora.getMonth()+1).padStart(2,'0')+'-'+String(ahora.getDate()).padStart(2,'0');
+    var grid=document.getElementById('citas-horas-grid'); grid.innerHTML='';
+    _cfg.horarios.forEach(function(hora){
+      var q=hora.split(':'), sMin=parseInt(q[0])*60+parseInt(q[1]);
+      var yaPaso=esHoy&&sMin<=hMin, ocupado=(_ocupados[fStr+'_'+hora]||0)>=_cfg.capacidad;
+      var libre=!yaPaso&&!ocupado;
+      var cell=document.createElement('div');
+      cell.style.cssText='border-radius:10px;padding:10px;text-align:center;'+(libre?'border:1.5px solid #e0e0d8;cursor:pointer;':'background:#f5f5f5;border:1.5px solid #eee;cursor:not-allowed;opacity:.4;');
+      cell.innerHTML='<div style="font-size:14px;font-weight:500;color:'+(libre?'#222':'#bbb')+'">'+hora+'</div><div style="font-size:10px;color:#888">'+(yaPaso?'ya pasó':ocupado?'ocupado':'disponible')+'</div>';
+      if(libre){ cell.setAttribute('data-hora',hora); cell.onclick=function(){ window.seleccionarHoraCita(this.getAttribute('data-hora')); }; }
       grid.appendChild(cell);
     });
-    // Mostrar step 2
-    document.getElementById('citas-step-cal').style.display = 'none';
-    document.getElementById('citas-step-hora').style.display = 'block';
-    document.getElementById('citas-step-title').textContent = 'Elige un horario';
-    var btnConf = document.getElementById('btn-confirmar-cita');
-    btnConf.disabled = true;
-    btnConf.style.background = '#ccc';
-    btnConf.style.cursor = 'not-allowed';
-    btnConf.textContent = 'Selecciona un horario';
+    var btn=document.getElementById('btn-confirmar-cita');
+    btn.disabled=true; btn.style.background='#ccc'; btn.style.cursor='not-allowed'; btn.textContent='Selecciona un horario';
+    _showStep('hora');
   };
 
   window.seleccionarHoraCita = function(hora) {
-    _citaSelHora = hora;
-    // Highlight seleccionado
-    document.querySelectorAll('#citas-horas-grid > div').forEach(function(el) {
-      if (el.getAttribute('data-hora') === hora) {
-        el.style.border = '2px solid #1D9E75';
-        el.querySelector('div').style.color = '#1D9E75';
-      } else if (el.getAttribute('data-hora')) {
-        el.style.border = '1.5px solid #e0e0d8';
-        el.querySelector('div').style.color = '#222';
-      }
+    _selHora=hora;
+    document.querySelectorAll('#citas-horas-grid > div[data-hora]').forEach(function(el){
+      var sel=el.getAttribute('data-hora')===hora;
+      el.style.border=sel?'2px solid #1D9E75':'1.5px solid #e0e0d8';
+      el.querySelector('div').style.color=sel?'#1D9E75':'#222';
     });
-    var btnConf = document.getElementById('btn-confirmar-cita');
-    var parts = _citaSelDia.split('-');
-    var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-    var diaNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    var label = diaNames[fd.getDay()] + ' ' + parseInt(parts[2]) + ' de ' + MESES[fd.getMonth()];
-    btnConf.textContent = 'Confirmar — ' + label + ', ' + hora;
-    btnConf.disabled = false;
-    btnConf.style.background = '#1D9E75';
-    btnConf.style.cursor = 'pointer';
+    var p=_selDia.split('-'), fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+    var lbl=DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()];
+    var btn=document.getElementById('btn-confirmar-cita');
+    btn.textContent='Confirmar — '+lbl+', '+hora;
+    btn.disabled=false; btn.style.background='#1D9E75'; btn.style.cursor='pointer';
   };
 
   window.confirmarCita = async function() {
-    if (!_citaSelDia || !_citaSelHora) return;
-    var btnConf = document.getElementById('btn-confirmar-cita');
-    btnConf.disabled = true;
-    btnConf.textContent = 'Guardando...';
+    if(!_selDia||!_selHora) return;
+    var btn=document.getElementById('btn-confirmar-cita');
+    btn.disabled=true; btn.textContent='Guardando...';
     try {
-      var user = firebase.auth().currentUser;
-      var nombre = (window._userData && window._userData.nombre) ? window._userData.nombre : (user ? user.email : 'Miembro');
-      await window.db.collection('citas').add({
-        uid: user.uid,
-        nombre: nombre,
-        fecha: _citaSelDia,
-        hora: _citaSelHora,
-        tipo: 'valoracion',
-        estado: 'pendiente',
-        creadoEn: firebase.firestore.FieldValue.serverTimestamp()
+      var uid=window._currentUid;
+      if(!uid) throw new Error('Sin sesión');
+      var nombre=(window._userData&&window._userData.nombre)?window._userData.nombre:'Miembro';
+      await window.addDoc(window.collection(window.db,'citas'),{
+        uid:uid, nombre:nombre, fecha:_selDia, hora:_selHora,
+        tipo:'valoracion', estado:'pendiente',
+        creadoEn:window.serverTimestamp()
       });
-      // Actualizar UI card
-      var parts = _citaSelDia.split('-');
-      var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-      var diaNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-      var labelOk = diaNames[fd.getDay()] + ' ' + parseInt(parts[2]) + ' de ' + MESES[fd.getMonth()] + ' a las ' + _citaSelHora;
-      document.getElementById('citas-step-hora').style.display = 'none';
-      document.getElementById('citas-step-ok').style.display = 'block';
-      document.getElementById('citas-ok-msg').textContent = labelOk;
-      document.getElementById('citas-step-title').textContent = '¡Listo!';
-      // Actualizar texto en card
-      var proxEl = document.getElementById('proxima-cita-texto');
-      if (proxEl) proxEl.textContent = labelOk;
-      // Cambiar botón
-      var btnRes = document.getElementById('btn-reservar-val');
-      if (btnRes) { btnRes.textContent = 'Modificar cita'; }
+      var p=_selDia.split('-'), fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+      document.getElementById('citas-ok-msg').textContent = DIA[fd.getDay()]+' '+parseInt(p[2])+' de '+MES[fd.getMonth()]+' a las '+_selHora;
+      _showStep('ok');
     } catch(err) {
-      console.error('Error guardando cita:', err);
-      btnConf.disabled = false;
-      btnConf.textContent = 'Error, intenta de nuevo';
-      btnConf.style.background = '#e74c3c';
+      console.error('Error cita:',err);
+      btn.disabled=false; btn.style.background='#e74c3c'; btn.style.cursor='pointer';
+      btn.textContent='Error — intenta de nuevo';
     }
   };
-
 })();
 </script>
 
