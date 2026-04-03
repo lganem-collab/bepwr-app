@@ -539,7 +539,7 @@
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div style="font-size:17px;font-weight:700">&#x1F4CB; Pr&#xF3;ximas Citas</div>
-          <button class="btn btn-sm" onclick="enviarReporteCitas()" style="background:#222;font-size:12px">&#x1F4E7; Enviar reporte</button>
+          <button class="btn btn-sm" onclick="enviarReporteCitas()" style="background:#222;font-size:12px">📧 Enviar reporte</button>
         </div>
         <div id="citas-proximas-list">
           <div style="text-align:center;color:var(--gray);padding:24px;font-size:13px">Cargando citas...</div>
@@ -3122,22 +3122,17 @@ window.filterNotifUsers = function (q) {
     const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb'};
     el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:12px;padding:12px;font-family:Space Mono,monospace">Cargando…</div>';
     function _renderSnap(snap){
-      const activas=snap.docs.filter(d=>d.data().estado!=='cancelada');
-      if(!activas.length){
-        el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:24px">No hay citas próximas agendadas.</div>';
+      if(!snap.docs.length){
+        el.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:24px">No hay citas próximas.</div>';
         window._citasProximas=[];return;
       }
-      activas.sort((a,b)=>{const da=a.data(),db=b.data();return(da.fecha+da.hora).localeCompare(db.fecha+db.hora);});
-      window._citasProximas=activas.map(d=>{const c=d.data();return{nombre:c.nombre,uid:c.uid,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
+      const all=snap.docs.slice().sort((a,b)=>{const da=a.data(),db=b.data();return(da.fecha+da.hora).localeCompare(db.fecha+db.hora);});
+      // Solo activas para el reporte
+      window._citasProximas=all.filter(d=>d.data().estado!=='cancelada').map(d=>{const c=d.data();return{nombre:c.nombre,uid:c.uid,fecha:c.fecha,hora:c.hora,duracion:c.duracion};});
       const dS={0:'Dom',1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb'};
       const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-      // Agrupar por fecha
       const grupos={};
-      activas.forEach(doc=>{
-        const c=doc.data();
-        if(!grupos[c.fecha]) grupos[c.fecha]=[];
-        grupos[c.fecha].push({doc,c});
-      });
+      all.forEach(doc=>{const c=doc.data();if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push({doc,c});});
       let html='<div style="background:#111;border-radius:12px;overflow:hidden">';
       Object.keys(grupos).sort().forEach(fecha=>{
         const [y,m,d]=fecha.split('-');
@@ -3147,10 +3142,12 @@ window.filterNotifUsers = function (q) {
         grupos[fecha].forEach(({doc,c})=>{
           const member=(window._allMembers||[]).find(mb=>mb.uid===c.uid);
           const nombre=c.nombre&&c.nombre!=='Miembro'?c.nombre:(member&&member.nombre)||c.nombre||'—';
-          html+=`<div style="display:grid;grid-template-columns:80px 1fr auto;gap:4px;padding:10px 14px;border-top:1px solid var(--border);align-items:center">
-            <div style="font-size:13px;font-family:'Space Mono',monospace;color:var(--orange)">${c.hora}</div>
-            <div style="font-size:13px;color:#eee">${nombre}</div>
-            <button class="btn btn-sm" onclick="cancelarCitaAdmin('${doc.id}','${nombre}')" style="background:#2a1010;color:#f55;font-size:11px;padding:4px 8px">Cancelar</button>
+          const cancelada=c.estado==='cancelada';
+          html+=`<div style="display:grid;grid-template-columns:80px 1fr auto auto;gap:4px;padding:10px 14px;border-top:1px solid var(--border);align-items:center;opacity:${cancelada?'0.55':'1'}">
+            <div style="font-size:13px;font-family:'Space Mono',monospace;color:${cancelada?'var(--gray)':'var(--orange)'}">${c.hora}</div>
+            <div style="font-size:13px;color:${cancelada?'#666':'#eee'}">${cancelada?'<s>'+nombre+'</s>':nombre}</div>
+            <span style="font-size:10px;padding:2px 7px;border-radius:10px;background:${cancelada?'#2a1010':'#0f2a1a'};color:${cancelada?'#f55':'#2ecc71'}">${cancelada?'Cancelada':'Confirmada'}</span>
+            ${cancelada?'<div></div>':`<button class="btn btn-sm" onclick="cancelarCitaAdmin('${doc.id}','${nombre}')" style="background:#2a1010;color:#f55;font-size:11px;padding:4px 8px">Cancelar</button>`}
           </div>`;
         });
       });
@@ -3228,14 +3225,19 @@ window.filterNotifUsers = function (q) {
 
   async function enviarReporteCitas() {
     const msg = document.getElementById('citas-report-msg');
-    msg.style.color='var(--gray)'; msg.textContent='Enviando reporte...';
+    if(!msg) return;
+    msg.style.color='var(--gray)'; msg.textContent='Enviando reporte…';
     try {
-      const res = await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trigger:'manual',citas:window._citasProximas||[]})});
+      const res = await fetch('/api/send-cita',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({tipo:'reporte',citas:window._citasProximas||[]})
+      });
       const data = await res.json();
-      if (res.ok){ msg.style.color='var(--green)'; msg.textContent='Reporte enviado exitosamente.'; }
+      if(res.ok){ msg.style.color='var(--green)'; msg.textContent='✅ Reporte enviado.'; }
       else { msg.style.color='#f55'; msg.textContent=data.error||'Error al enviar.'; }
-    } catch(e){ msg.style.color='#f55'; msg.textContent='Error de red.'; }
-    setTimeout(()=>msg.textContent='',4000);
+    } catch(e){ msg.style.color='#f55'; msg.textContent='Error: '+e.message; }
+    setTimeout(()=>{if(msg)msg.textContent='';},4000);
   }
 
 </script>
