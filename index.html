@@ -439,10 +439,6 @@
     <div class="metodo-card" id="card-guia">
       <div class="metodo-card-label">Guía Nutrimental</div>
       <p class="guia-desc" id="metodo-guia-desc" style="font-size:13px;color:#aaa;margin:0 0 12px">Guía personalizada para tu objetivo</p>
-      <button id="btn-reservar-val" onclick="abrirModalCitas()" style="width:100%;padding:13px 16px;background:#1D9E75;color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Reservar Valoración
-      </button>
       <button id="metodo-guia-btn" class="metodo-btn metodo-btn--outline" style="display:none;color:#fff;background:none;border:1.5px solid currentColor;border-radius:10px;padding:10px 20px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Ver Guía Nutrimental</button>
       <p id="metodo-guia-unavailable" class="metodo-note" style="display:none">PDF no disponible aún</p>
     </div>
@@ -503,7 +499,7 @@
               <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m&#xE9;tricas...</div>
             </div>
           </div>
-          <button class="btn-secondary" onclick="openAgendarModal()" style="width:100%;margin-top:4px;background:var(--orange);color:#fff;border-color:var(--orange);font-weight:600">&#x1F4C5; Agendar Valoraci&#xF3;n</button>
+          <button class="btn-secondary" onclick="abrirModalCitas()" style="width:100%;margin-top:4px;background:var(--orange);color:#fff;border-color:var(--orange);font-weight:600">&#x1F4C5; Agendar Valoraci&#xF3;n</button>
           <button class="btn-secondary" onclick="openHistorialModal()" style="width:100%;margin-top:4px">&#x1F4CB; Ver historial completo</button>
         </div>
       </div>
@@ -3244,7 +3240,7 @@ window._applyIVF=applyIVF;
 // SISTEMA DE CITAS
 // ============================================================
 (function(){
-  var _citasCfg = { diasSemana:[1,2,3,4,5], horarios:['07:00','08:00','09:00','10:00'], capacidad:1 };
+  var _citasCfg = { diasSemana:[1,2,3,4,5], horarios:['07:00','07:15','07:30','07:45','08:00','08:15','08:30','08:45','09:00','09:15','09:30','09:45','10:00','10:15','10:30','10:45'], capacidad:1 };
   var _citasMes = { year: new Date().getFullYear(), month: new Date().getMonth() };
   var _citasDiasOcupados = {};   // { 'YYYY-MM-DD': count }
   var _citaSelDia = null;
@@ -3282,7 +3278,7 @@ window._applyIVF=applyIVF;
 
   async function _cargarConfigCitas() {
     try {
-      var snap = await db.collection('config').doc('slots').get();
+      var snap = await window.db.collection('config').doc('slots').get();
       if (snap.exists) {
         var d = snap.data();
         if (d.diasSemana) _citasCfg.diasSemana = d.diasSemana;
@@ -3297,7 +3293,7 @@ window._applyIVF=applyIVF;
     try {
       var inicio = new Date(year, month, 1).toISOString().split('T')[0];
       var fin = new Date(year, month+1, 0).toISOString().split('T')[0];
-      var snap = await db.collection('citas')
+      var snap = await window.db.collection('citas')
         .where('fecha', '>=', inicio)
         .where('fecha', '<=', fin)
         .where('estado', '!=', 'cancelada')
@@ -3428,7 +3424,7 @@ window._applyIVF=applyIVF;
     try {
       var user = firebase.auth().currentUser;
       var nombre = (window._userData && window._userData.nombre) ? window._userData.nombre : (user ? user.email : 'Miembro');
-      await db.collection('citas').add({
+      await window.db.collection('citas').add({
         uid: user.uid,
         nombre: nombre,
         fecha: _citaSelDia,
