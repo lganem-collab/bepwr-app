@@ -3494,6 +3494,36 @@ window._applyIVF=applyIVF;
     try{
       await window.updateDoc(window.doc(window.db,'citas',_proximaCitaId),
         {estado:'cancelada',canceladoEn:window.serverTimestamp()});
+      // Notificación Firestore al miembro
+      var uid=window._currentUid;
+      var cita=window._citaPendiente||{};
+      try{
+        await window.addDoc(window.collection(window.db,'usuarios',uid,'notificaciones'),{
+          titulo:'Cita cancelada',
+          cuerpo:'Tu valoración ha sido cancelada. Puedes agendar una nueva cuando quieras.',
+          tipo:'cita_cancelada',fecha:window.serverTimestamp(),leida:false
+        });
+        if(typeof loadNotifications==='function') loadNotifications(uid);
+      }catch(ne){console.log('notif cancel err',ne);}
+      // Notificación push local
+      try{
+        if('Notification' in window && Notification.permission==='granted'){
+          new Notification('bePWR — Cita cancelada',{
+            body:'Tu valoración ha sido cancelada. Puedes agendar una nueva cuando quieras.',
+            icon:'/icons/icon-192.png',tag:'cita-cancelada'
+          });
+        }
+      }catch(pe){}
+      // Email de cancelación
+      var nombre=(window._userData&&window._userData.nombre)?window._userData.nombre:
+                 (window._authUser&&window._authUser.email)?window._authUser.email:'Miembro';
+      var email=(window._userData&&window._userData.email)?window._userData.email:
+                (window._authUser&&window._authUser.email)?window._authUser.email:'';
+      if(cita.fecha&&cita.hora){
+        fetch('/api/send-cita',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({tipo:'cancelacion',nombre:nombre,fecha:cita.fecha,hora:cita.hora,emailMiembro:email})
+        }).catch(e=>console.log('email cancel err',e));
+      }
       document.getElementById('modal-confirmar-cancel').style.display='none';
       document.getElementById('modal-detalle-cita').style.display='none';
       _proximaCitaId=null;_ocultarCardCita();_actualizarMetodo(null);
