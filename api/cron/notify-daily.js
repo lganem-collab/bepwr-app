@@ -150,6 +150,47 @@ export default async function handler(req, res) {
       }
     } catch(e){ console.error('citas24h err:', e.message); }
 
+
+    // ── ALERTA DE USO RESEND ──
+    // Revisa el uso mensual y avisa a lganem@gmail.com si supera 80% (2,400) o 95% (2,850)
+    try {
+      const resendUsage = await fetch('https://api.resend.com/emails?limit=1', {
+        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` }
+      });
+      // Resend no tiene endpoint de usage en plan free, usamos contador propio en Firestore
+      const usageDoc = await db.collection('config').doc('resendUsage').get();
+      const usage = usageDoc.exists ? usageDoc.data() : {};
+      const mes = new Date().toISOString().slice(0,7); // YYYY-MM
+      const count = (usage.mes === mes) ? (usage.count || 0) : 0;
+      const LIMITE = 3000;
+      const pct = Math.round(count / LIMITE * 100);
+      // Alerta al 80% y 95%
+      const umbral = count >= 2850 ? 95 : count >= 2400 ? 80 : 0;
+      if (umbral && usage.ultimaAlerta !== umbral + '-' + mes) {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'bePWR <citas@bepwr.vip>',
+            to: ['lganem@gmail.com'],
+            subject: `⚠️ bePWR: ${pct}% del límite de Resend usado (${count}/${LIMITE})`,
+            html: `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;background:#fff9eb;border-radius:12px;border:2px solid #f59e0b">
+              <h2 style="color:#b45309;margin:0 0 12px">\u26a0\ufe0f Alerta de uso de emails</h2>
+              <p style="color:#333;font-size:15px">Has usado <strong>${count} de ${LIMITE} emails</strong> este mes en Resend (<strong>${pct}%</strong>).</p>
+              ${umbral >= 95
+                ? '<p style="color:#dc2626;font-weight:600">\u26a0\ufe0f Est\u00e1s muy cerca del l\u00edmite. Considera activar el plan de pago en resend.com para no interrumpir el env\u00edo.</p>'
+                : '<p style="color:#b45309">El l\u00edmite gratuito es 3,000 emails/mes. Si lo superas, los emails dejar\u00e1n de enviarse.</p>'}
+              <a href="https://resend.com/settings/usage" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#FF5C1A;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Ver uso en Resend</a>
+              <p style="font-size:12px;color:#999;margin-top:20px">bePWR Functional Training \u00b7 Quer\u00e9taro</p>
+            </div>`
+          })
+        });
+        // Marcar alerta enviada para no duplicar
+        await db.collection('config').doc('resendUsage').set({ mes, count, ultimaAlerta: umbral + '-' + mes }, { merge: true });
+      }
+    } catch(e) { console.warn('resend usage check:', e.message); }
+
+
     return res.status(200).json({ ok: true, bday, val, citas24h });
   } catch (e) {
     console.error(e);
