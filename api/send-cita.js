@@ -1,9 +1,4 @@
 // api/send-cita.js – maneja confirmacion, cancelacion y reporte de citas
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
-if(!getApps().length){initializeApp({credential:cert({projectId:process.env.FCM_PROJECT_ID,clientEmail:process.env.FCM_CLIENT_EMAIL,privateKey:process.env.FCM_PRIVATE_KEY?.replace(/\\n/g,'\n')})});}
-const _adb=getAdminFirestore();
-async function _incResend(n=1){try{const mes=new Date().toISOString().slice(0,7);const ref=_adb.collection('config').doc('resendUsage');await _adb.runTransaction(async t=>{const d=await t.get(ref);const prev=d.exists&&d.data().mes===mes?d.data().count||0:0;t.set(ref,{mes,count:prev+n,updatedAt:new Date().toISOString()},{merge:true});});}catch(e){console.warn('incResend:',e.message);}}
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -81,7 +76,6 @@ export default async function handler(req, res) {
     });
     const result = await r.json();
     if (!r.ok) throw new Error(result.message || 'Error Resend');
-    await _incResend(to.length);
     return res.status(200).json({ ok: true, id: result.id });
   } catch (err) {
     console.error('send-cita error:', err);
