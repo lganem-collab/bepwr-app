@@ -30,6 +30,7 @@ export default async function handler(req, res) {
           <p style="color:#888;margin:4px 0 0;font-size:13px">Valoraciones pr\u00F3ximas</p>
         </div>
         <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e0e0e0">
+          <p style="font-size:15px;color:#333">Hola <strong>Staff</strong>,</p>
           ${lista.length ? `<table style="width:100%;border-collapse:collapse;font-size:13px">
             <tr style="background:#eee"><th style="padding:8px;text-align:left">Fecha</th><th style="padding:8px;text-align:left">Hora</th><th style="padding:8px;text-align:left">Miembro</th></tr>
             ${lista.map(c=>`<tr style="border-bottom:1px solid #e0e0e0"><td style="padding:8px">${fechaLegible(c.fecha,'')}</td><td style="padding:8px">${c.hora}</td><td style="padding:8px">${c.nombre||'\u2014'}</td></tr>`).join('')}
