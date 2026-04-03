@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       subject = 'Reporte de citas pr\u00F3ximas \u00B7 bePWR';
       html = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#1D9E75;padding:20px;border-radius:12px 12px 0 0;text-align:center">
-          <h1 style="color:white;margin:0;font-size:22px">bePWR</h1>
+          <h1 style="color:white;margin:0;font-size:22px">be<span style="color:#000;font-weight:900">PWR</span></h1>
           <p style="color:rgba(255,255,255,.85);margin:4px 0 0;font-size:13px">Valoraciones pr\u00F3ximas</p>
         </div>
         <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e0e0e0">
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       subject = cancel ? `Cita cancelada \u00B7 ${nombre} \u00B7 ${fl}` : `Valoraci\u00F3n agendada \u00B7 ${nombre} \u00B7 ${fl}`;
       html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto">
         <div style="background:${cancel?'#e74c3c':'#1D9E75'};padding:20px;border-radius:12px 12px 0 0;text-align:center">
-          <h1 style="color:white;margin:0;font-size:22px">bePWR</h1>
+          <h1 style="color:white;margin:0;font-size:22px">be<span style="color:#000;font-weight:900">PWR</span></h1>
           <p style="color:rgba(255,255,255,.85);margin:4px 0 0;font-size:13px">${cancel?'Cita cancelada':'Valoraci\u00F3n confirmada'}</p>
         </div>
         <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e0e0e0">
