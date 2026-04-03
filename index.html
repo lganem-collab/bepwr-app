@@ -3262,7 +3262,7 @@ window._applyIVF=applyIVF;
         window.collection(window.db,'citas'),
         window.where('uid','==',uid),
         window.where('fecha','>=',hoy),
-        window.where('estado','==','pendiente'),
+        window.where('estado','==','confirmada'),
         window.orderBy('fecha'), window.orderBy('hora'), window.limit(1)
       ));
       if(!snap.empty){
@@ -3411,10 +3411,10 @@ window._applyIVF=applyIVF;
       var email=(window._userData&&window._userData.email)?window._userData.email:'';
       var ref=await window.addDoc(window.collection(window.db,'citas'),{
         uid:uid,nombre:nombre,fecha:_selDia,hora:_selHora,
-        tipo:'valoracion',estado:'pendiente',creadoEn:window.serverTimestamp()
+        tipo:'valoracion',estado:'confirmada',creadoEn:window.serverTimestamp()
       });
       _proximaCitaId=ref.id;
-      var cita={uid,nombre,fecha:_selDia,hora:_selHora,tipo:'valoracion',estado:'pendiente'};
+      var cita={uid,nombre,fecha:_selDia,hora:_selHora,tipo:'valoracion',estado:'confirmada'};
       _mostrarCardCita(cita); _actualizarMetodo(cita);
       // Mostrar confirmación
       var p=_selDia.split('-'),fd=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
