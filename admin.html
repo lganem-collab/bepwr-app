@@ -32,10 +32,10 @@
     .field{margin-bottom:16px}
     .field label{display:block;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace;margin-bottom:7px}
     .field input,.field select{width:100%;background:#141414;border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
-    input[type="date"]{background:#f0f0f0!important;color:#111!important;color-scheme:light;border-color:#ccc!important}
+    input[type="date"]{background:#f0f0f0!important;color:#666!important;color-scheme:light;border-color:#ccc!important}
     input[type="date"]::-webkit-calendar-picker-indicator{filter:none;cursor:pointer;opacity:1}
     .field input:focus,.field select:focus{border-color:var(--orange)}
-    .field input::placeholder{color:#333}
+    .field input::placeholder{color:#666}
     .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .btn{padding:14px 24px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .1s;letter-spacing:.3px}
     .btn:active{transform:scale(.98);opacity:.85}
@@ -63,7 +63,7 @@
     .section-title{font-family:Space Mono,monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gray)}
     .search-input{background:#141414;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:14px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;width:240px;transition:border-color .2s}
     .search-input:focus{border-color:var(--orange)}
-    .search-input::placeholder{color:#333}
+    .search-input::placeholder{color:#666}
     .members-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
     .table-head{display:grid;grid-template-columns:2fr 1.2fr 0.8fr 0.6fr 0.9fr 180px;padding:12px 20px;border-bottom:1px solid var(--border);background:#141414}
     .th{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace}
@@ -566,7 +566,7 @@
   <div class="modal">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
       <div class="modal-title" style="margin-bottom:0">Nueva Valoraci&#xF3;n</div>
-      <input type="date" id="m-fecha" style="width:auto;background:#f0f0f0;color:#111;border:1px solid #ccc;border-radius:8px;padding:8px 10px;font-size:13px;font-family:'DM Sans',sans-serif" />
+      <input type="date" id="m-fecha" style="width:auto;background:#f0f0f0;color:#666;border:1px solid #ccc;border-radius:8px;padding:8px 10px;font-size:13px;font-family:'DM Sans',sans-serif" />
     </div>
     <div class="modal-sub" id="metrics-modal-sub"></div>
     <input type="hidden" id="metrics-uid" />
@@ -797,7 +797,7 @@ if (user && user.uid === MASTER_UID) {
     
     if (dias < 0) return '<span style="background:#f87171;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;font-family:Space Mono,monospace;margin-left:6px">VENCIDA</span>';
     if (dias <= 7) return `<span style="background:#fb923c;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;font-family:Space Mono,monospace;margin-left:6px">VENCE ${dias}d</span>`;
-    if (dias <= 30) return `<span style="background:#fbbf24;color:#111;font-size:9px;padding:2px 6px;border-radius:4px;font-family:Space Mono,monospace;margin-left:6px">${dias}d</span>`;
+    if (dias <= 30) return `<span style="background:#fbbf24;color:#666;font-size:9px;padding:2px 6px;border-radius:4px;font-family:Space Mono,monospace;margin-left:6px">${dias}d</span>`;
     return '';
   }
 
@@ -1304,7 +1304,7 @@ if (user && user.uid === MASTER_UID) {
     const dias = Math.ceil((new Date(m.vigenciaFecha) - new Date(hoy)) / (864e5));
     if (dias < 0) return '<span style="background:#f87171;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">VENCIDA</span>';
     if (dias <= 7) return '<span style="background:#fb923c;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">VENCE ' + dias + 'd</span>';
-    if (dias <= 30) return '<span style="background:#fbbf24;color:#111;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">' + dias + 'd</span>';
+    if (dias <= 30) return '<span style="background:#fbbf24;color:#666;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px">' + dias + 'd</span>';
     return '';
   }
 
@@ -1635,7 +1635,7 @@ if (user && user.uid === MASTER_UID) {
 
       ${getRutinaHTML(m.objetivo?.meta || m.meta, m.nacimiento, m.edad)}
 
-      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px;${m.activo===false?'opacity:0.4;cursor:not-allowed;pointer-events:none;':''}" ${m.activo===false?'disabled':''} onclick="openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración${m.activo===false?' — miembro inactivo':''}</button>
+      <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px;${m.activo===false?'opacity:0.55;cursor:not-allowed;pointer-events:none;':''}" ${m.activo===false?'disabled':''} onclick="openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración${m.activo===false?' — miembro inactivo':''}</button>
 
       <div class="modal-section">Historial de valoraciones</div>
       <div style="font-size:10px;color:var(--gray);margin:-10px 0 12px;font-family:Space Mono,monospace">Haz clic en una valoración para consultarla o editarla</div>
@@ -2509,7 +2509,7 @@ for (const med of medidasVal) {
       <div style="background:#1a1a1a;border-radius:10px;padding:14px 16px">
         <div style="font-size:13px;color:var(--gray);margin-bottom:6px">${g.label}</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;color:#555;white-space:nowrap">/pdfs/${g.key}.pdf</span>
+          <span style="font-size:11px;color:#666;white-space:nowrap">/pdfs/${g.key}.pdf</span>
           <input id="guia-url-${g.key}" type="url" placeholder="URL externa (opcional)"
             value="${urls[g.key] || ''}"
             style="flex:1;background:#111;border:1px solid #333;border-radius:6px;padding:6px 10px;color:#fff;font-size:13px" />
@@ -2878,7 +2878,7 @@ window.filterNotifUsers = function (q) {
   function dashBarChart(containerId, data, color) {
     const el = document.getElementById(containerId);
     if (!el) return;
-    if (!data.length) { el.innerHTML = '<div style="color:#555;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin datos</div>'; return; }
+    if (!data.length) { el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin datos</div>'; return; }
     const max = Math.max(...data.map(d => d.v), 1);
     const W = 460; // fixed viewBox width — scales with CSS width:100%
     const H = 160;
@@ -3026,10 +3026,10 @@ window.filterNotifUsers = function (q) {
       const sorted = Object.values(byMember).sort((a,b)=>b.count-a.count);
       const tbl = document.getElementById('dash-table-miembros');
       if (tbl) {
-        if (!sorted.length) { tbl.innerHTML = '<div style="color:#555;font-size:12px;font-family:Space Mono,monospace">Sin visitas en este período</div>'; }
+        if (!sorted.length) { tbl.innerHTML = '<div style="color:#666;font-size:12px;font-family:Space Mono,monospace">Sin visitas en este período</div>'; }
         else {
           tbl.innerHTML = `<div style="display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-family:'Space Mono',monospace;font-size:11px">
-            <div style="color:#555;padding-bottom:4px">MIEMBRO</div><div style="color:#555;padding-bottom:4px">VISITAS</div><div style="color:#555;padding-bottom:4px">ÚLTIMA</div>
+            <div style="color:#666;padding-bottom:4px">MIEMBRO</div><div style="color:#666;padding-bottom:4px">VISITAS</div><div style="color:#666;padding-bottom:4px">ÚLTIMA</div>
             ${sorted.map(m=>`<div style="color:#ddd">${m.nombre}</div><div style="color:#FF5C1A;text-align:right">${m.count}</div><div style="color:#666">${m.ultima}</div>`).join('')}
           </div>`;
         }
@@ -3176,7 +3176,7 @@ window.filterNotifUsers = function (q) {
         .orderBy('fecha', 'desc')
         .get();
       const todas = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      if (!todas.length) { el.innerHTML = '<div style="text-align:center;color:#555;font-size:13px;padding:20px">Sin historial de citas</div>'; return; }
+      if (!todas.length) { el.innerHTML = '<div style="text-align:center;color:#666;font-size:13px;padding:20px">Sin historial de citas</div>'; return; }
       // Agrupar por mes
       const grupos = {};
       todas.forEach(c => {
@@ -3207,7 +3207,7 @@ window.filterNotifUsers = function (q) {
       el.innerHTML = `<div style="background:#111;border-radius:12px;overflow:hidden">${html}</div>`;
     } catch(e) {
       console.error('loadCitasHistorial:', e);
-      el.innerHTML = '<div style="text-align:center;color:#555;font-size:13px;padding:20px">Error cargando historial</div>';
+      el.innerHTML = '<div style="text-align:center;color:#666;font-size:13px;padding:20px">Error cargando historial</div>';
     }
   }
 
