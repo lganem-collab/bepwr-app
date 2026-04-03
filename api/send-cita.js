@@ -25,9 +25,9 @@ export default async function handler(req, res) {
       to = ['lganem@gmail.com'];
       subject = 'Reporte de citas pr\u00F3ximas \u00B7 bePWR';
       html = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-        <div style="background:#1D9E75;padding:20px;border-radius:12px 12px 0 0;text-align:center">
-          <h1 style="color:white;margin:0;font-size:22px">be<span style="color:#000;font-weight:900">PWR</span></h1>
-          <p style="color:rgba(255,255,255,.85);margin:4px 0 0;font-size:13px">Valoraciones pr\u00F3ximas</p>
+        <div style="background:#ffffff;padding:20px;border-radius:12px 12px 0 0;text-align:center;border-bottom:1px solid #e0e0e0">
+          <h1 style="color:#1a1a1a;margin:0;font-size:22px">be<span style="color:#FF5C1A;font-weight:900">PWR</span></h1>
+          <p style="color:#888;margin:4px 0 0;font-size:13px">Valoraciones pr\u00F3ximas</p>
         </div>
         <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e0e0e0">
           ${lista.length ? `<table style="width:100%;border-collapse:collapse;font-size:13px">
@@ -44,9 +44,9 @@ export default async function handler(req, res) {
       if (emailMiembro && emailMiembro !== 'lganem@gmail.com') to.push(emailMiembro);
       subject = cancel ? `Cita cancelada \u00B7 ${nombre} \u00B7 ${fl}` : `Valoraci\u00F3n agendada \u00B7 ${nombre} \u00B7 ${fl}`;
       html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto">
-        <div style="background:${cancel?'#e74c3c':'#1D9E75'};padding:20px;border-radius:12px 12px 0 0;text-align:center">
-          <h1 style="color:white;margin:0;font-size:22px">be<span style="color:#000;font-weight:900">PWR</span></h1>
-          <p style="color:rgba(255,255,255,.85);margin:4px 0 0;font-size:13px">${cancel?'Cita cancelada':'Valoraci\u00F3n confirmada'}</p>
+        <div style="background:#ffffff;padding:20px;border-radius:12px 12px 0 0;text-align:center;border-bottom:1px solid ${cancel?'#f5c6c6':'#c8e6c9'}">
+          <h1 style="color:#1a1a1a;margin:0;font-size:22px">be<span style="color:#FF5C1A;font-weight:900">PWR</span></h1>
+          <p style="color:${cancel?'#e74c3c':'#1D9E75'};font-weight:600;margin:4px 0 0;font-size:13px">${cancel?'Cita cancelada':'Valoraci\u00F3n confirmada'}</p>
         </div>
         <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e0e0e0">
           <p style="font-size:15px;color:#333">Hola <strong>${nombre}</strong>,</p>
