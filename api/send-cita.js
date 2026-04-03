@@ -36,7 +36,7 @@ export default async function handler(req, res) {
             <tr style="background:#eee"><th style="padding:8px;text-align:left">Fecha</th><th style="padding:8px;text-align:left">Hora</th><th style="padding:8px;text-align:left">Miembro</th></tr>
             ${lista.map(c=>`<tr style="border-bottom:1px solid #e0e0e0"><td style="padding:8px">${fechaLegible(c.fecha,'')}</td><td style="padding:8px">${c.hora}</td><td style="padding:8px">${c.nombre||'\u2014'}</td></tr>`).join('')}
           </table>` : '<p style="color:#666">No hay citas pr\u00F3ximas agendadas.</p>'}
-          <p style="font-size:12px;color:#999;margin-top:20px;text-align:center">bePWR Functional Training \u00B7 Quer\u00E9taro</p>
+          <p style="font-size:12px;color:#999;margin-top:20px;text-align:center">bePWR Functional Training \u00B7 Quer\u00E9taro, M\u00E9xico<br>\u00BFNo deseas recibir estos correos? <a href="mailto:citas@bepwr.vip?subject=Cancelar%20suscripci%C3%B3n" style="color:#999;text-decoration:underline">Haz clic aqu\u00ED</a></p>
         </div></div>`;
     } else {
       if (!nombre || !fecha || !hora) return res.status(400).json({ error: 'Faltan datos' });
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
                 <li>Ve al ba\u00F1o antes de la medici\u00F3n</li>
                 <li>Usa ropa ligera, sin accesorios met\u00E1licos</li>
               </ul></div>`}
-          <p style="font-size:12px;color:#999;margin-top:20px;text-align:center">bePWR Functional Training \u00B7 Quer\u00E9taro</p>
+          <p style="font-size:12px;color:#999;margin-top:20px;text-align:center">bePWR Functional Training \u00B7 Quer\u00E9taro, M\u00E9xico<br>\u00BFNo deseas recibir estos correos? <a href="mailto:citas@bepwr.vip?subject=Cancelar%20suscripci%C3%B3n" style="color:#999;text-decoration:underline">Haz clic aqu\u00ED</a></p>
         </div></div>`;
     }
 
