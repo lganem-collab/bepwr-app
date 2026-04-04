@@ -3627,7 +3627,9 @@ function abrirMisLogros(){
       grid.innerHTML=window._LOGROS_DEF.map(l=>{
         const tiene=!!desbloqueados[l.id];
         const fecha=tiene&&desbloqueados[l.id].fecha?new Date(desbloqueados[l.id].fecha.toDate?desbloqueados[l.id].fecha.toDate():desbloqueados[l.id].fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):'';
-        const clickAttr = tiene ? `onclick="window.abrirMedallaDetalle('${l.img}','${l.titulo.replace(/'/g,\"\\\\'\")}','${(l.desc||'').replace(/'/g,\"\\\\'\")}','${fecha}')"` : '';
+        window._logrosRender = window._logrosRender || {};
+        window._logrosRender[l.id] = {img:l.img, titulo:l.titulo, desc:l.desc||'', fecha:fecha};
+        const clickAttr = tiene ? 'onclick="window.abrirMedallaDetalle(window._logrosRender[\''+l.id+'\'])"' : '';
         return `<div ${clickAttr} style="background:#1a1a1a;border-radius:16px;padding:16px;text-align:center;border:1px solid ${tiene?'#D4A017':'#222'};${!tiene?'opacity:0.6':''}${tiene?';cursor:pointer':''}">
           <img src="${l.img}" style="width:100%;max-width:130px;${!tiene?'filter:grayscale(100%) brightness(0.4)':''}" onerror="this.style.display='none'" />
           <div style="font-size:13px;font-weight:600;color:${tiene?'#fff':'#555'};margin-top:8px">${l.titulo}</div>
@@ -3661,7 +3663,9 @@ window.desbloquearLogro = async function(uid, logroId){
   </div>
 
   <script>
-  window.abrirMedallaDetalle = function(img, titulo, desc, fecha) {
+  window.abrirMedallaDetalle = function(data) {
+    if (!data) return;
+    const img=data.img, titulo=data.titulo, desc=data.desc, fecha=data.fecha;
     const m = document.getElementById('modal-medalla-detalle');
     const inner = document.getElementById('medalla-detalle-inner');
     document.getElementById('medalla-detalle-img').src = img;
