@@ -1159,9 +1159,16 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
             function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,3);var v=Math.round(target*e);el.textContent=v;ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ);if(p<1)requestAnimationFrame(step);else el.textContent=target;}
             requestAnimationFrame(step);
           }
+          var animando=false;
           var obs=new IntersectionObserver(function(entries){
-            if(entries[0].isIntersecting){obs.disconnect();doAnim();}
-          },{threshold:0.5,rootMargin:'0px'});
+            if(entries[0].isIntersecting){
+              if(!animando){animando=true;doAnim();setTimeout(function(){animando=false;},2400);}
+            } else {
+              el.textContent='0';
+              ring.setAttribute('stroke-dasharray','0 '+circ);
+              animando=false;
+            }
+          },{threshold:0.3,rootMargin:'0px'});
           obs.observe(el);
         })(inbodyEl,inbodyRing,califPct,califCircum);
       } else {
@@ -2988,9 +2995,16 @@ ring.setAttribute('stroke-dasharray','0 '+circ);
     function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,3);var v=Math.round(target*e);el2.textContent=v;ring2.setAttribute('stroke-dasharray',(circ2*v/100)+' '+circ2);if(p<1)requestAnimationFrame(step);else el2.textContent=target;}
     requestAnimationFrame(step);
   }
+  var animando=false;
   var obs=new IntersectionObserver(function(entries){
-    if(entries[0].isIntersecting){obs.disconnect();doAnim();}
-  },{threshold:0.5,rootMargin:'0px'});
+    if(entries[0].isIntersecting){
+      if(!animando){animando=true;doAnim();setTimeout(function(){animando=false;},2400);}
+    } else {
+      el2.textContent='0';
+      ring2.setAttribute('stroke-dasharray','0 '+circ2);
+      animando=false;
+    }
+  },{threshold:0.3,rootMargin:'0px'});
   obs.observe(el2);
 })(el,ring,sc,circ);
 }
