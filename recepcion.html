@@ -345,17 +345,29 @@
           }
         });
         if (!miembros.length) { allRes.forEach(function(r){r.innerHTML="<div class=\"presencial-empty\">Sin resultados</div>";}); return; }
+        // Cargar visitas de los últimos 45 min para mostrar badge
+        var hace45 = new Date(Date.now() - 45*60*1000);
+        var visSnap = await F.getDocs(F.query(F.collection(db, 'visitas'),
+          F.where('timestamp', '>=', F.Timestamp.fromDate(hace45))
+        ));
+        var recientes = {};
+        visSnap.forEach(function(vd){ recientes[vd.data().uid] = vd.data().timestamp.toDate(); });
         var html = miembros.slice(0,8).map(function(m) {
           var uid  = m.uid;
           var nom  = m.nombre.replace(/"/g, "&quot;");
           var sub  = m.sub;
+          var yaEntro = !!recientes[uid];
+          var minRestantes = yaEntro ? Math.ceil((recientes[uid].getTime()+45*60*1000-Date.now())/60000) : 0;
+          var badge = yaEntro ? "<span style=\"background:#2a2a2a;color:#f59e0b;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:6px;\">Ya entró · " + minRestantes + "min</span>" : "";
+          var btnStyle = yaEntro ? "opacity:0.4;cursor:not-allowed;" : "";
+          var btnClick = yaEntro ? "" : "onclick=\"registrarPresencial('"+uid+"')\"";
           return "<div class=\"presencial-item\">" +
             "<div class=\"presencial-item-info\">" +
-              "<div class=\"presencial-item-name\">" + nom + "</div>" +
+              "<div class=\"presencial-item-name\">" + nom + badge + "</div>" +
               "<div class=\"presencial-item-sub\">"  + sub + "</div>" +
             "</div>" +
-            "<button class=\"presencial-item-btn\" onclick=\"registrarPresencial('"+uid+"')\">" +
-              "Registrar entrada" +
+            "<button class=\"presencial-item-btn\" "+btnClick+" style=\""+btnStyle+"\">" +
+              (yaEntro ? "Registrado" : "Registrar entrada") +
             "</button>" +
           "</div>";
         }).join("");
@@ -441,6 +453,19 @@
       var weekKey = getWeekKey();
       var weekSnap = await F.getDocs(F.query(F.collection(db, 'visitas'), F.where('uid', '==', uid), F.where('semana', '==', weekKey)));
       var weekVisitas = weekSnap.size + 1;
+
+      // Verificar cooldown 45 minutos
+      var ahora = Date.now();
+      var hace45min = new Date(ahora - 45 * 60 * 1000);
+      var coolSnap = await F.getDocs(F.query(F.collection(db, 'visitas'),
+        F.where('uid', '==', uid),
+        F.where('timestamp', '>=', F.Timestamp.fromDate(hace45min))
+      ));
+      if (!coolSnap.empty) {
+        var ultimaTs = coolSnap.docs[0].data().timestamp.toDate().getTime();
+        var minRestantes = Math.ceil((ultimaTs + 45*60*1000 - ahora) / 60000);
+        return showError('Ya registrado. Puede volver a entrar en ' + minRestantes + ' min.');
+      }
 
       // Registrar visita
       await F.addDoc(F.collection(db, 'visitas'), {
