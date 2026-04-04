@@ -192,14 +192,15 @@
     .member-card.visible ~ * .waiting-info,
     #member-card.visible + * { display: none; }
 
+    .presencial-mobile { display:block; }
+    .presencial-desktop { display:none; }
+    @media (min-width: 701px) {
+      .presencial-mobile { display:none; }
+      .presencial-desktop { display:block; }
+    }
     @media (max-width: 700px) {
-      main {
-        grid-template-columns: 1fr;
-        padding: 24px 16px;
-        gap: 24px;
-      }
-      .col-info { justify-content: flex-start; }
-      .presencial-wrap { margin-top:16px; }
+      main { grid-template-columns:1fr; padding:24px 16px; gap:24px; }
+      .col-info { justify-content:flex-start; }
     }
 
 
@@ -254,6 +255,15 @@
         <p id="no-camera-msg">Lector fisico activo<br/>Apunta el QR al lector</p>
         <button class="btn-activar-cam" id="btn-activar-cam" style="display:none" onclick="pedirPermisoCam()">📷 Activar cámara</button>
       </div>
+      <!-- Registro Presencial Mobile -->
+      <div class="presencial-wrap presencial-mobile">
+        <div class="presencial-title">Registro presencial</div>
+        <div class="presencial-search">
+          <input type="text" class="presencial-input" placeholder="Nombre, email o teléfono…" autocomplete="off" oninput="syncPresencial(this)" />
+          <button onclick="buscarPresencial()">Buscar</button>
+        </div>
+        <div class="presencial-results presencial-results-el"></div>
+      </div>
       <p class="scanner-label" id="scanner-label">Apunta la camara al codigo QR del miembro</p>
     </div>
 
@@ -296,14 +306,14 @@
         <p style="font-size:18px;font-weight:600;color:var(--muted);text-align:center">Esperando escaneo...</p>
         <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:8px">Muestra el QR de bePWR al lector</p>
       </div>
-      <!-- Registro Presencial Manual -->
-      <div class="presencial-wrap">
+      <!-- Registro Presencial Desktop -->
+      <div class="presencial-wrap presencial-desktop">
         <div class="presencial-title">Registro presencial</div>
         <div class="presencial-search">
-          <input type="text" id="presencial-input" placeholder="Nombre, email o teléfono…" autocomplete="off" />
+          <input type="text" class="presencial-input" placeholder="Nombre, email o teléfono…" autocomplete="off" oninput="syncPresencial(this)" />
           <button onclick="buscarPresencial()">Buscar</button>
         </div>
-        <div class="presencial-results" id="presencial-results"></div>
+        <div class="presencial-results presencial-results-el"></div>
       </div>
     </div>
 
@@ -312,11 +322,15 @@
   <footer>bePWR - Sistema de acceso</footer>
 
   <script>
+    function syncPresencial(el) {
+      document.querySelectorAll(".presencial-input").forEach(function(i){ i.value=el.value; });
+    }
     async function buscarPresencial() {
-      var q = (document.getElementById("presencial-input").value || "").trim().toLowerCase();
-      var res = document.getElementById("presencial-results");
+      var q = ((document.querySelector(".presencial-input")||{}).value || "").trim().toLowerCase();
+      var allRes = document.querySelectorAll(".presencial-results-el");
+      var res = allRes[0];
       if (!q || q.length < 2) { res.innerHTML = "<div class=\"presencial-empty\">Escribe al menos 2 caracteres</div>"; return; }
-      res.innerHTML = "<div class=\"presencial-empty\">Buscando…</div>";
+      allRes.forEach(function(r){r.innerHTML="<div class=\"presencial-empty\">Buscando…</div>";});
       try {
         var F = window._Firestore, db = window._db;
         var snap = await F.getDocs(F.collection(db, "usuarios"));
@@ -330,8 +344,8 @@
             miembros.push({ uid: docu.id, nombre: data.nombre || data.alias || "Sin nombre", sub: data.email || data.meta || "" });
           }
         });
-        if (!miembros.length) { res.innerHTML = "<div class=\"presencial-empty\">Sin resultados</div>"; return; }
-        res.innerHTML = miembros.slice(0,8).map(function(m) {
+        if (!miembros.length) { allRes.forEach(function(r){r.innerHTML="<div class=\"presencial-empty\">Sin resultados</div>";}); return; }
+        var html = miembros.slice(0,8).map(function(m) {
           var uid  = m.uid;
           var nom  = m.nombre.replace(/"/g, "&quot;");
           var sub  = m.sub;
@@ -345,24 +359,24 @@
             "</button>" +
           "</div>";
         }).join("");
+        allRes.forEach(function(r){r.innerHTML=html;});
       } catch(e) {
-        res.innerHTML = "<div class=\"presencial-empty\">Error: " + e.message + "</div>";
+        allRes.forEach(function(r){r.innerHTML="<div class=\"presencial-empty\">Error: "+e.message+"</div>";});
       }
     }
 
     async function registrarPresencial(uid) {
       try {
         await processCheckin(uid);
-        document.getElementById("presencial-input").value = "";
-        document.getElementById("presencial-results").innerHTML = "";
+        document.querySelectorAll(".presencial-input").forEach(function(i){i.value="";});
+        document.querySelectorAll(".presencial-results-el").forEach(function(r){r.innerHTML="";});
       } catch(e) {
         showError("Error al registrar: " + e.message);
       }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-      var inp = document.getElementById("presencial-input");
-      if (inp) inp.addEventListener("keydown", function(e){ if(e.key==="Enter") buscarPresencial(); });
+      document.querySelectorAll(".presencial-input").forEach(function(inp){ inp.addEventListener("keydown", function(e){ if(e.key==="Enter") buscarPresencial(); }); });
     });
 
     function getISOWeek(date) {
