@@ -200,6 +200,22 @@
       }
     }
 
+
+    .presencial-wrap { margin-top:24px; border-top:1px solid var(--border); padding-top:20px; }
+    .presencial-title { font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .presencial-search { display:flex; gap:8px; }
+    .presencial-search input { flex:1; background:#1a1a1a; border:1px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--text); font-size:14px; font-family:inherit; outline:none; transition:border-color .2s; }
+    .presencial-search input:focus { border-color:var(--accent); }
+    .presencial-search input::placeholder { color:var(--muted); }
+    .presencial-search button { background:var(--accent); border:none; border-radius:10px; padding:10px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .presencial-results { margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+    .presencial-item { display:flex; align-items:center; justify-content:space-between; background:#1a1a1a; border:1px solid var(--border); border-radius:10px; padding:10px 14px; }
+    .presencial-item-info { display:flex; flex-direction:column; gap:2px; }
+    .presencial-item-name { font-size:14px; font-weight:600; color:var(--text); }
+    .presencial-item-sub  { font-size:12px; color:var(--muted); }
+    .presencial-item-btn  { background:transparent; border:1px solid var(--accent); color:var(--accent); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .presencial-item-btn:hover { background:var(--accent); color:#fff; }
+    .presencial-empty { font-size:13px; color:var(--muted); text-align:center; padding:12px 0; }
   </style>
 </head>
 <body>
@@ -225,6 +241,15 @@
         <div class="corner br"></div>
         <div class="scan-line"></div>
         <div class="scanner-flash" id="scanner-flash"></div>
+      </div>
+      <!-- Registro Presencial Manual -->
+      <div class="presencial-wrap">
+        <div class="presencial-title">Registro presencial</div>
+        <div class="presencial-search">
+          <input type="text" id="presencial-input" placeholder="Nombre, email o teléfono…" autocomplete="off" />
+          <button onclick="buscarPresencial()">Buscar</button>
+        </div>
+        <div class="presencial-results" id="presencial-results"></div>
       </div>
       <div class="no-camera" id="no-camera">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -283,6 +308,59 @@
   <footer>bePWR - Sistema de acceso</footer>
 
   <script>
+    async function buscarPresencial() {
+      var q = (document.getElementById("presencial-input").value || "").trim().toLowerCase();
+      var res = document.getElementById("presencial-results");
+      if (!q || q.length < 2) { res.innerHTML = "<div class=\"presencial-empty\">Escribe al menos 2 caracteres</div>"; return; }
+      res.innerHTML = "<div class=\"presencial-empty\">Buscando…</div>";
+      try {
+        var F = window._Firestore, db = window._db;
+        var snap = await F.getDocs(F.collection(db, "usuarios"));
+        var miembros = [];
+        snap.forEach(function(docu) {
+          var data = docu.data();
+          var nom = (data.nombre || data.alias || "").toLowerCase();
+          var eml = (data.email || "").toLowerCase();
+          var tel = (data.telefono || "").toLowerCase();
+          if (nom.includes(q) || eml.includes(q) || tel.includes(q)) {
+            miembros.push({ uid: docu.id, nombre: data.nombre || data.alias || "Sin nombre", sub: data.email || data.meta || "" });
+          }
+        });
+        if (!miembros.length) { res.innerHTML = "<div class=\"presencial-empty\">Sin resultados</div>"; return; }
+        res.innerHTML = miembros.slice(0,8).map(function(m) {
+          var uid  = m.uid;
+          var nom  = m.nombre.replace(/"/g, "&quot;");
+          var sub  = m.sub;
+          return "<div class=\"presencial-item\">" +
+            "<div class=\"presencial-item-info\">" +
+              "<div class=\"presencial-item-name\">" + nom + "</div>" +
+              "<div class=\"presencial-item-sub\">"  + sub + "</div>" +
+            "</div>" +
+            "<button class=\"presencial-item-btn\" onclick=\"registrarPresencial('"+uid+"')\">" +
+              "Registrar entrada" +
+            "</button>" +
+          "</div>";
+        }).join("");
+      } catch(e) {
+        res.innerHTML = "<div class=\"presencial-empty\">Error: " + e.message + "</div>";
+      }
+    }
+
+    async function registrarPresencial(uid) {
+      try {
+        await processCheckin(uid);
+        document.getElementById("presencial-input").value = "";
+        document.getElementById("presencial-results").innerHTML = "";
+      } catch(e) {
+        showError("Error al registrar: " + e.message);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      var inp = document.getElementById("presencial-input");
+      if (inp) inp.addEventListener("keydown", function(e){ if(e.key==="Enter") buscarPresencial(); });
+    });
+
     function getISOWeek(date) {
       date = date || new Date();
       var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
