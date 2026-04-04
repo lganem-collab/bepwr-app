@@ -1151,11 +1151,19 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
         inbodyRing.setAttribute('stroke', califColor);
         inbodyLabel.textContent = 'Puntuación /100';
         inbodyLabel.style.color = califColor;
-        (function(el, ring, target, circ) {
-          var dur=1800, st=null;
-          function step(ts){ if(!st)st=ts; var p=Math.min((ts-st)/dur,1); var e=1-Math.pow(1-p,3); var v=Math.round(target*e); el.textContent=v; ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ); if(p<1)requestAnimationFrame(step); else el.textContent=target; }
-          requestAnimationFrame(step);
-        })(inbodyEl, inbodyRing, califPct, califCircum);
+        inbodyEl.textContent = '0';
+        inbodyRing.setAttribute('stroke-dasharray', '0 '+califCircum);
+        (function(el,ring,target,circ){
+          function doAnim(){
+            var dur=2200,st=null;
+            function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,3);var v=Math.round(target*e);el.textContent=v;ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ);if(p<1)requestAnimationFrame(step);else el.textContent=target;}
+            requestAnimationFrame(step);
+          }
+          var obs=new IntersectionObserver(function(entries){
+            if(entries[0].isIntersecting){obs.disconnect();doAnim();}
+          },{threshold:0.5,rootMargin:'0px'});
+          obs.observe(el);
+        })(inbodyEl,inbodyRing,califPct,califCircum);
       } else {
         inbodyEl.textContent = '\u2014';
         inbodyRing.setAttribute('stroke-dasharray', '0 ' + califCircum);
@@ -2972,10 +2980,18 @@ var col=ivfColor(sc);
 ring.setAttribute('stroke',col);
 lbl.textContent=ivfLabel(sc);
 lbl.style.color=col;
+el.textContent='0';
+ring.setAttribute('stroke-dasharray','0 '+circ);
 (function(el2,ring2,target,circ2){
-  var dur=1800,st=null;
-  function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,3);var v=Math.round(target*e);el2.textContent=v;ring2.setAttribute('stroke-dasharray',(circ2*v/100)+' '+circ2);if(p<1)requestAnimationFrame(step);else el2.textContent=target;}
-  requestAnimationFrame(step);
+  function doAnim(){
+    var dur=2200,st=null;
+    function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,3);var v=Math.round(target*e);el2.textContent=v;ring2.setAttribute('stroke-dasharray',(circ2*v/100)+' '+circ2);if(p<1)requestAnimationFrame(step);else el2.textContent=target;}
+    requestAnimationFrame(step);
+  }
+  var obs=new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting){obs.disconnect();doAnim();}
+  },{threshold:0.5,rootMargin:'0px'});
+  obs.observe(el2);
 })(el,ring,sc,circ);
 }
 window._applyIVF=applyIVF;
