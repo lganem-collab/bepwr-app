@@ -1,4 +1,4 @@
-// api/cron/notify-evening.js — Miércoles y Domingo 7pm QRO (01:00 UTC)
+// api/cron/notify-evening.js — Miércoles y Domingo 7pm QRO (01:00 UTC jueves/lunes)
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
@@ -16,10 +16,10 @@ const messaging = getMessaging();
 export default async function handler(req, res) {
   const day = new Date().getDay();
   let title, body;
-  if (day === 3) {
+  if (day === 4) {
     title = '\uD83C\uDF06 \u00A1Tarde perfecta para entrenar!';
     body = 'Mitad de semana \u2014 \u00BFya tienes tus sesiones programadas? Reserva tu clase de hoy o ma\u00F1ana en bePWR.';
-  } else if (day === 0) {
+  } else if (day === 1) {
     title = '\uD83D\uDCC5 Planea tu semana desde hoy';
     body = 'Ma\u00F1ana empieza una nueva semana. Reserva ya tus 2-4 sesiones y llega a tus metas.';
   } else {
