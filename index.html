@@ -1129,15 +1129,11 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
     if (scoreEl) {
       if (score !== null) {
         var scoreColor = score >= 70 ? '#4ade80' : score >= 50 ? '#FF5C1A' : '#f87171';
-        var scoreLblTxt = score >= 70 ? 'Excelente progreso' : score >= 50 ? 'Buen progreso' : 'Necesita mejorar';
+        scoreEl.textContent = score;
         scoreRing.setAttribute('stroke', scoreColor);
-        scoreLabel.textContent = scoreLblTxt;
+        scoreRing.setAttribute('stroke-dasharray', (scoreCircum * score / 100) + ' ' + scoreCircum);
+        scoreLabel.textContent = score >= 70 ? 'Excelente progreso' : score >= 50 ? 'Buen progreso' : 'Necesita mejorar';
         scoreLabel.style.color = scoreColor;
-        (function(el, ring, target, circ) {
-          var dur=1800, st=null;
-          function step(ts){ if(!st)st=ts; var p=Math.min((ts-st)/dur,1); var e=1-Math.pow(1-p,3); var v=Math.round(target*e); el.textContent=v; ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ); if(p<1)requestAnimationFrame(step); else el.textContent=target; }
-          requestAnimationFrame(step);
-        })(scoreEl, scoreRing, score, scoreCircum);
       } else {
         scoreEl.textContent = '\u2014';
         scoreRing.setAttribute('stroke-dasharray', '0 ' + scoreCircum);
@@ -2680,24 +2676,24 @@ if (config && config.rutina) {
 <div id="modal-bepwr-info" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px">
   <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
     <button onclick="document.getElementById('modal-bepwr-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer">&#x2715;</button>
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">bePWR SCORE</div>
-    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Tu progreso de <strong style="color:#fff">0 a 100</strong> — compara tu valoración inicial contra la actual, ponderado según tu objetivo personal.</p>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">bePWR SCORE · ESTADO FÍSICO ACTUAL</div>
+    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Calificación de <strong style="color:#fff">0 a 100</strong> de tu estado físico actual, calculada con tus métricas más recientes.</p>
     <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:12px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">QUÉ EVALÚA</div>
-      <div>&#x2696; Peso corporal</div>
-      <div>&#x1F4AA; Masa muscular</div>
-      <div>&#x1F525; Grasa corporal y % grasa</div>
-      <div>&#x1F4A7; Grasa visceral</div>
-      <div>&#x1F4CA; Calificación InBody</div>
-      <div style="color:#666;font-size:11px;margin-top:4px">Los pesos de cada métrica cambian según tu objetivo.</div>
+      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">CÓMO SE CONSTRUYE</div>
+      <div>&#x1F4CA; Calificación InBody &#x2014; 35%</div>
+      <div>&#x1F525; % Grasa corporal vs rangos saludables &#x2014; 25%</div>
+      <div>&#x1F4A7; Grasa visceral &#x2014; 20%</div>
+      <div>&#x1F4AA; Fuerza funcional (mancuernas / peso) &#x2014; 10%</div>
+      <div>&#x1F4CF; Cintura vs referencia OMS &#x2014; 10%</div>
     </div>
     <div style="font-size:12px;line-height:1.8;margin-bottom:12px">
       <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">CÓMO SE INTERPRETA</div>
-      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">70&#x2013;100</strong> &#x2014; Excelente progreso</div>
-      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">50&#x2013;69</strong> &#x2014; Buen progreso</div>
-      <div><span style="color:#f87171">&#x25CF;</span> <strong style="color:#f87171">0&#x2013;49</strong> &#x2014; Necesita mejorar</div>
+      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">88&#x2013;100</strong> &#x2014; Destacado</div>
+      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">73&#x2013;87</strong> &#x2014; Avanzado</div>
+      <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">56&#x2013;72</strong> &#x2014; Óptimo</div>
+      <div><span style="color:#60a5fa">&#x25CF;</span> <strong style="color:#60a5fa">0&#x2013;55</strong> &#x2014; En Proceso</div>
     </div>
-    <div style="font-size:11px;color:#666;font-family:'Space Mono',monospace">Requiere al menos 2 valoraciones.</div>
+    <div style="font-size:11px;color:#666;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
   </div>
 </div>
 
@@ -2972,12 +2968,15 @@ var el=document.getElementById('bepwr-score-value');
 var ring=document.getElementById('bepwr-score-ring');
 var lbl=document.getElementById('bepwr-score-label');
 if(!el)return;
-el.textContent=sc;
 var col=ivfColor(sc);
 ring.setAttribute('stroke',col);
-ring.setAttribute('stroke-dasharray',(circ*sc/100)+' '+circ);
 lbl.textContent=ivfLabel(sc);
 lbl.style.color=col;
+(function(el2,ring2,target,circ2){
+  var dur=1800,st=null;
+  function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,3);var v=Math.round(target*e);el2.textContent=v;ring2.setAttribute('stroke-dasharray',(circ2*v/100)+' '+circ2);if(p<1)requestAnimationFrame(step);else el2.textContent=target;}
+  requestAnimationFrame(step);
+})(el,ring,sc,circ);
 }
 window._applyIVF=applyIVF;
 })();
