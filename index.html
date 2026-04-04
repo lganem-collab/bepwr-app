@@ -28,7 +28,7 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{--black:#0a0a0a;--card:#181818;--border:#2a2a2a;--orange:#FF5C1A;--white:#f5f5f5;--gray:#aaa;--safe-bottom:env(safe-area-inset-bottom,0px)}
-    html,body{background:var(--black);color:var(--white);-webkit-text-size-adjust:100%;font-family:'DM Sans',sans-serif;height:100%;overflow:hidden}
+    html,body{background:var(--black);color:var(--white);-webkit-text-size-adjust:100%;font-family:'DM Sans',sans-serif;height:100%;overflow:hidden;overscroll-behavior:none}
     #app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--black)}
 
     /* SPLASH */
@@ -845,7 +845,27 @@ window.setDoc = setDoc;
 
   // &#x2500;&#x2500; AUTH STATE &#x2500;&#x2500;
   let authReady = false;
-  onAuthStateChanged(auth, async user => {
+  // Fix iOS scroll bounce
+(function(){
+  var startY=0;
+  document.addEventListener('touchstart',function(e){startY=e.touches[0].clientY;},{passive:true});
+  document.addEventListener('touchmove',function(e){
+    var el=e.target;
+    while(el&&el!==document.body){
+      if(el.classList&&el.classList.contains('scroll-area')){
+        var top=el.scrollTop;
+        var bottom=el.scrollHeight-el.clientHeight-top;
+        var dy=e.touches[0].clientY-startY;
+        if((top<=0&&dy>0)||(bottom<=0&&dy<0)){e.preventDefault();}
+        return;
+      }
+      el=el.parentElement;
+    }
+    e.preventDefault();
+  },{passive:false});
+})();
+
+onAuthStateChanged(auth, async user => {
     splash.classList.add('out');
     if (user) {
       // Block staff from accessing member app
