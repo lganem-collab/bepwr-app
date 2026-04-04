@@ -1062,7 +1062,7 @@ window.setDoc = setDoc;
         renderProfileMetrics(ultima);
 
         // Verificar logros automáticamente (sin await para no bloquear UI)
-        window.verificarLogros && window.verificarLogros(uid, metricas, data.genero || '');
+        window.verificarLogros && window.verificarLogros(user.uid, metricas, data.genero || '');
 
         // Generar mensaje IA
 generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? calcBePWRScore(anterior, ultima, obj) : null), null);
@@ -1134,7 +1134,7 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
         scoreLabel.textContent = scoreLblTxt;
         scoreLabel.style.color = scoreColor;
         (function(el, ring, target, circ) {
-          var dur=900, st=null;
+          var dur=1800, st=null;
           function step(ts){ if(!st)st=ts; var p=Math.min((ts-st)/dur,1); var e=1-Math.pow(1-p,3); var v=Math.round(target*e); el.textContent=v; ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ); if(p<1)requestAnimationFrame(step); else el.textContent=target; }
           requestAnimationFrame(step);
         })(scoreEl, scoreRing, score, scoreCircum);
@@ -1156,7 +1156,7 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
         inbodyLabel.textContent = 'Puntuación /100';
         inbodyLabel.style.color = califColor;
         (function(el, ring, target, circ) {
-          var dur=900, st=null;
+          var dur=1800, st=null;
           function step(ts){ if(!st)st=ts; var p=Math.min((ts-st)/dur,1); var e=1-Math.pow(1-p,3); var v=Math.round(target*e); el.textContent=v; ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ); if(p<1)requestAnimationFrame(step); else el.textContent=target; }
           requestAnimationFrame(step);
         })(inbodyEl, inbodyRing, califPct, califCircum);
