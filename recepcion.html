@@ -198,6 +198,8 @@
         padding: 24px 16px;
         gap: 24px;
       }
+      .col-info { justify-content: flex-start; }
+      .presencial-wrap { margin-top:16px; }
     }
 
 
@@ -216,6 +218,7 @@
     .presencial-item-btn  { background:transparent; border:1px solid var(--accent); color:var(--accent); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
     .presencial-item-btn:hover { background:var(--accent); color:#fff; }
     .presencial-empty { font-size:13px; color:var(--muted); text-align:center; padding:12px 0; }
+    .btn-activar-cam { margin-top:12px; background:var(--accent); border:none; border-radius:10px; padding:10px 20px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
   </style>
 </head>
 <body>
@@ -248,7 +251,8 @@
           <rect x="3" y="14" width="7" height="7" rx="1"/>
           <path d="M14 14h2v2h-2zM18 14h3M18 18v3M14 18h2v3M20 18h1"/>
         </svg>
-        <p>Lector fisico activo<br/>Apunta el QR al lector</p>
+        <p id="no-camera-msg">Lector fisico activo<br/>Apunta el QR al lector</p>
+        <button class="btn-activar-cam" id="btn-activar-cam" style="display:none" onclick="pedirPermisoCam()">📷 Activar cámara</button>
       </div>
       <p class="scanner-label" id="scanner-label">Apunta la camara al codigo QR del miembro</p>
     </div>
@@ -449,7 +453,6 @@
 
     async function startCamera() {
       try {
-        // Intentar primero con camara trasera (movil), luego cualquier camara (desktop)
         var stream;
         try {
           stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } } });
@@ -461,8 +464,29 @@
       } catch(e) {
         document.getElementById('scanner-wrap').style.display = 'none';
         document.getElementById('no-camera').classList.add('visible');
-        document.getElementById('scanner-label').textContent = 'Usa el lector QR para registrar la entrada';
-        document.getElementById('status-text').textContent = 'Lector fisico activo';
+        if (e.name === 'NotAllowedError') {
+          document.getElementById('no-camera-msg').innerHTML = 'Cámara bloqueada<br/>Activa el permiso en tu navegador';
+          document.getElementById('btn-activar-cam').style.display = 'inline-block';
+          document.getElementById('status-text').textContent = 'Cámara bloqueada';
+        } else {
+          document.getElementById('scanner-label').textContent = 'Usa el lector QR para registrar la entrada';
+          document.getElementById('status-text').textContent = 'Lector fisico activo';
+        }
+      }
+    }
+
+    async function pedirPermisoCam() {
+      document.getElementById('btn-activar-cam').textContent = 'Activando...';
+      try {
+        var stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream; video.play();
+        document.getElementById('scanner-wrap').style.display = '';
+        document.getElementById('no-camera').classList.remove('visible');
+        document.getElementById('status-text').textContent = 'Listo para escanear';
+        requestAnimationFrame(scanLoop);
+      } catch(e) {
+        document.getElementById('btn-activar-cam').textContent = '📷 Activar cámara';
+        alert('No se pudo activar la cámara. Ve a Configuración del navegador → Privacidad → Cámara y permite el acceso a este sitio.');
       }
     }
 
