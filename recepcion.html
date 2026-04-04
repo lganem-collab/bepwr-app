@@ -201,7 +201,7 @@
     }
 
 
-    .presencial-wrap { margin-top:24px; border-top:1px solid var(--border); padding-top:20px; }
+    .presencial-wrap { margin-top:8px; border-top:1px solid var(--border); padding-top:16px; }
     .presencial-title { font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
     .presencial-search { display:flex; gap:8px; }
     .presencial-search input { flex:1; background:#1a1a1a; border:1px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--text); font-size:14px; font-family:inherit; outline:none; transition:border-color .2s; }
@@ -241,15 +241,6 @@
         <div class="corner br"></div>
         <div class="scan-line"></div>
         <div class="scanner-flash" id="scanner-flash"></div>
-      </div>
-      <!-- Registro Presencial Manual -->
-      <div class="presencial-wrap">
-        <div class="presencial-title">Registro presencial</div>
-        <div class="presencial-search">
-          <input type="text" id="presencial-input" placeholder="Nombre, email o teléfono…" autocomplete="off" />
-          <button onclick="buscarPresencial()">Buscar</button>
-        </div>
-        <div class="presencial-results" id="presencial-results"></div>
       </div>
       <div class="no-camera" id="no-camera">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -300,6 +291,15 @@
       <div class="waiting-info" id="waiting-info">
         <p style="font-size:18px;font-weight:600;color:var(--muted);text-align:center">Esperando escaneo...</p>
         <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:8px">Muestra el QR de bePWR al lector</p>
+      </div>
+      <!-- Registro Presencial Manual -->
+      <div class="presencial-wrap">
+        <div class="presencial-title">Registro presencial</div>
+        <div class="presencial-search">
+          <input type="text" id="presencial-input" placeholder="Nombre, email o teléfono…" autocomplete="off" />
+          <button onclick="buscarPresencial()">Buscar</button>
+        </div>
+        <div class="presencial-results" id="presencial-results"></div>
       </div>
     </div>
 
@@ -449,7 +449,13 @@
 
     async function startCamera() {
       try {
-        var stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } } });
+        // Intentar primero con camara trasera (movil), luego cualquier camara (desktop)
+        var stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } } });
+        } catch(e1) {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 640 } } });
+        }
         video.srcObject = stream; video.play();
         requestAnimationFrame(scanLoop);
       } catch(e) {
