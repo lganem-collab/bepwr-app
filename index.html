@@ -1128,12 +1128,16 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
     var scoreLabel = document.getElementById('bepwr-score-label');
     if (scoreEl) {
       if (score !== null) {
-        scoreEl.textContent = score;
         var scoreColor = score >= 70 ? '#4ade80' : score >= 50 ? '#FF5C1A' : '#f87171';
+        var scoreLblTxt = score >= 70 ? 'Excelente progreso' : score >= 50 ? 'Buen progreso' : 'Necesita mejorar';
         scoreRing.setAttribute('stroke', scoreColor);
-        scoreRing.setAttribute('stroke-dasharray', (scoreCircum * score / 100) + ' ' + scoreCircum);
-        scoreLabel.textContent = score >= 70 ? 'Excelente progreso' : score >= 50 ? 'Buen progreso' : 'Necesita mejorar';
+        scoreLabel.textContent = scoreLblTxt;
         scoreLabel.style.color = scoreColor;
+        (function(el, ring, target, circ) {
+          var dur=900, st=null;
+          function step(ts){ if(!st)st=ts; var p=Math.min((ts-st)/dur,1); var e=1-Math.pow(1-p,3); var v=Math.round(target*e); el.textContent=v; ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ); if(p<1)requestAnimationFrame(step); else el.textContent=target; }
+          requestAnimationFrame(step);
+        })(scoreEl, scoreRing, score, scoreCircum);
       } else {
         scoreEl.textContent = '\u2014';
         scoreRing.setAttribute('stroke-dasharray', '0 ' + scoreCircum);
@@ -1148,7 +1152,14 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
     var inbodyLabel = document.getElementById('inbody-score-label');
     if (inbodyEl) {
       if (califPct > 0) {
-        animateScore(inbodyEl, inbodyRing, inbodyLabel, califPct, califColor, califCircum, 'Puntuación /100');
+        inbodyRing.setAttribute('stroke', califColor);
+        inbodyLabel.textContent = 'Puntuación /100';
+        inbodyLabel.style.color = califColor;
+        (function(el, ring, target, circ) {
+          var dur=900, st=null;
+          function step(ts){ if(!st)st=ts; var p=Math.min((ts-st)/dur,1); var e=1-Math.pow(1-p,3); var v=Math.round(target*e); el.textContent=v; ring.setAttribute('stroke-dasharray',(circ*v/100)+' '+circ); if(p<1)requestAnimationFrame(step); else el.textContent=target; }
+          requestAnimationFrame(step);
+        })(inbodyEl, inbodyRing, califPct, califCircum);
       } else {
         inbodyEl.textContent = '\u2014';
         inbodyRing.setAttribute('stroke-dasharray', '0 ' + califCircum);
