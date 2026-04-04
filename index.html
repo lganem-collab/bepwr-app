@@ -1148,11 +1148,7 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
     var inbodyLabel = document.getElementById('inbody-score-label');
     if (inbodyEl) {
       if (califPct > 0) {
-        inbodyEl.textContent = califPct;
-        inbodyRing.setAttribute('stroke', califColor);
-        inbodyRing.setAttribute('stroke-dasharray', (califCircum * califPct / 100) + ' ' + califCircum);
-        inbodyLabel.textContent = 'Puntuaci\u00F3n /100';
-        inbodyLabel.style.color = califColor;
+        animateScore(inbodyEl, inbodyRing, inbodyLabel, califPct, califColor, califCircum, 'Puntuación /100');
       } else {
         inbodyEl.textContent = '\u2014';
         inbodyRing.setAttribute('stroke-dasharray', '0 ' + califCircum);
