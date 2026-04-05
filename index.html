@@ -4150,7 +4150,9 @@ function interpret(key,score){
 
 function calcularEvolucion(ant,act,perfil,objKey){
   var edad=perfil.edad||35,genero=perfil.genero||'Masculino',altura=perfil.altura||170;
-  var pesos=WEIGHTS[objKey]||WEIGHTS.salud_general;
+  // Usa pesos de Firestore si están disponibles, si no usa hardcoded
+  var pesosFS = window._PESOS_FIRESTORE;
+  var pesos=(pesosFS&&pesosFS[objKey])||(pesosFS&&pesosFS.salud_general)||WEIGHTS[objKey]||WEIGHTS.salud_general;
   var ranges=getRanges(edad,genero,altura);
   var breakdown=[],sumWS=0,sumW=0;
   METRIC_DEFS.forEach(function(def){
@@ -4279,6 +4281,40 @@ re:["El cuerpo puede cambiar. Ya lo ha hecho antes. Lo hará de nuevo.","Esta va
 };
 </script>
 
+
+<script>
+// ── Carga pesos del Índice de Evolución desde Firestore (Fase 2) ──────
+(function() {
+  function cargarPesosFirestore() {
+    var db = window.db;
+    if (!db) { setTimeout(cargarPesosFirestore, 1000); return; }
+    try {
+      var { doc, getDoc } = window._fsModules || {};
+      if (!getDoc) {
+        import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js').then(function(m) {
+          window._fsModules = m;
+          m.getDoc(m.doc(db, 'config', 'indice_pesos')).then(function(snap) {
+            if (snap.exists()) {
+              var data = snap.data();
+              if (data && data.pesos) {
+                window._PESOS_FIRESTORE = data.pesos;
+                // Notificar al motor si ya está cargado
+                if (window._applyPesosFirestore) window._applyPesosFirestore(data.pesos);
+              }
+            }
+          }).catch(function(e) { /* fallback silencioso a hardcoded */ });
+        });
+      }
+    } catch(e) { /* fallback silencioso */ }
+  }
+  // Esperar a que Firebase esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(cargarPesosFirestore, 2000); });
+  } else {
+    setTimeout(cargarPesosFirestore, 2000);
+  }
+})();
+</script>
 <!-- Modal Aviso -->
 <div id="modal-aviso" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;padding:20px">
   <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:24px;max-width:440px;width:100%;position:relative">
