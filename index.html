@@ -367,31 +367,22 @@
           </div>
 
           <!-- Tendencia de Valoracion -->
-          <div id="card-tendencia" class="m-card" style="padding:20px 18px;margin-bottom:16px;display:none">
-
-            <!-- Línea 1: TENDENCIA + ⓘ izquierda | badge derecha -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-              <div style="display:flex;align-items:center;gap:6px">
-                <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace" id="tendencia-header">TENDENCIA</div>
-                <button onclick="document.getElementById('modal-tendencia-info').style.display='flex'" style="background:none;border:none;font-size:13px;cursor:pointer;padding:0;opacity:0.7;line-height:1" id="tendencia-info-btn">&#x24D8;</button>
+          <div id="card-indice" class="m-card" style="padding:20px 18px;margin-bottom:16px;display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace">ÍNDICE DE EVOLUCIÓN</div>
+              <div id="indice-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace"></div>
+            </div>
+            <div style="position:relative;width:100px;height:100px;margin:0 auto 12px">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
+                <circle id="indice-ring" cx="50" cy="50" r="42" fill="none" stroke="#FF5C1A" stroke-width="7"
+                  stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <span id="indice-value" style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:#fff">—</span>
               </div>
-              <div id="tendencia-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace"></div>
             </div>
-
-      <!-- Card Gráfica Referencias Científicas -->
-      <div id="card-ref-chart" class="m-card" style="padding:20px 18px;margin-bottom:16px;display:none">
-        <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">Refs. Científicas</div>
-        <div id="ref-chart-bars" style="display:flex;gap:8px;align-items:flex-end;height:150px;position:relative"></div>
-      </div>
-
-            <!-- Línea 2: círculo centrado, mismo tamaño que bePWR Score -->
-            <div style="display:flex;justify-content:center;margin-bottom:14px">
-              <div id="tendencia-icon" style="width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:28px;font-weight:600"><span id="tendencia-score-text">+0</span></div>
-            </div>
-
-            <!-- Línea 3: frase motivacional centrada -->
-            <div id="tendencia-frase" style="font-size:13px;line-height:1.5;text-align:center;color:var(--gray)"></div>
-
+            <div id="indice-frase" style="font-size:12px;line-height:1.5;text-align:center;font-style:italic;padding:0 8px;min-height:36px"></div>
           </div>
 
 
@@ -518,6 +509,11 @@
               <div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Cargando m&#xE9;tricas...</div>
             </div>
           </div>
+          <div id="indice-que-paso" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px">
+            <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:10px">¿QUÉ PASÓ ENTRE TUS VALORACIONES?</div>
+            <div id="indice-que-paso-texto" style="font-size:13px;line-height:1.7;color:#ccc"></div>
+          </div>
+          <button id="btn-ver-factores" onclick="window.abrirModalFactores()" style="display:none;width:100%;margin-bottom:12px;padding:12px;background:#FF5C1A22;color:#FF5C1A;border:1px solid #FF5C1A44;border-radius:12px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer">▼ VER FACTORES DE EVOLUCIÓN</button>
           <button class="btn-secondary" onclick="abrirModalCitas()" style="width:100%;margin-top:4px;background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600">&#x1F4C5; Agendar Valoraci&#xF3;n</button>
       <div id="proxima-cita-card" style="display:none;margin-top:10px;background:#EAF3DE;border-radius:12px;padding:12px 14px;cursor:pointer;" onclick="window.verDetalleCita()">
         <div style="font-size:11px;color:#3B6D11;font-weight:500;margin-bottom:3px;">PRÓXIMA CITA</div>
@@ -1099,7 +1095,7 @@ onAuthStateChanged(auth, async user => {
         if(window._applyIVF) window._applyIVF(ultima, anterior);
         window._refGenero=data.genero||'';
 window._refNac=data.nacimiento||null;
-if(window._applyTendencia) window._applyTendencia(ultima, anterior, ultima.fecha || '');
+if(window._applyIndiceEvolucion) window._applyIndiceEvolucion(ultima, anterior, ultima.fecha || '');
         renderChart(metricas);
         renderProfileMetrics(ultima);
 
@@ -2937,54 +2933,7 @@ function calcTendencia(ini, act, meta, du) {
   return Math.max(-10, Math.min(10, Math.round(score * 10)));
 }
 function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
-window._applyTendencia=function(act,ini,valFecha){
-if(!ini||ini===act)return;
-var card=document.getElementById("card-tendencia");
-var circle=document.getElementById("tendencia-icon");
-var scoreText=document.getElementById("tendencia-score-text");
-var badge=document.getElementById("tendencia-badge");
-var frase=document.getElementById("tendencia-frase");
-var icon=document.getElementById("tendencia-icon");
-var header=document.getElementById("tendencia-header");
-
-if(!card)return;
-var meta=(window.cachedUserData&&window.cachedUserData.meta)||"";
-var score=calcTendencia(ini,act,meta,window.cachedUserData||{});
-var tipo=score>3?"progreso":score>=-3?"proceso":"retroceso";
-var uid=window._currentUid||"anon";
-var tCacheKey="tendencia-frase-"+uid;
-var cachedFrase=null;
-try{
-  var tc=JSON.parse(localStorage.getItem(tCacheKey)||"{}");
-  if(tc.tipo===tipo && tc.valFecha && tc.valFecha===valFecha) cachedFrase=tc.frase;
-}catch(e){}
-var cfg={
-progreso:{color:"#FF5C1A",bg:"#1a0e00",border:"#7c3a00",iconBg:"#FF5C1A22",label:"PROGRESO",
-  path:"M3,17 8,11 13,14 21,5",arrow:"M17,5 21,5 21,9",frase:tipo==="progreso"&&cachedFrase?cachedFrase:rand(FRASES_PROGRESO)},
-proceso:{color:"#4ade80",bg:"#0a150a",border:"#1d3a1d",iconBg:"#4ade8022",label:"Mantenimiento / En Proceso",
-  path:null,line:true,frase:tipo==="proceso"&&cachedFrase?cachedFrase:rand(FRASES_PROCESO)},
-retroceso:{color:"#facc15",bg:"#1a1500",border:"#3a3000",iconBg:"#facc1522",label:"RETROCESO",
-  path:"M3,7 8,13 13,10 21,19",arrow:null,frase:tipo==="retroceso"&&cachedFrase?cachedFrase:rand(FRASES_RETROCESO)}
-};
-var c=cfg[tipo];
-card.style.display="block";
-card.style.background=c.bg;
-card.style.border="1px solid "+c.border;
-
-
-header.style.color=c.color;
-var infoBtn=document.getElementById('tendencia-info-btn');if(infoBtn)infoBtn.style.color=c.color;
-header.textContent="TENDENCIA";
-badge.style.background=c.iconBg;
-badge.style.border="1px solid "+c.color.replace(")",",0.4)").replace("rgb","rgba");
-badge.style.color=c.color;
-badge.textContent=c.label;
-frase.style.color=tipo==="progreso"?"#ffe0cc":tipo==="proceso"?"#e8f5e8":"#fef9cc";
-frase.textContent=c.frase;
-try{localStorage.setItem(tCacheKey,JSON.stringify({tipo:tipo,frase:c.frase,valFecha:valFecha||""}));}catch(e){}
-if(circle){circle.style.background=c.iconBg;circle.style.border="2px solid "+c.color;circle.style.color=c.color;}
-if(scoreText){scoreText.textContent=(score>0?"+":"")+score;}
-window.renderRefChart(act, act.genero||"");};
+// _applyTendencia reemplazada por _applyIndiceEvolucion
 window.renderRefChart = function(act, _ignored) {
   var card = document.getElementById('card-ref-chart');
   var barsEl = document.getElementById('ref-chart-bars');
@@ -4061,5 +4010,288 @@ window.desbloquearLogro = async function(uid, logroId){
     },4000);
   };
   </script>
+
+<!-- Modal Factores de Evolución -->
+<div id="modal-factores" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.92);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px">
+  <div style="max-width:500px;margin:0 auto;padding-bottom:80px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-top:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1.5px">FACTORES DE EVOLUCIÓN</div>
+      <button onclick="document.getElementById('modal-factores').style.display='none'" style="background:none;border:none;color:#888;font-size:26px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div id="modal-factores-pos" style="margin-bottom:24px"></div>
+    <div id="modal-factores-neu" style="margin-bottom:24px"></div>
+    <div id="modal-factores-neg"></div>
+  </div>
+</div>
+
+<script>
+/* ── bePWR Índice de Evolución — Motor de Cálculo v1.0 ── */
+(function(){
+
+// ── Mapeo objetivos Firestore → clave interna ─────────────────────────
+var META_MAP={
+  'Bajar grasa / bajar de peso':'bajar_grasa','Bajar de Peso':'bajar_grasa',
+  'Ganar músculo / recomposición':'ganar_musculo','Ganar Músculo':'ganar_musculo',
+  'Salud metabólica / salud general':'salud_general','Salud metabólica':'salud_general','Salud Metabólica':'salud_general',
+  'Estética / composición equilibrada':'estetico','Estético':'estetico',
+  'Rendimiento funcional':'rendimiento','Rendimiento Funcional':'rendimiento',
+  'Deportivo - Ciclismo':'dep_ciclismo','Deportivo - Correr':'dep_correr',
+  'Deportivo - Fútbol':'dep_futbol','Deportivo - Golf':'dep_golf',
+  'Deportivo - Natación':'dep_natacion','Deportivo - Otro':'dep_otro',
+  'Deportivo - Padel':'dep_padel','Deportivo - Tenis':'dep_tenis',
+  'Incrementar performance · Ciclismo':'dep_ciclismo','Incrementar performance · Correr':'dep_correr',
+  'Incrementar performance · Golf':'dep_golf','Incrementar performance · Natación':'dep_natacion',
+  'Incrementar performance · Padel':'dep_padel'
+};
+function mapearObjetivo(m){return META_MAP[m]||'salud_general';}
+
+// ── Pesos por objetivo (suman 100 cada uno) ───────────────────────────
+var WEIGHTS={
+  bajar_grasa:{peso:8,masa_musculo:12,grasa_corporal_kg:13,imc:5,pgc:14,grasa_visceral:11,inbody_score:7,biceps_cm:2,abdomen_cm:9,cintura_cm:12,cadera_cm:1,pantorrilla_cm:3,mancuerna_lb:3},
+  ganar_musculo:{peso:3,masa_musculo:22,grasa_corporal_kg:7,imc:2,pgc:8,grasa_visceral:6,inbody_score:13,biceps_cm:8,abdomen_cm:4,cintura_cm:5,cadera_cm:4,pantorrilla_cm:7,mancuerna_lb:11},
+  salud_general:{peso:6,masa_musculo:11,grasa_corporal_kg:7,imc:5,pgc:11,grasa_visceral:18,inbody_score:9,biceps_cm:1,abdomen_cm:9,cintura_cm:14,cadera_cm:2,pantorrilla_cm:3,mancuerna_lb:4},
+  estetico:{peso:3,masa_musculo:14,grasa_corporal_kg:11,imc:2,pgc:13,grasa_visceral:6,inbody_score:9,biceps_cm:8,abdomen_cm:9,cintura_cm:10,cadera_cm:6,pantorrilla_cm:5,mancuerna_lb:4},
+  rendimiento:{peso:1,masa_musculo:18,grasa_corporal_kg:7,imc:1,pgc:8,grasa_visceral:7,inbody_score:15,biceps_cm:6,abdomen_cm:5,cintura_cm:6,cadera_cm:2,pantorrilla_cm:10,mancuerna_lb:14},
+  dep_ciclismo:{peso:8,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:11,grasa_visceral:7,inbody_score:12,biceps_cm:2,abdomen_cm:6,cintura_cm:6,cadera_cm:3,pantorrilla_cm:14,mancuerna_lb:5},
+  dep_correr:{peso:10,masa_musculo:13,grasa_corporal_kg:10,imc:5,pgc:12,grasa_visceral:8,inbody_score:11,biceps_cm:2,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:3},
+  dep_futbol:{peso:6,masa_musculo:15,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:13,biceps_cm:5,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:10,mancuerna_lb:4},
+  dep_golf:{peso:5,masa_musculo:12,grasa_corporal_kg:8,imc:4,pgc:9,grasa_visceral:9,inbody_score:11,biceps_cm:8,abdomen_cm:12,cintura_cm:12,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
+  dep_natacion:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:14,abdomen_cm:8,cintura_cm:7,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
+  dep_padel:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:12,abdomen_cm:8,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:1},
+  dep_tenis:{peso:5,masa_musculo:13,grasa_corporal_kg:8,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:12,abdomen_cm:9,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:2},
+  dep_otro:{peso:5,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:8,inbody_score:13,biceps_cm:7,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:5}
+};
+
+// ── Definición de métricas ─────────────────────────────────────────────
+var METRIC_DEFS=[
+  {key:'peso',label:'Peso',unit:'kg',direction:'down_if_over',threshold:2.0},
+  {key:'masa_musculo',label:'Músculo Esquelético',unit:'kg',direction:'up',threshold:0.7},
+  {key:'grasa_corporal_kg',label:'Grasa Corporal',unit:'kg',direction:'down',threshold:1.5},
+  {key:'imc',label:'IMC',unit:'',direction:'to_range',threshold:0.5},
+  {key:'pgc',label:'% Grasa (PGC)',unit:'%',direction:'down',threshold:1.0},
+  {key:'grasa_visceral',label:'Grasa Visceral',unit:'',direction:'down',threshold:2.0},
+  {key:'inbody_score',label:'InBody Score',unit:'pts',direction:'up',threshold:7.0},
+  {key:'biceps_cm',label:'Bíceps',unit:'cm',direction:'up',threshold:0.8},
+  {key:'abdomen_cm',label:'Abdomen',unit:'cm',direction:'down',threshold:2.0},
+  {key:'cintura_cm',label:'Cintura',unit:'cm',direction:'down',threshold:2.0},
+  {key:'cadera_cm',label:'Cadera',unit:'cm',direction:'compound',threshold:1.5},
+  {key:'pantorrilla_cm',label:'Pantorrilla',unit:'cm',direction:'up',threshold:0.8},
+  {key:'mancuerna_lb',label:'Mancuerna (fuerza)',unit:'lb',direction:'up',threshold:5.0}
+];
+
+var CADERA_ARRIBA=['ganar_musculo','rendimiento','estetico','dep_ciclismo','dep_correr','dep_futbol','dep_golf','dep_natacion','dep_padel','dep_tenis','dep_otro'];
+
+function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
+
+function parsePesoP(v){
+  if(!v)return null;
+  if(typeof v==='number')return v;
+  if(typeof v==='string'){var n=parseFloat(v);return isNaN(n)?null:n;}
+  if(typeof v==='object'){var n=parseFloat(v.max||v.min||v.value);return isNaN(n)?null:n;}
+  return null;
+}
+
+function getRanges(edad,genero,altura){
+  var altM=(altura||170)/100, esH=genero==='Masculino', esM=genero==='Femenino';
+  var imcMin=edad>=50?(esH?23:22):(esH?22:21), imcMax=edad>=50?(esH?27:26):(esH?25:24);
+  var gRng=esH?(edad<30?[11,20]:edad<40?[12,21]:edad<50?[14,23]:[15,24]):esM?(edad<30?[16,23]:edad<40?[17,24]:edad<50?[19,26]:[21,28]):(edad<30?[13.5,21.5]:edad<40?[14.5,22.5]:[16.5,24.5]);
+  return{peso:[imcMin*altM*altM,imcMax*altM*altM],imc:[imcMin,imcMax],pgc:gRng,grasa_visceral:[1,9],inbody_score:[70,100],cintura_cm:esH?[75,94]:esM?[65,80]:[70,87],abdomen_cm:esH?[75,94]:esM?[65,80]:[70,87]};
+}
+
+function calcMS(key,prev,curr,threshold,direction,ranges){
+  if(prev===null||curr===null||isNaN(prev)||isNaN(curr))return null;
+  var delta=curr-prev; if(delta===0)return 0;
+  var dir;
+  if(direction==='down')dir=prev-curr;
+  else if(direction==='up')dir=curr-prev;
+  else if(direction==='down_if_over'){var rng=ranges['peso'];if(rng){var enA=prev>=rng[0]&&prev<=rng[1],enB=curr>=rng[0]&&curr<=rng[1];dir=(enA&&enB)?(prev-curr)*0.3:(prev-curr);}else dir=prev-curr;}
+  else if(direction==='to_range'){var rng=ranges['imc']||[22,25],centro=(rng[0]+rng[1])/2;dir=Math.abs(prev-centro)-Math.abs(curr-centro);}
+  else dir=0;
+  return clamp(dir/threshold,-1,1);
+}
+
+function calcCadera(ant,act,objKey,threshold){
+  var antC=parseFloat(ant.cadera_cm),actC=parseFloat(act.cadera_cm);
+  if(isNaN(antC)||isNaN(actC))return null; if(antC===actC)return 0;
+  var delta=actC-antC,mag=clamp(Math.abs(delta)/threshold,0,1);
+  var subio=delta>0,bajo=delta<0;
+  var antG=parseFloat(ant.grasa_corporal_kg),actG=parseFloat(act.grasa_corporal_kg);
+  var antM=parseFloat(ant.masa_musculo),actM=parseFloat(act.masa_musculo);
+  var gBajo=!isNaN(antG)&&!isNaN(actG)&&actG<antG,gSubio=!isNaN(antG)&&!isNaN(actG)&&actG>antG;
+  var mSubio=!isNaN(antM)&&!isNaN(actM)&&actM>antM,mBajo=!isNaN(antM)&&!isNaN(actM)&&actM<antM;
+  if(CADERA_ARRIBA.indexOf(objKey)>-1){
+    if(subio&&gBajo&&mSubio)return+mag;
+    if(subio&&gBajo)return+mag*0.7;
+    if(subio&&mSubio&&!gSubio)return+mag*0.6;
+    if(subio&&gSubio)return-mag;
+    if(subio)return 0;
+    if(bajo&&mBajo&&!gBajo)return-mag;
+    if(bajo&&mBajo&&gBajo)return-mag*0.3;
+    if(bajo&&gBajo)return+mag*0.3;
+    return 0;
+  } else {
+    if(bajo&&gBajo&&mBajo)return+mag*0.2;
+    if(bajo&&gBajo)return+mag;
+    if(bajo&&mBajo)return-mag*0.5;
+    if(bajo)return+mag*0.4;
+    if(subio&&gSubio)return-mag;
+    if(subio&&mSubio&&gBajo)return 0;
+    return-mag*0.3;
+  }
+}
+
+function interpret(key,score){
+  if(score===null)return'Sin datos suficientes';
+  var abs=Math.abs(score),pos=score>0;
+  if(abs<0.05)return'Sin cambio relevante';
+  var mag=abs>=0.7?'significativo':abs>=0.35?'moderado':'leve';
+  var L={
+    peso:pos?'Peso acercándose al rango óptimo':'Peso alejándose del rango',
+    masa_musculo:pos?'Ganancia muscular favorable':'⚠ Pérdida de masa muscular',
+    grasa_corporal_kg:pos?'Reducción de grasa corporal':'Aumento de grasa corporal',
+    imc:pos?'IMC mejorando hacia rango saludable':'IMC alejándose del rango',
+    pgc:pos?'Reducción de % grasa':'Incremento de % grasa',
+    grasa_visceral:pos?'Reducción de grasa visceral — impacto cardiometabólico positivo':'⚠ Aumento de grasa visceral — riesgo cardiometabólico',
+    inbody_score:pos?'InBody Score mejorando':'InBody Score bajando',
+    biceps_cm:pos?'Ganancia de perímetro bíceps':'Reducción de bíceps',
+    abdomen_cm:pos?'Reducción de abdomen':'Aumento de abdomen',
+    cintura_cm:pos?'Reducción de cintura — favorable':'⚠ Aumento de cintura',
+    cadera_cm:pos?(Math.abs(score)>0.5?'Cadera: señal de ganancia muscular glútea':'Cadera: cambio levemente favorable'):(Math.abs(score)>0.5?'⚠ Cadera: señal de acumulación de grasa o pérdida de masa':'Cadera: cambio levemente desfavorable'),
+    pantorrilla_cm:pos?'Ganancia de pantorrilla':'Reducción de pantorrilla',
+    mancuerna_lb:pos?'Incremento de fuerza funcional':'Reducción de fuerza funcional'
+  };
+  return (L[key]||'Cambio detectado')+' ('+mag+')';
+}
+
+function calcularEvolucion(ant,act,perfil,objKey){
+  var edad=perfil.edad||35,genero=perfil.genero||'Masculino',altura=perfil.altura||170;
+  var pesos=WEIGHTS[objKey]||WEIGHTS.salud_general;
+  var ranges=getRanges(edad,genero,altura);
+  var breakdown=[],sumWS=0,sumW=0;
+  METRIC_DEFS.forEach(function(def){
+    var key=def.key,direction=def.direction,threshold=def.threshold;
+    var prev=ant[key]!==undefined?parseFloat(ant[key]):null;
+    var curr=act[key]!==undefined?parseFloat(act[key]):null;
+    var peso=pesos[key]||0;
+    var mScore=direction==='compound'?calcCadera(ant,act,objKey,threshold):calcMS(key,prev,curr,threshold,direction,ranges);
+    var wScore=mScore!==null&&peso>0?mScore*peso:null;
+    var delta=prev!==null&&curr!==null?curr-prev:null;
+    if(wScore!==null&&peso>0){sumWS+=wScore;sumW+=peso;}
+    breakdown.push({key:key,label:def.label,unit:def.unit,previous:prev,current:curr,changeRaw:delta,metricScore:mScore,weight:peso,weightedScore:wScore,interpretation:interpret(key,mScore)});
+  });
+  var ratio=sumW>0?sumWS/sumW:0;
+  var finalIndex=clamp(Math.round(50+50*ratio),1,100);
+  var statusLabel=finalIndex>=65?'Avance Notorio':finalIndex>=53?'Avance':finalIndex>=47?'Mantenimiento':finalIndex>=35?'Ligero Retroceso':'Retrocediendo';
+  var pos=breakdown.filter(function(m){return m.metricScore!==null&&m.metricScore>0.15;}).map(function(m){return m.interpretation;});
+  var neg=breakdown.filter(function(m){return m.metricScore!==null&&m.metricScore<-0.15;}).map(function(m){return m.interpretation;});
+  var neu=breakdown.filter(function(m){return m.metricScore!==null&&Math.abs(m.metricScore)<=0.15&&m.previous!==null;}).map(function(m){return m.label+': sin cambio relevante';});
+  return{finalIndex:finalIndex,statusLabel:statusLabel,breakdown:breakdown,positiveDrivers:pos,negativeDrivers:neg,neutralDrivers:neu,ratio:ratio};
+}
+
+function generarTextoEvolucion(result,objKey){
+  var fi=result.finalIndex,breakdown=result.breakdown;
+  var topPos=breakdown.filter(function(m){return m.weightedScore!==null&&m.weightedScore>0&&m.weight>2;}).sort(function(a,b){return b.weightedScore-a.weightedScore;}).slice(0,3);
+  var topNeg=breakdown.filter(function(m){return m.weightedScore!==null&&m.weightedScore<0&&m.weight>2;}).sort(function(a,b){return a.weightedScore-b.weightedScore;}).slice(0,3);
+  var ap=fi>=65?'Con un índice de '+fi+' puntos, esta valoración confirma un Avance Notorio en tu composición corporal.':fi>=53?'Con un índice de '+fi+' puntos, se registra un Avance con métricas moviéndose en la dirección correcta.':fi>=47?'Con un índice de '+fi+' puntos, esta valoración muestra un período de Mantenimiento — el cuerpo se mantuvo estable entre mediciones.':fi>=35?'Con un índice de '+fi+' puntos, esta valoración refleja un Ligero Retroceso que conviene atender antes de la próxima medición.':'Con un índice de '+fi+' puntos, esta valoración indica un retroceso importante en la composición corporal.';
+  var texP='',texN='';
+  if(topPos.length){var ls=topPos.map(function(m){return m.label.toLowerCase();});texP=topPos.length===1?'El factor que más impulsó el resultado fue '+ls[0]+'.':ls.length===2?'Los principales factores de avance fueron '+ls[0]+' y '+ls[1]+'.':'Los principales factores de avance fueron '+ls[0]+', '+ls[1]+' y '+ls[2]+'.';}
+  if(topNeg.length){var ls=topNeg.map(function(m){return m.label.toLowerCase();});texN=topNeg.length===1?'El área que más afectó el índice fue '+ls[0]+' — es la prioridad a trabajar en el siguiente ciclo.':'Las áreas que más afectaron el índice fueron '+ls[0]+' y '+ls[1]+' — son la prioridad para el siguiente ciclo.';}
+  var cierres={bajar_grasa:'Para la siguiente valoración, el foco debe estar en mantener o ganar músculo mientras continúa la reducción de grasa.',ganar_musculo:'El foco para el siguiente ciclo debe ser la progresión de carga en entrenamiento y la recuperación adecuada.',salud_general:'La prioridad es seguir reduciendo grasa visceral y mantener activa la masa muscular funcional.',estetico:'La clave es mantener el músculo mientras se controla el porcentaje de grasa.',rendimiento:'El foco debe estar en la calidad del entrenamiento y la recuperación para sostener la masa funcional.',dep_ciclismo:'Mantén la potencia de piernas y el peso corporal controlado — la relación potencia/peso es clave.',dep_correr:'La economía de carrera mejora con menos grasa y más músculo funcional en tren inferior.',dep_natacion:'La fuerza de tren superior y la composición corporal son los factores que más impactan el rendimiento.',dep_padel:'La potencia explosiva y la agilidad dependen de una buena relación músculo/grasa.',dep_futbol:'La velocidad y la resistencia mejoran con más músculo funcional y menos grasa corporal.',dep_golf:'La estabilidad y la rotación de torso son claves — fortaleza funcional y movilidad son tu prioridad.',dep_tenis:'La potencia de servicio y la resistencia se sostienen mejor con buena composición corporal.',dep_otro:'Mantén el equilibrio entre entrenamiento específico de tu deporte y la composición corporal óptima.'};
+  var cierre=cierres[objKey]||cierres.salud_general;
+  return[ap,texP,texN,cierre].filter(Boolean).join(' ');
+}
+
+// ── _applyIndiceEvolucion (reemplaza _applyTendencia) ────────────────
+window._applyIndiceEvolucion=function(act,ini,valFecha){
+  if(!ini||ini===act)return;
+  var card=document.getElementById('card-indice');
+  var ring=document.getElementById('indice-ring');
+  var valEl=document.getElementById('indice-value');
+  var badge=document.getElementById('indice-badge');
+  var fraseEl=document.getElementById('indice-frase');
+  if(!card)return;
+
+  var ud=window.cachedUserData||{};
+  var meta=ud.meta||'';
+  var genero=(ud.genero||'').toLowerCase().indexOf('fem')>-1?'Femenino':'Masculino';
+  var altura=ud.altura||170;
+  var edad=35;
+  try{var nac=ud.nacimiento;if(nac){var d=nac.toDate?nac.toDate():new Date(nac);edad=Math.floor((Date.now()-d.getTime())/(365.25*24*3600*1000));}}catch(e){}
+  var objKey=mapearObjetivo(meta);
+
+  function pp(v){if(!v)return null;if(typeof v==='number')return v;if(typeof v==='string'){var n=parseFloat(v);return isNaN(n)?null:n;}if(typeof v==='object'){var n=parseFloat(v.max||v.min||v.value);return isNaN(n)?null:n;}return null;}
+
+  var anterior={peso:ini.peso,masa_musculo:ini.musculo,grasa_corporal_kg:ini.grasaCorporal,imc:ini.imc,pgc:ini.pgc,grasa_visceral:ini.grasaVisceral,inbody_score:ini.calificacion,biceps_cm:ini.brazo,abdomen_cm:ini.abdomen,cintura_cm:ini.cintura,cadera_cm:ini.cadera,pantorrilla_cm:ini.pantorrilla,mancuerna_lb:pp(ini.pruebaPeso)};
+  var actual={peso:act.peso,masa_musculo:act.musculo,grasa_corporal_kg:act.grasaCorporal,imc:act.imc,pgc:act.pgc,grasa_visceral:act.grasaVisceral,inbody_score:act.calificacion,biceps_cm:act.brazo,abdomen_cm:act.abdomen,cintura_cm:act.cintura,cadera_cm:act.cadera,pantorrilla_cm:act.pantorrilla,mancuerna_lb:pp(act.pruebaPeso)};
+
+  var result=calcularEvolucion(anterior,actual,{edad:edad,genero:genero,altura:altura},objKey);
+  window._indiceEvolucionResult=result;
+
+  var fi=result.finalIndex,label=result.statusLabel;
+  var color=fi>=65?'#FF5C1A':fi>=53?'#f97316':fi>=47?'#60a5fa':fi>=35?'#facc15':'#f87171';
+
+  card.style.display='block';
+  badge.textContent=label;
+  badge.style.cssText='border-radius:20px;padding:2px 10px;font-size:10px;font-family:Space Mono,monospace;background:'+color+'22;color:'+color+';border:1px solid '+color;
+  ring.setAttribute('stroke',color);
+
+  // Frase motivacional (usa FRASES si ya cargó)
+  if(window._FRASES_INDICE){
+    var cat=fi>=65?'ap':fi>=53?'al':fi>=47?'es':fi>=35?'rl':'re';
+    var arr=window._FRASES_INDICE[cat];
+    var f=arr[Math.floor(Math.random()*arr.length)];
+    fraseEl.textContent=f;
+    fraseEl.style.color=fi>=47?'#ffe0cc':'#fef3cd';
+  }
+
+  // Animar ring igual que bePWR Score
+  var circ=2*Math.PI*42;
+  valEl.textContent='0';
+  ring.setAttribute('stroke-dasharray','0 '+circ);
+  (function(el2,ring2,target,circ2){
+    function doAnim(){var dur=2200,st=null;function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);var e=1-Math.pow(1-p,3);var v=Math.round(target*e);el2.textContent=v;ring2.setAttribute('stroke-dasharray',(circ2*v/100)+' '+circ2);if(p<1)requestAnimationFrame(step);else el2.textContent=target;}requestAnimationFrame(step);}
+    var animando=false;
+    var obs=new IntersectionObserver(function(entries){if(entries[0].isIntersecting){if(!animando){animando=true;doAnim();setTimeout(function(){animando=false;},2400);}}else{el2.textContent='0';ring2.setAttribute('stroke-dasharray','0 '+circ2);animando=false;}},{threshold:0.3,rootMargin:'0px'});
+    obs.observe(el2);
+  })(valEl,ring,fi,circ);
+
+  // Actualizar pestaña Métricas
+  var textoEl=document.getElementById('indice-que-paso-texto');
+  var quePasoEl=document.getElementById('indice-que-paso');
+  var btnEl=document.getElementById('btn-ver-factores');
+  if(textoEl){textoEl.textContent=generarTextoEvolucion(result,objKey);}
+  if(quePasoEl)quePasoEl.style.display='block';
+  if(btnEl)btnEl.style.display='block';
+};
+
+// ── Modal Factores de Evolución ───────────────────────────────────────
+window.abrirModalFactores=function(){
+  var result=window._indiceEvolucionResult;
+  if(!result){return;}
+  function renderGroup(el,title,color,icon,items){
+    if(!el)return;
+    if(!items.length){el.innerHTML='';return;}
+    var html='<div style="font-family:Space Mono,monospace;font-size:9px;letter-spacing:1.5px;color:'+color+';margin-bottom:10px;text-transform:uppercase">'+icon+' '+title+'</div>';
+    items.forEach(function(item){html+='<div style="font-size:13px;padding:10px 14px;background:'+color+'18;border-left:3px solid '+color+';border-radius:0 10px 10px 0;margin-bottom:8px;color:#ddd;line-height:1.6">'+item+'</div>';});
+    el.innerHTML=html;
+  }
+  renderGroup(document.getElementById('modal-factores-pos'),'Favorables','#FF5C1A','▲',result.positiveDrivers);
+  renderGroup(document.getElementById('modal-factores-neu'),'Neutros','#888','→',result.neutralDrivers);
+  renderGroup(document.getElementById('modal-factores-neg'),'Desfavorables','#facc15','▼',result.negativeDrivers);
+  document.getElementById('modal-factores').style.display='block';
+};
+
+})();
+</script>
+
+<script>
+window._FRASES_INDICE={
+ap:["Esto es lo que el esfuerzo constante construye — sigue escribiendo esta historia.","Tu cuerpo respondió. Tu trabajo está dando frutos.","Cada valoración es una prueba de que el camino vale la pena.","La constancia tiene nombre — y hoy se llama tuyo.","Cuando el cuerpo avanza, la mente lo sigue. Imparable.","Este resultado es el reflejo de decisiones que tomaste cada día.","Lo que mides, lo gestionas. Lo que gestionas, lo transformas.","Aquí está la evidencia de que vale la pena presentarse.","Tu mejor versión tiene nueva dirección de entrega.","El cuerpo guarda memoria de cada entrenamiento. Hoy lo confirma.","Resultados así se construyen en silencio, un día a la vez.","La disciplina de ayer se convierte en el progreso de hoy.","Estás en la dirección correcta. Mantén ese rumbo.","Este número es solo el principio de lo que estás construyendo.","Tu cuerpo es el mejor testimonio de tu compromiso.","Cada pequeña decisión correcta suma hasta llegar aquí.","Progreso real, medible y tuyo. Eso es bePWR.","El trabajo funciona. Tú funcionas. Sigue.","Hoy la ciencia confirma lo que ya sentías.","Los resultados llegan cuando la intención se vuelve hábito.","Esto es lo que se ve cuando apareces aunque cueste.","Tu proceso tiene evidencia. Y es poderosa.","Un paso más cerca de la mejor versión de ti.","El esfuerzo invertido está rindiendo dividendos.","Tu cuerpo está respondiendo exactamente como debe.","La transformación se mide en momentos como este.","Sigue construyendo — los cimientos están sólidos.","Este avance es tuyo. Nadie más lo puede quitar.","La consistencia tiene recompensa. La estás cobrando.","Cada valoración positiva es un voto de confianza en tu proceso.","Tu evolución está confirmada. Ahora ve por más.","El trabajo en silencio produce grandes resultados en voz alta.","El compromiso que tienes contigo es evidente en cada número.","Esto se llama progreso. Celébralo y sigue.","Tu cuerpo trabaja para ti porque tú trabajas para él.","El camino sigue. Y los números muestran que vas bien.","Seguir apareciendo es la mitad del trabajo. La otra mitad, esto.","Cada sesión de entrenamiento te trajo hasta aquí.","Tu historia de transformación tiene un nuevo capítulo positivo.","El esfuerzo tiene dirección. Y la dirección es hacia adelante.","Resultados así son la razón por la que empezaste.","Tú eres la prueba de que el proceso funciona.","La mejor versión de ti está construyéndose aquí, ahora.","Cada número favorable es un argumento para seguir.","Tu cuerpo está en sintonía con tus objetivos. Poderoso.","Lo que la ciencia mide hoy, la dedicación lo construyó ayer.","Progreso comprobado. La siguiente valoración te espera con más.","El resultado habla por ti. Sigue dejándolo hablar.","La mejor inversión que hiciste fue en ti mismo. Está rindiendo.","Aquí está la prueba de que mostrarse todos los días vale la pena."],
+al:["El avance, aunque pequeño, es real y medible. Eso importa.","Las grandes transformaciones empiezan con pasos exactamente como este.","El momentum está contigo. Mantenlo.","Cada mejora, por mínima que sea, es una declaración de intención.","El rumbo es correcto. La velocidad se ajusta.","Pequeñas ganancias acumuladas construyen grandes cambios.","Tu cuerpo está respondiendo. Dale tiempo y consistencia.","El proceso tiene su ritmo. El tuyo está avanzando.","Un paso adelante siempre supera quedarse en el mismo lugar.","La dirección importa más que la velocidad. Vas bien.","Este avance es la base del siguiente. Sigue construyendo.","Las mejoras sostenidas superan siempre los resultados rápidos.","Tu esfuerzo está dejando huella. Los números lo confirman.","El camino largo se recorre exactamente así — un paso a la vez.","Avanzar con constancia es más valioso que avanzar con prisa.","Tu cuerpo está en modo construcción. Respétalo y sigue.","El progreso gradual es el más duradero. Estás en el camino correcto.","La mejora continua es la estrategia de los que llegan lejos.","Tu compromiso está produciendo resultados. Cada valoración lo confirma.","El trabajo de hoy es la inversión del mañana.","Avanzar levemente hoy es avanzar mucho en el año.","La disciplina constante tiene más poder que el esfuerzo explosivo.","Estás en movimiento. Eso es exactamente lo que importa.","El cuerpo cambia cuando le das razones para cambiar. Tú lo estás haciendo.","La paciencia y la constancia son el dúo más poderoso en la transformación.","Tu proceso está funcionando. Dale continuidad.","Los cambios reales se construyen exactamente así — con consistencia.","Tu cuerpo está evolucionando en la dirección que elegiste.","El avance moderado sostenido supera siempre al esfuerzo sin continuidad.","Estás construyendo hábitos que el cuerpo agradece.","La transformación es un maratón. Llevas buen ritmo.","Cada mejora es una señal de que tu cuerpo está escuchando.","Progreso es progreso, sin importar la magnitud. Celébralo.","Tu historial de valoraciones está contando una buena historia.","Las semillas plantadas con esfuerzo dan frutos con tiempo.","Estás avanzando. Eso es todo lo que necesitas seguir haciendo.","El cuerpo responde a quien se presenta. Tú te presentas.","Pequeñas victorias son victorias. Capitalizalas.","La constancia es tu superpoder. Úsala.","El camino se abre para quien sigue caminando.","Hoy es un poco mejor que ayer. Mañana será un poco mejor que hoy.","Tu esfuerzo tiene retorno. Los números lo comprueban.","Las grandes metas se consiguen con exactamente estos pequeños pasos.","Tu cuerpo está cambiando. Dale las herramientas para seguir.","El avance existe. La siguiente meta, también.","Cada valoración confirma el rumbo. El tuyo está confirmado.","Tu proceso tiene evidencia de vida. Sigue alimentándolo.","Los resultados toman tiempo. El tuyo está llegando.","La mejor versión de ti se está formando en cada decisión correcta.","Sigue apareciendo. El progreso acumulado tiene mucho por revelar."],
+es:["Mantenerse es también una forma de ganar. La base está sólida.","La estabilidad es el punto de partida de todo gran avance.","El cuerpo también necesita consolidar antes de seguir avanzando.","Estar aquí, midiéndote, ya es una ventaja enorme.","La consistencia construye plataformas. Tú estás en la tuya.","Los períodos estables son los que preparan el terreno para el siguiente salto.","Mantener el rumbo cuando los resultados se estabilizan requiere carácter. Tienes eso.","Tu cuerpo está consolidando lo ganado. Dale motivos para seguir.","La meseta es parte del proceso, y quien la sostiene, la supera.","Estás donde muchos quisieran estar: en movimiento y con datos reales.","Las raíces profundas sostienen los árboles más altos. Sigue construyendo raíces.","El cuerpo tiene su inteligencia. Está organizando el siguiente avance.","La estabilidad de hoy es la plataforma del progreso de mañana.","Tu disciplina está manteniendo lo construido. Eso tiene valor.","Los cambios profundos a veces se preparan en silencio.","Estar estable significa que el trabajo anterior funcionó. Ahora ve por más.","El cuerpo respeta la consistencia incluso cuando los números descansan.","Una valoración estable es una invitación a revisar y ajustar la estrategia.","La transformación tiene ciclos. Este es el de la consolidación.","Tu compromiso se mantiene. El cuerpo lo reconocerá pronto.","Estar aquí, siguiendo el proceso, ya diferencia tu historia.","Los grandes cambios se anuncian con períodos de calma. Prepárate.","La estabilidad bien administrada se convierte en el impulso del siguiente ciclo.","Tu cuerpo está listo para el siguiente estímulo. Dale razones para moverse.","El período de mantenimiento tiene su valor. Lo estás aprovechando.","La consistencia en tiempos de estabilidad define quién llega lejos.","Sigue apareciendo. El resultado sigue procesando.","Tu base está sólida. El siguiente piso se construye sobre ella.","La paciencia aquí es una inversión que el cuerpo devuelve con intereses.","Los períodos estables separan a quienes llegan de quienes se detienen.","Tu historia de valoraciones está construyendo algo importante. Sigue.","El cuerpo está en equilibrio. Rompe ese equilibrio con el siguiente reto.","La disciplina constante produce resultados. El tiempo lo confirma.","Cada valoración, sin importar el resultado, es una decisión de seguir.","La transformación se mide en meses y años. Este es uno de esos meses.","Estar estable con métricas de salud ya es un logro que muchos buscan.","El siguiente avance está en la siguiente decisión que tomes hoy.","Tu compromiso con medirte ya te pone adelante de la mayoría.","El cuerpo escucha. Sigue enviándole la señal correcta.","La estabilidad bien entendida es momentum acumulado esperando dirección.","Revisar, ajustar y continuar — esa es la fórmula. Estás en el paso correcto.","Tu historial de valoraciones es tu mapa. El territorio te espera.","La mejor versión de ti sigue disponible. El siguiente ciclo es la cita.","El proceso tiene su ritmo. El tuyo sigue activo.","Cada vez que te mides, eliges seguir. Esa decisión construye todo lo demás.","La constancia en la meseta es lo que separa las transformaciones reales.","Tu cuerpo está en modo preparación. Dale el estímulo correcto.","Mantenerse requiere esfuerzo. Estás demostrando que lo tienes.","La siguiente valoración es tu oportunidad de romper este equilibrio.","Sigue confiando en el proceso — los períodos estables tienen su recompensa."],
+rl:["Los retrocesos son parte del proceso — la información que traen vale oro.","Saber dónde estás es el primer paso para ir adonde quieres.","Esta valoración te dice dónde enfocar la energía. Eso tiene un valor enorme.","El cuerpo manda señales. Esta es una para ajustar el rumbo.","El camino a veces da curvas. Los que llegan son los que las navegan.","Esta valoración es un punto de inflexión, bien aprovechado.","El siguiente ciclo empieza con mejor información que el anterior.","Los mejores atletas ajustan su plan cuando los datos lo indican. Tú también.","Un resultado así es una invitación a revisar, ajustar y volver con más fuerza.","La información es poder. Ahora tienes más poder que antes.","Tu proceso tiene datos que trabajar. Eso es exactamente lo que necesitas.","El cuerpo está esperando el ajuste correcto. Esta valoración te lo indica.","Los que llegan lejos usan los resultados difíciles como combustible.","Esta información es valiosa. Úsala para la siguiente etapa.","Los ajustes estratégicos nacen exactamente de momentos como este.","Tu compromiso de medirte es la prueba de que vas a revertir esto.","El cuerpo puede cambiar de dirección. Esta valoración marca el punto de partida.","Un paso atrás bien entendido impulsa dos pasos adelante con claridad.","La siguiente valoración ya tiene plan. Esta te lo dio.","Los resultados desafiantes son los que construyen la mayor resiliencia.","Tu historia de transformación tiene capítulos difíciles y final poderoso.","Esta es la curva del camino — la llegada sigue adelante.","La mejor versión de ti está construida también sobre estos momentos.","Quien se mide cuando los resultados son difíciles tiene el carácter que llega.","El cuerpo responde cuando se le dan las herramientas correctas. Ajusta y sigue.","Esta valoración es el mapa. El destino sigue siendo el mismo.","Los datos difíciles son los más honestos. Y los más útiles.","Tu coach tiene ahora información precisa para ayudarte a retomar el rumbo.","La dirección puede corregirse. El compromiso ya está probado.","Cada valoración difícil que enfrentas demuestra que estás en el juego.","El esfuerzo pasado construyó una base. Ahora se trata de usarla.","La siguiente sesión ya importa más. Úsala bien.","Este resultado es temporal. Tu capacidad de cambio, permanente.","Tu cuerpo está esperando el siguiente estímulo correcto. Dáselo.","La información que tienes hoy vale más que la incertidumbre de ayer.","Los que transforman su cuerpo saben que el proceso tiene alturas y valles.","Tu compromiso con el proceso es la razón por la que esto tiene solución.","El cuerpo tiene memoria. Lo que hagas en el siguiente ciclo cuenta.","Los resultados de mañana se construyen con las decisiones de hoy.","La transformación exige enfrentar los números. Tú lo estás haciendo.","Revertir una tendencia requiere información y acción. Ya tienes la primera.","Esta valoración marca el inicio del siguiente avance bien fundamentado.","Los retos de hoy son los logros de mañana, cuando los hayas superado.","Tu coach y tú tienen ahora datos concretos para trabajar. Eso es valioso.","La claridad que da esta valoración es el primer ingrediente del cambio.","Sigue adelante — la mejor versión de ti te está esperando.","El proceso te pide un ajuste. Hazlo y continúa con más fuerza.","Esta curva tiene salida. Y está justo al frente.","Tu historial dice que puedes avanzar. Este momento lo confirma por contraste.","Las grandes metas se consiguen con pequeños logros. El próximo empieza hoy."],
+re:["El cuerpo puede cambiar. Ya lo ha hecho antes. Lo hará de nuevo.","Esta valoración es el punto de partida de tu regreso. Así de simple.","Los que más avanzan son los que siguen cuando los resultados piden más esfuerzo.","Tu valentía de medirte en este momento es el primer acto de cambio.","La mayor transformación comienza con la mayor honestidad. Aquí está.","El camino de regreso empieza con el primer paso. Este es ese paso.","Tu cuerpo puede hacer más. Esta valoración te dice que está listo.","Los resultados difíciles son los que dan la información más valiosa.","Sigue adelante — la mejor versión de ti te espera justo del otro lado.","Este resultado es una llamada a la acción. La más poderosa que existe.","La transformación más impresionante siempre empieza desde el punto más desafiante.","Tu cuerpo tiene capacidad de adaptación extraordinaria. Actívala.","Cada sesión de entrenamiento a partir de hoy construye el resultado siguiente.","Los números de hoy son la motivación de mañana. Úsalos bien.","Quien enfrenta sus métricas en el momento más difícil demuestra el carácter que transforma.","El camino a la mejor versión de ti pasa exactamente por aquí.","Esta es información poderosa y tuya. Úsala para construir el siguiente capítulo.","Tu historia de transformación aún se está escribiendo. Este capítulo pide acción.","Los grandes cambios nacen de momentos exactamente como este.","La decisión de medirte hoy es la más importante que podrías haber tomado.","El cuerpo responde. Dale razones consistentes para cambiar de dirección.","Tu potencial de cambio es exactamente igual que antes de esta valoración.","Las grandes metas se consiguen con pequeños logros. El primero empieza hoy.","Tu coach tiene ahora la imagen completa para ayudarte a construir el regreso.","La información más difícil es la más honesta. Y la más útil.","Este resultado dice qué ajustar. El siguiente dice qué lograste.","Tu cuerpo está esperando el compromiso renovado. Dáselo.","El regreso siempre es posible. Lo que necesita es decisión y consistencia.","La siguiente valoración puede contar una historia completamente diferente.","Tu capacidad de cambio es más grande que cualquier número en esta pantalla.","Las raíces del cambio se plantan en los momentos más difíciles.","Tienes el sistema, el coach y el plan. Ahora es momento de usarlos.","Esta valoración es el combustible para el trabajo que viene.","El cuerpo que quieres está esperando las acciones que lo construyen.","Cada entrenamiento a partir de hoy tiene un propósito muy claro.","Los resultados difíciles son para los valientes que se atreven a medirlos. Tú lo eres.","La transformación más poderosa comienza con la verdad más clara.","Tu proceso puede cambiar de dirección hoy mismo.","El mejor momento para comprometerse con el cambio es exactamente este.","Tu cuerpo tiene la capacidad. La consistencia le da la dirección.","Sigue aquí, sigue midiéndote, sigue trabajando — el resultado sigue.","Esta valoración marca el inicio del siguiente ciclo. Empiézalo con todo.","Los que llegan a sus metas son exactamente los que siguen cuando cuesta más.","Tu historia de transformación tiene más páginas por escribir. Empiézalas hoy.","El siguiente resultado ya se está cocinando en las decisiones de esta semana.","Tienes todo lo que necesitas para cambiar esto. Empieza con la próxima sesión.","La mejor inversión que puedes hacer ahora es en tu siguiente entrenamiento.","El proceso te pide esfuerzo renovado. Y tiene todo para recompensarlo.","La versión de ti que quieres ser está a un ciclo de comprometerte completamente.","Sigue adelante — las grandes metas se consiguen con pequeños logros diarios."]
+};
+</script>
 </body>
 </html>
