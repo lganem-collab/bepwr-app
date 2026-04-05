@@ -3019,7 +3019,7 @@ window.renderRefChart = function(act, _ignored) {
     {label:'% Grasa',   val:act.pgc,           unit:'%',  ref:pgcR,
      inst:'ACSM',instFull:'American College of Sports Medicine',
      refLabel:'< '+pgcR+'%  ('+edad+' años)'},
-    {label:'G. Visceral',val:act.grasaVisceral, unit:'',   ref:9,
+    {label:'G. Visceral',val:act.grasaVisceral, unit:'kg',  ref:9,
      inst:'IDF', instFull:'International Diabetes Federation',
      refLabel:'≤ 9  (escala InBody)'},
     {label:'IMC',       val:act.imc,           unit:'',   ref:24.9,
@@ -3061,7 +3061,7 @@ window.renderRefChart = function(act, _ignored) {
 
     // Línea blanca de referencia
     var line=document.createElement('div');
-    line.style.cssText='position:absolute;left:0;right:0;bottom:'+refPx+'px;height:2px;background:rgba(255,255,255,.8);z-index:3;pointer-events:none';
+    line.style.cssText='position:absolute;left:0;right:0;bottom:'+refPx+'px;height:2px;background:rgba(255,255,255,.8);z-index:3';
 
     // Label institución (tappable) — a la derecha de la línea
     var lbl=document.createElement('span');
