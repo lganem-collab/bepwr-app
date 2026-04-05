@@ -102,11 +102,24 @@
     #toast.error{border-color:rgba(248,113,113,.4);color:var(--red)}
     .form-error{font-size:12px;color:var(--red);margin-top:10px;font-family:Space Mono,monospace;min-height:16px;text-align:center}
     @media(max-width:768px){
+      body{overflow-x:hidden}
+      .topbar{padding:0 12px;gap:8px}
+      .tabs{padding:0 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;display:flex;white-space:nowrap;scrollbar-width:none}
+      .tabs::-webkit-scrollbar{display:none}
+      .tab-btn{flex-shrink:0;padding:10px 12px;font-size:11px}
       .stats-row{grid-template-columns:1fr 1fr}
+      .members-table{overflow-x:auto;-webkit-overflow-scrolling:touch}
       .table-head,.table-row{grid-template-columns:2fr 1fr 130px}
       .th:nth-child(n+3):not(:last-child),.table-row .td:nth-child(n+3):not(:last-child){display:none}
-      .content{padding:16px}
-      .tabs,.topbar{padding:0 16px}
+      .content{padding:12px}
+      .topbar{padding:0 12px}
+      .modal-sheet{max-height:95vh;border-radius:20px 20px 0 0}
+    }
+    @media(max-width:480px){
+      .stats-row{grid-template-columns:1fr}
+      .content{padding:8px}
+      .topbar{padding:0 8px;font-size:13px}
+      .chart-card{overflow-x:auto}
     }
     input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
     input[type="number"]{-moz-appearance:textfield}
