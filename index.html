@@ -2990,97 +2990,103 @@ window.renderRefChart = function(act, _ignored) {
   var barsEl = document.getElementById('ref-chart-bars');
   if(!card||!barsEl) return;
 
-  // Mover después de card-tendencia
   var tendCard = document.getElementById('card-tendencia');
   if(tendCard&&tendCard.parentNode&&tendCard.nextSibling!==card)
     tendCard.parentNode.insertBefore(card,tendCard.nextSibling);
 
-  // Color = califColor de Tendencia (el del círculo), calculado por calif%
   var barColor = window._tendColor || '#4ade80';
 
-  // Genero y edad del usuario
-  var esH = (window._refGenero==='Masculino');
-  var edad = 35;
-  try {
-    var nac=window._refNac;
-    if(nac){var d=nac.toDate?nac.toDate():new Date(nac);edad=Math.floor((Date.now()-d.getTime())/(365.25*24*3600*1000));}
-  }catch(e){}
+  // FIX 3: detección robusta de género + fallback al campo del act
+  var generoStr = window._refGenero || act.genero || '';
+  var esH = generoStr==='Masculino' || generoStr.toLowerCase().indexOf('mascul')>-1;
 
+  var edad=35;
+  try{var nac=window._refNac;if(nac){var d=nac.toDate?nac.toDate():new Date(nac);edad=Math.floor((Date.now()-d.getTime())/(365.25*24*3600*1000));}}catch(e){}
+
+  // FIX 3: Referencias % grasa corregidas (ACSM — límite superior zona saludable/fitness)
+  // Hombres: fitness óptimo 14-17%, aceptable hasta ~22%. Referencia = límite superior saludable
+  // Mujeres: fitness óptimo 21-24%, aceptable hasta ~28%.
   function pgcRef(esH,e){
-    if(esH) return e<30?20:e<40?22:e<50?24:26;
-    return e<30?28:e<40?30:e<50?32:34;
+    if(esH) return e<30?18:e<40?20:e<50?22:24;
+    return e<30?25:e<40?27:e<50?29:31;
   }
+  function pgcLabel(esH,e){
+    if(esH) return e<30?'14–18%':e<40?'15–20%':e<50?'17–22%':'18–24%';
+    return e<30?'21–25%':e<40?'23–27%':e<50?'25–29%':'27–31%';
+  }
+
   var cinRef=esH?90:80, pgcR=pgcRef(esH,edad);
 
   var metrics=[
-    {label:'Cintura',    val:act.cintura,       unit:'cm', ref:cinRef,
+    {label:'Cintura',    val:act.cintura,       unit:'cm',  ref:cinRef,
      inst:'IDF', instFull:'International Diabetes Federation',
-     refLabel:(esH?'< 90':'< 80')+' cm'},
-    {label:'% Grasa',   val:act.pgc,           unit:'%',  ref:pgcR,
+     refLabel:(esH?'< 90 cm (H)':'< 80 cm (M)')},
+    {label:'% Grasa',   val:act.pgc,           unit:'%',   ref:pgcR,
      inst:'ACSM',instFull:'American College of Sports Medicine',
-     refLabel:'< '+pgcR+'%  ('+edad+' años)'},
+     refLabel:pgcLabel(esH,edad)+' — '+edad+' años'},
     {label:'G. Visceral',val:act.grasaVisceral, unit:'kg',  ref:9,
      inst:'IDF', instFull:'International Diabetes Federation',
-     refLabel:'≤ 9  (escala InBody)'},
-    {label:'IMC',       val:act.imc,           unit:'',   ref:24.9,
+     refLabel:'≤ 9 kg  (escala InBody)'},
+    {label:'IMC',       val:act.imc,           unit:'',    ref:24.9,
      inst:'OMS', instFull:'Organización Mundial de la Salud',
-     refLabel:'18.5 – 24.9'}
+     refLabel:'18.5 – 24.9  (normal)'}
   ];
 
   barsEl.innerHTML='';
-
-  // Guardar targets para animación
   var barEls=[], targets=[];
 
   metrics.forEach(function(m,idx){
     if(m.val==null||isNaN(parseFloat(m.val))) return;
     var v=parseFloat(m.val);
     var max=m.ref*1.5;
-    var barPx = Math.round(Math.min(Math.max(v/max,0.04),1)*140); // px reales
-    var refPx = Math.round(Math.min(m.ref/max,1)*140);            // px de la línea
+    var barPx=Math.round(Math.min(Math.max(v/max,0.04),1)*140);
+    var refPx=Math.round(Math.min(m.ref/max,1)*140);
 
-    // Columna
     var col=document.createElement('div');
     col.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center';
 
-    // Área fija 140px
     var area=document.createElement('div');
     area.style.cssText='width:100%;height:140px;position:relative';
 
-    // Barra — arranca en height:0, animada luego
+    // Barra
     var bar=document.createElement('div');
     bar.className='ref-bar';
     bar.style.cssText='position:absolute;bottom:0;left:0;right:0;border-radius:6px 6px 0 0;background:'+barColor+';height:0px;min-height:0';
 
-    // Valor — SIEMPRE encima del punto más alto (barra o línea ref)
-    var topPx=Math.max(barPx,refPx);
+    // FIX 1: Valor en la parte BAJA de la barra (4px desde el fondo)
     var valEl=document.createElement('div');
     valEl.className='ref-val-lbl';
-    valEl.style.cssText='position:absolute;left:0;right:0;text-align:center;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;bottom:'+(topPx+6)+'px';
+    valEl.style.cssText='position:absolute;left:0;right:0;text-align:center;font-size:10px;font-weight:700;color:rgba(0,0,0,.75);white-space:nowrap;bottom:4px;z-index:4';
     valEl.textContent=(v%1===0?v:v.toFixed(1))+(m.unit||'');
 
     // Línea blanca de referencia
     var line=document.createElement('div');
-    line.style.cssText='position:absolute;left:0;right:0;bottom:'+refPx+'px;height:2px;background:rgba(255,255,255,.8);z-index:3';
+    line.style.cssText='position:absolute;left:0;right:0;bottom:'+refPx+'px;height:2px;background:rgba(255,255,255,.85);z-index:3';
 
-    // Label institución (tappable) — a la derecha de la línea
+    // Label institución (tappable)
     var lbl=document.createElement('span');
-    lbl.style.cssText='position:absolute;right:2px;top:-14px;font-size:9px;font-weight:700;color:rgba(255,255,255,.75);cursor:pointer;letter-spacing:.4px;user-select:none;-webkit-user-select:none';
+    lbl.style.cssText='position:absolute;right:2px;top:-14px;font-size:9px;font-weight:700;color:rgba(255,255,255,.8);cursor:pointer;letter-spacing:.4px;user-select:none;-webkit-user-select:none';
     lbl.textContent=m.inst;
 
-    // Tooltip con institución + ref saludable
+    // FIX 2: Tooltip — primera columna abre a la DERECHA, resto a la izquierda
     var tip=document.createElement('div');
     tip.className='ref-tip';
-    tip.style.cssText='display:none;position:absolute;right:-4px;bottom:20px;background:#111;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 11px;z-index:20;min-width:190px;pointer-events:none';
+    var tipLeft = (idx===0) ? 'left:0;right:auto;' : 'right:-4px;left:auto;';
+    tip.style.cssText='display:none;position:absolute;'+tipLeft+'bottom:20px;background:#111;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:7px 11px;z-index:30;min-width:200px;max-width:240px;pointer-events:none';
     tip.innerHTML='<div style="font-size:10px;font-weight:700;color:#fff;margin-bottom:3px">'+m.instFull+'</div>'
-      +'<div style="font-size:10px;color:#aaa">Ref. saludable: <span style="color:#fff;font-weight:600">'+m.refLabel+'</span></div>';
+      +'<div style="font-size:10px;color:#bbb">Ref. saludable:</div>'
+      +'<div style="font-size:11px;font-weight:700;color:#FF5C1A;margin-top:1px">'+m.refLabel+'</div>';
 
-    // Tap: mostrar/ocultar tooltip — con setTimeout para evitar cierre inmediato
     lbl.addEventListener('click',function(e){
       e.stopPropagation();
       var isOpen=tip.style.display==='block';
       document.querySelectorAll('.ref-tip').forEach(function(t){t.style.display='none';});
-      if(!isOpen){ tip.style.display='block'; setTimeout(function(){ document.addEventListener('click',function h(){tip.style.display='none';document.removeEventListener('click',h);},{once:true}); },50); }
+      if(!isOpen){
+        tip.style.display='block';
+        setTimeout(function(){
+          document.addEventListener('click',function h(){tip.style.display='none';document.removeEventListener('click',h);},{once:true});
+        },50);
+      }
     });
 
     line.appendChild(lbl);
@@ -3096,47 +3102,32 @@ window.renderRefChart = function(act, _ignored) {
     col.appendChild(area);
     col.appendChild(labelEl);
     barsEl.appendChild(col);
-
-    barEls.push(bar);
-    targets.push(barPx);
+    barEls.push(bar); targets.push(barPx);
   });
 
-  // === ANIMACIÓN tipo InBody: IntersectionObserver ===
+  // Animación tipo InBody con IntersectionObserver
   card.style.display='block';
   card.style.opacity='0';
   card.style.transform='translateY(20px)';
 
   var animated=false;
   function doAnim(){
-    // Fade in card
     card.style.transition='opacity .4s ease,transform .4s ease';
-    card.style.opacity='1';
-    card.style.transform='translateY(0)';
-    // Animar cada barra con retraso escalonado
+    card.style.opacity='1'; card.style.transform='translateY(0)';
     barEls.forEach(function(b,i){
       b.style.height='0px';
-      setTimeout(function(){
-        b.style.transition='height .65s cubic-bezier(.34,1.2,.64,1)';
-        b.style.height=targets[i]+'px';
-      }, i*140);
+      setTimeout(function(){b.style.transition='height .65s cubic-bezier(.34,1.2,.64,1)';b.style.height=targets[i]+'px';},i*140);
     });
   }
-  function resetBars(){
-    barEls.forEach(function(b){ b.style.transition='none'; b.style.height='0px'; });
-    card.style.opacity='0';
-    card.style.transform='translateY(20px)';
-    animated=false;
+  function reset(){
+    barEls.forEach(function(b){b.style.transition='none';b.style.height='0px';});
+    card.style.opacity='0'; card.style.transform='translateY(20px)'; animated=false;
   }
-
   var obs=new IntersectionObserver(function(entries){
-    if(entries[0].isIntersecting){
-      if(!animated){ animated=true; doAnim(); }
-    } else {
-      resetBars();
-    }
+    if(entries[0].isIntersecting){if(!animated){animated=true;doAnim();}}else{reset();}
   },{threshold:0.3,rootMargin:'0px'});
   obs.observe(card);
-};;;;;
+};;;;;;
 
 })();
 </script>
