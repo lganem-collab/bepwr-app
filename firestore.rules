@@ -76,10 +76,19 @@ service cloud.firestore {
 
     // ── Configuracion global (citasConfig, guias) ────────────────────────
     match /config/{docId} {
-      // Staff puede leer y escribir toda la config
+      // Staff puede leer y escribir toda la config (excepto indice_pesos)
       allow read, write: if isStaff();
       // Miembros autenticados pueden leer (para ver slots disponibles)
       allow read: if request.auth != null;
+    }
+
+    // ── Tabla maestra de pesos del Índice de Evolución ───────────────────
+    // ACCESO EXCLUSIVO: solo el admin maestro puede escribir esta tabla
+    match /config/indice_pesos {
+      // Cualquier usuario autenticado puede leer (el motor de cálculo lo necesita)
+      allow read: if request.auth != null;
+      // SOLO el admin maestro puede modificar los pesos
+      allow write: if request.auth != null && request.auth.uid == '1zZIfBnLGqRiPKVRVfHxlt2O3Di2';
     }
 
   }
