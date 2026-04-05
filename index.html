@@ -1097,7 +1097,9 @@ onAuthStateChanged(auth, async user => {
         const ultima = metricas[metricas.length - 1];
         renderMetrics(ultima, obj, anterior);
         if(window._applyIVF) window._applyIVF(ultima, anterior);
-        if(window._applyTendencia) window._applyTendencia(ultima, anterior, ultima.fecha || '');
+        window._refGenero=data.genero||'';
+window._refNac=data.nacimiento||null;
+if(window._applyTendencia) window._applyTendencia(ultima, anterior, ultima.fecha || '');
         renderChart(metricas);
         renderProfileMetrics(ultima);
 
@@ -2982,107 +2984,144 @@ try{localStorage.setItem(tCacheKey,JSON.stringify({tipo:tipo,frase:c.frase,valFe
 if(circle){circle.style.background=c.iconBg;circle.style.border="2px solid "+c.color;circle.style.color=c.color;}
 if(scoreText){scoreText.textContent=(score>0?"+":"")+score;}
 window.renderRefChart(act, act.genero||"");};
-window.renderRefChart = function(act, genero) {
+window.renderRefChart = function(act, generoIgnored) {
   var card = document.getElementById('card-ref-chart');
   var barsEl = document.getElementById('ref-chart-bars');
   if(!card || !barsEl) return;
 
-  // Mover el card DESPUÉS del card-tendencia en el DOM
+  // Mover card después del card-tendencia
   var tendCard = document.getElementById('card-tendencia');
-  if(tendCard && tendCard.parentNode && tendCard.nextSibling !== card) {
+  if(tendCard && tendCard.parentNode && tendCard.nextSibling !== card)
     tendCard.parentNode.insertBefore(card, tendCard.nextSibling);
-  }
 
+  // Usar genero y nacimiento del usuario (guardados desde data)
+  var genero = window._refGenero || '';
   var esH = (genero === 'Masculino');
 
-  // Cada métrica usa su propia escala: max = ref * 1.5
-  // Así la línea de referencia siempre queda al 66% del alto → visual consistente
-  var metrics = [
-    {
-      label:'Cintura', val:act.cintura, unit:'cm',
-      ref: esH ? 90 : 80,
-      inst:'IDF', instFull:'International Diabetes Federation',
-      color: function(v,r){ return v<=r ? '#4ade80' : v<=r+12 ? '#FF5C1A' : '#f87171'; }
-    },
-    {
-      label:'% Grasa', val:act.pgc, unit:'%',
-      ref: esH ? 25 : 35,
-      inst:'ACSM', instFull:'American College of Sports Medicine',
-      color: function(v,r){ return v<=r ? '#4ade80' : v<=r+8 ? '#FF5C1A' : '#f87171'; }
-    },
-    {
-      label:'G. Visceral', val:act.grasaVisceral, unit:'',
-      ref: 9,
-      inst:'IDF', instFull:'International Diabetes Federation',
-      color: function(v,r){ return v<=9 ? '#4ade80' : v<=13 ? '#FF5C1A' : '#f87171'; }
-    },
-    {
-      label:'IMC', val:act.imc, unit:'',
-      ref: 24.9,
-      inst:'OMS', instFull:'Organización Mundial de la Salud',
-      color: function(v,r){ return (v>=18.5&&v<=24.9)?'#4ade80':(v<=29.9&&v>=17)?'#FF5C1A':'#f87171'; }
+  // Calcular edad
+  var edad = 35;
+  try {
+    var nac = window._refNac;
+    if(nac) {
+      var nacDate = nac.toDate ? nac.toDate() : new Date(nac);
+      edad = Math.floor((Date.now() - nacDate.getTime()) / (365.25*24*3600*1000));
     }
+  } catch(e){}
+
+  // Referencia % grasa ajustada por edad+género (ACSM)
+  function getPGCRef(esH, edad) {
+    if(esH) {
+      if(edad < 30) return 20; if(edad < 40) return 22;
+      if(edad < 50) return 24; return 26;
+    } else {
+      if(edad < 30) return 28; if(edad < 40) return 30;
+      if(edad < 50) return 32; return 34;
+    }
+  }
+
+  // Colores iguales que Tendencia (califPct)
+  function getColor(pct) {
+    if(pct>=90) return '#a855f7';
+    if(pct>=80) return '#60a5fa';
+    if(pct>=60) return '#4ade80';
+    if(pct>=50) return '#FF5C1A';
+    return '#f87171';
+  }
+
+  // Compliance %: qué tan dentro del rango saludable está el valor
+  function compliance(val, ref) {
+    if(val <= ref) return 90;
+    var exc = (val-ref)/ref;
+    if(exc < 0.05) return 80;
+    if(exc < 0.15) return 65;
+    if(exc < 0.30) return 50;
+    return 30;
+  }
+  function complianceIMC(v) {
+    if(v>=18.5&&v<=24.9) return 90;
+    if((v>=17&&v<18.5)||(v>24.9&&v<=27)) return 65;
+    if((v>=16&&v<17)||(v>27&&v<=30)) return 50;
+    return 30;
+  }
+
+  var pgcRef = getPGCRef(esH, edad);
+  var cinRef = esH ? 90 : 80;
+
+  var metrics = [
+    { label:'Cintura',     val:act.cintura,       unit:'cm', ref:cinRef,
+      inst:'IDF', instFull:'International Diabetes Federation',
+      comp:function(v){return compliance(v,cinRef);} },
+    { label:'% Grasa',    val:act.pgc,           unit:'%',  ref:pgcRef,
+      inst:'ACSM', instFull:'American College of Sports Medicine',
+      comp:function(v){return compliance(v,pgcRef);} },
+    { label:'G. Visceral', val:act.grasaVisceral, unit:'',   ref:9,
+      inst:'IDF', instFull:'International Diabetes Federation',
+      comp:function(v){return compliance(v,9);} },
+    { label:'IMC',        val:act.imc,           unit:'',   ref:24.9,
+      inst:'OMS', instFull:'Organización Mundial de la Salud',
+      comp:function(v){return complianceIMC(v);} }
   ];
 
   barsEl.innerHTML = '';
 
   metrics.forEach(function(m, idx) {
-    if(m.val==null || isNaN(parseFloat(m.val))) return;
+    if(m.val==null||isNaN(parseFloat(m.val))) return;
     var v = parseFloat(m.val);
     var r = m.ref;
-    var max = r * 1.5; // escala propia: ref queda al 66%
-    var barPct = Math.min(Math.max(v/max*100, 4), 100);
-    var refFromBottom = (r/max*100); // % desde abajo donde va la línea
-    var col = m.color(v, r);
-    var displayVal = (v % 1 === 0 ? v : v.toFixed(1)) + (m.unit || '');
+    var max = r * 1.5;                          // escala propia: ref al 66%
+    var barPct  = Math.min(Math.max(v/max*100, 4), 100);
+    var refPct  = Math.min(r/max*100, 100);     // posición línea desde abajo
+    var col = getColor(m.comp(v));
+    var displayVal = (v%1===0?v:v.toFixed(1))+(m.unit||'');
 
+    // Columna
     var colEl = document.createElement('div');
     colEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center';
 
-    // Área de la gráfica con altura fija
+    // Área de gráfica con altura fija
     var areaEl = document.createElement('div');
     areaEl.style.cssText = 'width:100%;height:140px;position:relative;display:flex;align-items:flex-end';
 
     // Barra
     var barEl = document.createElement('div');
     barEl.className = 'ref-bar';
-    barEl.style.cssText = 'width:100%;border-radius:6px 6px 0 0;position:relative;background:'+col+';min-height:6px';
-    barEl.setAttribute('data-pct', barPct);
+    barEl.style.cssText = 'width:100%;border-radius:6px 6px 0 0;position:relative;background:'+col+';min-height:6px;height:0px';
 
-    // Valor arriba de la barra
+    // Valor encima
     var valEl = document.createElement('div');
     valEl.style.cssText = 'position:absolute;top:-20px;width:100%;text-align:center;font-size:11px;font-weight:700;color:#fff;white-space:nowrap';
     valEl.textContent = displayVal;
     barEl.appendChild(valEl);
 
-    // Línea de referencia (posicionada relativa al área, no a la barra)
+    // Línea de referencia BLANCA (sobre el área, no sobre la barra)
     var lineEl = document.createElement('div');
-    lineEl.style.cssText = 'position:absolute;left:0;right:0;bottom:'+refFromBottom+'%;height:2px;background:#FF5C1A;z-index:3';
+    lineEl.style.cssText = 'position:absolute;left:0;right:0;bottom:'+refPct+'%;height:2px;background:rgba(255,255,255,.9);z-index:3;pointer-events:none';
 
-    // Siglas con tooltip
+    // Label institución
     var lblEl = document.createElement('span');
-    lblEl.style.cssText = 'position:absolute;right:2px;top:-14px;font-size:9px;font-weight:700;color:#FF5C1A;cursor:pointer;letter-spacing:.5px;user-select:none';
+    lblEl.style.cssText = 'position:absolute;right:2px;top:-13px;font-size:9px;font-weight:700;color:rgba(255,255,255,.8);cursor:pointer;letter-spacing:.4px;user-select:none';
     lblEl.textContent = m.inst;
 
+    // Tooltip
     var tipEl = document.createElement('div');
-    tipEl.style.cssText = 'display:none;position:absolute;right:0;top:-32px;background:#1a1a1a;border:1px solid #FF5C1A;border-radius:6px;padding:4px 8px;font-size:10px;color:#fff;white-space:nowrap;z-index:10';
+    tipEl.className = 'ref-tip';
+    tipEl.style.cssText = 'display:none;position:absolute;right:0;top:-30px;background:#111;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:4px 8px;font-size:9px;color:#fff;white-space:nowrap;z-index:10';
     tipEl.textContent = m.instFull;
 
-    lblEl.addEventListener('click', function(e) {
+    lblEl.addEventListener('click', function(e){
       e.stopPropagation();
-      var showing = tipEl.style.display === 'block';
-      document.querySelectorAll('.ref-tip').forEach(function(t){ t.style.display='none'; });
-      tipEl.style.display = showing ? 'none' : 'block';
+      var open = tipEl.style.display==='block';
+      document.querySelectorAll('.ref-tip').forEach(function(t){t.style.display='none';});
+      tipEl.style.display = open?'none':'block';
     });
-    document.addEventListener('click', function(){ tipEl.style.display='none'; });
+    document.addEventListener('click', function(){tipEl.style.display='none';});
 
-    tipEl.className = 'ref-tip';
     lineEl.appendChild(lblEl);
     lineEl.appendChild(tipEl);
     areaEl.appendChild(barEl);
     areaEl.appendChild(lineEl);
 
-    // Label debajo
+    // Etiqueta debajo
     var labelEl = document.createElement('div');
     labelEl.style.cssText = 'font-size:10px;color:#888;text-align:center;margin-top:5px;line-height:1.2';
     labelEl.textContent = m.label;
@@ -3091,24 +3130,23 @@ window.renderRefChart = function(act, genero) {
     colEl.appendChild(labelEl);
     barsEl.appendChild(colEl);
 
-    // Animar barra con retraso escalonado
-    barEl.style.height = '0px';
-    setTimeout(function() {
+    // Animar barra
+    setTimeout(function(){
       barEl.style.transition = 'height .7s cubic-bezier(.34,1.2,.64,1)';
-      barEl.style.height = (barPct/100*140) + 'px';
-    }, 100 + idx * 130);
+      barEl.style.height = (barPct/100*140)+'px';
+    }, 80 + idx*130);
   });
 
-  // Mostrar card con animación fadeIn
+  // Mostrar card
   card.style.display = 'block';
   card.style.opacity = '0';
   card.style.transform = 'translateY(20px)';
-  setTimeout(function() {
-    card.style.transition = 'opacity .5s ease, transform .5s ease';
+  setTimeout(function(){
+    card.style.transition = 'opacity .5s ease,transform .5s ease';
     card.style.opacity = '1';
     card.style.transform = 'translateY(0)';
   }, 50);
-};;
+};;;
 
 })();
 </script>
