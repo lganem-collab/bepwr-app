@@ -830,7 +830,7 @@ if (user && user.uid === MASTER_UID) {
     ];
     const tema = temas[new Date().getDate() % temas.length];
 
-    const prompt = `Coach bePWR Quer\u00E9taro. ${saludo}. Escribe un mensaje motivador y educativo del d\u00EDa sobre: ${tema}. M\u00E1ximo 3 p\u00E1rrafos. Incluye un dato cient\u00EDfico pr\u00E1ctico. Espa\u00F1ol, directo, sin clich\u00E9s.`;
+    const prompt = `Coach bePWR Quer\u00E9taro. ${saludo}. Escribe un mensaje motivador y educativo del d\u00EDa sobre: ${tema}. M\u00E1ximo 3 p\u00E1rrafos. Incluye un dato cient\u00EDfico pr\u00E1ctico. Espa\u00F1ol, directo, sin clich\u00E9s. LIMITE ESTRICTO: tu respuesta completa no debe superar 600 caracteres.`;
 
     try {
       const res = await fetch('/api/chat', {
