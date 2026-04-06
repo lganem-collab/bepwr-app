@@ -2458,18 +2458,25 @@ function renderPruebaPeso(data) {
   function renderRutina(config, data) {
     var el = document.getElementById('metodo-rutina-container'); if (!el) return;
     el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;font-size:14px">Calculando tu rutina...</div>';
-    var uid = window._currentUid, db = window._db;
+    var uid = window._currentUid, db = window.db;
     var meta = (config&&config.meta)||'';
     var edad = 0;
     if (config&&config.nacimiento) { var nd=config.nacimiento.toDate?config.nacimiento.toDate():new Date(config.nacimiento); edad=Math.floor((Date.now()-nd.getTime())/(365.25*24*3600*1000)); }
     var ge = edad>=45?'45+':edad>=30?'30-45':'<30';
+    // Load horario slots if not cached
+    var horarioP = Promise.resolve();
+    if (!window._horarioSlots && db) {
+      horarioP = window.getDocs(window.collection(db,'horario')).then(function(snap){
+        window._horarioSlots = snap.docs.map(function(d){ return d.data(); });
+      }).catch(function(){ window._horarioSlots = []; });
+    }
     var loadV = Promise.resolve({sa:0,freq:{}});
     if (uid&&db&&window.getDocs&&window.collection&&window.query&&window.where) {
       loadV = window.getDocs(window.query(window.collection(db,'visitas'),window.where('uid','==',uid))).then(function(snap){
         var s=new Set(),f={}; snap.forEach(function(d){var dd=d.data();if(dd.semana)s.add(dd.semana);if(dd.tipoClase)f[dd.tipoClase]=(f[dd.tipoClase]||0)+1;}); return{sa:s.size,freq:f};
       }).catch(function(){return{sa:0,freq:{}};});
     }
-    loadV.then(function(r){
+    Promise.all([loadV, horarioP]).then(function(results){ var r = results[0];
       var sa=r.sa,freq=r.freq,etapa=sa<=3?1:sa<=12?2:3,rec=_getRec(meta,ge,etapa),ei=_ETAPAS_DEF[etapa];
       var compl=(_COMPL[meta]||{})[ge]||'';
       var slots=window._horarioSlots||[];
