@@ -173,9 +173,9 @@
     <div class="tab" id="tab-guias" onclick="switchTab('guias')" style="display:none">&#x1F4C4; Guías</div>
     <div class="tab" id="tab-citas" onclick="switchTab('citas')" style="display:none">&#x1F4C5; Citas Val</div>
     <div class="tab" id="tab-pesos" onclick="switchTab('pesos')" style="display:none">⚖️ Pesos 🔒</div>
-        <div class="tab" id="tab-horario" onclick="switchTab('horario')">Horario</div>
-        <div class="tab" id="tab-clases" onclick="switchTab('clases')">Clases</div>
-        <div class="tab" id="tab-rutina-config" onclick="switchTab('rutina-config')">Rutina</div>
+        Horario</div>
+        Clases</div>
+        Rutina</div>
   </div>
   <div class="content">
 
@@ -450,6 +450,9 @@
           <button class="btn btn-secondary" onclick="switchTab('members')" style="flex:1">Cancelar</button>
           <button class="btn btn-primary" id="btn-send-notif" onclick="sendNotification()" style="flex:1">&#x1F4E3; Enviar notificaci&#xF3;n</button>
         </div>
+        <div class="tab" id="tab-horario" onclick="switchTab('horario')">Horario</div>
+        <div class="tab" id="tab-clases" onclick="switchTab('clases')">Clases</div>
+        <div class="tab" id="tab-rutina" onclick="switchTab('rutina')">Rutina</div>
       </div>
 
       <div style="margin-top:28px">
@@ -835,6 +838,9 @@ if (user && user.uid === MASTER_UID) {
     const el=document.getElementById(id);
     el.classList.remove('active');
     el.style.display='none';
+  if(document.getElementById('section-horario'))document.getElementById('section-horario').style.display='none';
+  if(document.getElementById('section-clases'))document.getElementById('section-clases').style.display='none';
+  if(document.getElementById('section-rutina'))document.getElementById('section-rutina').style.display='none';
   }
 
   // LOGIN
@@ -2587,9 +2593,6 @@ for (const med of medidasVal) {
       const contentEl = document.getElementById('tab-content-'+t);
       if (tabEl) tabEl.classList.toggle('on', t===tab);
       if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
-  if(document.getElementById('section-horario')) document.getElementById('section-horario').style.display='none';
-  if(document.getElementById('section-clases')) document.getElementById('section-clases').style.display='none';
-  if(document.getElementById('section-rutina-config')) document.getElementById('section-rutina-config').style.display='none';
     });
     if (tab === 'staff') loadStaffList();
     if (tab === 'bitacora') loadBitacora();
@@ -2620,10 +2623,11 @@ for (const med of medidasVal) {
       if (adminOpt) adminOpt.style.display = window.currentStaffRole === 'admin' ? '' : 'none';
     }
 
-  if (tab === 'horario') { if(document.getElementById('section-horario')) document.getElementById('section-horario').style.display='block'; cargarHorario(); }
-  if (tab === 'clases') { if(document.getElementById('section-clases')) document.getElementById('section-clases').style.display='block'; cargarClases(); }
-  if (tab === 'rutina-config') { if(document.getElementById('section-rutina-config')) document.getElementById('section-rutina-config').style.display='block'; cargarRutinaConfig(); }
-  }
+  
+  if(tab==='horario'){var el=document.getElementById('section-horario');if(el)el.style.display='block';cargarHorario();}
+  if(tab==='clases'){var el2=document.getElementById('section-clases');if(el2)el2.style.display='block';cargarClases();}
+  if(tab==='rutina'){var el3=document.getElementById('section-rutina');if(el3)el3.style.display='block';cargarRutinaConfig();}
+}
 
   // ── GUÍAS NUTRIMENTALES ──
   const GUIAS_CONFIG = [
@@ -3587,196 +3591,142 @@ window.filterNotifUsers = function (q) {
 var _horarioCache = null;
 var _clasesCache = null;
 
-async function cargarHorario() {
-  var grid = document.getElementById('horario-grid');
-  if (!grid) return;
-  grid.innerHTML = '<div style="color:#888;font-size:13px">Cargando horario...</div>';
-  try {
-    var { getDocs, collection, doc, setDoc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js');
-    var db = firebase.firestore();
-    var clasesSnap = await db.collection('config').doc('clases').get();
-    _clasesCache = clasesSnap.exists ? clasesSnap.data().lista : [];
-    var snap = await db.collection('horario').orderBy('dia').orderBy('hora').get();
-    var slots = [];
-    snap.forEach(function(d) { slots.push(Object.assign({_id: d.id}, d.data())); });
-    var dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">';
-    for (var d = 0; d <= 6; d++) {
-      var daySlots = slots.filter(function(s) { return s.dia === d; });
-      if (!daySlots.length) continue;
-      html += '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:16px">';
-      html += '<div style="font-size:13px;font-weight:700;color:#FF5C1A;margin-bottom:10px">' + dias[d] + '</div>';
-      daySlots.forEach(function(s) {
-        var cls = _clasesCache.find(function(c) { return c.id === s.tipoClase; }) || {};
-        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2a2a2a">';
-        html += '<div><div style="font-size:13px;font-weight:600;color:#f0f0f0">' + s.hora + ' · ' + (cls.nombre||s.tipoClase) + '</div>';
-        html += '<div style="font-size:11px;color:#888">' + (s.coach||'Sin coach') + ' · Cupo: ' + (s.cupo||17) + '</div></div>';
-        html += '<div style="display:flex;gap:6px">';
-        html += '<button onclick="editarSlot(\'' + s._id + \'')" style="background:transparent;border:1px solid #444;border-radius:6px;padding:4px 8px;color:#ccc;font-size:11px;cursor:pointer">✏️</button>';
-        html += '<button onclick="eliminarSlot(\'' + s._id + \'')" style="background:transparent;border:1px solid #444;border-radius:6px;padding:4px 8px;color:#f87171;font-size:11px;cursor:pointer">🗑️</button>';
-        html += '</div></div>';
+
+// === HORARIO ===
+var _clasesCache=null;
+async function cargarHorario(){
+  var grid=document.getElementById('horario-grid');
+  if(!grid)return;
+  grid.innerHTML='<div style="color:#888;font-size:13px">Cargando...</div>';
+  try{
+    var db=firebase.firestore();
+    var cSnap=await db.collection('config').doc('clases').get();
+    _clasesCache=cSnap.exists?(cSnap.data().lista||[]):[];
+    var snap=await db.collection('horario').orderBy('dia').orderBy('hora').get();
+    var slots=[];
+    snap.forEach(function(d){slots.push(Object.assign({_id:d.id},d.data()));});
+    var DIAS=['Dom','Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b'];
+    var html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">';
+    for(var d=0;d<=6;d++){
+      var ds=slots.filter(function(s){return s.dia===d;});
+      if(!ds.length)continue;
+      html+='<div style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:14px">';
+      html+='<div style="font-size:12px;font-weight:700;color:#FF5C1A;margin-bottom:8px">'+DIAS[d]+'</div>';
+      ds.forEach(function(s){
+        var cls=(_clasesCache||[]).find(function(c){return c.id===s.tipoClase;})||{};
+        html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222">';
+        html+='<div><div style="font-size:13px;font-weight:600;color:#f0f0f0">'+s.hora+' - '+(cls.nombre||s.tipoClase)+'</div>';
+        html+='<div style="font-size:11px;color:#888">'+(s.coach||'Sin coach')+' | Cupo: '+(s.cupo||17)+'</div></div>';
+        html+='<div style="display:flex;gap:4px">';
+        html+='<button onclick="editarSlot(\''+s._id+'\')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#ccc;font-size:11px;cursor:pointer">Edit</button>';
+        html+='<button onclick="eliminarSlot(\''+s._id+'\')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#f87171;font-size:11px;cursor:pointer">Del</button>';
+        html+='</div></div>';
       });
-      html += '</div>';
+      html+='</div>';
     }
-    html += '</div>';
-    grid.innerHTML = html;
-  } catch(e) { grid.innerHTML = '<div style="color:#f87171">Error: ' + e.message + '</div>'; }
+    html+='</div>';
+    grid.innerHTML=html;
+  }catch(e){grid.innerHTML='<div style="color:#f87171">Error: '+e.message+'</div>';}
 }
-
-function agregarSlot() { editarSlot(null); }
-
-function editarSlot(id) {
-  var cls = (_clasesCache||[]).map(function(c) { return '<option value="' + c.id + '">' + c.nombre + '</option>'; }).join('');
-  var dias = [{v:1,n:'Lunes'},{v:2,n:'Martes'},{v:3,n:'Miércoles'},{v:4,n:'Jueves'},{v:5,n:'Viernes'},{v:6,n:'Sábado'},{v:0,n:'Domingo'}];
-  var diasOpts = dias.map(function(d) { return '<option value="' + d.v + '">' + d.n + '</option>'; }).join('');
-  var html = '<div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:16px" id="slot-form">';
-  html += '<h3 style="font-size:15px;font-weight:700;margin-bottom:14px">' + (id ? 'Editar clase' : 'Nueva clase') + '</h3>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Día</label><select id="sl-dia" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px">' + diasOpts + '</select></div>';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Hora</label><input id="sl-hora" type="time" value="07:00" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Clase</label><select id="sl-clase" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px">' + cls + '</select></div>';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Duración (min)</label><input id="sl-dur" type="number" value="45" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Coach</label><input id="sl-coach" type="text" placeholder="Nombre del coach" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Cupo máx</label><input id="sl-cupo" type="number" value="17" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
-  html += '</div><div style="display:flex;gap:8px">';
-  html += '<button onclick="guardarSlot(\'' + (id||'') + \'')" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>';
-  html += '<button onclick="document.getElementById(\'slot-form\').remove()" style="background:transparent;border:1px solid #444;border-radius:8px;padding:8px 16px;color:#ccc;font-size:13px;cursor:pointer">Cancelar</button></div></div>';
-  var grid = document.getElementById('horario-grid');
-  grid.insertAdjacentHTML('afterbegin', html);
+function agregarSlot(){editarSlot(null);}
+function editarSlot(id){
+  var cls=(_clasesCache||[]).map(function(c){return '<option value="'+c.id+'">'+c.nombre+'</option>';}).join('');
+  var dOpts=['Dom','Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b'].map(function(n,v){return '<option value="'+v+'">'+n+'</option>';}).join('');
+  var h='<div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:18px;margin-bottom:14px" id="slot-form">';
+  h+='<h3 style="font-size:14px;font-weight:700;margin-bottom:12px">'+(id?'Editar':'Nueva clase')+'</h3>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+  h+='<div><label style="font-size:11px;color:#888">D\u00eda</label><select id="sl-dia" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px">'+dOpts+'</select></div>';
+  h+='<div><label style="font-size:11px;color:#888">Hora</label><input id="sl-hora" type="time" value="07:00" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;color:#888">Clase</label><select id="sl-clase" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px">'+cls+'</select></div>';
+  h+='<div><label style="font-size:11px;color:#888">Coach</label><input id="sl-coach" type="text" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;color:#888">Cupo</label><input id="sl-cupo" type="number" value="17" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;color:#888">Dur (min)</label><input id="sl-dur" type="number" value="45" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
+  h+='</div><div style="display:flex;gap:6px">';
+  h+='<button onclick="guardarSlot(\''+( id||'')+'\'  )" style="background:#FF5C1A;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer">Guardar</button>';
+  h+='<button onclick="document.getElementById(\'slot-form\').remove()" style="background:none;border:1px solid #444;border-radius:7px;padding:7px 12px;color:#ccc;font-size:12px;cursor:pointer">Cancelar</button></div></div>';
+  document.getElementById('horario-grid').insertAdjacentHTML('afterbegin',h);
 }
-
-async function guardarSlot(id) {
-  var data = {
-    dia: parseInt(document.getElementById('sl-dia').value),
-    hora: document.getElementById('sl-hora').value,
-    tipoClase: document.getElementById('sl-clase').value,
-    duracion: parseInt(document.getElementById('sl-dur').value)||45,
-    coach: document.getElementById('sl-coach').value,
-    cupo: parseInt(document.getElementById('sl-cupo').value)||17,
-    activo: true
-  };
-  try {
-    var db = firebase.firestore();
-    if (id) await db.collection('horario').doc(id).set(data);
-    else await db.collection('horario').add(data);
-    _horarioCache = null;
-    cargarHorario();
-  } catch(e) { alert('Error: ' + e.message); }
+async function guardarSlot(id){
+  var data={dia:parseInt(document.getElementById('sl-dia').value),hora:document.getElementById('sl-hora').value,tipoClase:document.getElementById('sl-clase').value,coach:document.getElementById('sl-coach').value,cupo:parseInt(document.getElementById('sl-cupo').value)||17,duracion:parseInt(document.getElementById('sl-dur').value)||45,activo:true};
+  try{var db=firebase.firestore();if(id)await db.collection('horario').doc(id).set(data);else await db.collection('horario').add(data);_horarioCache=null;cargarHorario();}catch(e){alert('Error: '+e.message);}
 }
-
-async function eliminarSlot(id) {
-  if (!confirm('\u00bfEliminar esta clase del horario?')) return;
+async function eliminarSlot(id){
+  if(!confirm('\u00bfEliminar esta clase?'))return;
   await firebase.firestore().collection('horario').doc(id).delete();
   cargarHorario();
 }
-
-// ════════════════════════════════════════════════
-// CLASES
-// ════════════════════════════════════════════════
-async function cargarClases() {
-  var list = document.getElementById('clases-list');
-  if (!list) return;
-  try {
-    var db = firebase.firestore();
-    var snap = await db.collection('config').doc('clases').get();
-    var lista = snap.exists ? snap.data().lista : [];
-    var html = '';
-    lista.forEach(function(c, idx) {
-      html += '<div style="display:flex;align-items:center;gap:12px;background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px 16px">';
-      html += '<div style="width:14px;height:14px;border-radius:50%;background:' + (c.color||'#888') + ';flex-shrink:0"></div>';
-      html += '<div style="flex:1;font-size:14px;font-weight:600;color:#f0f0f0">' + c.nombre + '</div>';
-      html += '<div style="font-size:11px;color:#888;font-family:monospace">' + c.id + '</div>';
-      var activoColor = c.activa ? '#4ade80' : '#888';
-      var activoLabel = c.activa ? 'Activa' : 'Inactiva';
-      html += '<span style="font-size:11px;font-weight:600;color:' + activoColor + '">' + activoLabel + '</span>';
-      html += '<button onclick="toggleClase(' + idx + ')" style="background:transparent;border:1px solid #444;border-radius:6px;padding:4px 10px;color:#ccc;font-size:11px;cursor:pointer">' + (c.activa ? 'Desactivar' : 'Activar') + '</button>';
-      html += '</div>';
+// === CLASES ===
+async function cargarClases(){
+  var list=document.getElementById('clases-list');
+  if(!list)return;
+  try{
+    var snap=await firebase.firestore().collection('config').doc('clases').get();
+    var lista=snap.exists?(snap.data().lista||[]):[];
+    window._clasesData=lista;
+    _clasesCache=lista;
+    var html='';
+    lista.forEach(function(c,idx){
+      html+='<div style="display:flex;align-items:center;gap:10px;background:#161616;border:1px solid #2a2a2a;border-radius:9px;padding:10px 14px">';
+      html+='<div style="width:12px;height:12px;border-radius:50%;background:'+(c.color||'#888')+';flex-shrink:0"></div>';
+      html+='<div style="flex:1;font-size:13px;font-weight:600;color:#f0f0f0">'+c.nombre+'</div>';
+      html+='<span style="font-size:11px;font-family:monospace;color:#666">'+c.id+'</span>';
+      html+='<span style="font-size:11px;font-weight:600;color:'+(c.activa?'#4ade80':'#666')+'">'+( c.activa?'Activa':'Inactiva')+'</span>';
+      html+='<button onclick="toggleClase('+idx+')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#ccc;font-size:11px;cursor:pointer">'+(c.activa?'Desactivar':'Activar')+'</button>';
+      html+='</div>';
     });
-    list.innerHTML = html;
-    window._clasesData = lista;
-  } catch(e) { list.innerHTML = '<div style="color:#f87171">Error: ' + e.message + '</div>'; }
+    list.innerHTML=html;
+  }catch(e){list.innerHTML='<div style="color:#f87171">Error: '+e.message+'</div>';}
 }
-
-async function toggleClase(idx) {
-  var lista = window._clasesData || [];
-  lista[idx].activa = !lista[idx].activa;
-  await firebase.firestore().collection('config').doc('clases').update({ lista: lista });
+async function toggleClase(idx){
+  var lista=window._clasesData||[];
+  lista[idx].activa=!lista[idx].activa;
+  await firebase.firestore().collection('config').doc('clases').update({lista:lista});
   cargarClases();
 }
-
-function agregarClase() {
-  var html = '<div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:16px" id="clase-form">';
-  html += '<h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Nueva Clase</h3>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">ID (sin espacios)</label><input id="cls-id" type="text" placeholder="ej: pilates" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Nombre</label><input id="cls-nombre" type="text" placeholder="ej: Pilates" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
-  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Color</label><input id="cls-color" type="color" value="#FF5C1A" style="width:100%;height:38px;background:#111;border:1px solid #333;border-radius:6px;cursor:pointer"></div>';
-  html += '</div><div style="display:flex;gap:8px">';
-  html += '<button onclick="guardarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>';
-  html += '<button onclick="document.getElementById(\'clase-form\').remove()" style="background:transparent;border:1px solid #444;border-radius:8px;padding:8px 16px;color:#ccc;font-size:13px;cursor:pointer">Cancelar</button></div></div>';
-  document.getElementById('clases-list').insertAdjacentHTML('afterbegin', html);
+function agregarClase(){
+  var h='<div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:18px;margin-bottom:14px" id="clase-form">';
+  h+='<h3 style="font-size:14px;font-weight:700;margin-bottom:12px">Nueva Clase</h3>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+  h+='<div><label style="font-size:11px;color:#888">ID</label><input id="cls-id" type="text" placeholder="ej: pilates" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;color:#888">Nombre</label><input id="cls-nombre" type="text" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;color:#888">Color</label><input id="cls-color" type="color" value="#FF5C1A" style="width:100%;height:36px;background:#111;border:1px solid #333;border-radius:5px;cursor:pointer"></div>';
+  h+='</div><div style="display:flex;gap:6px">';
+  h+='<button onclick="guardarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer">Guardar</button>';
+  h+='<button onclick="document.getElementById(\'clase-form\').remove()" style="background:none;border:1px solid #444;border-radius:7px;padding:7px 12px;color:#ccc;font-size:12px;cursor:pointer">Cancelar</button></div></div>';
+  document.getElementById('clases-list').insertAdjacentHTML('afterbegin',h);
 }
-
-async function guardarClase() {
-  var id = (document.getElementById('cls-id').value||''). trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
-  var nombre = (document.getElementById('cls-nombre').value||''). trim();
-  var color = document.getElementById('cls-color').value;
-  if (!id || !nombre) return alert('Completa ID y nombre');
-  var lista = window._clasesData || [];
-  lista.push({ id: id, nombre: nombre, color: color, activa: true });
-  await firebase.firestore().collection('config').doc('clases').update({ lista: lista });
+async function guardarClase(){
+  var id=(document.getElementById('cls-id').value||'').trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
+  var nombre=(document.getElementById('cls-nombre').value||'').trim();
+  var color=document.getElementById('cls-color').value;
+  if(!id||!nombre)return alert('Completa ID y nombre');
+  var lista=window._clasesData||[];
+  lista.push({id:id,nombre:nombre,color:color,activa:true});
+  await firebase.firestore().collection('config').doc('clases').update({lista:lista});
   cargarClases();
 }
-
-// ════════════════════════════════════════════════
-// RUTINA CONFIG
-// ════════════════════════════════════════════════
-var _OBJS = [
-  'Bajar grasa / bajar de peso',
-  'Ganar músculo / recomposición',
-  'Salud metabólica / salud general',
-  'Estética / composición equilibrada',
-  'Rendimiento funcional'
-];
-var _GRUPOS = ['<30','30-45','45+'];
-var _ETAPAS_LABELS = ['Adaptación (1-3 sem)','Desarrollo (4-12 sem)','Optimización (13+ sem)'];
-
-function cargarRutinaConfig() {
-  var cont = document.getElementById('rutina-config-table');
-  if (!cont) return;
-  var cls = (_clasesCache||[]).filter(function(c) { return c.activa; });
-  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px">';
-  html += '<thead><tr style="background:#1a1a1a">';
-  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Objetivo</th>';
-  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Grupo edad</th>';
-  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 1</th>';
-  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 2</th>';
-  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 3</th>';
-  html += '</tr></thead><tbody>';
-  // Build from current _MIX in index.html (loaded from Firestore config eventually)
-  // For now show the in-code defaults — editable in future sprint
-  var mixData = {
-    'Bajar grasa / bajar de peso': { '<30':['Full Body+Core (2x) · Lower Body','Full Body+Core (2x) · Lower Body','Full Body+Core (2x) · Lower Body · Upper Body'],'30-45':['Full Body+Core (2x) · Lower Body','Full Body+Core (2x) · Lower Body','Full Body+Core · Lower Body · Upper Body'],'45+':['Women 50+ (2x) · Full Body+Core','Women 50+ (2x) · Full Body+Core','Women 50+ (3x) · Full Body+Core'] },
-    'Ganar músculo / recomposición': { '<30':['Upper Body + Lower Body','Upper(2x) + Lower(2x)','Upper(2x) + Lower(2x) + Full Body'],'30-45':['Upper Body + Lower Body','Upper + Lower + Full Body','Upper(2x) + Lower(2x)'],'45+':['Upper Body + Lower Body','Upper + Lower','Upper + Lower + Full Body'] },
-    'Salud metabólica / salud general': { '<30':['Full Body+Core + Lower Body','Full Body+Core(2x) + Lower Body','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core + Women 50+','Full Body+Core(2x) + Women 50+','Full Body+Core + Lower + Women 50+'],'45+':['Women 50+(2x) + Full Body+Core','Women 50+(2x) + Full Body+Core','Women 50+(3x)'] },
-    'Estética / composición equilibrada': { '<30':['Full Body+Core + Lower Body','Full Body+Core + Upper + Lower','Full Body+Core(2x) + Upper + Lower'],'30-45':['Full Body+Core + Lower Body','Full Body+Core + Upper + Lower','Full Body+Core + Upper + Lower + Full Body+Glutes'],'45+':['Women 50+ + Full Body+Core','Women 50+ + Full Body+Core','Women 50+ + Full Body+Core + Upper'] },
-    'Rendimiento funcional': { '<30':['Full Body+Core (2x)','Full Body+Core(3x) + Full Body+Glutes','Full Body+Core(3x) + Full Body+Glutes + Upper'],'30-45':['Full Body+Core + Full Body+Glutes','Full Body+Core(2x) + Full Body+Glutes','Full Body+Core(2x) + Full Body+Glutes + Lower'],'45+':['Women 50+ + Full Body+Core','Full Body+Core(2x) + Women 50+','Full Body+Core(2x) + Women 50+'] }
-  };
-  _OBJS.forEach(function(obj) {
-    var row = mixData[obj];
-    if (!row) return;
-    _GRUPOS.forEach(function(ge, gi) {
-      html += '<tr style="border-bottom:1px solid #1f1f1f">';
-      if (gi === 0) html += '<td style="padding:10px 12px;font-weight:600;color:#f0f0f0;vertical-align:top" rowspan="3">' + obj + '</td>';
-      html += '<td style="padding:8px 12px;color:#888;white-space:nowrap">' + ge + '</td>';
-      (row[ge]||[]).forEach(function(etapa) {
-        html += '<td style="padding:8px 12px;color:#ccc">' + etapa + '</td>';
-      });
-      html += '</tr>';
+// === RUTINA CONFIG ===
+function cargarRutinaConfig(){
+  var cont=document.getElementById('rutina-config-table');
+  if(!cont)return;
+  var objs=['Bajar grasa / bajar de peso','Ganar m\u00fasculo / recomposici\u00f3n','Salud metab\u00f3lica / salud general','Est\u00e9tica / composici\u00f3n equilibrada','Rendimiento funcional'];
+  var grupos=['<30','30-45','45+'];
+  var mix={'Bajar grasa / bajar de peso':{'<30':['Full Body+Core (2x) + Lower Body','Full Body+Core (2x) + Lower Body','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core (2x) + Lower Body','Full Body+Core + Lower + Upper','Full Body+Core + Lower + Upper (2x)'],'45+':['Women 50+ (2x) + Full Body+Core','Women 50+ (2x) + Full Body+Core','Women 50+ (3x)']},'Ganar m\u00fasculo / recomposici\u00f3n':{'<30':['Upper + Lower','Upper (2x) + Lower (2x)','Upper (2x) + Lower (2x) + Full Body+Core'],'30-45':['Upper + Lower','Upper + Lower + Full Body+Core','Upper (2x) + Lower (2x)'],'45+':['Upper + Lower','Upper + Lower','Upper + Lower + Full Body+Core']},'Salud metab\u00f3lica / salud general':{'<30':['Full Body+Core + Lower','Full Body+Core (2x) + Lower','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core + Women 50+','Full Body+Core (2x) + Women 50+','Full Body+Core + Lower + Women 50+'],'45+':['Women 50+ (2x) + Full Body+Core','Women 50+ (2x) + Full Body+Core','Women 50+ (3x)']},'Est\u00e9tica / composici\u00f3n equilibrada':{'<30':['Full Body+Core + Lower','Full Body+Core + Upper + Lower','Full Body+Core (2x) + Upper + Lower'],'30-45':['Full Body+Core + Lower','Full Body+Core + Upper + Lower','Full Body+Core + Upper + Lower + Glutes'],'45+':['Women 50+ + Full Body+Core','Women 50+ + Full Body+Core','Women 50+ + Full Body+Core + Upper']},'Rendimiento funcional':{'<30':['Full Body+Core (2x)','Full Body+Core (3x) + Glutes','Full Body+Core (3x) + Glutes + Upper'],'30-45':['Full Body+Core + Glutes','Full Body+Core (2x) + Glutes','Full Body+Core (2x) + Glutes + Lower'],'45+':['Women 50+ + Full Body+Core','Full Body+Core (2x) + Women 50+','Full Body+Core (2x) + Women 50+']}};
+  var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+  h+='<thead><tr style="background:#1a1a1a"><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Objetivo</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Edad</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 1</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 2</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 3</th></tr></thead><tbody>';
+  objs.forEach(function(obj){
+    var row=mix[obj];
+    if(!row)return;
+    grupos.forEach(function(ge,gi){
+      h+='<tr style="border-bottom:1px solid #1f1f1f">';
+      if(gi===0)h+='<td style="padding:8px 10px;font-weight:600;color:#f0f0f0;vertical-align:top" rowspan="3">'+obj+'</td>';
+      h+='<td style="padding:6px 10px;color:#888;white-space:nowrap">'+ge+'</td>';
+      (row[ge]||[]).forEach(function(e){h+='<td style="padding:6px 10px;color:#ccc">'+e+'</td>';});
+      h+='</tr>';
     });
   });
-  html += '</tbody></table>';
-  cont.innerHTML = html;
+  h+='</tbody></table>';
+  cont.innerHTML=h;
 }
 </script>
 <!-- MODAL PERFIL STAFF -->
@@ -3905,33 +3855,24 @@ function cargarRutinaConfig() {
   </div>
 
   <!-- ═══ SECCIÓN HORARIO ═══ -->
-  <div id="section-horario" style="display:none;padding:24px 32px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h2 style="font-size:20px;font-weight:700">Horario Semanal</h2>
+
+  <div id="section-horario" style="display:none;padding:20px 28px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="font-size:18px;font-weight:700">Horario Semanal</h2>
       <button onclick="agregarSlot()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Agregar clase</button>
-    </div>
-    <div id="horario-grid" style="display:grid;gap:8px"></div>
+    </div><div id="horario-grid" style="display:grid;gap:8px"></div>
   </div>
-
-
-  <!-- ═══ SECCIÓN CLASES ═══ -->
-  <div id="section-clases" style="display:none;padding:24px 32px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h2 style="font-size:20px;font-weight:700">Catálogo de Clases</h2>
+  <div id="section-clases" style="display:none;padding:20px 28px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="font-size:18px;font-weight:700">Catálogo de Clases</h2>
       <button onclick="agregarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Nueva clase</button>
-    </div>
-    <div id="clases-list" style="display:grid;gap:8px"></div>
+    </div><div id="clases-list" style="display:grid;gap:8px"></div>
   </div>
-
-
-  <!-- ═══ SECCIÓN RUTINA CONFIG ═══ -->
-  <div id="section-rutina-config" style="display:none;padding:24px 32px">
-    <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Criterios de Rutina</h2>
-    <p style="font-size:13px;color:#888;margin-bottom:20px">Clases recomendadas por objetivo, grupo de edad y etapa de progreso.</p>
+  <div id="section-rutina" style="display:none;padding:20px 28px">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:8px">Criterios de Rutina</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:16px">Mix de clases por objetivo, edad y etapa.</p>
     <div id="rutina-config-table" style="overflow-x:auto"></div>
   </div>
-
-
 </body>
 </html>
  
