@@ -2310,7 +2310,7 @@ for (const med of medidasVal) {
         cadera: isNaN(cadera)?null:cadera,
         pantorrilla: isNaN(pantorrilla)?null:pantorrilla,
         pruebaPeso: pruebaPeso || null,
-        fecha, fechaRaw: document.getElementById('m-fecha').value
+        fecha, fechaTs: fecha ? new Date(fecha).getTime() : null, fechaRaw: document.getElementById('m-fecha').value
       };
       document.getElementById('new-val-status').textContent = 'â Valoración capturada';
       document.getElementById('new-val-status').style.color = '#4ade80';
@@ -2331,7 +2331,7 @@ for (const med of medidasVal) {
         cadera:      isNaN(cadera)      ? null : cadera,
         pantorrilla: isNaN(pantorrilla) ? null : pantorrilla,
         pruebaPeso: pruebaPeso || null,
-        fecha, registradoPor: auth.currentUser?.uid || null, miembroNombre
+        fecha, fechaTs: fecha ? new Date(fecha).getTime() : null, registradoPor: auth.currentUser?.uid || null, miembroNombre
       };
       if (window._editingMetricId) {
         // Confirm before editing past metric
