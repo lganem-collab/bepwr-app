@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-        document.getElementById('edit-nivel').value = data.nivelFitness || 1;
 <html lang="es">
 <head>
 <script>
@@ -298,9 +297,9 @@
 </select>
 
         </div>
-          <div class="form-group">
-            <label class="form-label">Nivel de Fitness</label>
-            <select id="nuevo-nivel" class="form-select">
+          <div class="field-row">
+            <label>Nivel de Fitness</label>
+            <select id="nuevo-nivel">
               <option value="1">Principiante</option>
               <option value="2">Medio</option>
               <option value="3">Avanzado</option>
@@ -1842,9 +1841,9 @@ if (user && user.uid === MASTER_UID) {
             <option value="Incrementar performance · Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Otro'?'selected':''}>🏅 Otro</option>
           </select>
         </div>
-          <div class="form-group">
-            <label class="form-label">Nivel de Fitness</label>
-            <select id="edit-nivel" class="form-select">
+          <div class="field-row">
+            <label>Nivel de Fitness</label>
+            <select id="edit-nivel">
               <option value="1">Principiante</option>
               <option value="2">Medio</option>
               <option value="3">Avanzado</option>
@@ -1889,6 +1888,7 @@ if (user && user.uid === MASTER_UID) {
       const _mOrig = (window._allMembers||[]).find(x=>x.uid===uid)||{};
       const activoVal = document.getElementById('edit-activo')?.value === 'false' ? false : true;
       const newMeta = document.getElementById('edit-meta').value;
+        document.getElementById('edit-nivel').value = data.nivelFitness || 1;
       const newPesoIni = Number(document.getElementById('edit-peso-ini').value) || null;
       await db.collection('usuarios').doc(uid).update({
         nombre: document.getElementById('edit-nombre').value,
