@@ -3402,7 +3402,7 @@ window.filterNotifUsers = function (q) {
       var val=(document.getElementById('pesos-ov-inp')||{}).value||'';
       var err=document.getElementById('pesos-ov-err');
       if(val.trim()!==_code){if(err)err.textContent='Código incorrecto';return;}
-      var ov=document.getElementById(\'pesos-ov\');if(ov)ov.remove();
+      var ov=document.getElementById('pesos-ov');if(ov)ov.remove();
       _edit=true;window.renderPesosObj();
       document.getElementById('btn-mod-pesos').style.display='none';
       document.getElementById('btn-save-pesos').style.display='inline-block';
