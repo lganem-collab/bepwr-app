@@ -1073,13 +1073,24 @@ onAuthStateChanged(auth, async user => {
           if (f.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) { var p=f.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
           var mx = f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
           if (mx && MESES_MAP[mx[2]] !== undefined) return new Date(parseInt(mx[3]), MESES_MAP[mx[2]], parseInt(mx[1])).getTime();
-          try { return new Date(f).getTime(); } catch(e) { return 0; }
+          try { var _t = new Date(f).getTime(); return isNaN(_t) ? 0 : _t; } catch(e) { return 0; }
         }
         return 0;
       }
-      const metricasRaw = metSnap.docs.map(d => d.data());
-      metricasRaw.forEach(m => { m._ts = parseFechaTs(m.fecha); });
-      metricasRaw.sort((a,b) => a._ts - b._ts);
+      // Guardar índice Firestore (query desc → idx0 = más reciente según Firestore)
+      const metricasRaw = metSnap.docs.map((d, _fi) => { const m = d.data(); m._fi = _fi; return m; });
+      metricasRaw.forEach(m => {
+        const ts = parseFechaTs(m.fecha);
+        m._ts = (m.fechaTs && !isNaN(m.fechaTs) && m.fechaTs > 0) ? m.fechaTs
+               : (ts && !isNaN(ts) && ts > 0) ? ts
+               : null;
+      });
+      metricasRaw.sort((a,b) => {
+        if (a._ts !== null && b._ts !== null) return a._ts - b._ts;
+        if (a._ts !== null) return -1;
+        if (b._ts !== null) return 1;
+        return b._fi - a._fi;
+      });
       const metricas = metricasRaw;
       cachedMetricas = metricas;
 
@@ -2534,18 +2545,27 @@ async function renderAnalisisCientifico(data, config) {
   if (!output) return;
 
   var uid = window._currentUid || 'anon';
-  var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha');
 
-  // Fecha de la última valoración (con proteccion)
+  // Fecha de la última valoración — DEBE calcularse ANTES de la cacheKey
   var valFechaActual = null;
   try {
     if (data.ultimaValoracion && data.ultimaValoracion.fecha) {
       var f = data.ultimaValoracion.fecha;
       if (f instanceof Date) valFechaActual = f.toISOString().slice(0, 10);
       else if (f.toDate) valFechaActual = f.toDate().toISOString().slice(0, 10);
-      else { var d = new Date(f); if (!isNaN(d.getTime())) valFechaActual = d.toISOString().slice(0, 10); }
+      else { var d2 = new Date(f); if (!isNaN(d2.getTime())) valFechaActual = d2.toISOString().slice(0, 10); }
     }
   } catch(e) { console.warn('Error parseando fecha valoración:', e); }
+
+  var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha');
+
+  // Limpiar localStorage entries con key incorrecta (sin-fecha) si tenemos fecha real
+  if (valFechaActual) {
+    try {
+      var staleKey = 'ia-analisis-' + uid + '-sin-fecha';
+      if (localStorage.getItem(staleKey)) localStorage.removeItem(staleKey);
+    } catch(e) {}
+  }
 
   // --- Intentar cargar desde cache (Firestore data o localStorage) ---
   var cachedText = data.analisisIA || null;
