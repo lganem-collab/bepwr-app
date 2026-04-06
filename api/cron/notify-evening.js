@@ -37,6 +37,14 @@ export default async function handler(req, res) {
     const response = await messaging.sendEachForMulticast({
       tokens,
       notification: { title, body },
+      android: {
+        priority: 'high',
+        notification: { channelId: 'bepwr-default', sound: 'default' }
+      },
+      apns: {
+        headers: { 'apns-priority': '10' },
+        payload: { aps: { sound: 'default', badge: 1 } }
+      },
       webpush: {
         notification: {
           title, body,
