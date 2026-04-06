@@ -2331,7 +2331,7 @@ for (const med of medidasVal) {
         cadera:      isNaN(cadera)      ? null : cadera,
         pantorrilla: isNaN(pantorrilla) ? null : pantorrilla,
         pruebaPeso: pruebaPeso || null,
-        fecha, fechaTs: fecha ? new Date(fecha).getTime() : null, registradoPor: auth.currentUser?.uid || null, miembroNombre
+        fecha, fechaTs: fecha ? new Date(fecha).getTime() : null, savedAt: firebase.firestore.FieldValue.serverTimestamp(), registradoPor: auth.currentUser?.uid || null, miembroNombre
       };
       if (window._editingMetricId) {
         // Confirm before editing past metric
