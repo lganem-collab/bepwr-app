@@ -562,6 +562,61 @@
       </div>
 
     </div>
+
+<!-- ── TAB PESOS — Tabla Maestra del Índice de Evolución ────────────── -->
+<div id="tab-content-pesos" style="display:none;max-width:860px;margin:0 auto;padding:16px">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚖️ Tabla Maestra</div>
+      <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0">Pesos del Índice de Evolución</h2>
+    </div>
+    <div id="pesos-fuente-badge" style="font-size:10px;font-family:'Space Mono',monospace;padding:4px 10px;border-radius:20px;background:#222;border:1px solid #333;color:#888">Cargando...</div>
+  </div>
+  <p style="font-size:12px;color:#666;margin:0 0 20px;font-family:'Space Mono',monospace">Solo el Admin Maestro puede ver y modificar esta tabla. 🔒</p>
+
+  <!-- Botones de acción -->
+  <div id="pesos-acciones" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+    <button id="btn-init-pesos" onclick="window.initPesosFirestore()" style="padding:10px 18px;background:#FF5C1A22;color:#FF5C1A;border:1px solid #FF5C1A55;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">+ INICIALIZAR EN FIRESTORE</button>
+    <button id="btn-mod-pesos" onclick="window.iniciarModPesos()" style="padding:10px 18px;background:#222;color:#aaa;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">✏️ MODIFICAR PESOS</button>
+    <button id="btn-save-pesos" onclick="window.guardarPesos()" style="display:none;padding:10px 18px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;font-weight:700">💾 GUARDAR CAMBIOS</button>
+    <button id="btn-cancel-pesos" onclick="window.cancelarEditPesos()" style="display:none;padding:10px 18px;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer">CANCELAR</button>
+  </div>
+
+  <!-- Selector de objetivo -->
+  <div style="margin-bottom:16px">
+    <label style="font-size:11px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;display:block;margin-bottom:6px">OBJETIVO</label>
+    <select id="pesos-obj-select" onchange="window.renderPesosObj()" style="width:100%;max-width:380px;background:#1a1a1a;border:1px solid #333;color:#fff;padding:10px 12px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif">
+      <option value="bajar_grasa">Bajar grasa / bajar de peso</option>
+      <option value="ganar_musculo">Ganar músculo / recomposición</option>
+      <option value="salud_general">Salud metabólica</option>
+      <option value="estetico">Estética / composición equilibrada</option>
+      <option value="rendimiento">Rendimiento funcional</option>
+      <option value="dep_ciclismo">Deportivo - Ciclismo</option>
+      <option value="dep_correr">Deportivo - Correr</option>
+      <option value="dep_futbol">Deportivo - Fútbol</option>
+      <option value="dep_golf">Deportivo - Golf</option>
+      <option value="dep_natacion">Deportivo - Natación</option>
+      <option value="dep_padel">Deportivo - Padel</option>
+      <option value="dep_tenis">Deportivo - Tenis</option>
+      <option value="dep_otro">Deportivo - Otro</option>
+    </select>
+  </div>
+
+  <!-- Tabla de pesos del objetivo seleccionado -->
+  <div id="pesos-tabla-wrapper" style="background:#111;border:1px solid #222;border-radius:16px;overflow:hidden;margin-bottom:20px">
+    <div style="padding:12px 16px;background:#0f0f0f;border-bottom:1px solid #222;font-size:9px;color:#555;font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;display:grid;grid-template-columns:1fr 60px 120px 80px;gap:8px">
+      <div>MÉTRICA</div><div style="text-align:center">PESO</div><div>BARRA</div><div style="text-align:center">DIRECCIÓN</div>
+    </div>
+    <div id="pesos-tabla-body"></div>
+    <div style="padding:10px 16px;background:#0a0a0a;border-top:1px solid #222;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;color:#555;font-family:'Space Mono',monospace">TOTAL</span>
+      <span id="pesos-total" style="font-size:15px;font-weight:700;font-family:'Space Mono',monospace;color:#4ade80">100</span>
+    </div>
+  </div>
+
+</div>
   </div>
 </div>
 
@@ -631,61 +686,6 @@
 </div>
 
 
-
-<!-- ── TAB PESOS — Tabla Maestra del Índice de Evolución ────────────── -->
-<div id="tab-content-pesos" style="display:none;max-width:860px;margin:0 auto;padding:16px">
-
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-    <div>
-      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚖️ Tabla Maestra</div>
-      <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0">Pesos del Índice de Evolución</h2>
-    </div>
-    <div id="pesos-fuente-badge" style="font-size:10px;font-family:'Space Mono',monospace;padding:4px 10px;border-radius:20px;background:#222;border:1px solid #333;color:#888">Cargando...</div>
-  </div>
-  <p style="font-size:12px;color:#666;margin:0 0 20px;font-family:'Space Mono',monospace">Solo el Admin Maestro puede ver y modificar esta tabla. 🔒</p>
-
-  <!-- Botones de acción -->
-  <div id="pesos-acciones" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-    <button id="btn-init-pesos" onclick="window.initPesosFirestore()" style="padding:10px 18px;background:#FF5C1A22;color:#FF5C1A;border:1px solid #FF5C1A55;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">+ INICIALIZAR EN FIRESTORE</button>
-    <button id="btn-mod-pesos" onclick="window.iniciarModPesos()" style="padding:10px 18px;background:#222;color:#aaa;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">✏️ MODIFICAR PESOS</button>
-    <button id="btn-save-pesos" onclick="window.guardarPesos()" style="display:none;padding:10px 18px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;font-weight:700">💾 GUARDAR CAMBIOS</button>
-    <button id="btn-cancel-pesos" onclick="window.cancelarEditPesos()" style="display:none;padding:10px 18px;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer">CANCELAR</button>
-  </div>
-
-  <!-- Selector de objetivo -->
-  <div style="margin-bottom:16px">
-    <label style="font-size:11px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;display:block;margin-bottom:6px">OBJETIVO</label>
-    <select id="pesos-obj-select" onchange="window.renderPesosObj()" style="width:100%;max-width:380px;background:#1a1a1a;border:1px solid #333;color:#fff;padding:10px 12px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif">
-      <option value="bajar_grasa">Bajar grasa / bajar de peso</option>
-      <option value="ganar_musculo">Ganar músculo / recomposición</option>
-      <option value="salud_general">Salud metabólica</option>
-      <option value="estetico">Estética / composición equilibrada</option>
-      <option value="rendimiento">Rendimiento funcional</option>
-      <option value="dep_ciclismo">Deportivo - Ciclismo</option>
-      <option value="dep_correr">Deportivo - Correr</option>
-      <option value="dep_futbol">Deportivo - Fútbol</option>
-      <option value="dep_golf">Deportivo - Golf</option>
-      <option value="dep_natacion">Deportivo - Natación</option>
-      <option value="dep_padel">Deportivo - Padel</option>
-      <option value="dep_tenis">Deportivo - Tenis</option>
-      <option value="dep_otro">Deportivo - Otro</option>
-    </select>
-  </div>
-
-  <!-- Tabla de pesos del objetivo seleccionado -->
-  <div id="pesos-tabla-wrapper" style="background:#111;border:1px solid #222;border-radius:16px;overflow:hidden;margin-bottom:20px">
-    <div style="padding:12px 16px;background:#0f0f0f;border-bottom:1px solid #222;font-size:9px;color:#555;font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;display:grid;grid-template-columns:1fr 60px 120px 80px;gap:8px">
-      <div>MÉTRICA</div><div style="text-align:center">PESO</div><div>BARRA</div><div style="text-align:center">DIRECCIÓN</div>
-    </div>
-    <div id="pesos-tabla-body"></div>
-    <div style="padding:10px 16px;background:#0a0a0a;border-top:1px solid #222;display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:11px;color:#555;font-family:'Space Mono',monospace">TOTAL</span>
-      <span id="pesos-total" style="font-size:15px;font-weight:700;font-family:'Space Mono',monospace;color:#4ade80">100</span>
-    </div>
-  </div>
-
-</div>
 
 <div id="toast"></div>
 
