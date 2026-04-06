@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+        document.getElementById('edit-nivel').value = data.nivelFitness || 1;
 <html lang="es">
 <head>
 <script>
@@ -297,6 +298,14 @@
 </select>
 
         </div>
+          <div class="form-group">
+            <label class="form-label">Nivel de Fitness</label>
+            <select id="nuevo-nivel" class="form-select">
+              <option value="1">Principiante</option>
+              <option value="2">Medio</option>
+              <option value="3">Avanzado</option>
+            </select>
+          </div>
 
       </div>
       <!-- Valoración Inicial -->
@@ -1774,7 +1783,8 @@ if (user && user.uid === MASTER_UID) {
     const confirmed = await showConfirm('¿Confirmas que deseas cambiar la meta de este miembro?');
     if (!confirmed) return;
     try {
-      await db.collection('usuarios').doc(uid).update({ 'objetivo.meta': newMeta, meta: newMeta });
+      await db.collection('usuarios').doc(uid).update({ 'objetivo.meta': newMeta, meta: newMeta,
+        nivelFitness: parseInt(document.getElementById('nuevo-nivel').value) || 1 });
       logBitacora('modificacion_miembro', 'Meta cambiada a: ' + newMeta, window._detailNombre || '');
       showToast('Meta actualizada â', 'success');
       await loadMembers();
@@ -1832,6 +1842,14 @@ if (user && user.uid === MASTER_UID) {
             <option value="Incrementar performance · Otro" ${(m.objetivo?.meta||m.meta)==='Incrementar performance · Otro'?'selected':''}>🏅 Otro</option>
           </select>
         </div>
+          <div class="form-group">
+            <label class="form-label">Nivel de Fitness</label>
+            <select id="edit-nivel" class="form-select">
+              <option value="1">Principiante</option>
+              <option value="2">Medio</option>
+              <option value="3">Avanzado</option>
+            </select>
+          </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
       </div>
       <div class="field-row">
@@ -1968,7 +1986,8 @@ if (user && user.uid === MASTER_UID) {
         peso:'m-peso', musculo:'m-musculo', grasaCorporal:'m-grasa-corp',
         imc:'m-imc', pgc:'m-pgc', grasaVisceral:'m-grasa-visc',
         calificacion:'m-calificacion', brazo:'m-brazo', abdomen:'m-abdomen',
-        cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla'
+        cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla',
+        nivelFitness: parseInt(document.getElementById('edit-nivel').value) || 1
       };
       for (const [key, id] of Object.entries(campos)) {
         const el = document.getElementById(id);
