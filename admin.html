@@ -172,6 +172,7 @@
     <div class="tab" id="tab-dashboard" onclick="switchTab('dashboard')" style="display:none">&#x1F4CA; Dashboard</div>
     <div class="tab" id="tab-guias" onclick="switchTab('guias')" style="display:none">&#x1F4C4; Guías</div>
     <div class="tab" id="tab-citas" onclick="switchTab('citas')" style="display:none">&#x1F4C5; Citas Val</div>
+    <div class="tab" id="tab-pesos" onclick="switchTab('pesos')" style="display:none">⚖️ Pesos 🔒</div>
   </div>
   <div class="content">
 
@@ -627,6 +628,63 @@
       <button class="btn btn-primary btn-sm" onclick="saveMetrics()">Guardar valoraci&#xF3;n</button>
     </div>
   </div>
+</div>
+
+
+
+<!-- ── TAB PESOS — Tabla Maestra del Índice de Evolución ────────────── -->
+<div id="tab-content-pesos" style="display:none;max-width:860px;margin:0 auto;padding:16px">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚖️ Tabla Maestra</div>
+      <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0">Pesos del Índice de Evolución</h2>
+    </div>
+    <div id="pesos-fuente-badge" style="font-size:10px;font-family:'Space Mono',monospace;padding:4px 10px;border-radius:20px;background:#222;border:1px solid #333;color:#888">Cargando...</div>
+  </div>
+  <p style="font-size:12px;color:#666;margin:0 0 20px;font-family:'Space Mono',monospace">Solo el Admin Maestro puede ver y modificar esta tabla. 🔒</p>
+
+  <!-- Botones de acción -->
+  <div id="pesos-acciones" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+    <button id="btn-init-pesos" onclick="window.initPesosFirestore()" style="padding:10px 18px;background:#FF5C1A22;color:#FF5C1A;border:1px solid #FF5C1A55;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">+ INICIALIZAR EN FIRESTORE</button>
+    <button id="btn-mod-pesos" onclick="window.iniciarModPesos()" style="padding:10px 18px;background:#222;color:#aaa;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">✏️ MODIFICAR PESOS</button>
+    <button id="btn-save-pesos" onclick="window.guardarPesos()" style="display:none;padding:10px 18px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;font-weight:700">💾 GUARDAR CAMBIOS</button>
+    <button id="btn-cancel-pesos" onclick="window.cancelarEditPesos()" style="display:none;padding:10px 18px;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer">CANCELAR</button>
+  </div>
+
+  <!-- Selector de objetivo -->
+  <div style="margin-bottom:16px">
+    <label style="font-size:11px;color:#666;font-family:'Space Mono',monospace;letter-spacing:1px;display:block;margin-bottom:6px">OBJETIVO</label>
+    <select id="pesos-obj-select" onchange="window.renderPesosObj()" style="width:100%;max-width:380px;background:#1a1a1a;border:1px solid #333;color:#fff;padding:10px 12px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif">
+      <option value="bajar_grasa">Bajar grasa / bajar de peso</option>
+      <option value="ganar_musculo">Ganar músculo / recomposición</option>
+      <option value="salud_general">Salud metabólica</option>
+      <option value="estetico">Estética / composición equilibrada</option>
+      <option value="rendimiento">Rendimiento funcional</option>
+      <option value="dep_ciclismo">Deportivo - Ciclismo</option>
+      <option value="dep_correr">Deportivo - Correr</option>
+      <option value="dep_futbol">Deportivo - Fútbol</option>
+      <option value="dep_golf">Deportivo - Golf</option>
+      <option value="dep_natacion">Deportivo - Natación</option>
+      <option value="dep_padel">Deportivo - Padel</option>
+      <option value="dep_tenis">Deportivo - Tenis</option>
+      <option value="dep_otro">Deportivo - Otro</option>
+    </select>
+  </div>
+
+  <!-- Tabla de pesos del objetivo seleccionado -->
+  <div id="pesos-tabla-wrapper" style="background:#111;border:1px solid #222;border-radius:16px;overflow:hidden;margin-bottom:20px">
+    <div style="padding:12px 16px;background:#0f0f0f;border-bottom:1px solid #222;font-size:9px;color:#555;font-family:'Space Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;display:grid;grid-template-columns:1fr 60px 120px 80px;gap:8px">
+      <div>MÉTRICA</div><div style="text-align:center">PESO</div><div>BARRA</div><div style="text-align:center">DIRECCIÓN</div>
+    </div>
+    <div id="pesos-tabla-body"></div>
+    <div style="padding:10px 16px;background:#0a0a0a;border-top:1px solid #222;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;color:#555;font-family:'Space Mono',monospace">TOTAL</span>
+      <span id="pesos-total" style="font-size:15px;font-weight:700;font-family:'Space Mono',monospace;color:#4ade80">100</span>
+    </div>
+  </div>
+
 </div>
 
 <div id="toast"></div>
@@ -2467,7 +2525,7 @@ for (const med of medidasVal) {
   }
 
   function switchTab(tab) {
-    const tabs = ['home','members','new','staff','notify','bitacora','dashboard','guias','citas'];
+    const tabs = ['home','members','new','staff','notify','bitacora','dashboard','guias','citas','pesos'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
       const contentEl = document.getElementById('tab-content-'+t);
@@ -2476,12 +2534,18 @@ for (const med of medidasVal) {
     });
     if (tab === 'staff') loadStaffList();
     if (tab === 'bitacora') loadBitacora();
+    if (tab === 'pesos') { if(window.loadPesosTab) window.loadPesosTab(); }
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'guias') loadGuias();
     if (tab === 'citas') loadCitasTab();;
     if (auth?.currentUser?.uid === MASTER_UID) {
       const _bt = document.getElementById('tab-bitacora');
       if (_bt) _bt.style.display = 'inline-block';
+      // Tab pesos solo para Admin Maestro
+      if (auth.currentUser && auth.currentUser.uid === MASTER_UID) {
+        const _bp = document.getElementById('tab-pesos');
+        if (_bp) _bp.style.display = 'inline-block';
+      }
     }
     if (tab === 'home') {
       const dateEl=document.getElementById('home-date');
@@ -3252,6 +3316,125 @@ window.filterNotifUsers = function (q) {
     } catch(e){ msg.style.color='#f55'; msg.textContent='Error: '+e.message; }
     setTimeout(()=>{if(msg)msg.textContent='';},4000);
   }
+
+
+  // ════════════════════════════════════════════════════════════
+  // TABLA MAESTRA DE PESOS — Admin Maestro Only
+  // ════════════════════════════════════════════════════════════
+  (function() {
+    var METRICS_DEF = [
+      {key:'peso',label:'Peso',dir:'↓/↑'},{key:'masa_musculo',label:'Músculo Esquelético',dir:'↑'},
+      {key:'grasa_corporal_kg',label:'Grasa Corporal',dir:'↓'},{key:'imc',label:'IMC',dir:'⇄'},
+      {key:'pgc',label:'% Grasa (PGC)',dir:'↓'},{key:'grasa_visceral',label:'Grasa Visceral',dir:'↓'},
+      {key:'inbody_score',label:'InBody Score',dir:'↑'},{key:'biceps_cm',label:'Bíceps',dir:'↑'},
+      {key:'abdomen_cm',label:'Abdomen',dir:'↓'},{key:'cintura_cm',label:'Cintura',dir:'↓'},
+      {key:'cadera_cm',label:'Cadera',dir:'⚙'},{key:'pantorrilla_cm',label:'Pantorrilla',dir:'↑'},
+      {key:'mancuerna_lb',label:'Mancuerna (fuerza)',dir:'↑'}
+    ];
+    var HW={bajar_grasa:{peso:8,masa_musculo:12,grasa_corporal_kg:13,imc:5,pgc:14,grasa_visceral:11,inbody_score:7,biceps_cm:2,abdomen_cm:9,cintura_cm:12,cadera_cm:1,pantorrilla_cm:3,mancuerna_lb:3},ganar_musculo:{peso:3,masa_musculo:22,grasa_corporal_kg:7,imc:2,pgc:8,grasa_visceral:6,inbody_score:13,biceps_cm:8,abdomen_cm:4,cintura_cm:5,cadera_cm:4,pantorrilla_cm:7,mancuerna_lb:11},salud_general:{peso:6,masa_musculo:11,grasa_corporal_kg:7,imc:5,pgc:11,grasa_visceral:18,inbody_score:9,biceps_cm:1,abdomen_cm:9,cintura_cm:14,cadera_cm:2,pantorrilla_cm:3,mancuerna_lb:4},estetico:{peso:3,masa_musculo:14,grasa_corporal_kg:11,imc:2,pgc:13,grasa_visceral:6,inbody_score:9,biceps_cm:8,abdomen_cm:9,cintura_cm:10,cadera_cm:6,pantorrilla_cm:5,mancuerna_lb:4},rendimiento:{peso:1,masa_musculo:18,grasa_corporal_kg:7,imc:1,pgc:8,grasa_visceral:7,inbody_score:15,biceps_cm:6,abdomen_cm:5,cintura_cm:6,cadera_cm:2,pantorrilla_cm:10,mancuerna_lb:14},dep_ciclismo:{peso:8,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:11,grasa_visceral:7,inbody_score:12,biceps_cm:2,abdomen_cm:6,cintura_cm:6,cadera_cm:3,pantorrilla_cm:14,mancuerna_lb:5},dep_correr:{peso:10,masa_musculo:13,grasa_corporal_kg:10,imc:5,pgc:12,grasa_visceral:8,inbody_score:11,biceps_cm:2,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:3},dep_futbol:{peso:6,masa_musculo:15,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:13,biceps_cm:5,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:10,mancuerna_lb:4},dep_golf:{peso:5,masa_musculo:12,grasa_corporal_kg:8,imc:4,pgc:9,grasa_visceral:9,inbody_score:11,biceps_cm:8,abdomen_cm:12,cintura_cm:12,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},dep_natacion:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:14,abdomen_cm:8,cintura_cm:7,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},dep_padel:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:12,abdomen_cm:8,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:1},dep_tenis:{peso:5,masa_musculo:13,grasa_corporal_kg:8,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:12,abdomen_cm:9,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:2},dep_otro:{peso:5,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:8,inbody_score:13,biceps_cm:7,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:5}};
+    var _pesos=null,_edit=false,_code=null;
+
+    window.loadPesosTab=async function(){
+      if(!auth.currentUser||auth.currentUser.uid!==MASTER_UID)return;
+      var badge=document.getElementById('pesos-fuente-badge');
+      var btnI=document.getElementById('btn-init-pesos'),btnM=document.getElementById('btn-mod-pesos');
+      try{
+        var snap=await db.collection('config').doc('indice_pesos').get();
+        if(snap.exists){
+          var d=snap.data();_pesos=d.pesos||HW;
+          var fecha=d.actualizado?new Date(d.actualizado).toLocaleDateString('es-MX'):'—';
+          if(badge){badge.textContent='Firestore v'+(d.version||1)+' · '+fecha;badge.style.borderColor='#4ade80';badge.style.color='#4ade80';}
+          if(btnI)btnI.style.display='none';if(btnM)btnM.style.display='inline-block';
+        }else{
+          _pesos=HW;
+          if(badge){badge.textContent='Sin inicializar en Firestore';badge.style.borderColor='#facc15';badge.style.color='#facc15';}
+          if(btnI)btnI.style.display='inline-block';if(btnM)btnM.style.display='none';
+        }
+      }catch(e){_pesos=HW;if(badge){badge.textContent='Error — usando hardcoded';badge.style.color='#f87171';}}
+      window.renderPesosObj();
+    };
+
+    window.renderPesosObj=function(){
+      var sel=document.getElementById('pesos-obj-select');
+      if(!sel||!_pesos)return;
+      var ok=sel.value,pesos=_pesos[ok]||{};
+      var body=document.getElementById('pesos-tabla-body'),totalEl=document.getElementById('pesos-total');
+      if(!body)return;
+      var total=0;
+      body.innerHTML=METRICS_DEF.map(function(m){
+        var val=pesos[m.key]||0;total+=val;
+        var bar=Math.min(Math.round(val*1.2),100);
+        var inp=_edit?'<input type="number" id="pi-'+m.key+'" value="'+val+'" min="0" max="50" oninput="window.updTotal()" style="width:48px;background:#111;border:1px solid #FF5C1A55;color:#FF5C1A;text-align:center;padding:4px;border-radius:6px;font-family:Space Mono,monospace;font-size:13px">':'<span style="font-family:Space Mono,monospace;font-size:14px;font-weight:700;color:#fff">'+val+'</span>';
+        return '<div style="padding:10px 16px;border-bottom:1px solid #1a1a1a;display:grid;grid-template-columns:1fr 60px 120px 60px;gap:8px;align-items:center"><span style="font-size:12px;color:#ccc">'+m.label+'</span><div style="text-align:center">'+inp+'</div><div style="height:6px;background:#222;border-radius:3px"><div style="width:'+bar+'%;height:100%;background:#FF5C1A;border-radius:3px"></div></div><div style="text-align:center;font-size:10px;color:#555">'+m.dir+'</div></div>';
+      }).join('');
+      if(totalEl){totalEl.textContent=total;totalEl.style.color=total===100?'#4ade80':'#f87171';}
+    };
+
+    window.updTotal=function(){
+      var t=0;document.querySelectorAll('[id^="pi-"]').forEach(function(i){t+=parseInt(i.value)||0;});
+      var el=document.getElementById('pesos-total');if(el){el.textContent=t;el.style.color=t===100?'#4ade80':'#f87171';}
+    };
+
+    window.initPesosFirestore=async function(){
+      if(!await showConfirm('Crear documento config/indice_pesos en Firestore con los valores hardcoded actuales?'))return;
+      try{
+        await db.collection('config').doc('indice_pesos').set({pesos:HW,version:1,actualizado:new Date().toISOString(),actualizadoPor:auth.currentUser.uid});
+        await db.collection('bitacora').add({accion:'init_pesos_indice',descripcion:'Tabla maestra inicializada en Firestore',fecha:new Date().toISOString(),autor:auth.currentUser.email});
+        showToast('Pesos inicializados en Firestore','success');window.loadPesosTab();
+      }catch(e){showToast('Error: '+e.message,'error');}
+    };
+
+    window.iniciarModPesos=async function(){
+      if(!auth.currentUser||auth.currentUser.uid!==MASTER_UID){showToast('Solo el Admin Maestro puede modificar los pesos','error');return;}
+      if(!await showConfirm('ATENCIÓN: Modificar los pesos afecta el Índice de Evolución de TODOS los miembros.\nSe enviará un código de verificación a tu email. ¿Continuar?'))return;
+      var code=Math.floor(100000+Math.random()*900000).toString();_code=code;
+      try{
+        var r=await fetch('/api/send-delete-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,email:auth.currentUser.email,secret:'bepwr2026notify'})});
+        if(!r.ok)throw new Error('Error al enviar código');
+        var ov=document.createElement('div');ov.id='pesos-ov';
+        ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+        ov.innerHTML='<div style="background:#1a1a1a;border:1px solid #FF5C1A55;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center"><div style="font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:1.5px;margin-bottom:12px">VERIFICACIÓN DE IDENTIDAD</div><div style="font-size:15px;color:#fff;font-weight:600;margin-bottom:8px">Código de confirmación</div><div style="font-size:13px;color:#aaa;margin-bottom:20px">Ingresa el código enviado a<br><strong>'+auth.currentUser.email+'</strong></div><input id="pesos-ov-inp" type="text" maxlength="6" placeholder="000000" style="width:100%;background:#111;border:1px solid #444;color:#fff;font-size:28px;text-align:center;padding:14px;border-radius:10px;margin-bottom:10px;font-family:Space Mono,monospace;box-sizing:border-box;letter-spacing:8px"><div id="pesos-ov-err" style="color:#f87171;font-size:12px;margin-bottom:14px;min-height:16px"></div><div style="display:flex;gap:10px"><button onclick="document.getElementById('pesos-ov').remove()" style="flex:1;background:#2a2a2a;border:1px solid #444;color:#aaa;padding:12px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace;font-size:11px">CANCELAR</button><button onclick="window.verificarPesos()" style="flex:1;background:#FF5C1A;border:none;color:#fff;font-weight:700;padding:12px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace;font-size:11px">VERIFICAR</button></div></div>';
+        document.body.appendChild(ov);setTimeout(function(){var i=document.getElementById('pesos-ov-inp');if(i)i.focus();},100);
+      }catch(e){showToast('Error: '+e.message,'error');}
+    };
+
+    window.verificarPesos=function(){
+      var val=(document.getElementById('pesos-ov-inp')||{}).value||'';
+      var err=document.getElementById('pesos-ov-err');
+      if(val.trim()!==_code){if(err)err.textContent='Código incorrecto';return;}
+      var ov=document.getElementById('pesos-ov');if(ov)ov.remove();
+      _edit=true;window.renderPesosObj();
+      document.getElementById('btn-mod-pesos').style.display='none';
+      document.getElementById('btn-save-pesos').style.display='inline-block';
+      document.getElementById('btn-cancel-pesos').style.display='inline-block';
+      showToast('Modo edición activado','success');
+    };
+
+    window.cancelarEditPesos=function(){
+      _edit=false;window.renderPesosObj();
+      document.getElementById('btn-mod-pesos').style.display='inline-block';
+      document.getElementById('btn-save-pesos').style.display='none';
+      document.getElementById('btn-cancel-pesos').style.display='none';
+    };
+
+    window.guardarPesos=async function(){
+      var sel=document.getElementById('pesos-obj-select');if(!sel)return;
+      var ok=sel.value,inputs=document.querySelectorAll('[id^="pi-"]'),t=0,np={};
+      inputs.forEach(function(i){var k=i.id.replace('pi-','');var v=parseInt(i.value)||0;np[k]=v;t+=v;});
+      if(t!==100){showToast('Los pesos deben sumar 100 (actual: '+t+')','error');return;}
+      if(!await showConfirm('CONFIRMACIÓN FINAL: Los pesos del objetivo "'+ok+'" serán actualizados en Firestore.\nEsta acción afecta el Índice de Evolución de todos los miembros con ese objetivo. ¿Confirmar?'))return;
+      try{
+        var snap=await db.collection('config').doc('indice_pesos').get();
+        var cur=snap.exists?(snap.data().pesos||HW):HW;
+        cur[ok]=np;
+        var ver=(snap.exists?snap.data().version||1:1)+1;
+        await db.collection('config').doc('indice_pesos').set({pesos:cur,version:ver,actualizado:new Date().toISOString(),actualizadoPor:auth.currentUser.uid});
+        await db.collection('bitacora').add({accion:'modificar_pesos_indice',descripcion:'Pesos actualizados para objetivo: '+ok+' (v'+ver+')',fecha:new Date().toISOString(),autor:auth.currentUser.email});
+        _pesos=cur;window.cancelarEditPesos();
+        showToast('Pesos guardados en Firestore (v'+ver+')','success');window.loadPesosTab();
+      }catch(e){showToast('Error al guardar: '+e.message,'error');}
+    };
+  })();
 
 </script>
 <!-- MODAL PERFIL STAFF -->
