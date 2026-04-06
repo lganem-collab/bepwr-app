@@ -70,7 +70,7 @@
     .scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:none;overscroll-behavior:none;padding:0 22px;padding-bottom:calc(80px + var(--safe-bottom))}
     .scroll-area::-webkit-scrollbar{display:none}
     .view{display:none}
-    .view.active{display:block;animation:fadeIn .25s ease}
+    .view.active{display:block;animation:fadeIn .25s ease;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
     /* HOME */
