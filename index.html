@@ -417,7 +417,7 @@
     </div>
 
     <div class="metodo-card" id="card-peso">
-      <div class="metodo-card-label">Peso Base Mancuernas</div>
+      <div class="metodo-card-label">Prueba de Peso</div>
       <div style="display:flex;align-items:baseline;gap:6px;margin:4px 0">
         <span class="peso-valor" id="metodo-peso-min">—</span>
         <span class="peso-sep" style="font-size:14px;color:#aaa">a</span>
@@ -600,15 +600,15 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         <span class="nav-label">M&#xE9;tricas</span>
       </div>
+      <div class="nav-item" id="nav-qr" onclick="navigate('qr')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2h-2zM18 14h3M18 18v3M14 18h2v3M20 18h1"/></svg>
+          <span class="nav-label">Mi QR</span>
+        </div>
       <div class="nav-item" id="nav-notif" onclick="navigate('notif')" style="position:relative">
         <div id="notif-badge" style="display:none;position:absolute;top:2px;right:6px;background:#f87171;color:#fff;border-radius:99px;font-size:9px;font-weight:700;min-width:16px;height:16px;align-items:center;justify-content:center;padding:0 4px;font-family:Space Mono,monospace;line-height:1">0</div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
         <span class="nav-label">Avisos</span>
       </div>
-        <div class="nav-item" id="nav-qr" onclick="navigate('qr')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2h-2zM18 14h3M18 18v3M14 18h2v3M20 18h1"/></svg>
-          <span class="nav-label">Mi QR</span>
-        </div>
     </nav>
   </div><!-- screen-app -->
 
@@ -1234,7 +1234,7 @@ window._tendColor = califColor;
       { label:'Cintura', ini:inicial.cintura, act:m.cintura, inv:true, unit:'cm' },
       { label:'Cadera', ini:inicial.cadera, act:m.cadera, inv:true, unit:'cm' },
       { label:'Pantorrilla', ini:inicial.pantorrilla, act:m.pantorrilla, inv:false, unit:'cm' },
-{ label:'Mancuernas', ini:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(inicial.pruebaPeso), act:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(m.pruebaPeso), inv:false, unit:'lb' },
+{ label:'Prueba de Peso', ini:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(inicial.pruebaPeso), act:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(m.pruebaPeso), inv:false, unit:'lb' },
     ];
     var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
     var bodyEl = document.getElementById('metricas-comparativa-body');
@@ -1820,7 +1820,7 @@ let cachedMetricas = [];
 <div class="hist-metric">Cintura <span>${m.cintura ? m.cintura+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Cadera <span>${m.cadera ? m.cadera+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Pantorrilla <span>${m.pantorrilla ? m.pantorrilla+' cm' : 'Sin datos'}</span></div>
-<div class="hist-metric">Mancuernas <span>${m.pruebaPeso || 'Sin datos'}</span></div>
+<div class="hist-metric">Prueba de Peso <span>${m.pruebaPeso || 'Sin datos'}</span></div>
           </div>
         </div>`).join('');
     }
@@ -4110,7 +4110,7 @@ var METRIC_DEFS=[
   {key:'cintura_cm',label:'Cintura',unit:'cm',direction:'down',threshold:2.0},
   {key:'cadera_cm',label:'Cadera',unit:'cm',direction:'compound',threshold:1.5},
   {key:'pantorrilla_cm',label:'Pantorrilla',unit:'cm',direction:'up',threshold:0.8},
-  {key:'mancuerna_lb',label:'Mancuerna (fuerza)',unit:'lb',direction:'up',threshold:5.0}
+  {key:'mancuerna_lb',label:'Prueba de Peso',unit:'lb',direction:'up',threshold:5.0}
 ];
 
 var CADERA_ARRIBA=['ganar_musculo','rendimiento','estetico','dep_ciclismo','dep_correr','dep_futbol','dep_golf','dep_natacion','dep_padel','dep_tenis','dep_otro'];
