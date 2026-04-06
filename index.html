@@ -1111,8 +1111,12 @@ onAuthStateChanged(auth, async user => {
         const anterior = metricas.length >= 2 ? metricas[metricas.length - 2] : metricas[0];
         const ultima = metricas[metricas.length - 1];
         // Sobreescribir data.ultimaValoracion con el resultado del sort correcto
-        // Esto garantiza que la IA use el mismo documento que la tabla
+        // Limpiar cache IA para forzar regeneración si cambia el peso (dos valoraciones mismo día)
         if (ultima) {
+          try {
+            var _uid2 = window._currentUid || '';
+            Object.keys(localStorage).filter(k => k.startsWith('ia-analisis-' + _uid2)).forEach(k => localStorage.removeItem(k));
+          } catch(e) {}
           data.ultimaValoracion = {
             fecha: ultima.fecha ? (ultima.fecha.toDate ? ultima.fecha.toDate() : new Date(ultima.fecha.match(/^\d{4}-\d{2}-\d{2}$/) ? ultima.fecha+'T00:00:00' : ultima.fecha)) : new Date(),
             tipo: 'composicion', peso: ultima.peso||null, musculo: ultima.musculo||null,
@@ -2608,7 +2612,8 @@ async function renderAnalisisCientifico(data, config) {
     }
   } catch(e) { console.warn('Error parseando fecha valoración:', e); }
 
-  var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha');
+  var pesoRound = Math.round(parseFloat(data.ultimaValoracion && data.ultimaValoracion.peso) || 0);
+  var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha') + (pesoRound ? '-p' + pesoRound : '');
 
   // Limpiar TODAS las keys de IA que no correspondan a la fecha actual
   if (valFechaActual) {
