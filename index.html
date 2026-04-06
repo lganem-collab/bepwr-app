@@ -1110,6 +1110,18 @@ onAuthStateChanged(auth, async user => {
       if (metricas.length > 0) {
         const anterior = metricas.length >= 2 ? metricas[metricas.length - 2] : metricas[0];
         const ultima = metricas[metricas.length - 1];
+        // Sobreescribir data.ultimaValoracion con el resultado del sort correcto
+        // Esto garantiza que la IA use el mismo documento que la tabla
+        if (ultima) {
+          data.ultimaValoracion = {
+            fecha: ultima.fecha ? (ultima.fecha.toDate ? ultima.fecha.toDate() : new Date(ultima.fecha.match(/^\d{4}-\d{2}-\d{2}$/) ? ultima.fecha+'T00:00:00' : ultima.fecha)) : new Date(),
+            tipo: 'composicion', peso: ultima.peso||null, musculo: ultima.musculo||null,
+            grasaCorporal: ultima.grasaCorporal||null, imc: ultima.imc||null, pgc: ultima.pgc||null,
+            grasaVisceral: ultima.grasaVisceral||null, calificacion: ultima.calificacion||null,
+            brazo: ultima.brazo||null, abdomen: ultima.abdomen||null, cintura: ultima.cintura||null,
+            cadera: ultima.cadera||null, pantorrilla: ultima.pantorrilla||null
+          };
+        }
         renderMetrics(ultima, obj, anterior);
         if(window._applyIVF) window._applyIVF(ultima, anterior);
         window._refGenero=data.genero||'';
