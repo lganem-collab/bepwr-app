@@ -1096,7 +1096,12 @@ onAuthStateChanged(auth, async user => {
         const ta = a._ts !== null ? a._ts : 0;
         const tb = b._ts !== null ? b._ts : 0;
         if (ta !== tb) return ta - tb;
-        return b._fi - a._fi; // tiebreaker: _fi menor = más reciente en query desc
+        // Misma fecha: usar _createTime (cuándo se creó el doc en Firestore)
+        // El doc creado ANTES = anterior, el creado DESPUÉS = ultima (actual)
+        const ca = a._createTime || 0;
+        const cb = b._createTime || 0;
+        if (ca !== cb) return ca - cb;
+        return b._fi - a._fi; // último recurso
       });
       const metricas = metricasRaw;
       cachedMetricas = metricas;
