@@ -17,10 +17,14 @@ if (!getApps().length) {
 const db = getFirestore();
 const messaging = getMessaging();
 
-async function sendPush(token, title, body) {
+async function sendPush(token, title, body, uid = null) {
   if (!token) return;
   try {
     await messaging.send({ token, notification: { title, body }, android: { priority: 'high', notification: { channelId: 'bepwr-default', sound: 'default' } }, apns: { headers: { 'apns-priority': '10' }, payload: { aps: { sound: 'default', badge: 1 } } }, webpush: { notification: { icon: '/icons/icon-192.png' } } });
+    if (uid) {
+      const ref = db.collection('usuarios').doc(uid).collection('notificaciones').doc();
+      await ref.set({ titulo: title, cuerpo: body, fecha: new Date(), leida: false, tipo: 'aviso' });
+    }
   } catch (e) {
     console.warn('FCM error:', e.message);
   }
@@ -53,7 +57,8 @@ export default async function handler(req, res) {
         if (nac.getMonth() + 1 === todayMonth && nac.getDate() === todayDay) {
           await sendPush(token,
             '🎂 ¡Feliz cumpleaños, ' + nombre + '!',
-            'Todo el equipo de bePWR te desea un increíble año lleno de salud y metas cumplidas. 🎉'
+            'Todo el equipo de bePWR te desea un increíble año lleno de salud y metas cumplidas. 🎉',
+            doc.id
           );
           bday++;
         }
@@ -66,7 +71,8 @@ export default async function handler(req, res) {
         if (pvStr === in2Str) {
           await sendPush(token,
             '📅 Tu valoración se acerca, ' + nombre,
-            'En 2 días es tu fecha de valoración en bePWR. ¡Agenda tu cita para ver tu progreso!'
+            'En 2 días es tu fecha de valoración en bePWR. ¡Agenda tu cita para ver tu progreso!',
+            doc.id
           );
           val++;
         }
@@ -108,7 +114,8 @@ export default async function handler(req, res) {
         // Push notification
         await sendPush(mToken,
           '\u23F0 Tu valoraci\u00F3n es ma\u00F1ana, ' + primer + '!',
-          fechaLabel + ' \u00B7 Recuerda: ayuno 2-4h, ropa ligera. \u00A1Te esperamos!'
+          fechaLabel + ' \u00B7 Recuerda: ayuno 2-4h, ropa ligera. \u00A1Te esperamos!',
+          uid
         );
         // Email recordatorio
         if (mEmail && process.env.RESEND_API_KEY) {
