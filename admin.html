@@ -2619,6 +2619,10 @@ for (const med of medidasVal) {
       const adminOpt = document.getElementById('ns-rol-admin');
       if (adminOpt) adminOpt.style.display = window.currentStaffRole === 'admin' ? '' : 'none';
     }
+
+  if (tab === 'horario') { if(document.getElementById('section-horario')) document.getElementById('section-horario').style.display='block'; cargarHorario(); }
+  if (tab === 'clases') { if(document.getElementById('section-clases')) document.getElementById('section-clases').style.display='block'; cargarClases(); }
+  if (tab === 'rutina-config') { if(document.getElementById('section-rutina-config')) document.getElementById('section-rutina-config').style.display='block'; cargarRutinaConfig(); }
   }
 
   // ── GUÍAS NUTRIMENTALES ──
@@ -3927,19 +3931,6 @@ function cargarRutinaConfig() {
     <div id="rutina-config-table" style="overflow-x:auto"></div>
   </div>
 
-  if (tab === 'horario') {
-    document.getElementById('section-horario').style.display = 'block';
-    cargarHorario();
-  }
-
-  if (tab === 'clases') {
-    document.getElementById('section-clases').style.display = 'block';
-    cargarClases();
-  }
-
-  if (tab === 'rutina-config') {
-    document.getElementById('section-rutina-config').style.display = 'block';
-    cargarRutinaConfig();
   }
 
 </body>
