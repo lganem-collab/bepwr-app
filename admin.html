@@ -553,8 +553,9 @@
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div style="font-size:17px;font-weight:700">&#x1F4CB; Pr&#xF3;ximas Citas</div>
-          <button class="btn btn-sm" onclick="enviarReporteCitas()" style="background:#FF5C1A;color:#fff;font-size:12px;font-weight:600">✉ Enviar reporte</button>
+          <button class="btn btn-sm" onclick="enviarReporteCitas()" style="background:#FF5C1A;color:#fff;font-size:12px;font-weight:600">✉ Reporte</button>
         </div>
+        <input type="text" id="prox-buscar" placeholder="&#x1F50D; Buscar por nombre, tel o mail..." oninput="filtrarProximas(this.value)" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;margin-bottom:10px">
         <div id="citas-proximas-list">
           <div style="text-align:center;color:var(--gray);padding:24px;font-size:13px">Cargando citas...</div>
         </div>
@@ -573,6 +574,10 @@
             <div>
               <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">HASTA</label>
               <input type="date" id="hist-fecha-hasta" style="background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px">
+            </div>
+            <div style="flex:1;min-width:160px">
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">BUSCAR (nombre, tel, mail)</label>
+              <input type="text" id="hist-buscar" placeholder="ej. Luis, 442..." onkeydown="if(event.key==='Enter')filtrarHistorialCitas()" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px">
             </div>
             <button class="btn btn-sm" onclick="filtrarHistorialCitas()" style="background:#FF5C1A;color:#fff;font-size:12px;font-weight:600;padding:8px 14px">&#x1F50D; Filtrar</button>
             <button class="btn btn-sm" onclick="enviarReporteHistorial()" style="background:#1a3a2a;color:#2ecc71;font-size:12px;border:1px solid #2ecc71;padding:8px 14px">&#x2709; Reporte</button>
@@ -3249,7 +3254,7 @@ window.filterNotifUsers = function (q) {
           const member=(window._allMembers||[]).find(mb=>mb.uid===c.uid);
           const nombre=c.nombre&&c.nombre!=='Miembro'?c.nombre:(member&&member.nombre)||c.nombre||'—';
           const cancelada=c.estado==='cancelada';
-          html+=`<div style="display:grid;grid-template-columns:80px 1fr auto auto;gap:4px;padding:10px 14px;border-top:1px solid var(--border);align-items:center;opacity:${cancelada?'0.55':'1'}">
+          html+=`<div class="cita-row" data-search="${nombre} ${c.celular||''} ${c.email||c.correo||''}" style="display:grid;grid-template-columns:80px 1fr auto auto;gap:4px;padding:10px 14px;border-top:1px solid var(--border);align-items:center;opacity:${cancelada?'0.55':'1'}">
             <div style="font-size:13px;font-family:'Space Mono',monospace;color:${cancelada?'var(--gray)':'var(--orange)'}">${c.hora}</div>
             <div style="font-size:13px;color:${cancelada?'#666':'#eee'}">${cancelada?'<s>'+nombre+'</s>':nombre}</div>
             <span style="font-size:10px;padding:2px 7px;border-radius:10px;background:${cancelada?'#2a1010':'#0f2a1a'};color:${cancelada?'#f55':'#2ecc71'}">${cancelada?'Cancelada':'Confirmada'}</span>
@@ -3281,6 +3286,7 @@ window.filterNotifUsers = function (q) {
   window.filtrarHistorialCitas = async function() {
     const desde = document.getElementById('hist-fecha-desde').value;
     const hasta = document.getElementById('hist-fecha-hasta').value;
+    const buscar = (document.getElementById('hist-buscar')?.value||'').trim().toLowerCase();
     const el = document.getElementById('citas-historial-list');
     const cntEl = document.getElementById('hist-count');
     if (!el) return;
@@ -3290,9 +3296,19 @@ window.filterNotifUsers = function (q) {
       if (desde) q = q.where('fecha','>=',desde);
       if (hasta) q = q.where('fecha','<=',hasta);
       const snap = await q.get();
-      _histTodas = snap.docs.map(d => ({id:d.id,...d.data()}));
+      let todas = snap.docs.map(d => ({id:d.id,...d.data()}));
+      // Filtro por texto: nombre, celular o email (client-side)
+      if (buscar) {
+        todas = todas.filter(c => {
+          const nom = (c.nombre||'').toLowerCase();
+          const cel = (c.celular||c.telefono||'').toLowerCase();
+          const mail = (c.email||c.correo||'').toLowerCase();
+          return nom.includes(buscar) || cel.includes(buscar) || mail.includes(buscar);
+        });
+      }
+      _histTodas = todas;
       _histPagina = 0;
-      if (cntEl) cntEl.textContent = _histTodas.length + ' cita' + (_histTodas.length!==1?'s':'');
+      if (cntEl) cntEl.textContent = _histTodas.length + ' cita' + (_histTodas.length!==1?'s':'') + (buscar?' (filtrado)':'');
       _renderHistPagina();
     } catch(e) {
       el.innerHTML = '<div style="text-align:center;color:#f55;font-size:13px;padding:20px">Error: '+e.message+'</div>';
@@ -3359,6 +3375,16 @@ window.filterNotifUsers = function (q) {
     setTimeout(()=>{if(msg)msg.textContent='';},4000);
   };
 
+
+  window.filtrarProximas = function(term) {
+    const t = (term||'').trim().toLowerCase();
+    const rows = document.querySelectorAll('#citas-proximas-list .cita-row');
+    if (!rows.length) return;
+    rows.forEach(row => {
+      const txt = (row.dataset.search||'').toLowerCase();
+      row.style.display = (!t || txt.includes(t)) ? '' : 'none';
+    });
+  };
 
   async function cancelarCitaAdmin(citaId, nombre) {
     if (!confirm('\u00BFCancelar la cita de '+nombre+'? Se liberar\u00E1 el horario.')) return;
