@@ -488,7 +488,7 @@
       // Registrar visita
       await F.addDoc(F.collection(db, 'visitas'), {
         uid: uid, nombre: nombre, timestamp: F.Timestamp.now(),
-        semana: weekKey, semanaNum: getISOWeek(), anio: new Date().getFullYear()
+        semana: weekKey, semanaNum: getISOWeek(), anio: new Date().getFullYear(),
     tipoClase: getClaseDelMomento(new Date())
       });
       showCard({ nombre: nombre, meta: meta, totalVisitas: totalVisitas, weekVisitas: weekVisitas });
