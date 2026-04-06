@@ -22,7 +22,10 @@ export default async function handler(req, res) {
 
   try {
     const snap = await db.collection('staff').where('activo', '==', true).get();
-    const tokens = snap.docs.map(d => d.data().fcmToken).filter(t => t && t.length > 10);
+    const usuariosC = snap.docs
+      .filter(d => d.data().fcmToken && d.data().fcmToken.length > 10)
+      .map(d => ({ uid: d.id, token: d.data().fcmToken }));
+    const tokens = usuariosC.map(u => u.token);
     if (!tokens.length) return res.status(200).json({ sent: 0, message: 'Sin tokens de coaches' });
     const response = await messaging.sendEachForMulticast({
       tokens,
@@ -40,6 +43,14 @@ export default async function handler(req, res) {
         notification: { title, body, icon: 'https://bepwr-app.vercel.app/icons/icon-192.png' }
       }
     });
+    const batchC = db.batch();
+    response.responses.forEach((r, i) => {
+      if (r.success) {
+        const ref = db.collection('usuarios').doc(usuariosC[i].uid).collection('notificaciones').doc();
+        batchC.set(ref, { titulo: title, cuerpo: body, fecha: new Date(), leida: false, tipo: 'coach' });
+      }
+    });
+    if (response.successCount > 0) await batchC.commit();
     return res.status(200).json({ ok: true, sent: response.successCount, failed: response.failureCount });
   } catch (e) {
     console.error('notify-coaches:', e);
