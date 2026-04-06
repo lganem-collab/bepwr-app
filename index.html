@@ -2473,8 +2473,19 @@ function renderPruebaPeso(data) {
     var loadV = Promise.resolve({sa:0,freq:{}});
     if (uid&&db&&window.getDocs&&window.collection&&window.query&&window.where) {
       loadV = window.getDocs(window.query(window.collection(db,'visitas'),window.where('uid','==',uid))).then(function(snap){
-        var s=new Set(),f={}; snap.forEach(function(d){var dd=d.data();if(dd.semana)s.add(dd.semana);if(dd.tipoClase)f[dd.tipoClase]=(f[dd.tipoClase]||0)+1;}); return{sa:s.size,freq:f};
-      }).catch(function(){return{sa:0,freq:{}};});
+        var s=new Set(),f={};
+        snap.forEach(function(d){var dd=d.data();if(dd.semana)s.add(dd.semana);if(dd.tipoClase)f[dd.tipoClase]=(f[dd.tipoClase]||0)+1;});
+        var saReal = s.size;
+        // Para miembros existentes: si tiene pocas visitas registradas, usar fechaAlta como estimación
+        var saFinal = saReal;
+        if (saReal < 4 && config && config.fechaAlta) {
+          var ms = config.fechaAlta.toDate ? config.fechaAlta.toDate().getTime() : new Date(config.fechaAlta).getTime();
+          var semsDesdeAlta = Math.floor((Date.now()-ms)/(7*24*3600*1000));
+          saFinal = Math.max(saReal, Math.min(semsDesdeAlta, 104));
+        }
+        return {sa:saFinal, saReal:saReal, freq:f};
+      }).catch(function(){return{sa:0,saReal:0,freq:{}};});
+    }
     }
     Promise.all([loadV, horarioP]).then(function(results){ var r = results[0];
       var sa=r.sa,freq=r.freq,etapa=sa<=3?1:sa<=12?2:3,rec=_getRec(meta,ge,etapa),ei=_ETAPAS_DEF[etapa];
@@ -2500,7 +2511,7 @@ function renderPruebaPeso(data) {
       h+='</div>';
       if(compl){h+='<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #4ade80;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento</div><div style="font-size:13px;color:#ccc">'+compl+'</div></div>';}
       if(tip){h+='<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #9F7AEA;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#9F7AEA;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consejo</div><div style="font-size:13px;color:#ccc">'+tip+'</div></div>';}
-      h+='<a href="https://bepwr.com/classes" target="_blank" style="display:block;background:#FF5C1A;color:#fff;text-align:center;padding:14px;border-radius:12px;font-weight:600;font-size:14px;text-decoration:none;margin-top:4px">Reservar mis clases →</a>';
+      // Botón de reserva removido — ya existe en la app
       h+='</div>';
       el.innerHTML=h;
     }).catch(function(){el.innerHTML='<div style="color:#888;padding:16px;font-size:13px">No se pudo cargar la rutina.</div>';});
