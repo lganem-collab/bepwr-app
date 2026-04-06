@@ -336,7 +336,7 @@
         <div id="bepwr-score-section">
           <!-- bePWR Score - full width -->
           <div class="m-card" style="text-align:center;padding:20px 14px;margin-bottom:10px">
-            <div style="font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;margin-bottom:12px"><span style="color:#fff;text-transform:lowercase">be</span><span style="color:#FF5C1A">PWR</span> <span style="text-transform:none">Score</span> <button onclick="document.getElementById('modal-bepwr-info').style.display='flex'" style="background:none;border:none;color:#FF5C1A;font-size:16px;cursor:pointer;padding:0 2px;vertical-align:middle;opacity:0.8">&#x24D8;</button></div>
+            <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:4px"><span style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#fff">be</span><span style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#FF5C1A">PWR</span><span style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#ccc">&nbsp;Score</span><button onclick="document.getElementById('modal-bepwr-info').style.display='flex'" style="background:none;border:none;color:#FF5C1A;font-size:14px;cursor:pointer;padding:0 3px;line-height:1;opacity:0.75;margin-left:2px">&#x24D8;</button></div>
             <div style="position:relative;width:100px;height:100px;margin:0 auto 10px">
               <svg width="100" height="100" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
@@ -354,21 +354,30 @@
 
           <!-- Tendencia de Valoracion -->
           <div id="card-indice" class="m-card" style="padding:20px 18px;margin-bottom:16px;display:none">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <!-- Línea 1: título centrado + ⓘ -->
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px">
               <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace">ÍNDICE DE EVOLUCIÓN</div>
-              <div id="indice-badge" style="border-radius:20px;padding:2px 10px;font-size:10px;font-family:'Space Mono',monospace"></div>
+              <button onclick="document.getElementById('modal-tendencia-info').style.display='flex'" style="background:none;border:none;color:#FF5C1A;font-size:13px;cursor:pointer;padding:0;line-height:1;opacity:0.7">&#x24D8;</button>
             </div>
-            <div style="position:relative;width:100px;height:100px;margin:0 auto 12px">
-              <svg width="100" height="100" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
-                <circle id="indice-ring" cx="50" cy="50" r="42" fill="none" stroke="#FF5C1A" stroke-width="7"
-                  stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 50 50)"/>
-              </svg>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-                <span id="indice-value" style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:#fff">—</span>
+            <!-- Línea 2: anillo izquierda + nombre del rango derecha -->
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:0 4px">
+              <div style="position:relative;width:88px;height:88px;flex-shrink:0">
+                <svg width="88" height="88" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="#2a2a2a" stroke-width="7"/>
+                  <circle id="indice-ring" cx="50" cy="50" r="42" fill="none" stroke="#FF5C1A" stroke-width="7"
+                    stroke-dasharray="0 264" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                  <span id="indice-value" style="font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:1px;color:#fff">—</span>
+                </div>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div id="indice-badge" style="font-size:19px;font-weight:700;font-family:'DM Sans',sans-serif;line-height:1.2;margin-bottom:2px;color:#FF5C1A"></div>
+                <div style="font-size:9px;color:#444;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase">de 1 a 100</div>
               </div>
             </div>
-            <div id="indice-frase" style="font-size:12px;line-height:1.5;text-align:center;font-style:italic;padding:0 8px;min-height:36px"></div>
+            <!-- Línea 3: frase centrada -->
+            <div id="indice-frase" style="font-size:12px;line-height:1.6;text-align:center;font-style:italic;color:#aaa;padding:10px 4px 0;border-top:1px solid var(--border);min-height:36px"></div>
           </div>
 
 
@@ -2715,24 +2724,29 @@ if (config && config.rutina) {
 <div id="modal-bepwr-info" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px">
   <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
     <button onclick="document.getElementById('modal-bepwr-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer">&#x2715;</button>
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">bePWR SCORE · ESTADO FÍSICO ACTUAL</div>
-    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Calificación de <strong style="color:#fff">0 a 100</strong> de tu estado físico actual, calculada con tus métricas más recientes.</p>
-    <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:12px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">CÓMO SE CONSTRUYE</div>
-      <div>&#x1F4CA; Calificación InBody &#x2014; 35%</div>
-      <div>&#x1F525; % Grasa corporal vs rangos saludables &#x2014; 25%</div>
-      <div>&#x1F4A7; Grasa visceral &#x2014; 20%</div>
-      <div>&#x1F4AA; Fuerza funcional (mancuernas / peso) &#x2014; 10%</div>
-      <div>&#x1F4CF; Cintura vs referencia OMS &#x2014; 10%</div>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:12px">bePWR SCORE</div>
+    <p style="font-size:15px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:10px">La fotografía de tu salud funcional hoy.</p>
+    <p style="font-size:13px;color:#ccc;line-height:1.6;margin-bottom:18px">Un número entre 0 y 100 que refleja cómo está tu cuerpo en este momento — no qué tan rápido estás cambiando, sino qué tan bien estás hoy. Considera tu composición corporal, tu grasa visceral, tu fuerza y tu cintura.</p>
+    <div style="font-size:11px;color:#888;font-family:'Space Mono',monospace;letter-spacing:.5px;margin-bottom:12px">¿QUÉ SIGNIFICA TU NÚMERO?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+      <div style="padding:12px 14px;background:#FF5C1A12;border-left:3px solid #FF5C1A;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#FF5C1A;font-family:'Space Mono',monospace;margin-bottom:4px">88–100 · DESTACADO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Tu composición corporal y fuerza funcional están en su mejor nivel. Eres parte del grupo más selecto del gym.</div>
+      </div>
+      <div style="padding:12px 14px;background:#4ade8012;border-left:3px solid #4ade80;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#4ade80;font-family:'Space Mono',monospace;margin-bottom:4px">73–87 · AVANZADO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Tienes una base sólida y clara. Tu cuerpo está trabajando bien en la mayoría de las métricas clave.</div>
+      </div>
+      <div style="padding:12px 14px;background:#facc1512;border-left:3px solid #facc15;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#facc15;font-family:'Space Mono',monospace;margin-bottom:4px">56–72 · ÓPTIMO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Tienes salud funcional. Una o dos áreas tienen margen de mejora y el training está haciendo efecto.</div>
+      </div>
+      <div style="padding:12px 14px;background:#f8717112;border-left:3px solid #f87171;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#f87171;font-family:'Space Mono',monospace;margin-bottom:4px">0–55 · EN PROCESO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Tu cuerpo está en construcción. Con consistencia en el entrenamiento y la nutrición, este número sube.</div>
+      </div>
     </div>
-    <div style="font-size:12px;line-height:1.8;margin-bottom:12px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">¿Cómo se interpreta?</div>
-      <div><span style="color:#60a5fa">&#x25CF;</span> <strong style="color:#60a5fa">0&#x2013;55</strong> &#x2014; En Proceso</div>
-      <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">56&#x2013;72</strong> &#x2014; Óptimo</div>
-      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">73&#x2013;87</strong> &#x2014; Avanzado</div>
-      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">88&#x2013;100</strong> &#x2014; Destacado</div>
-    </div>
-    <div style="font-size:11px;color:#666;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
+    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Se actualiza con cada nueva valoración.</div>
   </div>
 </div>
 
@@ -3119,7 +3133,7 @@ if(!isNaN(ci)&&ci>0){
 if(w===0)return null;
 return Math.round((s/w)*100);
 }
-function ivfColor(s){return s>=88?'#FF5C1A':s>=73?'#4ade80':s>=56?'#facc15':'#60a5fa';}
+function ivfColor(s){return s>=88?'#FF5C1A':s>=73?'#4ade80':s>=56?'#facc15':'#f87171';}
 function ivfLabel(s){return s>=88?'Destacado':s>=73?'Avanzado':s>=56?'\u00d3ptimo':'En Proceso';}
 function applyIVF(m,ini){
 var gen=(window.cachedUserData&&window.cachedUserData.genero)||'';
@@ -3370,28 +3384,35 @@ window._applyIVF=applyIVF;
 </script>
 
 <div id="modal-tendencia-info" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px">
-  <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative">
+  <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:360px;width:100%;padding:24px;position:relative;max-height:90vh;overflow-y:auto">
     <button onclick="document.getElementById('modal-tendencia-info').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#aaa;font-size:20px;cursor:pointer">&#x2715;</button>
-    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:16px">TENDENCIA</div>
-    <p style="font-size:13px;color:#ddd;line-height:1.6;margin-bottom:14px">Evalúa si tus métricas se acercan o alejan de <strong style="color:#fff">rangos saludables personalizados</strong> según tu edad, género y estatura.</p>
-    <div style="font-size:12px;color:#aaa;line-height:1.8;margin-bottom:12px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">QUÉ ANALIZA</div>
-      <div>&#x2696; Peso — rangos IMC saludable (OMS)</div>
-      <div>&#x1F4AA; Músculo esquelético — refs. por edad y género</div>
-      <div>&#x1F525; % Grasa corporal — rangos ACSM 2018</div>
-      <div>&#x1F4A7; Grasa visceral — escala InBody</div>
-      <div>&#x1F4CA; Calificación InBody</div>
-      <div>&#x1F4CD; Abdomen — referencia OMS</div>
-      <div>&#x1F3CB; Mancuernas — fuerza funcional relativa</div>
-      <div style="color:#666;font-size:11px;margin-top:4px">Los pesos de cada métrica cambian según tu objetivo.</div>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1px;margin-bottom:12px">ÍNDICE DE EVOLUCIÓN</div>
+    <p style="font-size:15px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:10px">La película de lo que pasó en este ciclo.</p>
+    <p style="font-size:13px;color:#ccc;line-height:1.6;margin-bottom:18px">Compara tus dos valoraciones más recientes y te dice si tu composición corporal avanzó, se mantuvo o retrocedió — considerando tu objetivo específico y todas tus métricas.</p>
+    <div style="font-size:11px;color:#888;font-family:'Space Mono',monospace;letter-spacing:.5px;margin-bottom:12px">¿QUÉ SIGNIFICA TU NÚMERO?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+      <div style="padding:12px 14px;background:#FF5C1A12;border-left:3px solid #FF5C1A;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#FF5C1A;font-family:'Space Mono',monospace;margin-bottom:4px">65–100 · AVANCE NOTORIO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Este ciclo fue claramente positivo. Tus métricas se movieron en la dirección correcta.</div>
+      </div>
+      <div style="padding:12px 14px;background:#4ade8012;border-left:3px solid #4ade80;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#4ade80;font-family:'Space Mono',monospace;margin-bottom:4px">53–64 · AVANCE</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Progresaste. No todo fue perfecto, pero el balance del ciclo es favorable.</div>
+      </div>
+      <div style="padding:12px 14px;background:#facc1512;border-left:3px solid #facc15;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#facc15;font-family:'Space Mono',monospace;margin-bottom:4px">47–52 · MANTENIMIENTO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Tu cuerpo se mantuvo estable. Un buen punto de partida para el siguiente ciclo.</div>
+      </div>
+      <div style="padding:12px 14px;background:#fb923c12;border-left:3px solid #fb923c;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#fb923c;font-family:'Space Mono',monospace;margin-bottom:4px">35–46 · LIGERO RETROCESO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Algunas métricas se alejaron de tu objetivo. El cuerpo manda señales — úsalas para ajustar el plan.</div>
+      </div>
+      <div style="padding:12px 14px;background:#f8717112;border-left:3px solid #f87171;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#f87171;font-family:'Space Mono',monospace;margin-bottom:4px">1–34 · RETROCEDIENDO</div>
+        <div style="font-size:12px;color:#ccc;line-height:1.5">Este ciclo fue difícil. Ya tienes el mapa de lo que cambiar en el siguiente.</div>
+      </div>
     </div>
-    <div style="font-size:12px;line-height:1.8;margin-bottom:12px">
-      <div style="color:#fff;font-size:11px;font-family:'Space Mono',monospace;margin-bottom:6px">¿CÓMO SE INTERPRETA?</div>
-      <div><span style="color:#facc15">&#x25CF;</span> <strong style="color:#facc15">RETROCESO</strong> &#x2014; métricas alejándose de sus rangos saludables</div>
-      <div><span style="color:#4ade80">&#x25CF;</span> <strong style="color:#4ade80">MANTENIMIENTO / EN PROCESO</strong> &#x2014; cambios moderados o dentro del rango</div>
-      <div><span style="color:#FF5C1A">&#x25CF;</span> <strong style="color:#FF5C1A">PROGRESO</strong> &#x2014; tus métricas se acercan al rango óptimo</div>
-    </div>
-    <div style="font-size:11px;color:#666;font-family:'Space Mono',monospace">Requiere al menos 2 valoraciones.</div>
+    <div style="font-size:11px;color:#555;font-family:'Space Mono',monospace">Requiere al menos 2 valoraciones para calcularse.</div>
   </div>
 </div>
 
@@ -4243,11 +4264,11 @@ window._applyIndiceEvolucion=function(act,ini,valFecha){
   window._indiceEvolucionResult=result;
 
   var fi=result.finalIndex,label=result.statusLabel;
-  var color=fi>=65?'#FF5C1A':fi>=53?'#f97316':fi>=47?'#60a5fa':fi>=35?'#facc15':'#f87171';
+  var color=fi>=65?'#FF5C1A':fi>=53?'#4ade80':fi>=47?'#facc15':fi>=35?'#fb923c':'#f87171';
 
   card.style.display='block';
   badge.textContent=label;
-  badge.style.cssText='border-radius:20px;padding:2px 10px;font-size:10px;font-family:Space Mono,monospace;background:'+color+'22;color:'+color+';border:1px solid '+color;
+  badge.style.cssText='font-size:19px;font-weight:700;font-family:DM Sans,sans-serif;line-height:1.2;color:'+color;
   ring.setAttribute('stroke',color);
 
   // Frase motivacional (usa FRASES si ya cargó)
@@ -4256,7 +4277,7 @@ window._applyIndiceEvolucion=function(act,ini,valFecha){
     var arr=window._FRASES_INDICE[cat];
     var f=arr[Math.floor(Math.random()*arr.length)];
     fraseEl.textContent=f;
-    fraseEl.style.color=fi>=47?'#ffe0cc':'#fef3cd';
+    fraseEl.style.color=fi>=65?'#ffe0cc':fi>=53?'#d4f5d4':fi>=47?'#fefacc':fi>=35?'#fde8cc':'#fdd4d4';
   }
 
   // Animar ring igual que bePWR Score
