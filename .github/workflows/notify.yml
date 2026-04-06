@@ -7,6 +7,11 @@ on:
     - cron: '30 11 * * 1-5'
     - cron: '0 15 * * *'
   workflow_dispatch:
+    inputs:
+      endpoint:
+        description: 'Endpoint: notify-morning, notify-evening, notify-coaches, notify-daily'
+        required: false
+        default: 'notify-daily'
 
 jobs:
   notify:
@@ -15,18 +20,22 @@ jobs:
       - name: Determinar endpoint
         id: endpoint
         run: |
-          HOUR=$(date -u +%H)
-          MIN=$(date -u +%M)
-          if [ "$HOUR" = "12" ] && [ "$MIN" = "00" ]; then
-            echo "path=/api/cron/notify-morning" >> $GITHUB_OUTPUT
-          elif [ "$HOUR" = "01" ] && [ "$MIN" = "00" ]; then
-            echo "path=/api/cron/notify-evening" >> $GITHUB_OUTPUT
-          elif [ "$HOUR" = "11" ] && [ "$MIN" = "30" ]; then
-            echo "path=/api/cron/notify-coaches" >> $GITHUB_OUTPUT
-          elif [ "$HOUR" = "15" ] && [ "$MIN" = "00" ]; then
-            echo "path=/api/cron/notify-daily" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "path=/api/cron/${{ github.event.inputs.endpoint }}" >> $GITHUB_OUTPUT
           else
-            echo "path=none" >> $GITHUB_OUTPUT
+            HOUR=$(date -u +%H)
+            MIN=$(date -u +%M)
+            if [ "$HOUR" = "12" ] && [ "$MIN" = "00" ]; then
+              echo "path=/api/cron/notify-morning" >> $GITHUB_OUTPUT
+            elif [ "$HOUR" = "01" ] && [ "$MIN" = "00" ]; then
+              echo "path=/api/cron/notify-evening" >> $GITHUB_OUTPUT
+            elif [ "$HOUR" = "11" ] && [ "$MIN" = "30" ]; then
+              echo "path=/api/cron/notify-coaches" >> $GITHUB_OUTPUT
+            elif [ "$HOUR" = "15" ] && [ "$MIN" = "00" ]; then
+              echo "path=/api/cron/notify-daily" >> $GITHUB_OUTPUT
+            else
+              echo "path=none" >> $GITHUB_OUTPUT
+            fi
           fi
 
       - name: Llamar endpoint
