@@ -561,6 +561,35 @@
         <div id="citas-report-msg" style="text-align:center;font-size:13px;margin-top:8px;color:var(--green)"></div>
       </div>
 
+      <!-- HISTORIAL CON FILTRO DE RANGO Y PAGINACIÓN -->
+      <div style="margin-top:24px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:12px">&#x1F4CB; Historial de Citas</div>
+        <div style="background:#111;border-radius:12px;padding:14px 16px;margin-bottom:12px">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+            <div>
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">DESDE</label>
+              <input type="date" id="hist-fecha-desde" style="background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:4px">HASTA</label>
+              <input type="date" id="hist-fecha-hasta" style="background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px">
+            </div>
+            <button class="btn btn-sm" onclick="filtrarHistorialCitas()" style="background:#FF5C1A;color:#fff;font-size:12px;font-weight:600;padding:8px 14px">&#x1F50D; Filtrar</button>
+            <button class="btn btn-sm" onclick="enviarReporteHistorial()" style="background:#1a3a2a;color:#2ecc71;font-size:12px;border:1px solid #2ecc71;padding:8px 14px">&#x2709; Reporte</button>
+            <span id="hist-count" style="font-size:12px;color:var(--gray);align-self:center"></span>
+          </div>
+        </div>
+        <div id="citas-historial-list">
+          <div style="text-align:center;color:var(--gray);font-size:13px;padding:24px;font-family:Space Mono,monospace">Selecciona un rango y presiona Filtrar.</div>
+        </div>
+        <div id="hist-pagination" style="display:none;justify-content:space-between;align-items:center;padding:10px 0">
+          <button class="btn btn-sm" id="hist-prev" onclick="cambiarPaginaHistorial(-1)" style="font-size:12px">&#x2190; Anterior</button>
+          <span id="hist-page-label" style="font-size:12px;color:var(--gray);font-family:Space Mono,monospace"></span>
+          <button class="btn btn-sm" id="hist-next" onclick="cambiarPaginaHistorial(1)" style="font-size:12px">Siguiente &#x2192;</button>
+        </div>
+        <div id="hist-report-msg" style="text-align:center;font-size:13px;margin-top:6px;color:var(--green)"></div>
+      </div>
+
     </div>
 
 <!-- ── TAB PESOS — Tabla Maestra del Índice de Evolución ────────────── -->
@@ -3243,50 +3272,92 @@ window.filterNotifUsers = function (q) {
     }
   }
 
-  async function loadCitasHistorial() {
+  // ── HISTORIAL CON FILTRO, PAGINACIÓN Y REPORTE ──
+  var _histTodas = [], _histPagina = 0;
+  const HIST_PAGE = 50;
+
+  async function loadCitasHistorial() { /* se carga al filtrar */ }
+
+  window.filtrarHistorialCitas = async function() {
+    const desde = document.getElementById('hist-fecha-desde').value;
+    const hasta = document.getElementById('hist-fecha-hasta').value;
     const el = document.getElementById('citas-historial-list');
+    const cntEl = document.getElementById('hist-count');
     if (!el) return;
+    el.innerHTML = '<div style="text-align:center;color:var(--gray);padding:20px;font-size:13px;font-family:Space Mono,monospace">Buscando…</div>';
     try {
-      const hoy = new Date().toISOString().split('T')[0];
-      const snap = await db.collection('citas')
-        .where('fecha', '<', hoy)
-        .orderBy('fecha', 'desc')
-        .get();
-      const todas = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      if (!todas.length) { el.innerHTML = '<div style="text-align:center;color:#666;font-size:13px;padding:20px">Sin historial de citas</div>'; return; }
-      // Agrupar por mes
-      const grupos = {};
-      todas.forEach(c => {
-        const [y,m] = c.fecha.split('-');
-        const key = y+'-'+m;
-        if (!grupos[key]) grupos[key] = [];
-        grupos[key].push(c);
-      });
-      const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-      const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-      let html = '';
-      Object.keys(grupos).sort().reverse().forEach(key => {
-        const [y,m] = key.split('-');
-        html += `<div style="font-size:11px;font-weight:600;color:#888;letter-spacing:.5px;padding:12px 14px 4px;text-transform:uppercase">${meses[parseInt(m)-1]} ${y}</div>`;
-        grupos[key].forEach(c => {
-          const fd = new Date(parseInt(c.fecha.split('-')[0]), parseInt(c.fecha.split('-')[1])-1, parseInt(c.fecha.split('-')[2]));
-          const label = dias[fd.getDay()]+' '+parseInt(c.fecha.split('-')[2])+', '+c.hora;
-          const isCanceled = c.estado === 'cancelada';
-          html += `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:10px 14px;border-bottom:1px solid #1a1a1a">
-            <div>
-              <div style="font-size:13px;color:#eee;font-weight:500">${c.nombre||'Miembro'}</div>
-              <div style="font-size:11px;color:#888;margin-top:1px">${label}</div>
-            </div>
-            <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:${isCanceled?'#3a1a1a':'#1a3a2a'};color:${isCanceled?'#e74c3c':'#2ecc71'}">${isCanceled?'Cancelada':'Completada'}</span>
-          </div>`;
-        });
-      });
-      el.innerHTML = `<div style="background:#111;border-radius:12px;overflow:hidden">${html}</div>`;
+      let q = db.collection('citas').orderBy('fecha','desc');
+      if (desde) q = q.where('fecha','>=',desde);
+      if (hasta) q = q.where('fecha','<=',hasta);
+      const snap = await q.get();
+      _histTodas = snap.docs.map(d => ({id:d.id,...d.data()}));
+      _histPagina = 0;
+      if (cntEl) cntEl.textContent = _histTodas.length + ' cita' + (_histTodas.length!==1?'s':'');
+      _renderHistPagina();
     } catch(e) {
-      console.error('loadCitasHistorial:', e);
-      el.innerHTML = '<div style="text-align:center;color:#666;font-size:13px;padding:20px">Error cargando historial</div>';
+      el.innerHTML = '<div style="text-align:center;color:#f55;font-size:13px;padding:20px">Error: '+e.message+'</div>';
+    }
+  };
+
+  function _renderHistPagina() {
+    const el = document.getElementById('citas-historial-list');
+    const pEl = document.getElementById('hist-pagination');
+    const lEl = document.getElementById('hist-page-label');
+    const prev = document.getElementById('hist-prev');
+    const next = document.getElementById('hist-next');
+    if (!el) return;
+    if (!_histTodas.length) {
+      el.innerHTML = '<div style="text-align:center;color:#666;font-size:13px;padding:20px">Sin citas en este rango.</div>';
+      if (pEl) pEl.style.display='none'; return;
+    }
+    const totalPags = Math.ceil(_histTodas.length/HIST_PAGE);
+    const pagina = _histTodas.slice(_histPagina*HIST_PAGE, (_histPagina+1)*HIST_PAGE);
+    const dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const grupos={};
+    pagina.forEach(c=>{
+      const p=c.fecha.split('-'); const key=p[0]+'-'+p[1];
+      if(!grupos[key])grupos[key]=[];grupos[key].push(c);
+    });
+    let html='';
+    Object.keys(grupos).sort().reverse().forEach(key=>{
+      const p=key.split('-');
+      html+=`<div style="font-size:11px;font-weight:600;color:#888;letter-spacing:.5px;padding:10px 14px 4px;text-transform:uppercase">${meses[parseInt(p[1])-1]} ${p[0]}</div>`;
+      grupos[key].forEach(c=>{
+        const pt=c.fecha.split('-');
+        const fd=new Date(parseInt(pt[0]),parseInt(pt[1])-1,parseInt(pt[2]));
+        const lbl=dias[fd.getDay()]+' '+parseInt(pt[2])+', '+c.hora;
+        const canc=c.estado==='cancelada';
+        html+=`<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:10px 14px;border-bottom:1px solid #1a1a1a"><div><div style="font-size:13px;color:#eee;font-weight:500">${c.nombre||'Miembro'}</div><div style="font-size:11px;color:#888;margin-top:1px">${lbl}</div></div><span style="font-size:11px;padding:3px 8px;border-radius:20px;background:${canc?'#3a1a1a':'#1a3a2a'};color:${canc?'#e74c3c':'#2ecc71'}">${canc?'Cancelada':'Completada'}</span></div>`;
+      });
+    });
+    el.innerHTML=`<div style="background:#111;border-radius:12px;overflow:hidden">${html}</div>`;
+    if (pEl) {
+      pEl.style.display=totalPags>1?'flex':'none';
+      if(lEl) lEl.textContent='Página '+(_histPagina+1)+' de '+totalPags;
+      if(prev) prev.disabled=_histPagina===0;
+      if(next) next.disabled=_histPagina>=totalPags-1;
     }
   }
+
+  window.cambiarPaginaHistorial = function(dir) {
+    const total=Math.ceil(_histTodas.length/HIST_PAGE);
+    _histPagina=Math.max(0,Math.min(total-1,_histPagina+dir));
+    _renderHistPagina();
+  };
+
+  window.enviarReporteHistorial = async function() {
+    const msg=document.getElementById('hist-report-msg');
+    if(!_histTodas.length){if(msg){msg.style.color='#f55';msg.textContent='Filtra primero un rango de citas.';setTimeout(()=>msg.textContent='',3000);}return;}
+    if(msg){msg.style.color='var(--gray)';msg.textContent='Enviando reporte…';}
+    try {
+      const res=await fetch('/api/send-cita',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:'reporte',citas:_histTodas})});
+      const data=await res.json();
+      if(res.ok){if(msg){msg.style.color='var(--green)';msg.textContent='✅ Reporte enviado ('+_histTodas.length+' citas)';}}
+      else{if(msg){msg.style.color='#f55';msg.textContent=data.error||'Error al enviar.';}}
+    }catch(e){if(msg){msg.style.color='#f55';msg.textContent='Error: '+e.message;}}
+    setTimeout(()=>{if(msg)msg.textContent='';},4000);
+  };
 
 
   async function cancelarCitaAdmin(citaId, nombre) {
