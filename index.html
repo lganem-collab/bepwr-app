@@ -1069,7 +1069,8 @@ onAuthStateChanged(auth, async user => {
         if (!f) return 0;
         if (f.toDate) return f.toDate().getTime();
         if (typeof f === 'string') {
-          if (f.match(/^\d{4}-\d{2}-\d{2}/)) return new Date(f).getTime();
+          if (f.match(/^\d{4}-\d{2}-\d{2}$/)) return new Date(f+'T00:00:00').getTime(); // local time
+          if (f.match(/^\d{4}-\d{2}-\d{2}T/)) return new Date(f).getTime();
           if (f.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) { var p=f.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
           var mx = f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
           if (mx && MESES_MAP[mx[2]] !== undefined) return new Date(parseInt(mx[3]), MESES_MAP[mx[2]], parseInt(mx[1])).getTime();
@@ -2211,7 +2212,8 @@ async function loadMetodoData() {
           if (!f) return 0;
           if (f.toDate) return f.toDate().getTime();
           if (typeof f === 'string') {
-            if (f.match(/^\d{4}-\d{2}-\d{2}/)) { var t=new Date(f).getTime(); return isNaN(t)?0:t; }
+            if (f.match(/^\d{4}-\d{2}-\d{2}$/)) { var t=new Date(f+'T00:00:00').getTime(); return isNaN(t)?0:t; }
+          if (f.match(/^\d{4}-\d{2}-\d{2}T/)) { var t=new Date(f).getTime(); return isNaN(t)?0:t; }
             if (f.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) { var p=f.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
             var mx=f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
             if (mx && MESES2[mx[2]] !== undefined) return new Date(parseInt(mx[3]),MESES2[mx[2]],parseInt(mx[1])).getTime();
