@@ -173,6 +173,9 @@
     <div class="tab" id="tab-guias" onclick="switchTab('guias')" style="display:none">&#x1F4C4; Guías</div>
     <div class="tab" id="tab-citas" onclick="switchTab('citas')" style="display:none">&#x1F4C5; Citas Val</div>
     <div class="tab" id="tab-pesos" onclick="switchTab('pesos')" style="display:none">⚖️ Pesos 🔒</div>
+        <div class="tab" id="tab-horario" onclick="switchTab('horario')">Horario</div>
+        <div class="tab" id="tab-clases" onclick="switchTab('clases')">Clases</div>
+        <div class="tab" id="tab-rutina-config" onclick="switchTab('rutina-config')">Rutina</div>
   </div>
   <div class="content">
 
@@ -2584,6 +2587,9 @@ for (const med of medidasVal) {
       const contentEl = document.getElementById('tab-content-'+t);
       if (tabEl) tabEl.classList.toggle('on', t===tab);
       if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
+  if(document.getElementById('section-horario')) document.getElementById('section-horario').style.display='none';
+  if(document.getElementById('section-clases')) document.getElementById('section-clases').style.display='none';
+  if(document.getElementById('section-rutina-config')) document.getElementById('section-rutina-config').style.display='none';
     });
     if (tab === 'staff') loadStaffList();
     if (tab === 'bitacora') loadBitacora();
@@ -3570,6 +3576,204 @@ window.filterNotifUsers = function (q) {
     };
   })();
 
+
+// ════════════════════════════════════════════════
+// HORARIO
+// ════════════════════════════════════════════════
+var _horarioCache = null;
+var _clasesCache = null;
+
+async function cargarHorario() {
+  var grid = document.getElementById('horario-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="color:#888;font-size:13px">Cargando horario...</div>';
+  try {
+    var { getDocs, collection, doc, setDoc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js');
+    var db = firebase.firestore();
+    var clasesSnap = await db.collection('config').doc('clases').get();
+    _clasesCache = clasesSnap.exists ? clasesSnap.data().lista : [];
+    var snap = await db.collection('horario').orderBy('dia').orderBy('hora').get();
+    var slots = [];
+    snap.forEach(function(d) { slots.push(Object.assign({_id: d.id}, d.data())); });
+    var dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">';
+    for (var d = 0; d <= 6; d++) {
+      var daySlots = slots.filter(function(s) { return s.dia === d; });
+      if (!daySlots.length) continue;
+      html += '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:16px">';
+      html += '<div style="font-size:13px;font-weight:700;color:#FF5C1A;margin-bottom:10px">' + dias[d] + '</div>';
+      daySlots.forEach(function(s) {
+        var cls = _clasesCache.find(function(c) { return c.id === s.tipoClase; }) || {};
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2a2a2a">';
+        html += '<div><div style="font-size:13px;font-weight:600;color:#f0f0f0">' + s.hora + ' · ' + (cls.nombre||s.tipoClase) + '</div>';
+        html += '<div style="font-size:11px;color:#888">' + (s.coach||'Sin coach') + ' · Cupo: ' + (s.cupo||17) + '</div></div>';
+        html += '<div style="display:flex;gap:6px">';
+        html += '<button onclick="editarSlot(\'' + s._id + \'')" style="background:transparent;border:1px solid #444;border-radius:6px;padding:4px 8px;color:#ccc;font-size:11px;cursor:pointer">✏️</button>';
+        html += '<button onclick="eliminarSlot(\'' + s._id + \'')" style="background:transparent;border:1px solid #444;border-radius:6px;padding:4px 8px;color:#f87171;font-size:11px;cursor:pointer">🗑️</button>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+  } catch(e) { grid.innerHTML = '<div style="color:#f87171">Error: ' + e.message + '</div>'; }
+}
+
+function agregarSlot() { editarSlot(null); }
+
+function editarSlot(id) {
+  var cls = (_clasesCache||[]).map(function(c) { return '<option value="' + c.id + '">' + c.nombre + '</option>'; }).join('');
+  var dias = [{v:1,n:'Lunes'},{v:2,n:'Martes'},{v:3,n:'Miércoles'},{v:4,n:'Jueves'},{v:5,n:'Viernes'},{v:6,n:'Sábado'},{v:0,n:'Domingo'}];
+  var diasOpts = dias.map(function(d) { return '<option value="' + d.v + '">' + d.n + '</option>'; }).join('');
+  var html = '<div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:16px" id="slot-form">';
+  html += '<h3 style="font-size:15px;font-weight:700;margin-bottom:14px">' + (id ? 'Editar clase' : 'Nueva clase') + '</h3>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Día</label><select id="sl-dia" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px">' + diasOpts + '</select></div>';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Hora</label><input id="sl-hora" type="time" value="07:00" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Clase</label><select id="sl-clase" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px">' + cls + '</select></div>';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Duración (min)</label><input id="sl-dur" type="number" value="45" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Coach</label><input id="sl-coach" type="text" placeholder="Nombre del coach" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Cupo máx</label><input id="sl-cupo" type="number" value="17" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
+  html += '</div><div style="display:flex;gap:8px">';
+  html += '<button onclick="guardarSlot(\'' + (id||'') + \'')" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>';
+  html += '<button onclick="document.getElementById(\'slot-form\').remove()" style="background:transparent;border:1px solid #444;border-radius:8px;padding:8px 16px;color:#ccc;font-size:13px;cursor:pointer">Cancelar</button></div></div>';
+  var grid = document.getElementById('horario-grid');
+  grid.insertAdjacentHTML('afterbegin', html);
+}
+
+async function guardarSlot(id) {
+  var data = {
+    dia: parseInt(document.getElementById('sl-dia').value),
+    hora: document.getElementById('sl-hora').value,
+    tipoClase: document.getElementById('sl-clase').value,
+    duracion: parseInt(document.getElementById('sl-dur').value)||45,
+    coach: document.getElementById('sl-coach').value,
+    cupo: parseInt(document.getElementById('sl-cupo').value)||17,
+    activo: true
+  };
+  try {
+    var db = firebase.firestore();
+    if (id) await db.collection('horario').doc(id).set(data);
+    else await db.collection('horario').add(data);
+    _horarioCache = null;
+    cargarHorario();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function eliminarSlot(id) {
+  if (!confirm('\u00bfEliminar esta clase del horario?')) return;
+  await firebase.firestore().collection('horario').doc(id).delete();
+  cargarHorario();
+}
+
+// ════════════════════════════════════════════════
+// CLASES
+// ════════════════════════════════════════════════
+async function cargarClases() {
+  var list = document.getElementById('clases-list');
+  if (!list) return;
+  try {
+    var db = firebase.firestore();
+    var snap = await db.collection('config').doc('clases').get();
+    var lista = snap.exists ? snap.data().lista : [];
+    var html = '';
+    lista.forEach(function(c, idx) {
+      html += '<div style="display:flex;align-items:center;gap:12px;background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px 16px">';
+      html += '<div style="width:14px;height:14px;border-radius:50%;background:' + (c.color||'#888') + ';flex-shrink:0"></div>';
+      html += '<div style="flex:1;font-size:14px;font-weight:600;color:#f0f0f0">' + c.nombre + '</div>';
+      html += '<div style="font-size:11px;color:#888;font-family:monospace">' + c.id + '</div>';
+      var activoColor = c.activa ? '#4ade80' : '#888';
+      var activoLabel = c.activa ? 'Activa' : 'Inactiva';
+      html += '<span style="font-size:11px;font-weight:600;color:' + activoColor + '">' + activoLabel + '</span>';
+      html += '<button onclick="toggleClase(' + idx + ')" style="background:transparent;border:1px solid #444;border-radius:6px;padding:4px 10px;color:#ccc;font-size:11px;cursor:pointer">' + (c.activa ? 'Desactivar' : 'Activar') + '</button>';
+      html += '</div>';
+    });
+    list.innerHTML = html;
+    window._clasesData = lista;
+  } catch(e) { list.innerHTML = '<div style="color:#f87171">Error: ' + e.message + '</div>'; }
+}
+
+async function toggleClase(idx) {
+  var lista = window._clasesData || [];
+  lista[idx].activa = !lista[idx].activa;
+  await firebase.firestore().collection('config').doc('clases').update({ lista: lista });
+  cargarClases();
+}
+
+function agregarClase() {
+  var html = '<div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:16px" id="clase-form">';
+  html += '<h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Nueva Clase</h3>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">ID (sin espacios)</label><input id="cls-id" type="text" placeholder="ej: pilates" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Nombre</label><input id="cls-nombre" type="text" placeholder="ej: Pilates" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px"></div>';
+  html += '<div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Color</label><input id="cls-color" type="color" value="#FF5C1A" style="width:100%;height:38px;background:#111;border:1px solid #333;border-radius:6px;cursor:pointer"></div>';
+  html += '</div><div style="display:flex;gap:8px">';
+  html += '<button onclick="guardarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>';
+  html += '<button onclick="document.getElementById(\'clase-form\').remove()" style="background:transparent;border:1px solid #444;border-radius:8px;padding:8px 16px;color:#ccc;font-size:13px;cursor:pointer">Cancelar</button></div></div>';
+  document.getElementById('clases-list').insertAdjacentHTML('afterbegin', html);
+}
+
+async function guardarClase() {
+  var id = (document.getElementById('cls-id').value||''). trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
+  var nombre = (document.getElementById('cls-nombre').value||''). trim();
+  var color = document.getElementById('cls-color').value;
+  if (!id || !nombre) return alert('Completa ID y nombre');
+  var lista = window._clasesData || [];
+  lista.push({ id: id, nombre: nombre, color: color, activa: true });
+  await firebase.firestore().collection('config').doc('clases').update({ lista: lista });
+  cargarClases();
+}
+
+// ════════════════════════════════════════════════
+// RUTINA CONFIG
+// ════════════════════════════════════════════════
+var _OBJS = [
+  'Bajar grasa / bajar de peso',
+  'Ganar músculo / recomposición',
+  'Salud metabólica / salud general',
+  'Estética / composición equilibrada',
+  'Rendimiento funcional'
+];
+var _GRUPOS = ['<30','30-45','45+'];
+var _ETAPAS_LABELS = ['Adaptación (1-3 sem)','Desarrollo (4-12 sem)','Optimización (13+ sem)'];
+
+function cargarRutinaConfig() {
+  var cont = document.getElementById('rutina-config-table');
+  if (!cont) return;
+  var cls = (_clasesCache||[]).filter(function(c) { return c.activa; });
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px">';
+  html += '<thead><tr style="background:#1a1a1a">';
+  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Objetivo</th>';
+  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Grupo edad</th>';
+  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 1</th>';
+  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 2</th>';
+  html += '<th style="padding:10px 12px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 3</th>';
+  html += '</tr></thead><tbody>';
+  // Build from current _MIX in index.html (loaded from Firestore config eventually)
+  // For now show the in-code defaults — editable in future sprint
+  var mixData = {
+    'Bajar grasa / bajar de peso': { '<30':['Full Body+Core (2x) · Lower Body','Full Body+Core (2x) · Lower Body','Full Body+Core (2x) · Lower Body · Upper Body'],'30-45':['Full Body+Core (2x) · Lower Body','Full Body+Core (2x) · Lower Body','Full Body+Core · Lower Body · Upper Body'],'45+':['Women 50+ (2x) · Full Body+Core','Women 50+ (2x) · Full Body+Core','Women 50+ (3x) · Full Body+Core'] },
+    'Ganar músculo / recomposición': { '<30':['Upper Body + Lower Body','Upper(2x) + Lower(2x)','Upper(2x) + Lower(2x) + Full Body'],'30-45':['Upper Body + Lower Body','Upper + Lower + Full Body','Upper(2x) + Lower(2x)'],'45+':['Upper Body + Lower Body','Upper + Lower','Upper + Lower + Full Body'] },
+    'Salud metabólica / salud general': { '<30':['Full Body+Core + Lower Body','Full Body+Core(2x) + Lower Body','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core + Women 50+','Full Body+Core(2x) + Women 50+','Full Body+Core + Lower + Women 50+'],'45+':['Women 50+(2x) + Full Body+Core','Women 50+(2x) + Full Body+Core','Women 50+(3x)'] },
+    'Estética / composición equilibrada': { '<30':['Full Body+Core + Lower Body','Full Body+Core + Upper + Lower','Full Body+Core(2x) + Upper + Lower'],'30-45':['Full Body+Core + Lower Body','Full Body+Core + Upper + Lower','Full Body+Core + Upper + Lower + Full Body+Glutes'],'45+':['Women 50+ + Full Body+Core','Women 50+ + Full Body+Core','Women 50+ + Full Body+Core + Upper'] },
+    'Rendimiento funcional': { '<30':['Full Body+Core (2x)','Full Body+Core(3x) + Full Body+Glutes','Full Body+Core(3x) + Full Body+Glutes + Upper'],'30-45':['Full Body+Core + Full Body+Glutes','Full Body+Core(2x) + Full Body+Glutes','Full Body+Core(2x) + Full Body+Glutes + Lower'],'45+':['Women 50+ + Full Body+Core','Full Body+Core(2x) + Women 50+','Full Body+Core(2x) + Women 50+'] }
+  };
+  _OBJS.forEach(function(obj) {
+    var row = mixData[obj];
+    if (!row) return;
+    _GRUPOS.forEach(function(ge, gi) {
+      html += '<tr style="border-bottom:1px solid #1f1f1f">';
+      if (gi === 0) html += '<td style="padding:10px 12px;font-weight:600;color:#f0f0f0;vertical-align:top" rowspan="3">' + obj + '</td>';
+      html += '<td style="padding:8px 12px;color:#888;white-space:nowrap">' + ge + '</td>';
+      (row[ge]||[]).forEach(function(etapa) {
+        html += '<td style="padding:8px 12px;color:#ccc">' + etapa + '</td>';
+      });
+      html += '</tr>';
+    });
+  });
+  html += '</tbody></table>';
+  cont.innerHTML = html;
+}
 </script>
 <!-- MODAL PERFIL STAFF -->
 <div id="modal-staff-profile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:950;overflow-y:auto">
@@ -3695,6 +3899,49 @@ window.filterNotifUsers = function (q) {
       </div>
     </div>
   </div>
+
+  <!-- ═══ SECCIÓN HORARIO ═══ -->
+  <div id="section-horario" style="display:none;padding:24px 32px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="font-size:20px;font-weight:700">Horario Semanal</h2>
+      <button onclick="agregarSlot()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Agregar clase</button>
+    </div>
+    <div id="horario-grid" style="display:grid;gap:8px"></div>
+  </div>
+
+
+  <!-- ═══ SECCIÓN CLASES ═══ -->
+  <div id="section-clases" style="display:none;padding:24px 32px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="font-size:20px;font-weight:700">Catálogo de Clases</h2>
+      <button onclick="agregarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Nueva clase</button>
+    </div>
+    <div id="clases-list" style="display:grid;gap:8px"></div>
+  </div>
+
+
+  <!-- ═══ SECCIÓN RUTINA CONFIG ═══ -->
+  <div id="section-rutina-config" style="display:none;padding:24px 32px">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Criterios de Rutina</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:20px">Clases recomendadas por objetivo, grupo de edad y etapa de progreso.</p>
+    <div id="rutina-config-table" style="overflow-x:auto"></div>
+  </div>
+
+  if (tab === 'horario') {
+    document.getElementById('section-horario').style.display = 'block';
+    cargarHorario();
+  }
+
+  if (tab === 'clases') {
+    document.getElementById('section-clases').style.display = 'block';
+    cargarClases();
+  }
+
+  if (tab === 'rutina-config') {
+    document.getElementById('section-rutina-config').style.display = 'block';
+    cargarRutinaConfig();
+  }
+
 </body>
 </html>
  
