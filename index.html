@@ -3068,29 +3068,54 @@ window.renderRefChart = function(act, _ignored) {
 
 <script>
 (function(){
-function ivfScore(ini,act,gen){
+function ivfScore(ini,act,gen,edad){
 var s=0,w=0;
+var e=edad||35,f=gen==='Femenino';
+
+// 1. InBody Score — 15pts (reducido para evitar circularidad con PGC y GV)
 var ib=parseFloat(act.calificacion);
-if(!isNaN(ib)&&ib>0){s+=(ib/100)*35;w+=35;}
+if(!isNaN(ib)&&ib>0){s+=(ib/100)*15;w+=15;}
+
+// 2. % Grasa Corporal — 25pts, rangos ACSM ajustados por edad y género
 var pgc=parseFloat(act.pgc);
 if(!isNaN(pgc)&&pgc>0){
-var f=gen==='Femenino',lo=f?18:10,hi=f?28:20,wn=f?38:30;
-var p=pgc>=lo&&pgc<=hi?25:pgc<lo?Math.max(5,25-(lo-pgc)*1.5):pgc<=wn?Math.max(5,25-(pgc-hi)*1.2):5;
-s+=p;w+=25;}
+  // Rangos óptimos ACSM por década: [límite inferior, límite superior, zona alta]
+  var lo,hi,wn;
+  if(f){lo=e<30?16:e<40?17:e<50?19:21; hi=e<30?24:e<40?25:e<50?27:29; wn=hi+10;}
+  else{lo=e<30?10:e<40?11:e<50?13:15; hi=e<30?18:e<40?20:e<50?22:24; wn=hi+10;}
+  var p=pgc>=lo&&pgc<=hi?25:pgc<lo?Math.max(5,25-(lo-pgc)*1.5):pgc<=wn?Math.max(5,25-(pgc-hi)*1.2):5;
+  s+=p;w+=25;}
+
+// 3. Grasa Visceral — 20pts (IDF — predictor cardiometabólico directo)
 var gv=parseFloat(act.grasaVisceral);
 if(!isNaN(gv)&&gv>0){
-var gp=gv<=9?20:gv<=12?Math.round(20-(gv-9)*2.5):gv<=15?Math.round(12.5-(gv-12)*2):Math.max(2,Math.round(6.5-(gv-15)));
-s+=gp;w+=20;}
-var pp=parseFloat(act.pruebaPeso),pe=parseFloat(act.peso);
+  var gp=gv<=9?20:gv<=12?Math.round(20-(gv-9)*2.5):gv<=15?Math.round(12.5-(gv-12)*2):Math.max(2,Math.round(6.5-(gv-15)));
+  s+=gp;w+=20;}
+
+// 4. Masa Muscular Esquelética Relativa — 20pts (SMI proxy: musculo/peso)
+// Predictor independiente de longevidad funcional (Studenski 2011, Newman 2006)
+var mu=parseFloat(act.musculo),pe=parseFloat(act.peso);
+if(!isNaN(mu)&&!isNaN(pe)&&pe>0&&mu>0){
+  var sr=mu/pe;
+  var mp;
+  if(f){mp=sr>=0.35?20:sr>=0.28?14:sr>=0.22?7:3;}
+  else{mp=sr>=0.42?20:sr>=0.35?14:sr>=0.28?7:3;}
+  s+=mp;w+=20;}
+
+// 5. Fuerza Funcional — 10pts (8RM mancuerna / peso corporal — protocolo bePWR)
+var pp=parseFloat(act.pruebaPeso);
 if(!isNaN(pp)&&!isNaN(pe)&&pe>0&&pp>0){
-var r=pp/pe,em=gen==='Femenino';
-var rp=em?(r>=0.7?10:r>=0.5?7:r>=0.35?4:2):(r>=1.0?10:r>=0.7?7:r>=0.5?4:2);
-s+=rp;w+=10;}
+  var r=pp/pe;
+  var rp=f?(r>=0.7?10:r>=0.5?7:r>=0.35?4:2):(r>=1.0?10:r>=0.7?7:r>=0.5?4:2);
+  s+=rp;w+=10;}
+
+// 6. Cintura — 10pts (IDF — riesgo metabólico abdominal)
 var ci=parseFloat(act.cintura);
 if(!isNaN(ci)&&ci>0){
-var em2=gen==='Femenino',cok=em2?80:94,chi=em2?88:102;
-var cp=ci<=cok?10:ci<=chi?Math.round(10-(ci-cok)/(chi-cok)*5):Math.max(1,Math.round(5-(ci-chi)*0.3));
-s+=cp;w+=10;}
+  var cok=f?80:94,chi2=f?88:102;
+  var cp=ci<=cok?10:ci<=chi2?Math.round(10-(ci-cok)/(chi2-cok)*5):Math.max(1,Math.round(5-(ci-chi2)*0.3));
+  s+=cp;w+=10;}
+
 if(w===0)return null;
 return Math.round((s/w)*100);
 }
@@ -3098,7 +3123,10 @@ function ivfColor(s){return s>=88?'#FF5C1A':s>=73?'#4ade80':s>=56?'#facc15':'#60
 function ivfLabel(s){return s>=88?'Destacado':s>=73?'Avanzado':s>=56?'\u00d3ptimo':'En Proceso';}
 function applyIVF(m,ini){
 var gen=(window.cachedUserData&&window.cachedUserData.genero)||'';
-var sc=ivfScore(ini||m,m,gen);
+// Calcular edad desde nacimiento (mismo patrón que Índice de Evolución)
+var edad=35;
+try{var nac=window.cachedUserData&&window.cachedUserData.nacimiento;if(nac){var dn=nac.toDate?nac.toDate():new Date(nac);edad=Math.floor((Date.now()-dn.getTime())/(365.25*24*3600*1000));}}catch(e){}
+var sc=ivfScore(ini||m,m,gen,edad);
 if(sc===null)return;
 var circ=2*Math.PI*42;
 var el=document.getElementById('bepwr-score-value');
