@@ -2488,7 +2488,7 @@ function renderPruebaPeso(data) {
     }
     }
     Promise.all([loadV, horarioP]).then(function(results){ var r = results[0];
-      var sa=r.sa,freq=r.freq,etapa=sa<=3?1:sa<=12?2:3,rec=_getRec(meta,ge,etapa),ei=_ETAPAS_DEF[etapa];
+      var sa=r.sa,freq=r.freq;var etapaVisitas=sa<=3?1:sa<=12?2:3;var nivelFitness=parseInt((config&&config.nivelFitness)||1)||1;var etapa=Math.max(etapaVisitas,nivelFitness);var rec=_getRec(meta,ge,etapa),ei=_ETAPAS_DEF[etapa];
       var compl=(_COMPL[meta]||{})[ge]||'';
       var slots=window._horarioSlots||[];
       var dias={};
