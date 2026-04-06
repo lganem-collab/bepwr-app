@@ -2456,37 +2456,75 @@ function renderPruebaPeso(data) {
     var mix = (r[ge]||r['30-45'])[Math.min(etapa-1,2)]; return {n:mix.length,mix:mix};
   }
   function renderRutina(config, data) {
-    var el = document.getElementById('metodo-rutina-container'); if (!el) return;
-    el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;font-size:14px">Calculando tu rutina...</div>';
-    var uid = window._currentUid, db = window.db;
-    var meta = (config&&config.meta)||'';
-    var edad = 0;
-    if (config&&config.nacimiento) { var nd=config.nacimiento.toDate?config.nacimiento.toDate():new Date(config.nacimiento); edad=Math.floor((Date.now()-nd.getTime())/(365.25*24*3600*1000)); }
-    var ge = edad>=45?'45+':edad>=30?'30-45':'<30';
-    // Load horario slots if not cached
-    var horarioP = Promise.resolve();
-    if (!window._horarioSlots && db) {
-      horarioP = window.getDocs(window.collection(db,'horario')).then(function(snap){
-        window._horarioSlots = snap.docs.map(function(d){ return d.data(); });
-      }).catch(function(){ window._horarioSlots = []; });
-    }
-    var loadV = Promise.resolve({sa:0,freq:{}});
-    if (uid&&db&&window.getDocs&&window.collection&&window.query&&window.where) {
-      loadV = window.getDocs(window.query(window.collection(db,'visitas'),window.where('uid','==',uid))).then(function(snap){
-        var s=new Set(),f={};
-        snap.forEach(function(d){var dd=d.data();if(dd.semana)s.add(dd.semana);if(dd.tipoClase)f[dd.tipoClase]=(f[dd.tipoClase]||0)+1;});
-        var saReal = s.size;
-        // Para miembros existentes: si tiene pocas visitas registradas, usar fechaAlta como estimación
-        var saFinal = saReal;
+  var el = document.getElementById('metodo-rutina-container'); if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;font-size:14px">Calculando tu rutina...</div>';
+  var uid = window._currentUid, db = window.db;
+  var meta = (config&&config.meta)||'';
+  var edad = 0;
+  if (config&&config.nacimiento) { try { var nd = config.nacimiento.toDate ? config.nacimiento.toDate() : new Date(config.nacimiento); edad = Math.floor((Date.now()-nd.getTime())/(365.25*24*3600*1000)); } catch(ex) {} }
+  var ge = edad>=45?'45+':edad>=30?'30-45':'<30';
+  var nivelFitness = parseInt((config&&config.nivelFitness)||1)||1;
+  // Load visitas with a 10s timeout
+  var visitasP = Promise.resolve({sa:0, freq:{}});
+  if (uid && db && window.getDocs && window.collection && window.query && window.where) {
+    var timeout = new Promise(function(resolve) { setTimeout(function() { resolve({sa:0, freq:{}}); }, 8000); });
+    visitasP = Promise.race([
+      window.getDocs(window.query(window.collection(db,'visitas'), window.where('uid','==',uid))).then(function(snap) {
+        var s = new Set(), f = {};
+        snap.forEach(function(d) { var dd = d.data(); if (dd.semana) s.add(dd.semana); if (dd.tipoClase) f[dd.tipoClase] = (f[dd.tipoClase]||0)+1; });
+        var saReal = s.size, saFinal = saReal;
         if (saReal < 4 && config && config.fechaAlta) {
-          var ms = config.fechaAlta.toDate ? config.fechaAlta.toDate().getTime() : new Date(config.fechaAlta).getTime();
-          var semsDesdeAlta = Math.floor((Date.now()-ms)/(7*24*3600*1000));
-          saFinal = Math.max(saReal, Math.min(semsDesdeAlta, 104));
+          try { var ms = config.fechaAlta.toDate ? config.fechaAlta.toDate().getTime() : new Date(config.fechaAlta).getTime(); saFinal = Math.max(saReal, Math.min(Math.floor((Date.now()-ms)/(7*24*3600*1000)), 104)); } catch(ex) {}
         }
-        return {sa:saFinal, saReal:saReal, freq:f};
-      }).catch(function(){return{sa:0,saReal:0,freq:{}};});
+        return {sa: saFinal, freq: f};
+      }).catch(function() { return {sa:0, freq:{}}; }),
+      timeout
+    ]);
+  }
+  // Load horario if needed
+  var horarioP = window._horarioSlots ? Promise.resolve() :
+    (db && window.getDocs && window.collection ? window.getDocs(window.collection(db,'horario')).then(function(snap) {
+      window._horarioSlots = snap.docs.map(function(d) { return d.data(); });
+    }).catch(function() { window._horarioSlots = []; }) : Promise.resolve());
+  Promise.all([visitasP, horarioP]).then(function(results) {
+    try {
+      var r = results[0];
+      var sa = r.sa, freq = r.freq;
+      var etapaVisitas = sa<=3?1:sa<=12?2:3;
+      var etapa = Math.max(etapaVisitas, nivelFitness);
+      var rec = _getRec(meta, ge, etapa), ei = _ETAPAS_DEF[etapa];
+      var compl = (_COMPL[meta]||{})[ge]||'';
+      var slots = window._horarioSlots||[];
+      var dias = {};
+      rec.mix.forEach(function(t) { if (!dias[t]) { var d = slots.filter(function(s) { return s.tipoClase===t&&s.activo; }).map(function(s) { return s.dia; }); dias[t] = Array.from ? Array.from(new Set(d)).sort() : d.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(); } });
+      var uniq = {}; rec.mix.forEach(function(t) { uniq[t] = (uniq[t]||0)+1; });
+      var topC = null, topN = 0; Object.keys(freq).forEach(function(t) { if (freq[t]>topN){topN=freq[t];topC=t;} });
+      var tip = etapa===3&&topC&&topN>4?'Llevas '+topN+' visitas de '+(_CL_NOM[topC]||topC)+'. Varía para seguir progresando.':'';
+      var DIAS_N = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      var h = '<div style="display:flex;flex-direction:column;gap:12px">';
+      h += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="background:'+ei.c+'22;color:'+ei.c+';border:1px solid '+ei.c+'44;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:600">'+ei.n+'</span><span style="font-size:12px;color:#888">'+ei.d+'</span></div>';
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+      h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:14px"><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Semanas activas</div><div style="font-size:28px;font-weight:700;color:#FF5C1A">'+sa+'</div><div style="font-size:12px;color:#888">con al menos 1 clase</div></div>';
+      h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:14px"><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Clases / semana</div><div style="font-size:28px;font-weight:700;color:#FF5C1A">'+rec.n+'</div><div style="font-size:12px;color:#888">recomendadas</div></div></div>';
+      h += '<div style="font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px">Tu mix semanal</div>';
+      h += '<div style="display:flex;flex-direction:column;gap:8px">';
+      Object.keys(uniq).forEach(function(t) {
+        var n = uniq[t], nom = _CL_NOM[t]||t, col = _CL_COL[t]||'#888';
+        var ds = (dias[t]||[]).map(function(d) { return DIAS_N[d]||d; }).join(' · ')||'Revisa horario';
+        h += '<div style="display:flex;align-items:center;gap:12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="width:4px;height:36px;border-radius:2px;background:'+col+';flex-shrink:0"></div><div style="flex:1"><div style="font-size:14px;font-weight:600;color:#f0f0f0">'+(n>1?n+'x ':'')+nom+'</div><div style="font-size:12px;color:#888;margin-top:2px">'+ds+'</div></div></div>';
+      });
+      h += '</div>';
+      if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #4ade80;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento</div><div style="font-size:13px;color:#ccc">'+compl+'</div></div>';
+      if (tip) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #9F7AEA;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#9F7AEA;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consejo</div><div style="font-size:13px;color:#ccc">'+tip+'</div></div>';
+      h += '</div>';
+      el.innerHTML = h;
+    } catch(ex) {
+      el.innerHTML = '<div style="color:#888;padding:16px;font-size:13px">No se pudo calcular la rutina: '+ex.message+'</div>';
     }
-    }
+  }).catch(function(ex) {
+    el.innerHTML = '<div style="color:#888;padding:16px;font-size:13px">Error al cargar rutina.</div>';
+  });
+}
     Promise.all([loadV, horarioP]).then(function(results){ var r = results[0];
       var sa=r.sa,freq=r.freq;var etapaVisitas=sa<=3?1:sa<=12?2:3;var nivelFitness=parseInt((config&&config.nivelFitness)||1)||1;var etapa=Math.max(etapaVisitas,nivelFitness);var rec=_getRec(meta,ge,etapa),ei=_ETAPAS_DEF[etapa];
       var compl=(_COMPL[meta]||{})[ge]||'';
