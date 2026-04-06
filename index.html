@@ -1078,18 +1078,25 @@ onAuthStateChanged(auth, async user => {
         return 0;
       }
       // Guardar índice Firestore (query desc → idx0 = más reciente según Firestore)
-      const metricasRaw = metSnap.docs.map((d, _fi) => { const m = d.data(); m._fi = _fi; return m; });
+      const metricasRaw = metSnap.docs.map((d, _fi) => {
+        const m = d.data();
+        m._fi = _fi; // 0 = lo que Firestore pone primero (desc query)
+        m._createTime = d.createTime ? d.createTime.toMillis() : 0; // timestamp real de creación
+        return m;
+      });
       metricasRaw.forEach(m => {
         const ts = parseFechaTs(m.fecha);
         m._ts = (m.fechaTs && !isNaN(m.fechaTs) && m.fechaTs > 0) ? m.fechaTs
                : (ts && !isNaN(ts) && ts > 0) ? ts
+               : (m._createTime && m._createTime > 0) ? m._createTime // createTime real de Firestore
                : null;
       });
+      // Sort ascendente: más antiguo primero, más reciente al final (ultima = last)
       metricasRaw.sort((a,b) => {
-        if (a._ts !== null && b._ts !== null) return a._ts - b._ts;
-        if (a._ts !== null) return -1;
-        if (b._ts !== null) return 1;
-        return b._fi - a._fi;
+        const ta = a._ts !== null ? a._ts : 0;
+        const tb = b._ts !== null ? b._ts : 0;
+        if (ta !== tb) return ta - tb;
+        return b._fi - a._fi; // tiebreaker: _fi menor = más reciente en query desc
       });
       const metricas = metricasRaw;
       cachedMetricas = metricas;
@@ -2188,16 +2195,41 @@ async function loadMetodoData() {
 
     let ultimaValoracion = null;
     try {
-      const vQuery = query(
-        collection(db, 'usuarios', uid, 'metricas'),
-        orderBy('fecha', 'desc'),
-        limit(1)
-      );
-      const vSnap = await getDocs(vQuery);
-      if (!vSnap.empty) {
-        const v = vSnap.docs[0].data();
-        const fechaVal = v.fecha?.toDate ? v.fecha.toDate() : new Date(v.fecha || Date.now());
-        ultimaValoracion = { fecha: fechaVal, tipo: 'composicion', peso: v.peso||null, musculo: v.musculo||null, grasaCorporal: v.grasaCorporal||null, imc: v.imc||null, pgc: v.pgc||null, grasaVisceral: v.grasaVisceral||null, calificacion: v.calificacion||null, brazo: v.brazo||null, abdomen: v.abdomen||null, cintura: v.cintura||null, cadera: v.cadera||null, pantorrilla: v.pantorrilla||null };
+      // Obtener las últimas métricas y elegir la más reciente por parseFechaTs
+      // (no usar limit(1) con orderBy('fecha') — Firestore ordena strings lexicográficamente
+      //  lo que rompe con formatos mixtos como '5 abr 2026' vs '2026-04-06')
+      const vQuery2 = query(collection(db, 'usuarios', uid, 'metricas'), limit(20));
+      const vSnap2 = await getDocs(vQuery2);
+      if (!vSnap2.empty) {
+        const MESES2 = {ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
+        function parseTs2(f) {
+          if (!f) return 0;
+          if (f.toDate) return f.toDate().getTime();
+          if (typeof f === 'string') {
+            if (f.match(/^\d{4}-\d{2}-\d{2}/)) { var t=new Date(f).getTime(); return isNaN(t)?0:t; }
+            if (f.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) { var p=f.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
+            var mx=f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+            if (mx && MESES2[mx[2]] !== undefined) return new Date(parseInt(mx[3]),MESES2[mx[2]],parseInt(mx[1])).getTime();
+            try { var t2=new Date(f).getTime(); return isNaN(t2)?0:t2; } catch(e){ return 0; }
+          }
+          return 0;
+        }
+        // Elegir el doc con mayor timestamp (verdadera última valoración)
+        let bestDoc = null, bestTs = -1;
+        vSnap2.docs.forEach((doc2, fi2) => {
+          const dat2 = doc2.data();
+          const ts2 = (dat2.fechaTs && !isNaN(dat2.fechaTs) && dat2.fechaTs > 0)
+            ? dat2.fechaTs
+            : parseTs2(dat2.fecha);
+          // Si ambos son 0 (sin fecha parseable), usar el más reciente en Firestore (menor fi)
+          const effective = ts2 > 0 ? ts2 : (1000000 - fi2);
+          if (effective > bestTs) { bestTs = effective; bestDoc = dat2; }
+        });
+        if (bestDoc) {
+          const v = bestDoc;
+          const fechaVal = v.fecha?.toDate ? v.fecha.toDate() : (v.fecha ? new Date(v.fecha) : new Date());
+          ultimaValoracion = { fecha: fechaVal, tipo: 'composicion', peso: v.peso||null, musculo: v.musculo||null, grasaCorporal: v.grasaCorporal||null, imc: v.imc||null, pgc: v.pgc||null, grasaVisceral: v.grasaVisceral||null, calificacion: v.calificacion||null, brazo: v.brazo||null, abdomen: v.abdomen||null, cintura: v.cintura||null, cadera: v.cadera||null, pantorrilla: v.pantorrilla||null };
+        }
       }
     } catch (e) {}
 
@@ -2559,11 +2591,14 @@ async function renderAnalisisCientifico(data, config) {
 
   var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha');
 
-  // Limpiar localStorage entries con key incorrecta (sin-fecha) si tenemos fecha real
+  // Limpiar TODAS las keys de IA que no correspondan a la fecha actual
   if (valFechaActual) {
     try {
-      var staleKey = 'ia-analisis-' + uid + '-sin-fecha';
-      if (localStorage.getItem(staleKey)) localStorage.removeItem(staleKey);
+      Object.keys(localStorage).forEach(function(k) {
+        if (k.startsWith('ia-analisis-' + uid + '-') && k !== cacheKey) {
+          localStorage.removeItem(k);
+        }
+      });
     } catch(e) {}
   }
 
