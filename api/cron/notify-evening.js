@@ -27,10 +27,10 @@ export default async function handler(req, res) {
   }
   try {
     const snap = await db.collection('usuarios').get();
-    const tokens = snap.docs
-      .map(d => d.data())
-      .filter(d => d.activo !== false && d.fcmToken && d.fcmToken.length > 10)
-      .map(d => d.fcmToken);
+    const usuarios = snap.docs
+      .filter(d => d.data().activo !== false && d.data().fcmToken && d.data().fcmToken.length > 10)
+      .map(d => ({ uid: d.id, token: d.data().fcmToken }));
+    const tokens = usuarios.map(u => u.token);
 
     if (!tokens.length) return res.status(200).json({ ok: true, sent: 0, message: 'Sin tokens' });
 
@@ -55,9 +55,16 @@ export default async function handler(req, res) {
       }
     });
 
+
+    const batch = db.batch();
     response.responses.forEach((r, i) => {
-      if (!r.success) console.warn('FCM fail token', i, ':', r.error?.code, r.error?.message);
+      if (r.success) {
+        const ref = db.collection('usuarios').doc(usuarios[i].uid).collection('notificaciones').doc();
+        batch.set(ref, { titulo: title, cuerpo: body, fecha: new Date(), leida: false, tipo: 'motivacion' });
+      }
     });
+    if (response.successCount > 0) await batch.commit();
+    
 
     return res.status(200).json({
       ok: true, day,
