@@ -1986,7 +1986,6 @@ if (user && user.uid === MASTER_UID) {
       const _mOrig = (window._allMembers||[]).find(x=>x.uid===uid)||{};
       const activoVal = document.getElementById('edit-activo')?.value === 'false' ? false : true;
       const newMeta = document.getElementById('edit-meta').value;
-        document.getElementById('edit-nivel').value = data.nivelFitness || 1;
       const newPesoIni = Number(document.getElementById('edit-peso-ini').value) || null;
       await db.collection('usuarios').doc(uid).update({
         nombre: document.getElementById('edit-nombre').value,
