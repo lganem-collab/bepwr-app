@@ -1610,8 +1610,10 @@ if (user && user.uid === MASTER_UID) {
     if (!plan) return '';
     // Deep copy plan to avoid mutating RUTINA_CONFIG
     var planCopy = JSON.parse(JSON.stringify(plan));
-    // If genero is not femenino, replace Women 50+ / 50+ references with Full Body+Core + Lower + Upper
-    if (genero !== 'femenino') {
+    // Women 50+ only for females over 50; everyone else gets Full Body+Core + Lower + Upper
+    var esFemenina = (genero === 'femenino' || genero === 'Femenino');
+    var esMayor50 = (edadNum !== null && !isNaN(edadNum) && edadNum > 50);
+    if (!(esFemenina && esMayor50)) {
       for (var j = 0; j < planCopy.clases.length; j++) {
         if (planCopy.clases[j].tipo && (planCopy.clases[j].tipo.indexOf('50+') !== -1 || planCopy.clases[j].tipo.indexOf('Women') !== -1)) {
           planCopy.clases[j].tipo = 'Full Body+Core + Lower + Upper';
