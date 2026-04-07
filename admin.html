@@ -1998,7 +1998,8 @@ if (user && user.uid === MASTER_UID) {
         vigenciaFecha: document.getElementById('edit-vigencia-fecha').value || null,
         activo: activoVal,
         'objetivo.meta': newMeta,
-        'objetivo.pesoInicial': newPesoIni
+        'objetivo.pesoInicial': newPesoIni,
+        nivelFitness: parseInt(document.getElementById('edit-nivel').value) || 1
       });
       const cambios = [];
       if (document.getElementById('edit-nombre').value !== (_mOrig.nombre||'')) cambios.push('nombre');
@@ -2083,8 +2084,7 @@ if (user && user.uid === MASTER_UID) {
         peso:'m-peso', musculo:'m-musculo', grasaCorporal:'m-grasa-corp',
         imc:'m-imc', pgc:'m-pgc', grasaVisceral:'m-grasa-visc',
         calificacion:'m-calificacion', brazo:'m-brazo', abdomen:'m-abdomen',
-        cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla',
-        nivelFitness: parseInt(document.getElementById('edit-nivel').value) || 1
+        cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla'
       };
       for (const [key, id] of Object.entries(campos)) {
         const el = document.getElementById(id);
