@@ -1,39 +1,15 @@
-function abrirModalClase(id) {
-  document.getElementById('modal-clase-titulo').textContent = id ? 'Editar Clase' : 'Nueva Clase';
-  document.getElementById('clase-edit-id').value = id || '';
-  if (!id) {
-    ['clase-nombre','clase-instructor','clase-cupo'].forEach(x=>document.getElementById(x).value='');
-    ['clase-tipo','clase-deporte','clase-dia'].forEach(x=>document.getElementById(x).value='');
-    document.getElementById('clase-hora').value='';
-  }
-  const m = document.getElementById('modal-clase');
-  m.style.display='flex';
-}
-function cerrarModalClase() {
-  document.getElementById('modal-clase').style.display='none';
-}
-async function guardarClase() {
-  const nombre = document.getElementById('clase-nombre').value.trim();
-  const tipo = document.getElementById('clase-tipo').value;
-  const deporte = document.getElementById('clase-deporte').value;
-  const instructor = document.getElementById('clase-instructor').value.trim();
-  const dia = document.getElementById('clase-dia').value;
-  const hora = document.getElementById('clase-hora').value;
-  const cupo = parseInt(document.getElementById('clase-cupo').value) || 0;
-  const editId = document.getElementById('clase-edit-id').value;
-  if (!nombre || !tipo || !dia || !hora) { alert('Completa nombre, tipo, día y hora'); return; }
-  const data = { nombre, tipo, deporte, instructor, dia, hora, cupo, activa: true, creadoEn: firebase.firestore.FieldValue.serverTimestamp() };
-  try {
-    if (editId) {
-      await firebase.firestore().collection('clases').doc(editId).update(data);
-    } else {
-      await firebase.firestore().collection('clases').add(data);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script>
+  (function(){
+    var p=new URLSearchParams(window.location.search);
+    var em=p.get('e'), pw=p.get('p');
+    if(em&&pw){
+      window._magicEmail=em; window._magicPass=pw;
+      history.replaceState({},"",window.location.pathname);
     }
-    cerrarModalClase();
-    cargarClases();
-  } catch(e) { alert('Error: '+e.message); }
-}
-async function agregarClase() { abrirModalClase(null); })();
+  })();
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -75,7 +51,7 @@ async function agregarClase() { abrirModalClase(null); })();
     .topbar-badge{font-size:10px;color:var(--gray);font-family:Space Mono,monospace;letter-spacing:1.5px;text-transform:uppercase;margin-left:12px}
     .logout-link{font-size:12px;color:var(--orange);cursor:pointer;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline}
     .tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);padding:0 32px;background:var(--dark);position:sticky;top:60px;z-index:99}
-    .tab{padding:14px 20px;font-size:10px;font-weight:500;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+    .tab{padding:14px 20px;font-size:10px;font-weight:500;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase}
     .tab.on{color:var(--orange);border-bottom-color:var(--orange)}
     .content{flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%}
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
@@ -698,47 +674,11 @@ async function agregarClase() { abrirModalClase(null); })();
     </div><div id="horario-grid" style="display:grid;gap:8px"></div>
   </div>
   <div id="section-clases" style="display:none;padding:20px 28px">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="font-size:18px;font-weight:700">Catálogo de Clases</h2>
-    <button onclick="abrirModalClase(null)" style="background:var(--orange);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600">+ Nueva clase</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="font-size:18px;font-weight:700">Catálogo de Clases</h2>
+      <button onclick="agregarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Nueva clase</button>
+    </div><div id="clases-list" style="display:grid;gap:8px"></div>
   </div>
-  <div id="clases-list" style="display:grid;gap:8px"></div>
-  <div id="modal-clase" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center">
-    <div style="background:#1a1a1a;border-radius:16px;padding:28px;width:100%;max-width:440px;margin:20px;box-sizing:border-box">
-      <h3 id="modal-clase-titulo" style="font-size:16px;font-weight:700;margin-bottom:20px">Nueva Clase</h3>
-      <input type="hidden" id="clase-edit-id">
-      <div style="display:grid;gap:12px">
-        <input id="clase-nombre" placeholder="Nombre de la clase" style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box">
-        <select id="clase-tipo" style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box">
-          <option value="">Tipo de clase...</option>
-          <option>Funcional</option><option>HIIT</option><option>Fuerza</option>
-          <option>Cardio</option><option>Yoga</option><option>Pilates</option>
-          <option>Ciclismo</option><option>Natación</option><option>Otro</option>
-        </select>
-        <select id="clase-deporte" style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box">
-          <option value="">Deporte / actividad (opcional)</option>
-          <option>Ciclismo</option><option>Correr</option><option>Natación</option>
-          <option>Padel</option><option>Tenis</option><option>Golf</option>
-          <option>Fútbol</option><option>Funcional general</option>
-        </select>
-        <input id="clase-instructor" placeholder="Instructor" style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <select id="clase-dia" style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box">
-            <option value="">Día...</option>
-            <option>Lunes</option><option>Martes</option><option>Miércoles</option>
-            <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
-          </select>
-          <input id="clase-hora" type="time" style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box">
-        </div>
-        <input id="clase-cupo" type="number" placeholder="Cupo máximo" min="1" style="background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box">
-      </div>
-      <div style="display:flex;gap:8px;margin-top:20px">
-        <button onclick="cerrarModalClase()" style="flex:1;background:#333;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer">Cancelar</button>
-        <button onclick="guardarClase()" style="flex:1;background:var(--orange);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600">Guardar</button>
-      </div>
-    </div>
-  </div>
-</div>
   <div id="section-rutina" style="display:none;padding:20px 28px">
     <h2 style="font-size:18px;font-weight:700;margin-bottom:8px">Criterios de Rutina</h2>
     <p style="font-size:13px;color:#888;margin-bottom:16px">Mix de clases por objetivo, edad y etapa.</p>
@@ -1619,7 +1559,7 @@ if (user && user.uid === MASTER_UID) {
     }
   };
 
-  function getRutinaHTML(meta, nacimiento, edad, genero) {
+  function getRutinaHTML(meta, nacimiento, edad) {
     if (!meta) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Sin rutina asignada (sin meta definida)</div>';
     var config = RUTINA_CONFIG[meta];
     if (!config) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Rutina no disponible para esta meta</div>';
@@ -1655,11 +1595,7 @@ if (user && user.uid === MASTER_UID) {
       html += '</div>';
     }
     html += '</div>';
-  // Fix Women 50+: solo para Femenino
-  if(genero && genero !== 'Femenino') {
-    opciones = (opciones||[]).map(o => typeof o === 'string' && o.includes('Women 50+') ? 'Full Body+Core + Lower + Upper' : o);
-  }
-      return html;
+    return html;
   }
 
   async function openDetail(uid) {
@@ -3749,34 +3685,26 @@ async function eliminarSlot(id){
   cargarHorario();
 }
 // === CLASES ===
-async function cargarClases() {
-  const list = document.getElementById('clases-list');
-  if (!list) return;
-  list.innerHTML = '<div style="color:#888;text-align:center;padding:20px">Cargando...</div>';
-  try {
-    const snap = await firebase.firestore().collection('clases').orderBy('dia').orderBy('nombre').get();
-    if (snap.empty) { list.innerHTML = '<div style="color:#888;text-align:center;padding:20px">No hay clases registradas</div>'; return; }
-    list.innerHTML = '';
-    snap.forEach(doc => {
-      const c = doc.data();
-      const div = document.createElement('div');
-      div.style.cssText = 'background:#1a1a1a;border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px';
-      div.innerHTML = `<div>
-        <div style="font-weight:600;font-size:14px">${c.nombre||''}</div>
-        <div style="color:#888;font-size:12px;margin-top:4px">${c.tipo||''}${c.deporte?' · '+c.deporte:''} · ${c.dia||''} ${c.hora||''}${c.instructor?' · '+c.instructor:''}${c.cupo?' · Cupo: '+c.cupo:''}</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0">
-        <button onclick="abrirModalClase('${doc.id}')" style="background:#333;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px">Editar</button>
-        <button onclick="eliminarClase('${doc.id}')" style="background:#7f1d1d;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px">Eliminar</button>
-      </div>`;
-      list.appendChild(div);
+async function cargarClases(){
+  var list=document.getElementById('clases-list');
+  if(!list)return;
+  try{
+    var snap=await firebase.firestore().collection('config').doc('clases').get();
+    var lista=snap.exists?(snap.data().lista||[]):[];
+    window._clasesData=lista;
+    _clasesCache=lista;
+    var html='';
+    lista.forEach(function(c,idx){
+      html+='<div style="display:flex;align-items:center;gap:10px;background:#161616;border:1px solid #2a2a2a;border-radius:9px;padding:10px 14px">';
+      html+='<div style="width:12px;height:12px;border-radius:50%;background:'+(c.color||'#888')+';flex-shrink:0"></div>';
+      html+='<div style="flex:1;font-size:13px;font-weight:600;color:#f0f0f0">'+c.nombre+'</div>';
+      html+='<span style="font-size:11px;font-family:monospace;color:#666">'+c.id+'</span>';
+      html+='<span style="font-size:11px;font-weight:600;color:'+(c.activa?'#4ade80':'#666')+'">'+( c.activa?'Activa':'Inactiva')+'</span>';
+      html+='<button onclick="toggleClase('+idx+')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#ccc;font-size:11px;cursor:pointer">'+(c.activa?'Desactivar':'Activar')+'</button>';
+      html+='</div>';
     });
-  } catch(e) { list.innerHTML = '<div style="color:#f87171;padding:20px">Error: '+e.message+'</div>'; }
-}
-async function eliminarClase(id) {
-  if (!confirm('\u00bfEliminar esta clase?')) return;
-  await firebase.firestore().collection('clases').doc(id).delete();
-  cargarClases();
+    list.innerHTML=html;
+  }catch(e){list.innerHTML='<div style="color:#f87171">Error: '+e.message+'</div>';}
 }
 async function toggleClase(idx){
   var lista=window._clasesData||[];
@@ -3812,7 +3740,7 @@ function cargarRutinaConfig(){
   if(!cont)return;
   var objs=['Bajar grasa / bajar de peso','Ganar m\u00fasculo / recomposici\u00f3n','Salud metab\u00f3lica / salud general','Est\u00e9tica / composici\u00f3n equilibrada','Rendimiento funcional'];
   var grupos=['<30','30-45','45+'];
-  var mix={'Bajar grasa / bajar de peso':{'<30':['Full Body+Core (2x) + Lower Body','Full Body+Core (2x) + Lower Body','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core (2x) + Lower Body','Full Body+Core + Lower + Upper','Full Body+Core + Lower + Upper (2x)'],'45+':['Full Body+Core + Lower + Upper','Full Body+Core + Lower + Upper','Full Body+Core + Lower + Upper (2x)'],'45+F':['Women 50+ (2x) + Full Body+Core','Women 50+ (2x) + Full Body+Core','Women 50+ (3x)']},'Ganar m\u00fasculo / recomposici\u00f3n':{'<30':['Upper + Lower','Upper (2x) + Lower (2x)','Upper (2x) + Lower (2x) + Full Body+Core'],'30-45':['Upper + Lower','Upper + Lower + Full Body+Core','Upper (2x) + Lower (2x)'],'45+':['Upper + Lower','Upper + Lower','Upper + Lower + Full Body+Core']},'Salud metab\u00f3lica / salud general':{'<30':['Full Body+Core + Lower','Full Body+Core (2x) + Lower','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core + Women 50+','Full Body+Core (2x) + Women 50+','Full Body+Core + Lower + Women 50+'],'45+':['Women 50+ (2x) + Full Body+Core','Women 50+ (2x) + Full Body+Core','Women 50+ (3x)']},'Est\u00e9tica / composici\u00f3n equilibrada':{'<30':['Full Body+Core + Lower','Full Body+Core + Upper + Lower','Full Body+Core (2x) + Upper + Lower'],'30-45':['Full Body+Core + Lower','Full Body+Core + Upper + Lower','Full Body+Core + Upper + Lower + Glutes'],'45+':['Women 50+ + Full Body+Core','Women 50+ + Full Body+Core','Women 50+ + Full Body+Core + Upper']},'Rendimiento funcional':{'<30':['Full Body+Core (2x)','Full Body+Core (3x) + Glutes','Full Body+Core (3x) + Glutes + Upper'],'30-45':['Full Body+Core + Glutes','Full Body+Core (2x) + Glutes','Full Body+Core (2x) + Glutes + Lower'],'45+':['Women 50+ + Full Body+Core','Full Body+Core (2x) + Women 50+','Full Body+Core (2x) + Women 50+']}};
+  var mix={'Bajar grasa / bajar de peso':{'<30':['Full Body+Core (2x) + Lower Body','Full Body+Core (2x) + Lower Body','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core (2x) + Lower Body','Full Body+Core + Lower + Upper','Full Body+Core + Lower + Upper (2x)'],'45+':['Women 50+ (2x) + Full Body+Core','Women 50+ (2x) + Full Body+Core','Women 50+ (3x)']},'Ganar m\u00fasculo / recomposici\u00f3n':{'<30':['Upper + Lower','Upper (2x) + Lower (2x)','Upper (2x) + Lower (2x) + Full Body+Core'],'30-45':['Upper + Lower','Upper + Lower + Full Body+Core','Upper (2x) + Lower (2x)'],'45+':['Upper + Lower','Upper + Lower','Upper + Lower + Full Body+Core']},'Salud metab\u00f3lica / salud general':{'<30':['Full Body+Core + Lower','Full Body+Core (2x) + Lower','Full Body+Core + Lower + Upper'],'30-45':['Full Body+Core + Women 50+','Full Body+Core (2x) + Women 50+','Full Body+Core + Lower + Women 50+'],'45+':['Women 50+ (2x) + Full Body+Core','Women 50+ (2x) + Full Body+Core','Women 50+ (3x)']},'Est\u00e9tica / composici\u00f3n equilibrada':{'<30':['Full Body+Core + Lower','Full Body+Core + Upper + Lower','Full Body+Core (2x) + Upper + Lower'],'30-45':['Full Body+Core + Lower','Full Body+Core + Upper + Lower','Full Body+Core + Upper + Lower + Glutes'],'45+':['Women 50+ + Full Body+Core','Women 50+ + Full Body+Core','Women 50+ + Full Body+Core + Upper']},'Rendimiento funcional':{'<30':['Full Body+Core (2x)','Full Body+Core (3x) + Glutes','Full Body+Core (3x) + Glutes + Upper'],'30-45':['Full Body+Core + Glutes','Full Body+Core (2x) + Glutes','Full Body+Core (2x) + Glutes + Lower'],'45+':['Women 50+ + Full Body+Core','Full Body+Core (2x) + Women 50+','Full Body+Core (2x) + Women 50+']}};
   var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
   h+='<thead><tr style="background:#1a1a1a"><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Objetivo</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Edad</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 1</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 2</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 3</th></tr></thead><tbody>';
   objs.forEach(function(obj){
