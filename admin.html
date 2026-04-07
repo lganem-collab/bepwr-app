@@ -1942,9 +1942,9 @@ if (user && user.uid === MASTER_UID) {
           <div class="field-row">
             <label>Nivel de Fitness</label>
             <select id="edit-nivel">
-              <option value="1">Principiante</option>
-              <option value="2">Medio</option>
-              <option value="3">Avanzado</option>
+              <option value="1" ${(m.nivelFitness||1)==1?'selected':''}>Principiante</option>
+              <option value="2" ${(m.nivelFitness||1)==2?'selected':''}>Medio</option>
+              <option value="3" ${(m.nivelFitness||1)==3?'selected':''}>Avanzado</option>
             </select>
           </div>
         <div class="field"><label>Peso inicial (kg)</label><input type="number" id="edit-peso-ini" value="${m.objetivo?.pesoInicial||''}" step="0.1" /></div>
