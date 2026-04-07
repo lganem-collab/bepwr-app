@@ -663,8 +663,7 @@
     </div>
   </div>
 
-</div>
-<div id="section-horario" style="display:none;padding:20px 28px">
+  <div id="section-horario" style="display:none;padding:20px 28px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h2 style="font-size:18px;font-weight:700">Horario Semanal</h2>
       <button onclick="agregarSlot()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Agregar clase</button>
@@ -3806,14 +3805,17 @@ function abrirModalClase(idx){
 function cerrarModalClase(){
   document.getElementById('modal-clase').style.display='none';
 }
+var _guardandoClase=false;
 async function guardarClase(){
+  if(_guardandoClase)return;
+  _guardandoClase=true;
   var nombre=(document.getElementById('cls-nombre').value||'').trim();
   var descripcion=(document.getElementById('cls-descripcion').value||'').trim();
   var categoria=document.getElementById('cls-categoria').value;
   var color=document.getElementById('cls-color').value;
   var activa=document.getElementById('cls-activa').checked;
   var errEl=document.getElementById('modal-clase-error');
-  if(!nombre){errEl.textContent='El nombre es obligatorio';errEl.style.display='block';return;}
+  if(!nombre){errEl.textContent='El nombre es obligatorio';errEl.style.display='block';_guardandoClase=false;return;}
   errEl.style.display='none';
   var id=nombre.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
   try{
@@ -3829,6 +3831,7 @@ async function guardarClase(){
     cerrarModalClase();
     cargarClases();
   }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
+  _guardandoClase=false;
 }
 async function eliminarClase(idx){
   if(!confirm('¿Eliminar esta clase?'))return;
