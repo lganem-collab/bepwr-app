@@ -173,9 +173,9 @@
     <div class="tab" id="tab-guias" onclick="switchTab('guias')" style="display:none">&#x1F4C4; Guías</div>
     <div class="tab" id="tab-citas" onclick="switchTab('citas')" style="display:none">&#x1F4C5; Citas Val</div>
     <div class="tab" id="tab-pesos" onclick="switchTab('pesos')" style="display:none">⚖️ Pesos 🔒</div>
-        <div class="tab" id="tab-horario" onclick="switchTab('horario')">Horario</div>
-        <div class="tab" id="tab-clases" onclick="switchTab('clases')">Clases</div>
-        <div class="tab" id="tab-rutina" onclick="switchTab('rutina')">Rutina</div>
+        <div class="tab" id="tab-horario" onclick="switchTab('horario')" style="display:none">Horario</div>
+        <div class="tab" id="tab-clases" onclick="switchTab('clases')" style="display:none">Clases</div>
+        <div class="tab" id="tab-rutina" onclick="switchTab('rutina')" style="display:none">Rutina</div>
         Horario</div>
         Clases</div>
         Rutina</div>
@@ -800,6 +800,9 @@ if (user && user.uid === MASTER_UID) {
   const tabBita = document.getElementById('tab-bitacora');
   if (tabBita) tabBita.style.display = 'inline-block';
   const tabDash = document.getElementById('tab-dashboard');
+  document.getElementById('tab-horario').style.display='inline-block';
+  document.getElementById('tab-clases').style.display='inline-block';
+  document.getElementById('tab-rutina').style.display='inline-block';
   if (tabDash) tabDash.style.display = 'inline-block';
 }
 
