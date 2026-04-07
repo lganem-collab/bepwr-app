@@ -689,6 +689,21 @@
         <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Nombre</label>
         <input id="cls-nombre" type="text" placeholder="Ej: FullBody" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
       </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Descripci&#xF3;n</label>
+        <textarea id="cls-descripcion" rows="2" placeholder="&#xBF;Qu&#xE9; trabaja esta clase? &#xBF;Para qu&#xE9; sirve?" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box;resize:vertical;font-family:inherit"></textarea>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Categor&#xED;a</label>
+        <select id="cls-categoria" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
+          <option value="">Seleccionar...</option>
+          <option value="Cardio">Cardio</option>
+          <option value="Fuerza">Fuerza</option>
+          <option value="Movilidad">Movilidad</option>
+          <option value="Performance">Performance</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
         <div>
           <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Color</label>
@@ -710,8 +725,14 @@
     </div>
   </div>
   <div id="section-rutina" style="display:none;padding:20px 28px">
-    <h2 style="font-size:18px;font-weight:700;margin-bottom:8px">Criterios de Rutina</h2>
-    <p style="font-size:13px;color:#888;margin-bottom:16px">Mix de clases por objetivo, edad y etapa.</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div>
+        <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Rutinas por Objetivo</h2>
+        <p style="font-size:13px;color:#888;margin:0">Edita la rutina recomendada para cada objetivo y rango de edad.</p>
+      </div>
+      <button onclick="guardarRutinas()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">Guardar cambios</button>
+    </div>
+    <div id="rutinas-status" style="display:none;font-size:12px;margin-bottom:8px"></div>
     <div id="rutina-config-table" style="overflow-x:auto"></div>
   </div>
 
@@ -3737,7 +3758,7 @@ async function cargarClases(){
     lista.forEach(function(c,idx){
       html+='<div style="display:flex;align-items:center;gap:10px;background:#161616;border:1px solid #2a2a2a;border-radius:9px;padding:10px 14px">';
       html+='<div style="width:14px;height:14px;border-radius:50%;background:'+(c.color||'#888')+';flex-shrink:0"></div>';
-      html+='<div style="flex:1;font-size:13px;font-weight:600;color:#f0f0f0">'+(c.nombre||'\u2014')+'</div>';
+      html+='<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#f0f0f0">'+(c.nombre||'\u2014')+'</div>'+(c.categoria?'<div style="font-size:11px;color:#888;margin-top:1px">'+c.categoria+'</div>':'')+'</div>';
       html+='<span style="font-size:11px;font-family:monospace;color:#555">'+(c.id||'')+'</span>';
       html+='<span style="font-size:11px;font-weight:600;color:'+(c.activa?'#4ade80':'#666')+'">'+(c.activa?'Activa':'Inactiva')+'</span>';
       html+='<button onclick="abrirModalClase('+idx+')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#ccc;font-size:11px;cursor:pointer">Editar</button>';
@@ -3750,6 +3771,8 @@ async function cargarClases(){
 }
 function abrirModalClase(idx){
   document.getElementById('cls-nombre').value='';
+  document.getElementById('cls-descripcion').value='';
+  document.getElementById('cls-categoria').value='';
   document.getElementById('cls-color').value='#FF5C1A';
   document.getElementById('cls-activa').checked=true;
   document.getElementById('cls-activa-label').textContent='Activa';
@@ -3761,6 +3784,8 @@ function abrirModalClase(idx){
     var c=lista[idx];
     if(c){
       document.getElementById('cls-nombre').value=c.nombre||'';
+      document.getElementById('cls-descripcion').value=c.descripcion||'';
+      document.getElementById('cls-categoria').value=c.categoria||'';
       document.getElementById('cls-color').value=c.color||'#FF5C1A';
       document.getElementById('cls-activa').checked=c.activa!==false;
       document.getElementById('cls-activa-label').textContent=c.activa!==false?'Activa':'Inactiva';
@@ -3783,6 +3808,8 @@ function cerrarModalClase(){
 }
 async function guardarClase(){
   var nombre=(document.getElementById('cls-nombre').value||'').trim();
+  var descripcion=(document.getElementById('cls-descripcion').value||'').trim();
+  var categoria=document.getElementById('cls-categoria').value;
   var color=document.getElementById('cls-color').value;
   var activa=document.getElementById('cls-activa').checked;
   var errEl=document.getElementById('modal-clase-error');
@@ -3794,9 +3821,9 @@ async function guardarClase(){
     var lista=snap.exists?(snap.data().lista||[]):[];
     var editIdx=parseInt(document.getElementById('cls-edit-idx').value);
     if(editIdx>=0&&editIdx<lista.length){
-      lista[editIdx]={id:id,nombre:nombre,color:color,activa:activa};
+      lista[editIdx]={id:id,nombre:nombre,descripcion:descripcion,categoria:categoria,color:color,activa:activa};
     }else{
-      lista.push({id:id,nombre:nombre,color:color,activa:activa});
+      lista.push({id:id,nombre:nombre,descripcion:descripcion,categoria:categoria,color:color,activa:activa});
     }
     await firebase.firestore().collection('config').doc('clases').set({lista:lista},{merge:true});
     cerrarModalClase();
