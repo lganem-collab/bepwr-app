@@ -51,7 +51,7 @@
     .topbar-badge{font-size:10px;color:var(--gray);font-family:Space Mono,monospace;letter-spacing:1.5px;text-transform:uppercase;margin-left:12px}
     .logout-link{font-size:12px;color:var(--orange);cursor:pointer;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline}
     .tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);padding:0 32px;background:var(--dark);position:sticky;top:60px;z-index:99}
-    .tab{padding:14px 20px;font-size:10px;font-weight:500;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase}
+    .tab{padding:14px 20px;font-size:10px;font-weight:500;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
     .tab.on{color:var(--orange);border-bottom-color:var(--orange)}
     .content{flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%}
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
@@ -676,8 +676,68 @@
   <div id="section-clases" style="display:none;padding:20px 28px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h2 style="font-size:18px;font-weight:700">Catálogo de Clases</h2>
-      <button onclick="agregarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Nueva clase</button>
+      <button onclick="abrirModalClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Nueva clase</button>
     </div><div id="clases-list" style="display:grid;gap:8px"></div>
+  </div>
+
+  <!-- MODAL CLASE -->
+  <div id="modal-clase" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:960;overflow-y:auto">
+    <div style="max-width:480px;margin:40px auto;padding:24px;background:#1a1a1a;border:1px solid #333;border-radius:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 id="modal-clase-title" style="font-size:16px;font-weight:700;margin:0">Nueva Clase</h3>
+        <button onclick="cerrarModalClase()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer">&times;</button>
+      </div>
+      <input type="hidden" id="cls-edit-id" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Nombre</label><input id="cls-nombre" type="text" placeholder="Ej: FullBody AM" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box"></div>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Tipo</label>
+          <select id="cls-tipo" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
+            <option value="">Seleccionar...</option>
+            <option value="FullBody">FullBody</option>
+            <option value="UpperBody">UpperBody</option>
+            <option value="LowerBody">LowerBody</option>
+            <option value="50+">50+</option>
+            <option value="PWR Yoga">PWR Yoga</option>
+            <option value="Glutes">Glutes</option>
+            <option value="Cardio">Cardio</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Deporte</label>
+          <select id="cls-deporte" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
+            <option value="">Ninguno</option>
+            <option value="Ciclismo">Ciclismo</option>
+            <option value="Correr">Correr</option>
+            <option value="Natación">Natación</option>
+            <option value="Padel">Padel</option>
+            <option value="Tenis">Tenis</option>
+            <option value="Golf">Golf</option>
+            <option value="Fútbol">Fútbol</option>
+            <option value="Funcional general">Funcional general</option>
+          </select>
+        </div>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Instructor</label><input id="cls-instructor" type="text" placeholder="Nombre del coach" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box"></div>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Día</label>
+          <select id="cls-dia" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
+            <option value="">Seleccionar...</option>
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sábado">Sábado</option>
+            <option value="Domingo">Domingo</option>
+          </select>
+        </div>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Hora</label><input id="cls-hora" type="time" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box"></div>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Cupo</label><input id="cls-cupo" type="number" placeholder="20" min="1" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box"></div>
+      </div>
+      <div id="modal-clase-error" style="color:#f87171;font-size:12px;margin-bottom:8px;display:none"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="cerrarModalClase()" style="background:none;border:1px solid #444;border-radius:8px;padding:8px 16px;color:#ccc;font-size:13px;cursor:pointer">Cancelar</button>
+        <button onclick="guardarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>
+      </div>
+    </div>
   </div>
   <div id="section-rutina" style="display:none;padding:20px 28px">
     <h2 style="font-size:18px;font-weight:700;margin-bottom:8px">Criterios de Rutina</h2>
@@ -1559,7 +1619,7 @@ if (user && user.uid === MASTER_UID) {
     }
   };
 
-  function getRutinaHTML(meta, nacimiento, edad) {
+  function getRutinaHTML(meta, nacimiento, edad, genero) {
     if (!meta) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Sin rutina asignada (sin meta definida)</div>';
     var config = RUTINA_CONFIG[meta];
     if (!config) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Rutina no disponible para esta meta</div>';
@@ -1578,20 +1638,33 @@ if (user && user.uid === MASTER_UID) {
     }
     var plan = config[bracket];
     if (!plan) return '';
+    // Deep copy plan to avoid mutating RUTINA_CONFIG
+    var planCopy = JSON.parse(JSON.stringify(plan));
+    // If genero is not femenino, replace Women 50+ / 50+ references with Full Body+Core + Lower + Upper
+    if (genero !== 'femenino') {
+      for (var j = 0; j < planCopy.clases.length; j++) {
+        if (planCopy.clases[j].tipo && (planCopy.clases[j].tipo.indexOf('50+') !== -1 || planCopy.clases[j].tipo.indexOf('Women') !== -1)) {
+          planCopy.clases[j].tipo = 'Full Body+Core + Lower + Upper';
+        }
+      }
+      if (planCopy.complemento && (planCopy.complemento.indexOf('50+') !== -1 || planCopy.complemento.indexOf('Women') !== -1)) {
+        planCopy.complemento = planCopy.complemento.replace(/Women\s*50\+/g, 'Full Body+Core + Lower + Upper').replace(/50\+/g, 'Full Body+Core + Lower + Upper');
+      }
+    }
     var html = '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">';
     html += '<div style="font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">Mi Rutina Semanal</div>';
-    html += '<div style="font-size:12px;color:var(--gray);margin-bottom:10px">Total recomendado: <span style="color:#fff;font-weight:600">' + plan.total + '</span></div>';
+    html += '<div style="font-size:12px;color:var(--gray);margin-bottom:10px">Total recomendado: <span style="color:#fff;font-weight:600">' + planCopy.total + '</span></div>';
     html += '<table style="width:100%;border-collapse:collapse;font-size:12px">';
     html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--gray);font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:1px">FRECUENCIA</td><td style="padding:6px 8px;color:var(--gray);font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:1px">CLASE</td></tr>';
-    for (var i = 0; i < plan.clases.length; i++) {
-      var c = plan.clases[i];
+    for (var i = 0; i < planCopy.clases.length; i++) {
+      var c = planCopy.clases[i];
       html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">' + c.freq + '</td><td style="padding:8px;font-weight:600;color:#fff">' + c.tipo + '</td></tr>';
     }
     html += '</table>';
-    if (plan.complemento) {
+    if (planCopy.complemento) {
       html += '<div style="margin-top:10px;padding:8px 10px;border-radius:8px;background:#0a0a0a;border-left:3px solid var(--orange)">';
       html += '<span style="font-size:9px;font-weight:700;color:var(--orange);font-family:\'Space Mono\',monospace;letter-spacing:1px">COMPLEMENTO</span>';
-      html += '<p style="margin:4px 0 0;font-size:12px;color:#fff">' + plan.complemento + '</p>';
+      html += '<p style="margin:4px 0 0;font-size:12px;color:#fff">' + planCopy.complemento + '</p>';
       html += '</div>';
     }
     html += '</div>';
@@ -1779,7 +1852,7 @@ if (user && user.uid === MASTER_UID) {
         </div>
       </div>
 
-      ${getRutinaHTML(m.objetivo?.meta || m.meta, m.nacimiento, m.edad)}
+      ${getRutinaHTML(m.objetivo?.meta || m.meta, m.nacimiento, m.edad, m.genero)}
 
       <button class="btn btn-success btn-sm" style="margin-bottom:16px;width:100%;padding:12px;${m.activo===false?'opacity:0.55;cursor:not-allowed;pointer-events:none;':''}" ${m.activo===false?'disabled':''} onclick="openMetricsModal('${uid}','${(m.nombre||'').replace(/'/g,"\'")}')">+ Nueva valoración${m.activo===false?' — miembro inactivo':''}</button>
 
@@ -3689,50 +3762,85 @@ async function cargarClases(){
   var list=document.getElementById('clases-list');
   if(!list)return;
   try{
-    var snap=await firebase.firestore().collection('config').doc('clases').get();
-    var lista=snap.exists?(snap.data().lista||[]):[];
-    window._clasesData=lista;
-    _clasesCache=lista;
+    var snap=await firebase.firestore().collection('clases').get();
     var html='';
-    lista.forEach(function(c,idx){
-      html+='<div style="display:flex;align-items:center;gap:10px;background:#161616;border:1px solid #2a2a2a;border-radius:9px;padding:10px 14px">';
-      html+='<div style="width:12px;height:12px;border-radius:50%;background:'+(c.color||'#888')+';flex-shrink:0"></div>';
-      html+='<div style="flex:1;font-size:13px;font-weight:600;color:#f0f0f0">'+c.nombre+'</div>';
-      html+='<span style="font-size:11px;font-family:monospace;color:#666">'+c.id+'</span>';
-      html+='<span style="font-size:11px;font-weight:600;color:'+(c.activa?'#4ade80':'#666')+'">'+( c.activa?'Activa':'Inactiva')+'</span>';
-      html+='<button onclick="toggleClase('+idx+')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#ccc;font-size:11px;cursor:pointer">'+(c.activa?'Desactivar':'Activar')+'</button>';
+    snap.forEach(function(doc){
+      var c=doc.data();
+      html+='<div style="display:flex;align-items:center;gap:10px;background:#161616;border:1px solid #2a2a2a;border-radius:9px;padding:10px 14px;flex-wrap:wrap">';
+      html+='<div style="flex:1;min-width:120px"><div style="font-size:13px;font-weight:600;color:#f0f0f0">'+((c.nombre||'')||'\u2014')+'</div>';
+      html+='<div style="font-size:11px;color:#888;margin-top:2px">'+(c.tipo||'')+( c.deporte?' \u00B7 '+c.deporte:'')+'</div></div>';
+      html+='<span style="font-size:11px;color:#888">'+(c.dia||'')+' '+(c.hora||'')+'</span>';
+      html+='<span style="font-size:11px;color:#aaa">'+(c.instructor||'')+'</span>';
+      html+='<span style="font-size:11px;color:#666">Cupo: '+(c.cupo||'\u2014')+'</span>';
+      html+='<button onclick="abrirModalClase(\''+doc.id+'\')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#ccc;font-size:11px;cursor:pointer">Editar</button>';
+      html+='<button onclick="eliminarClase(\''+doc.id+'\')" style="background:none;border:1px solid #f87171;border-radius:5px;padding:3px 8px;color:#f87171;font-size:11px;cursor:pointer">Eliminar</button>';
       html+='</div>';
     });
+    if(!html) html='<div style="text-align:center;color:#666;font-size:13px;padding:20px">No hay clases registradas</div>';
     list.innerHTML=html;
   }catch(e){list.innerHTML='<div style="color:#f87171">Error: '+e.message+'</div>';}
 }
-async function toggleClase(idx){
-  var lista=window._clasesData||[];
-  lista[idx].activa=!lista[idx].activa;
-  await firebase.firestore().collection('config').doc('clases').update({lista:lista});
-  cargarClases();
+async function abrirModalClase(id){
+  document.getElementById('cls-edit-id').value='';
+  document.getElementById('cls-nombre').value='';
+  document.getElementById('cls-tipo').value='';
+  document.getElementById('cls-deporte').value='';
+  document.getElementById('cls-instructor').value='';
+  document.getElementById('cls-dia').value='';
+  document.getElementById('cls-hora').value='';
+  document.getElementById('cls-cupo').value='';
+  document.getElementById('modal-clase-error').style.display='none';
+  document.getElementById('modal-clase-title').textContent=id?'Editar Clase':'Nueva Clase';
+  if(id){
+    document.getElementById('cls-edit-id').value=id;
+    try{
+      var doc=await firebase.firestore().collection('clases').doc(id).get();
+      if(doc.exists){
+        var d=doc.data();
+        document.getElementById('cls-nombre').value=d.nombre||'';
+        document.getElementById('cls-tipo').value=d.tipo||'';
+        document.getElementById('cls-deporte').value=d.deporte||'';
+        document.getElementById('cls-instructor').value=d.instructor||'';
+        document.getElementById('cls-dia').value=d.dia||'';
+        document.getElementById('cls-hora').value=d.hora||'';
+        document.getElementById('cls-cupo').value=d.cupo||'';
+      }
+    }catch(e){console.error(e);}
+  }
+  document.getElementById('modal-clase').style.display='block';
 }
-function agregarClase(){
-  var h='<div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:18px;margin-bottom:14px" id="clase-form">';
-  h+='<h3 style="font-size:14px;font-weight:700;margin-bottom:12px">Nueva Clase</h3>';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
-  h+='<div><label style="font-size:11px;color:#888">ID</label><input id="cls-id" type="text" placeholder="ej: pilates" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
-  h+='<div><label style="font-size:11px;color:#888">Nombre</label><input id="cls-nombre" type="text" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
-  h+='<div><label style="font-size:11px;color:#888">Color</label><input id="cls-color" type="color" value="#FF5C1A" style="width:100%;height:36px;background:#111;border:1px solid #333;border-radius:5px;cursor:pointer"></div>';
-  h+='</div><div style="display:flex;gap:6px">';
-  h+='<button onclick="guardarClase()" style="background:#FF5C1A;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer">Guardar</button>';
-  h+='<button onclick="document.getElementById(\'clase-form\').remove()" style="background:none;border:1px solid #444;border-radius:7px;padding:7px 12px;color:#ccc;font-size:12px;cursor:pointer">Cancelar</button></div></div>';
-  document.getElementById('clases-list').insertAdjacentHTML('afterbegin',h);
+function cerrarModalClase(){
+  document.getElementById('modal-clase').style.display='none';
 }
 async function guardarClase(){
-  var id=(document.getElementById('cls-id').value||'').trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
   var nombre=(document.getElementById('cls-nombre').value||'').trim();
-  var color=document.getElementById('cls-color').value;
-  if(!id||!nombre)return alert('Completa ID y nombre');
-  var lista=window._clasesData||[];
-  lista.push({id:id,nombre:nombre,color:color,activa:true});
-  await firebase.firestore().collection('config').doc('clases').update({lista:lista});
-  cargarClases();
+  var tipo=document.getElementById('cls-tipo').value;
+  var deporte=document.getElementById('cls-deporte').value;
+  var instructor=(document.getElementById('cls-instructor').value||'').trim();
+  var dia=document.getElementById('cls-dia').value;
+  var hora=document.getElementById('cls-hora').value;
+  var cupo=parseInt(document.getElementById('cls-cupo').value)||0;
+  var errEl=document.getElementById('modal-clase-error');
+  if(!nombre||!tipo){errEl.textContent='Nombre y tipo son obligatorios';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  var data={nombre:nombre,tipo:tipo,deporte:deporte,instructor:instructor,dia:dia,hora:hora,cupo:cupo};
+  try{
+    var editId=document.getElementById('cls-edit-id').value;
+    if(editId){
+      await firebase.firestore().collection('clases').doc(editId).update(data);
+    }else{
+      await firebase.firestore().collection('clases').add(data);
+    }
+    cerrarModalClase();
+    cargarClases();
+  }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
+}
+async function eliminarClase(id){
+  if(!confirm('¿Eliminar esta clase?'))return;
+  try{
+    await firebase.firestore().collection('clases').doc(id).delete();
+    cargarClases();
+  }catch(e){alert('Error: '+e.message);}
 }
 // === RUTINA CONFIG ===
 function cargarRutinaConfig(){
