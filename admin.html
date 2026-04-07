@@ -704,7 +704,7 @@
           </select>
         </div>
         <div><label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Deporte</label>
-          <select id="cls-deporte" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
+          <select id="clase-deporte" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
             <option value="">Ninguno</option>
             <option value="Ciclismo">Ciclismo</option>
             <option value="Correr">Correr</option>
@@ -3784,7 +3784,7 @@ async function abrirModalClase(id){
   document.getElementById('cls-edit-id').value='';
   document.getElementById('cls-nombre').value='';
   document.getElementById('cls-tipo').value='';
-  document.getElementById('cls-deporte').value='';
+  document.getElementById('clase-deporte').value='';
   document.getElementById('cls-instructor').value='';
   document.getElementById('cls-dia').value='';
   document.getElementById('cls-hora').value='';
@@ -3799,7 +3799,7 @@ async function abrirModalClase(id){
         var d=doc.data();
         document.getElementById('cls-nombre').value=d.nombre||'';
         document.getElementById('cls-tipo').value=d.tipo||'';
-        document.getElementById('cls-deporte').value=d.deporte||'';
+        document.getElementById('clase-deporte').value=d.deporte||'';
         document.getElementById('cls-instructor').value=d.instructor||'';
         document.getElementById('cls-dia').value=d.dia||'';
         document.getElementById('cls-hora').value=d.hora||'';
@@ -3815,7 +3815,7 @@ function cerrarModalClase(){
 async function guardarClase(){
   var nombre=(document.getElementById('cls-nombre').value||'').trim();
   var tipo=document.getElementById('cls-tipo').value;
-  var deporte=document.getElementById('cls-deporte').value;
+  var deporte=document.getElementById('clase-deporte').value;
   var instructor=(document.getElementById('cls-instructor').value||'').trim();
   var dia=document.getElementById('cls-dia').value;
   var hora=document.getElementById('cls-hora').value;
