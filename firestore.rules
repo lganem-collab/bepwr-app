@@ -74,6 +74,11 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid;
     }
 
+    // ── Catálogo de clases ─────────────────────────────────────────────
+    match /clases/{claseId} {
+      allow read, write: if isSignedIn();
+    }
+
     // ── Configuracion global (citasConfig, guias) ────────────────────────
     match /config/{docId} {
       // Staff puede leer y escribir toda la config (excepto indice_pesos)
