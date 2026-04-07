@@ -2511,6 +2511,8 @@ function renderPruebaPeso(data) {
       var etapaVisitas = sa<=3?1:sa<=12?2:3;
       var etapa = Math.max(etapaVisitas, nivelFitness);
       var rec = _getRec(meta, ge, etapa, sa), ei = _ETAPAS_DEF[etapa];
+      var genero = (config&&config.genero)||'';
+      rec.mix = rec.mix.map(function(t){ return (t==='women50'&&genero!=='Femenino')?'full_body_core':t; });
       var compl = (_COMPL[meta]||{})[ge]||'';
       if (compl && compl.indexOf('PWR Yoga') === -1) compl += ' \u00B7 PWR Yoga';
       var slots = window._horarioSlots||[];
@@ -2546,6 +2548,7 @@ function renderPruebaPeso(data) {
 }
     Promise.all([loadV, horarioP]).then(function(results){ var r = results[0];
       var sa=r.sa,freq=r.freq;var etapaVisitas=sa<=3?1:sa<=12?2:3;var nivelFitness=parseInt((config&&config.nivelFitness)||1)||1;var etapa=Math.max(etapaVisitas,nivelFitness);var rec=_getRec(meta,ge,etapa,sa),ei=_ETAPAS_DEF[etapa];
+      var _g=(config&&config.genero)||'';rec.mix=rec.mix.map(function(t){return(t==='women50'&&_g!=='Femenino')?'full_body_core':t;});
       var compl=(_COMPL[meta]||{})[ge]||'';
       var slots=window._horarioSlots||[];
       var dias={};
