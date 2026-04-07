@@ -1,4 +1,4 @@
-const CACHE = 'bepwr-v14';
+const CACHE = 'bepwr-v15';
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 
