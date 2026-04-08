@@ -2832,7 +2832,7 @@ if (config && config.rutina) {
 
       // Guardar en localStorage (siempre funciona)
       try {
-        localStorage.setItem(cacheKey, JSON.stringify({ texto: text, fecha: hoy, valFecha: valFechaActual }));
+        localStorage.setItem(cacheKey, JSON.stringify({ texto: text, fecha: hoy, valFecha: valFechaActual, meta: metaSlug }));
       } catch(e) {}
 
       // Guardar en Firestore (puede fallar por permisos)
