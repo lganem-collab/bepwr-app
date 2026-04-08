@@ -1567,7 +1567,8 @@ function renderProfileMetrics(m) {
     const uid = window._currentUid || '';
     const today = new Date().toISOString().slice(0, 10);
     const valFecha = (metrica && metrica.fecha ? String(metrica.fecha).slice(0,10) : '');
-    const storageKey = 'ai_usage_' + uid + '_' + today + '_' + valFecha;
+    const metaSlug = ((objetivo && objetivo.meta) || '').replace(/\s/g,'_').slice(0,20);
+    const storageKey = 'ai_usage_' + uid + '_' + today + '_' + valFecha + '_' + metaSlug;
     let usage = {};
     try { usage = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
     const count = usage.count || 0;
@@ -2701,7 +2702,8 @@ async function renderAnalisisCientifico(data, config) {
   } catch(e) { console.warn('Error parseando fecha valoración:', e); }
 
   var pesoRound = Math.round(parseFloat(data.ultimaValoracion && data.ultimaValoracion.peso) || 0);
-  var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha') + (pesoRound ? '-p' + pesoRound : '');
+  var metaSlug = (data && data.objetivo && data.objetivo.meta ? data.objetivo.meta : '').replace(/\s/g,'_').slice(0,20);
+  var cacheKey = 'ia-analisis-' + uid + '-' + (valFechaActual || 'sin-fecha') + (pesoRound ? '-p' + pesoRound : '') + (metaSlug ? '-' + metaSlug : '');
 
   // Limpiar TODAS las keys de IA que no correspondan a la fecha actual
   if (valFechaActual) {
