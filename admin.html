@@ -2032,7 +2032,7 @@ if (user && user.uid === MASTER_UID) {
       if (newMeta !== (_mOrig.objetivo?.meta||'')) cambios.push('metaâ'+newMeta);
       if (activoVal !== (_mOrig.activo!==false)) cambios.push(activoVal?'activado':'desactivado');
       logBitacora('modificacion_miembro', 'Editado: '+(cambios.join(', ')||'datos')+' de '+document.getElementById('edit-nombre').value, document.getElementById('edit-nombre').value);
-      showToast('Datos actualizados â', 'success');
+      showToast('Datos actualizados ✓', 'success');
       await loadMembers();
       setTimeout(() => openDetail(uid), 500);
     } catch(e) {

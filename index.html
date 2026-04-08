@@ -430,6 +430,7 @@
     <div class="metodo-card" id="card-rutina" style="border:1px solid rgba(255,92,26,0.5)">
       <div class="metodo-card-label">Mi Rutina Semanal</div>
       <div id="metodo-rutina-container"><p class="metodo-loading">Cargando rutina...</p></div>
+      <a href="https://bepwr.com/classes" target="_blank" onclick="logEvento('reserva')" class="btn-primary" style="margin-top:12px;display:block;text-align:center;text-decoration:none">&#x2192; Reservar una clase</a>
     </div>
 
     <div class="metodo-card" id="card-valoracion">
@@ -2555,9 +2556,8 @@ function renderPruebaPeso(data) {
         h += '<div style="display:flex;align-items:center;gap:12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="width:4px;height:36px;border-radius:2px;background:'+col+';flex-shrink:0"></div><div style="flex:1"><div style="font-size:14px;font-weight:600;color:#f0f0f0">'+(n>1?n+'x ':'')+nom+'</div><div style="font-size:12px;color:#888;margin-top:2px">'+ds+'</div></div></div>';
       });
       h += '</div>';
-      if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #4ade80;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento</div><div style="font-size:13px;color:#ccc">'+compl+'</div></div>';
+      if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #4ade80;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento</div><div style="font-size:13px;color:#ccc">Elige al menos una opci\u00F3n \u00B7 '+compl+'</div></div>';
       if (tip) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #9F7AEA;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#9F7AEA;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consejo</div><div style="font-size:13px;color:#ccc">'+tip+'</div></div>';
-      h += '<a href="https://bepwr.com/classes" target="_blank" onclick="logEvento(\'reserva\')" class="btn-primary" style="margin-top:8px;display:block;text-align:center;text-decoration:none">\u2192 Reservar una clase</a>';
       h += '</div>';
       el.innerHTML = h;
     } catch(ex) {
@@ -2590,7 +2590,7 @@ function renderPruebaPeso(data) {
         h+='<div style="display:flex;align-items:center;gap:12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="width:4px;height:36px;border-radius:2px;background:'+col+';flex-shrink:0"></div><div style="flex:1"><div style="font-size:14px;font-weight:600;color:#f0f0f0">'+(n>1?n+'x ':'')+nom+'</div><div style="font-size:12px;color:#888;margin-top:2px">'+ds+'</div></div></div>';
       });
       h+='</div>';
-      if(compl){h+='<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #4ade80;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento</div><div style="font-size:13px;color:#ccc">'+compl+'</div></div>';}
+      if(compl){h+='<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #4ade80;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento</div><div style="font-size:13px;color:#ccc">Elige al menos una opci\u00F3n \u00B7 '+compl+'</div></div>';}
       if(tip){h+='<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #9F7AEA;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#9F7AEA;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consejo</div><div style="font-size:13px;color:#ccc">'+tip+'</div></div>';}
       // Botón de reserva removido — ya existe en la app
       h+='</div>';
