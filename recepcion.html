@@ -386,7 +386,6 @@
         document.querySelectorAll(".presencial-input").forEach(function(i){i.value="";});
         document.querySelectorAll(".presencial-results-el").forEach(function(r){r.innerHTML="";});
       } catch(e) {
-        console.error('processCheckin error:', e);
         showError("Error al registrar: " + e.message);
       }
     }
@@ -499,7 +498,7 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         var uid = physicalBuffer.trim(); physicalBuffer = '';
-        if (uid.length > 10 && !cooldown) { cooldown = true; scanning = false; processCheckin(uid).catch(function(e){ console.error('processCheckin error:', e); showError('Error al registrar'); }); }
+        if (uid.length > 10 && !cooldown) { cooldown = true; scanning = false; processCheckin(uid).catch(function(){ showError('Error al registrar'); }); }
       } else if (e.key.length === 1) {
         physicalBuffer += e.key; clearTimeout(physicalTimer);
         physicalTimer = setTimeout(function(){ physicalBuffer = ''; }, 300);
@@ -558,7 +557,7 @@
         if (code && scanning && !cooldown && code.data !== lastScanned) {
           lastScanned = code.data; cooldown = true; scanning = false;
           document.getElementById('status-text').textContent = 'Procesando...';
-          processCheckin(code.data.trim()).then(function(){ document.getElementById('status-text').textContent = 'Listo para escanear'; lastScanned = ''; }).catch(function(e){ console.error('processCheckin error:', e); showError('Error al registrar'); lastScanned = ''; });
+          processCheckin(code.data.trim()).then(function(){ document.getElementById('status-text').textContent = 'Listo para escanear'; lastScanned = ''; }).catch(function(){ showError('Error al registrar'); lastScanned = ''; });
         }
       }
       requestAnimationFrame(scanLoop);
