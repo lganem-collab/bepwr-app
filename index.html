@@ -2482,6 +2482,10 @@ function renderPruebaPeso(data) {
   if (config&&config.nacimiento) { try { var nd = config.nacimiento.toDate ? config.nacimiento.toDate() : new Date(config.nacimiento); edad = Math.floor((Date.now()-nd.getTime())/(365.25*24*3600*1000)); } catch(ex) {} }
   var ge = edad>=45?'45+':edad>=30?'30-45':'<30';
   var nivelFitness = parseInt((config&&config.nivelFitness)||1)||1;
+  console.log('[rutina] meta:', meta);
+  console.log('[rutina] edad:', edad, 'ge:', ge);
+  console.log('[rutina] nivelFitness:', nivelFitness);
+  console.log('[rutina] config.nacimiento:', config&&config.nacimiento, 'config.nivelFitness:', config&&config.nivelFitness);
   // Load visitas with a 10s timeout
   var visitasP = Promise.resolve({sa:0, freq:{}});
   if (uid && db && window.getDocs && window.collection && window.query && window.where) {
@@ -2510,7 +2514,9 @@ function renderPruebaPeso(data) {
       var sa = r.sa, freq = r.freq;
       var etapaVisitas = sa<=3?1:sa<=12?2:3;
       var etapa = Math.max(etapaVisitas, nivelFitness);
+      console.log('[rutina] sa:', sa, 'etapaVisitas:', etapaVisitas, 'etapaFinal:', etapa);
       var rec = _getRec(meta, ge, etapa, sa), ei = _ETAPAS_DEF[etapa];
+      console.log('[rutina] rec.mix:', JSON.stringify(rec.mix), 'rec.n:', rec.n);
       var genero = (config&&config.genero)||'';
       rec.mix = rec.mix.map(function(t){ return (t==='women50'&&genero!=='Femenino')?'full_body_core':t; });
       var compl = (_COMPL[meta]||{})[ge]||'';
