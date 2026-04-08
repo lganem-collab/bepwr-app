@@ -20,57 +20,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Instalar firebase-admin
-        run: npm install firebase-admin node-fetch@2
-
-      - name: Consultar citas y enviar reporte
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          APP_URL: ${{ secrets.VERCEL_APP_URL }}
+      - name: Llamar endpoint reporte
         run: |
-          node -e "
-          const admin = require('firebase-admin');
-          const fetch = require('node-fetch');
-
-          const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-          admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-          const db = admin.firestore();
-
-          async function main() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const snap = await db.collection('citas')
-              .where('fecha', '>=', hoy)
-              .where('estado', '==', 'confirmada')
-              .orderBy('fecha')
-              .orderBy('hora')
-              .get();
-
-            const citas = snap.docs.map(d => {
-              const c = d.data();
-              return { nombre: c.nombre, fecha: c.fecha, hora: c.hora, duracion: c.duracion || 15 };
-            });
-
-            console.log('Citas encontradas:', citas.length);
-
-            const appUrl = process.env.APP_URL || 'https://bepwr-app.vercel.app';
-            const res = await fetch(appUrl + '/api/send-report', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + process.env.CRON_SECRET
-              },
-              body: JSON.stringify({ trigger: 'cron', citas })
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-              console.log('Reporte enviado exitosamente. Total citas:', data.total);
-            } else {
-              console.error('Error al enviar reporte:', data.error);
-              process.exit(1);
-            }
-          }
-
-          main().catch(e => { console.error(e); process.exit(1); });
-          "
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.NOTIFY_SECRET }}" \
+            "https://bepwr-app.vercel.app/api/cron/report-daily"
