@@ -2544,7 +2544,7 @@ function renderPruebaPeso(data) {
       var tip = etapa===3&&topC&&topN>4?'Llevas '+topN+' visitas de '+(_CL_NOM[topC]||topC)+'. Varía para seguir progresando.':'';
       var DIAS_N = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
       var h = '<div style="display:flex;flex-direction:column;gap:12px">';
-      h += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="background:'+ei.c+'22;color:'+ei.c+';border:1px solid '+ei.c+'44;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:600">'+ei.n+'</span><span style="font-size:12px;color:#888">'+ei.d+'</span></div>';
+      h += '<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap"><span style="background:'+ei.c+'22;color:'+ei.c+';border:1px solid '+ei.c+'44;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:600">'+ei.n+'</span><span style="font-size:12px;color:#888">'+ei.d+'</span></div>';
       h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
       h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:14px"><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Semanas activas</div><div style="font-size:28px;font-weight:700;color:#FF5C1A">'+sa+'</div><div style="font-size:12px;color:#888">con al menos 1 clase</div></div>';
       h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:14px"><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Clases / semana</div><div style="font-size:28px;font-weight:700;color:#FF5C1A">'+rec.n+'</div><div style="font-size:12px;color:#888">recomendadas</div></div></div>';
@@ -2556,7 +2556,7 @@ function renderPruebaPeso(data) {
         h += '<div style="display:flex;align-items:center;gap:12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="width:4px;height:36px;border-radius:2px;background:'+col+';flex-shrink:0"></div><div style="flex:1"><div style="font-size:14px;font-weight:600;color:#f0f0f0">'+(n>1?n+'x ':'')+nom+'</div><div style="font-size:12px;color:#888;margin-top:2px">'+ds+'</div></div></div>';
       });
       h += '</div>';
-      if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #4ade80;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento \u00B7 1 vez por semana m\u00EDn.</div><div style="font-size:13px;color:#ccc">Elige al menos una opci\u00F3n \u00B7 '+compl+'</div></div>';
+      if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento \u00B7 1 vez por semana m\u00EDn.</div><div style="font-size:13px;color:#ccc">Elige al menos una opci\u00F3n \u00B7 '+compl+'</div></div>';
       if (tip) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #9F7AEA;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#9F7AEA;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consejo</div><div style="font-size:13px;color:#ccc">'+tip+'</div></div>';
       h += '</div>';
       el.innerHTML = h;
