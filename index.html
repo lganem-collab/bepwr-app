@@ -2276,7 +2276,9 @@ return {
   guiaUrls,
   analisisIA: d.analisisIA || null,
   analisisIA_fecha: d.analisisIA_fecha || null,
-  analisisIA_valFecha: d.analisisIA_valFecha || null
+  analisisIA_valFecha: d.analisisIA_valFecha || null,
+  nivelFitness: d.nivelFitness || 1,
+  fechaAlta: d.fechaAlta || null
 };
 
 
@@ -2477,15 +2479,11 @@ function renderPruebaPeso(data) {
   var el = document.getElementById('metodo-rutina-container'); if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;font-size:14px">Calculando tu rutina...</div>';
   var uid = window._currentUid, db = window.db;
-  var meta = (config&&config.meta)||'';
+  var meta = (data&&data.objetivo)||'';
   var edad = 0;
-  if (config&&config.nacimiento) { try { var nd = config.nacimiento.toDate ? config.nacimiento.toDate() : new Date(config.nacimiento); edad = Math.floor((Date.now()-nd.getTime())/(365.25*24*3600*1000)); } catch(ex) {} }
+  if (data&&data.nacimiento) { try { var nd = data.nacimiento.toDate ? data.nacimiento.toDate() : new Date(data.nacimiento); edad = Math.floor((Date.now()-nd.getTime())/(365.25*24*3600*1000)); } catch(ex) {} }
   var ge = edad>=45?'45+':edad>=30?'30-45':'<30';
-  var nivelFitness = parseInt((config&&config.nivelFitness)||1)||1;
-  console.log('[rutina] meta:', meta);
-  console.log('[rutina] edad:', edad, 'ge:', ge);
-  console.log('[rutina] nivelFitness:', nivelFitness);
-  console.log('[rutina] config.nacimiento:', config&&config.nacimiento, 'config.nivelFitness:', config&&config.nivelFitness);
+  var nivelFitness = parseInt((data&&data.nivelFitness)||1)||1;
   // Load visitas with a 10s timeout
   var visitasP = Promise.resolve({sa:0, freq:{}});
   if (uid && db && window.getDocs && window.collection && window.query && window.where) {
@@ -2514,10 +2512,8 @@ function renderPruebaPeso(data) {
       var sa = r.sa, freq = r.freq;
       var etapaVisitas = sa<=3?1:sa<=12?2:3;
       var etapa = Math.max(etapaVisitas, nivelFitness);
-      console.log('[rutina] sa:', sa, 'etapaVisitas:', etapaVisitas, 'etapaFinal:', etapa);
       var rec = _getRec(meta, ge, etapa, sa), ei = _ETAPAS_DEF[etapa];
-      console.log('[rutina] rec.mix:', JSON.stringify(rec.mix), 'rec.n:', rec.n);
-      var genero = (config&&config.genero)||'';
+      var genero = (data&&data.genero)||'';
       rec.mix = rec.mix.map(function(t){ return (t==='women50'&&genero!=='Femenino')?'full_body_core':t; });
       var compl = (_COMPL[meta]||{})[ge]||'';
       if (compl && compl.indexOf('PWR Yoga') === -1) compl += ' \u00B7 PWR Yoga';
@@ -2554,7 +2550,7 @@ function renderPruebaPeso(data) {
 }
     Promise.all([loadV, horarioP]).then(function(results){ var r = results[0];
       var sa=r.sa,freq=r.freq;var etapaVisitas=sa<=3?1:sa<=12?2:3;var nivelFitness=parseInt((config&&config.nivelFitness)||1)||1;var etapa=Math.max(etapaVisitas,nivelFitness);var rec=_getRec(meta,ge,etapa,sa),ei=_ETAPAS_DEF[etapa];
-      var _g=(config&&config.genero)||'';rec.mix=rec.mix.map(function(t){return(t==='women50'&&_g!=='Femenino')?'full_body_core':t;});
+      var _g=(data&&data.genero)||'';rec.mix=rec.mix.map(function(t){return(t==='women50'&&_g!=='Femenino')?'full_body_core':t;});
       var compl=(_COMPL[meta]||{})[ge]||'';
       var slots=window._horarioSlots||[];
       var dias={};
