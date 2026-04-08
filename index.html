@@ -2449,7 +2449,12 @@ function renderPruebaPeso(data) {
     'Rendimiento funcional':{'<30':[['full_body_core','full_body_core'],['full_body_core','full_body_core','full_body_core','full_body_glutes'],['full_body_core','full_body_core','full_body_core','full_body_glutes','upper_body']],'30-45':[['full_body_core','full_body_glutes'],['full_body_core','full_body_core','full_body_glutes'],['full_body_core','full_body_core','full_body_glutes','lower_body']],'45+':[['women50','full_body_core'],['full_body_core','full_body_core','women50'],['full_body_core','full_body_core','women50']]},
     'Incrementar performance \u00B7 Ciclismo':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]},
     'Incrementar performance \u00B7 Nataci\u00F3n':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','upper_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','upper_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','upper_body','full_body_core']]},
-    'Incrementar performance \u00B7 Deportivo':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]}
+    'Incrementar performance \u00B7 Correr':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]},
+    'Incrementar performance \u00B7 Padel':{'<30':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'30-45':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'45+':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']]},
+    'Incrementar performance \u00B7 Tenis':{'<30':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'30-45':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'45+':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']]},
+    'Incrementar performance \u00B7 Golf':{'<30':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'30-45':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'45+':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']]},
+    'Incrementar performance \u00B7 F\u00FAtbol':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]},
+    'Incrementar performance \u00B7 Otro':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]}
   };
   var _COMPL = {
     'Bajar grasa / bajar de peso':{'<30':'Cardio zona 2: trotar suave o bicicleta, 30-40 min, 2x/sem','30-45':'Caminata diaria 30 min + cardio zona 2, 1-2x/sem','45+':'Caminata diaria 30 min'},
@@ -2457,24 +2462,30 @@ function renderPruebaPeso(data) {
     'Rendimiento funcional':{'<30':'Hidratación 40-50 ml/kg \u00B7 Sueño 8h \u00B7 Carbos altos','30-45':'Recuperación activa \u00B7 Sueño no negociable','45+':'Movilidad diaria \u00B7 Sueño 8h \u00B7 Evitar lesiones'},
     'Incrementar performance \u00B7 Ciclismo':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
     'Incrementar performance \u00B7 Nataci\u00F3n':{'<30':'PWR Yoga \u00B7 Trote m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 Deportivo':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'}
+    'Incrementar performance \u00B7 Correr':{'<30':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Padel':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Tenis':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Golf':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 F\u00FAtbol':{'<30':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Otro':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'}
   };
   function _getRec(meta, ge, etapa, sa) {
     var r = _MIX[meta]; if (!r) { return meta&&meta.includes('Incrementar')?{n:2,mix:['full_body_core','pwr_yoga']}:{n:3,mix:['full_body_core','lower_body','upper_body']}; }
-    // Etapa 3 rotation for Ciclismo/Deportivo
-    if (etapa === 3 && meta && meta.indexOf('Ciclismo') !== -1) {
+    // Rotación etapa 3: deportes de tren inferior (Ciclismo, Correr, Fútbol, Otro)
+    var _deporteInferior = ['Ciclismo','Correr','F\u00FAtbol','Otro'];
+    if (etapa === 3 && meta && _deporteInferior.some(function(d){return meta.indexOf(d)!==-1;})) {
       var mix = (sa % 3) === 2 ? ['upper_body','full_body_core'] : ['lower_body','full_body_core'];
       return {n:mix.length, mix:mix};
     }
-    if (etapa === 3 && meta && meta.indexOf('Deportivo') !== -1) {
-      var mix = (sa % 3) === 2 ? ['upper_body','full_body_core'] : ['lower_body','full_body_core'];
+    // Rotación etapa 3: deportes de tren superior (Padel, Tenis, Golf)
+    var _deporteSuperior = ['Padel','Tenis','Golf'];
+    if (etapa === 3 && meta && _deporteSuperior.some(function(d){return meta.indexOf(d)!==-1;})) {
+      var mix = (sa % 3) === 2 ? ['lower_body','full_body_core'] : ['upper_body','full_body_core'];
       return {n:mix.length, mix:mix};
     }
-    // Natación: etapa 2+ rotation
-    if (meta && meta.indexOf('Nataci\u00F3n') !== -1) {
-      var slots = r[ge]||r['30-45'];
-      var base = slots[Math.min(etapa-1,2)];
-      var mix = etapa >= 2 ? ((sa % 2) === 0 ? ['lower_body','full_body_core'] : ['upper_body','full_body_core']) : base;
+    // Rotación natación: etapa 2+ alterna cada semana
+    if (meta && meta.indexOf('Nataci\u00F3n') !== -1 && etapa >= 2) {
+      var mix = (sa % 2) === 0 ? ['lower_body','full_body_core'] : ['upper_body','full_body_core'];
       return {n:mix.length, mix:mix};
     }
     var arr = r[ge]||r['30-45'];
