@@ -2676,9 +2676,11 @@ for (const med of medidasVal) {
         });
       }
 
-      fetch('/api/send-welcome', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, nombre:nombreCompleto, password:pass})})
-        .then(r=>r.json()).then(d=>console.log('email result:',d))
-        .catch(e=>console.error('email error:',e.message));
+      try {
+        const wr = await fetch('/api/send-welcome', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, nombre:nombreCompleto, password:pass})});
+        const wd = await wr.json();
+        console.log('email result:', wd);
+      } catch(we) { console.error('email error:', we.message); }
 
       showToast('â ' + nombreCompleto + ' creado. Email enviado a ' + email, 'success');
       logBitacora('alta_miembro', 'Alta de miembro: ' + nombreCompleto + ' | ' + email, nombreCompleto);
