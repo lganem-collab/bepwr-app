@@ -1804,6 +1804,8 @@ if (Object.keys(updates).length > 0) {
     const _uid = window._currentUid || '';
     if (_uid) {
       Object.keys(localStorage).filter(k => k.startsWith('ia-analisis-' + _uid + '-')).forEach(k => localStorage.removeItem(k));
+      // Re-inicializar tab Método para que regenere el análisis con nuevo objetivo
+      if (typeof window.initMetodoTab === 'function') setTimeout(() => window.initMetodoTab(), 300);
     }
   }
 }
