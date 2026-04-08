@@ -53,6 +53,9 @@
     .sidebar-logo .be{color:#fff;font-size:20px;font-weight:900}.sidebar-logo .pwr{color:#FF5C1A;font-size:20px;font-weight:900}
     .sidebar-logo sup{font-size:0.4em;vertical-align:super}
     .sidebar-collapsed .sidebar-logo .pwr,.sidebar-collapsed .sidebar-logo sup{display:none}
+    #sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#333 transparent}
+    #sidebar-nav::-webkit-scrollbar{width:4px}
+    #sidebar-nav::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
     .sidebar-section{font-size:9px;color:#555;font-family:Space Mono,monospace;letter-spacing:2px;text-transform:uppercase;padding:16px 16px 4px;white-space:nowrap;overflow:hidden}
     .sidebar-collapsed .sidebar-section{opacity:0}
     .sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-radius:8px;margin:2px 8px;color:#888;font-size:14px;transition:color .15s,background .15s;white-space:nowrap}
@@ -171,6 +174,7 @@
   <div id="sidebar">
     <button id="sidebar-toggle" onclick="toggleSidebar()">&#x2630;</button>
     <div class="sidebar-logo"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
+    <div id="sidebar-nav">
     <div class="sidebar-section">General</div>
     <div class="sidebar-item active" id="tab-home" onclick="switchTab('home')"><span class="sidebar-icon">&#x1F3E0;</span><span class="sidebar-label">Inicio</span></div>
     <div class="sidebar-item" id="tab-members" onclick="switchTab('members')"><span class="sidebar-icon">&#x1F465;</span><span class="sidebar-label">Miembros</span></div>
@@ -185,6 +189,7 @@
     <div class="sidebar-item" id="tab-horario" onclick="switchTab('horario')" style="display:none"><span class="sidebar-icon">&#x1F5D3;&#xFE0F;</span><span class="sidebar-label">Horario</span></div>
     <div class="sidebar-item" id="tab-clases" onclick="switchTab('clases')" style="display:none"><span class="sidebar-icon">&#x1F3CB;&#xFE0F;</span><span class="sidebar-label">Clases</span></div>
     <div class="sidebar-item" id="tab-rutina" onclick="switchTab('rutina')" style="display:none"><span class="sidebar-icon">&#x1F4DD;</span><span class="sidebar-label">Rutina</span></div>
+    </div>
   </div>
   <div id="main-area">
   <div class="topbar">
