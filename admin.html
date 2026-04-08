@@ -44,15 +44,30 @@
     .btn-sm{padding:8px 16px;font-size:12px;border-radius:8px;width:auto;white-space:nowrap}
     .btn-success{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
     .btn:disabled{opacity:.4;cursor:not-allowed}
-    #s-app{display:none;flex-direction:column;height:100vh}
-    .topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+    #s-app{display:none;flex-direction:row;height:100vh}
+    #sidebar{display:flex;flex-direction:column;width:220px;min-width:220px;background:#0d0d0d;border-right:1px solid #2a2a2a;transition:width .25s ease,min-width .25s ease;overflow:hidden;height:100vh;position:sticky;top:0;z-index:101}
+    .sidebar-collapsed #sidebar{width:60px;min-width:60px}
+    #sidebar-toggle{background:none;border:none;color:#888;padding:12px 16px;cursor:pointer;font-size:18px;text-align:left;width:100%}
+    #sidebar-toggle:hover{color:#f0f0f0}
+    .sidebar-logo{padding:12px 16px 4px;display:flex;align-items:center;gap:8px}
+    .sidebar-logo .be{color:#fff;font-size:20px;font-weight:900}.sidebar-logo .pwr{color:#FF5C1A;font-size:20px;font-weight:900}
+    .sidebar-logo sup{font-size:0.4em;vertical-align:super}
+    .sidebar-collapsed .sidebar-logo .pwr,.sidebar-collapsed .sidebar-logo sup{display:none}
+    .sidebar-section{font-size:9px;color:#555;font-family:Space Mono,monospace;letter-spacing:2px;text-transform:uppercase;padding:16px 16px 4px;white-space:nowrap;overflow:hidden}
+    .sidebar-collapsed .sidebar-section{opacity:0}
+    .sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-radius:8px;margin:2px 8px;color:#888;font-size:14px;transition:color .15s,background .15s;white-space:nowrap}
+    .sidebar-item.active{color:#FF5C1A;background:rgba(255,92,26,.07)}
+    .sidebar-item:hover{color:#f0f0f0;background:rgba(255,255,255,.05)}
+    .sidebar-icon{font-size:18px;flex-shrink:0;width:24px;text-align:center}
+    .sidebar-label{overflow:hidden;white-space:nowrap}
+    .sidebar-collapsed .sidebar-label{opacity:0;width:0}
+    .sidebar-collapsed .sidebar-item{justify-content:center;padding:10px 0;margin:2px 4px}
+    #main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;flex-shrink:0}
     .topbar-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1}
     .topbar-logo .be{color:#ffffff}.topbar-logo .pwr{color:#FF5C1A}.topbar-logo sup{font-size:0.45em;vertical-align:super}
     .topbar-badge{font-size:10px;color:var(--gray);font-family:Space Mono,monospace;letter-spacing:1.5px;text-transform:uppercase;margin-left:12px}
     .logout-link{font-size:12px;color:var(--orange);cursor:pointer;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;text-decoration:underline}
-    .tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);padding:0 32px;background:var(--dark);position:sticky;top:60px;z-index:99}
-    .tab{padding:14px 20px;font-size:10px;font-weight:500;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;font-family:Space Mono,monospace;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
-    .tab.on{color:var(--orange);border-bottom-color:var(--orange)}
     .content{flex:1 1 auto;padding:32px;max-width:1100px;margin:0 auto;width:100%}
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
     .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
@@ -104,15 +119,16 @@
     @media(max-width:768px){
       body{overflow-x:hidden}
       .topbar{padding:0 12px;gap:8px}
-      .tabs{padding:0 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;display:flex;white-space:nowrap;scrollbar-width:none}
-      .tabs::-webkit-scrollbar{display:none}
-      .tab-btn{flex-shrink:0;padding:10px 12px;font-size:11px}
+      #sidebar{width:60px;min-width:60px}
+      .sidebar-label{opacity:0;width:0}
+      .sidebar-item{justify-content:center;padding:10px 0;margin:2px 4px}
+      .sidebar-section{opacity:0}
+      .sidebar-logo .pwr,.sidebar-logo sup{display:none}
       .stats-row{grid-template-columns:1fr 1fr}
       .members-table{overflow-x:auto;-webkit-overflow-scrolling:touch}
       .table-head,.table-row{grid-template-columns:2fr 1fr 130px}
       .th:nth-child(n+3):not(:last-child),.table-row .td:nth-child(n+3):not(:last-child){display:none}
       .content{padding:12px}
-      .topbar{padding:0 12px}
       .modal-sheet{max-height:95vh;border-radius:20px 20px 0 0}
     }
     @media(max-width:480px){
@@ -124,7 +140,7 @@
     input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
     input[type="number"]{-moz-appearance:textfield}
   </style>
-<style>html,body{overflow:hidden;position:fixed;width:100%;height:100%}.content{overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100vh - 105px)}</style></head>
+<style>html,body{overflow:hidden;position:fixed;width:100%;height:100%}.content{overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100vh - 60px)}</style></head>
 <body>
 
 <!-- LOGIN -->
@@ -152,9 +168,27 @@
 
 <!-- APP -->
 <div id="s-app" class="screen">
+  <div id="sidebar">
+    <button id="sidebar-toggle" onclick="toggleSidebar()">&#x2630;</button>
+    <div class="sidebar-logo"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
+    <div class="sidebar-section">General</div>
+    <div class="sidebar-item active" id="tab-home" onclick="switchTab('home')"><span class="sidebar-icon">&#x1F3E0;</span><span class="sidebar-label">Inicio</span></div>
+    <div class="sidebar-item" id="tab-members" onclick="switchTab('members')"><span class="sidebar-icon">&#x1F465;</span><span class="sidebar-label">Miembros</span></div>
+    <div class="sidebar-item" id="tab-staff" onclick="switchTab('staff')" style="display:none"><span class="sidebar-icon">&#x1F464;</span><span class="sidebar-label">Staff</span></div>
+    <div class="sidebar-item" id="tab-notify" onclick="switchTab('notify')" style="display:none"><span class="sidebar-icon">&#x1F4E2;</span><span class="sidebar-label">Env&#xED;o de Avisos</span></div>
+    <div class="sidebar-section">Admin</div>
+    <div class="sidebar-item" id="tab-bitacora" onclick="switchTab('bitacora')" style="display:none"><span class="sidebar-icon">&#x1F4CB;</span><span class="sidebar-label">Bit&#xE1;cora</span></div>
+    <div class="sidebar-item" id="tab-dashboard" onclick="switchTab('dashboard')" style="display:none"><span class="sidebar-icon">&#x1F4CA;</span><span class="sidebar-label">Dashboard</span></div>
+    <div class="sidebar-item" id="tab-citas" onclick="switchTab('citas')" style="display:none"><span class="sidebar-icon">&#x1F4C5;</span><span class="sidebar-label">Citas Val</span></div>
+    <div class="sidebar-item" id="tab-pesos" onclick="switchTab('pesos')" style="display:none"><span class="sidebar-icon">&#x2696;&#xFE0F;</span><span class="sidebar-label">Pesos</span></div>
+    <div class="sidebar-section">Clases</div>
+    <div class="sidebar-item" id="tab-horario" onclick="switchTab('horario')" style="display:none"><span class="sidebar-icon">&#x1F5D3;&#xFE0F;</span><span class="sidebar-label">Horario</span></div>
+    <div class="sidebar-item" id="tab-clases" onclick="switchTab('clases')" style="display:none"><span class="sidebar-icon">&#x1F3CB;&#xFE0F;</span><span class="sidebar-label">Clases</span></div>
+    <div class="sidebar-item" id="tab-rutina" onclick="switchTab('rutina')" style="display:none"><span class="sidebar-icon">&#x1F4DD;</span><span class="sidebar-label">Rutina</span></div>
+  </div>
+  <div id="main-area">
   <div class="topbar">
       <div style="display:flex;align-items:center">
-        <div class="topbar-logo"><span class="be">be</span><span class="pwr">PWR<sup>&#xAE;</sup></span></div>
         <div class="topbar-badge">Staff Panel</div>
       </div>
     <div style="display:flex;align-items:center;gap:16px">
@@ -162,20 +196,6 @@
       <div class="logout-link" onclick="openChangePass()" style="color:#aaa">&#x1F510;</div>
       <div class="logout-link" onclick="doLogout()">Salir</div>
     </div>
-  </div>
-  <div class="tabs">
-    <div class="tab on" id="tab-home" onclick="switchTab('home')">Inicio</div>
-    <div class="tab" id="tab-members" onclick="switchTab('members')">Miembros</div>
-    <div class="tab" id="tab-staff" onclick="switchTab('staff')" style="display:none">&#x1F465; Staff</div>
-    <div class="tab" id="tab-notify" onclick="switchTab('notify')" style="display:none">&#x1F4E3; Env&#xED;o de Avisos</div>
-    <div class="tab" id="tab-bitacora" onclick="switchTab('bitacora')" style="display:none">&#x1F4CB; Bit&#xE1;cora</div>
-    <div class="tab" id="tab-dashboard" onclick="switchTab('dashboard')" style="display:none">&#x1F4CA; Dashboard</div>
-    <div class="tab" id="tab-guias" onclick="switchTab('guias')" style="display:none">&#x1F4C4; Guías</div>
-    <div class="tab" id="tab-citas" onclick="switchTab('citas')" style="display:none">&#x1F4C5; Citas Val</div>
-    <div class="tab" id="tab-pesos" onclick="switchTab('pesos')" style="display:none">⚖️ Pesos 🔒</div>
-        <div class="tab" id="tab-horario" onclick="switchTab('horario')" style="display:none">Horario</div>
-        <div class="tab" id="tab-clases" onclick="switchTab('clases')" style="display:none">Clases</div>
-        <div class="tab" id="tab-rutina" onclick="switchTab('rutina')" style="display:none">Rutina</div>
   </div>
   <div class="content">
 
@@ -737,7 +757,8 @@
   </div>
 
 </div>
-</div>
+</div><!-- /main-area -->
+</div><!-- /s-app -->
 <!-- MODAL DETAIL -->
 <div class="modal-overlay" id="modal-detail">
   <div class="modal">
@@ -859,21 +880,21 @@
           if (window.currentStaffRole === 'admin') {
   const tabStaff  = document.getElementById('tab-staff');
   const tabNotify = document.getElementById('tab-notify');
-  if (tabStaff)  tabStaff.style.display  = 'inline-block';
-  if (tabNotify) tabNotify.style.display = 'inline-block';
+  if (tabStaff)  tabStaff.style.display  = 'flex';
+  if (tabNotify) tabNotify.style.display = 'flex';
   const tabCitas = document.getElementById('tab-citas');
-  if (tabCitas) tabCitas.style.display = 'inline-block';;
+  if (tabCitas) tabCitas.style.display = 'flex';;
 }
 
 // Solo Admin Maestro ve la bitácora
 if (user && user.uid === MASTER_UID) {
   const tabBita = document.getElementById('tab-bitacora');
-  if (tabBita) tabBita.style.display = 'inline-block';
+  if (tabBita) tabBita.style.display = 'flex';
   const tabDash = document.getElementById('tab-dashboard');
-  document.getElementById('tab-horario').style.display='inline-block';
-  document.getElementById('tab-clases').style.display='inline-block';
-  document.getElementById('tab-rutina').style.display='inline-block';
-  if (tabDash) tabDash.style.display = 'inline-block';
+  document.getElementById('tab-horario').style.display='flex';
+  document.getElementById('tab-clases').style.display='flex';
+  document.getElementById('tab-rutina').style.display='flex';
+  if (tabDash) tabDash.style.display = 'flex';
 }
 
         } catch(domErr) { console.error('DOM error:', domErr); }
@@ -905,7 +926,7 @@ if (user && user.uid === MASTER_UID) {
     const el=document.getElementById(id);
     el.classList.add('active');
       switchTab('home');
-    if(id==='s-app'){el.style.display='flex';el.style.flexDirection='column';}
+    if(id==='s-app'){el.style.display='flex';el.style.flexDirection='row';}
     else if(id==='s-login') el.style.display='flex';
   }
   function hide(id){
@@ -2674,13 +2695,17 @@ for (const med of medidasVal) {
     btn.textContent = 'Guardar Miembro'; btn.disabled = false;
   }
 
+  function toggleSidebar() {
+    document.getElementById('s-app').classList.toggle('sidebar-collapsed');
+  }
+
   function switchTab(tab) {
   var _sH=document.getElementById("section-horario"),_sC=document.getElementById("section-clases"),_sR=document.getElementById("section-rutina");if(_sH)_sH.style.display="none";if(_sC)_sC.style.display="none";if(_sR)_sR.style.display="none";
     const tabs = ['home','members','new','staff','notify','bitacora','dashboard','guias','citas','pesos'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
       const contentEl = document.getElementById('tab-content-'+t);
-      if (tabEl) tabEl.classList.toggle('on', t===tab);
+      if (tabEl) tabEl.classList.toggle('active', t===tab);
       if (contentEl) contentEl.style.display = t===tab ? 'block' : 'none';
     });
     if (tab === 'staff') loadStaffList();
@@ -2691,11 +2716,11 @@ for (const med of medidasVal) {
     if (tab === 'citas') loadCitasTab();;
     if (auth?.currentUser?.uid === MASTER_UID) {
       const _bt = document.getElementById('tab-bitacora');
-      if (_bt) _bt.style.display = 'inline-block';
+      if (_bt) _bt.style.display = 'flex';
       // Tab pesos solo para Admin Maestro
       if (auth.currentUser && auth.currentUser.uid === MASTER_UID) {
         const _bp = document.getElementById('tab-pesos');
-        if (_bp) _bp.style.display = 'inline-block';
+        if (_bp) _bp.style.display = 'flex';
       }
     }
     if (tab === 'home') {
@@ -2716,6 +2741,11 @@ for (const med of medidasVal) {
   if(tab==='horario'){var el=document.getElementById('section-horario');if(el)el.style.display='block';cargarHorario();}
   if(tab==='clases'){var el2=document.getElementById('section-clases');if(el2)el2.style.display='block';cargarClases();}
   if(tab==='rutina'){var el3=document.getElementById('section-rutina');if(el3)el3.style.display='block';cargarRutinaConfig();}
+  // Mark sidebar active for horario/clases/rutina
+  ['horario','clases','rutina'].forEach(function(t){
+    var si=document.getElementById('tab-'+t);
+    if(si) si.classList.toggle('active',t===tab);
+  });
 }
 
   // ── GUÍAS NUTRIMENTALES ──
