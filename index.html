@@ -2896,20 +2896,20 @@ if (config && config.rutina) {
     <p style="font-size:13px;color:#ccc;line-height:1.6;margin-bottom:18px">Un número entre 0 y 100 que refleja cómo está tu cuerpo en este momento — no qué tan rápido estás cambiando, sino qué tan bien estás hoy. Considera tu composición corporal, tu grasa visceral, tu fuerza y tu cintura.</p>
     <div style="font-size:11px;color:#888;font-family:'Space Mono',monospace;letter-spacing:.5px;margin-bottom:12px">¿QUÉ SIGNIFICA TU NÚMERO?</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
-      <div style="padding:12px 14px;background:#FF5C1A12;border-left:3px solid #FF5C1A;border-radius:0 10px 10px 0">
-        <div style="font-size:12px;font-weight:700;color:#FF5C1A;font-family:'Space Mono',monospace;margin-bottom:4px">88–100 · DESTACADO</div>
+      <div style="padding:12px 14px;background:#4ade8012;border-left:3px solid #4ade80;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#4ade80;font-family:'Space Mono',monospace;margin-bottom:4px">88–100 · DESTACADO</div>
         <div style="font-size:12px;color:#ccc;line-height:1.5">Tu composición corporal y fuerza funcional están en su mejor nivel. Eres parte del grupo más selecto del gym.</div>
       </div>
-      <div style="padding:12px 14px;background:#4ade8012;border-left:3px solid #4ade80;border-radius:0 10px 10px 0">
-        <div style="font-size:12px;font-weight:700;color:#4ade80;font-family:'Space Mono',monospace;margin-bottom:4px">73–87 · AVANZADO</div>
+      <div style="padding:12px 14px;background:#60a5fa12;border-left:3px solid #60a5fa;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#60a5fa;font-family:'Space Mono',monospace;margin-bottom:4px">73–87 · AVANZADO</div>
         <div style="font-size:12px;color:#ccc;line-height:1.5">Tienes una base sólida y clara. Tu cuerpo está trabajando bien en la mayoría de las métricas clave.</div>
       </div>
       <div style="padding:12px 14px;background:#facc1512;border-left:3px solid #facc15;border-radius:0 10px 10px 0">
         <div style="font-size:12px;font-weight:700;color:#facc15;font-family:'Space Mono',monospace;margin-bottom:4px">56–72 · ÓPTIMO</div>
         <div style="font-size:12px;color:#ccc;line-height:1.5">Tienes salud funcional. Una o dos áreas tienen margen de mejora y el training está haciendo efecto.</div>
       </div>
-      <div style="padding:12px 14px;background:#f8717112;border-left:3px solid #f87171;border-radius:0 10px 10px 0">
-        <div style="font-size:12px;font-weight:700;color:#f87171;font-family:'Space Mono',monospace;margin-bottom:4px">0–55 · EN PROCESO</div>
+      <div style="padding:12px 14px;background:#fb923c12;border-left:3px solid #fb923c;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#fb923c;font-family:'Space Mono',monospace;margin-bottom:4px">0–55 · EN PROCESO</div>
         <div style="font-size:12px;color:#ccc;line-height:1.5">Tu cuerpo está en construcción. Con consistencia en el entrenamiento y la nutrición, este número sube.</div>
       </div>
     </div>
@@ -3300,7 +3300,7 @@ if(!isNaN(ci)&&ci>0){
 if(w===0)return null;
 return Math.round((s/w)*100);
 }
-function ivfColor(s){return s>=88?'#FF5C1A':s>=73?'#4ade80':s>=56?'#facc15':'#f87171';}
+function ivfColor(s){return s>=88?'#4ade80':s>=73?'#60a5fa':s>=56?'#facc15':'#fb923c';}
 function ivfLabel(s){return s>=88?'Destacado':s>=73?'Avanzado':s>=56?'\u00d3ptimo':'En Proceso';}
 function applyIVF(m,ini){
 var gen=(window.cachedUserData&&window.cachedUserData.genero)||'';
@@ -3558,12 +3558,12 @@ window._applyIVF=applyIVF;
     <p style="font-size:13px;color:#ccc;line-height:1.6;margin-bottom:18px">Compara tus dos valoraciones más recientes y te dice si tu composición corporal avanzó, se mantuvo o retrocedió — considerando tu objetivo específico y todas tus métricas.</p>
     <div style="font-size:11px;color:#888;font-family:'Space Mono',monospace;letter-spacing:.5px;margin-bottom:12px">¿QUÉ SIGNIFICA TU NÚMERO?</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
-      <div style="padding:12px 14px;background:#FF5C1A12;border-left:3px solid #FF5C1A;border-radius:0 10px 10px 0">
-        <div style="font-size:12px;font-weight:700;color:#FF5C1A;font-family:'Space Mono',monospace;margin-bottom:4px">65–100 · AVANCE NOTORIO</div>
+      <div style="padding:12px 14px;background:#4ade8012;border-left:3px solid #4ade80;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#4ade80;font-family:'Space Mono',monospace;margin-bottom:4px">65–100 · AVANCE NOTORIO</div>
         <div style="font-size:12px;color:#ccc;line-height:1.5">Este ciclo fue claramente positivo. Tus métricas se movieron en la dirección correcta.</div>
       </div>
-      <div style="padding:12px 14px;background:#4ade8012;border-left:3px solid #4ade80;border-radius:0 10px 10px 0">
-        <div style="font-size:12px;font-weight:700;color:#4ade80;font-family:'Space Mono',monospace;margin-bottom:4px">53–64 · AVANCE</div>
+      <div style="padding:12px 14px;background:#60a5fa12;border-left:3px solid #60a5fa;border-radius:0 10px 10px 0">
+        <div style="font-size:12px;font-weight:700;color:#60a5fa;font-family:'Space Mono',monospace;margin-bottom:4px">53–64 · AVANCE</div>
         <div style="font-size:12px;color:#ccc;line-height:1.5">Progresaste. No todo fue perfecto, pero el balance del ciclo es favorable.</div>
       </div>
       <div style="padding:12px 14px;background:#facc1512;border-left:3px solid #facc15;border-radius:0 10px 10px 0">
