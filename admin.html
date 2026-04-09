@@ -3942,7 +3942,7 @@ async function abrirModalHorario(fecha, hora, slotId) {
       var staffSnap = await firebase.firestore().collection('staff').get();
       staffSnap.forEach(function(d) {
         var sd = d.data();
-        if (sd.nombre && sd.activo !== false) selCoach.innerHTML += '<option value="' + sd.nombre + '">' + sd.nombre + '</option>';
+        if (sd.nombre && sd.activo !== false && sd.email !== 'lganem@gmail.com') selCoach.innerHTML += '<option value="' + sd.nombre + '">' + sd.nombre + '</option>';
       });
     } catch(e) {}
   }
