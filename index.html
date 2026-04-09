@@ -2539,7 +2539,45 @@ function renderPruebaPeso(data) {
       var sa = r.sa, freq = r.freq;
       var etapaVisitas = sa<=3?1:sa<=12?2:3;
       var etapa = Math.max(etapaVisitas, nivelFitness);
-      var rec = _getRec(meta, ge, etapa, sa), ei = _ETAPAS_DEF[etapa];
+      // ── Motor bePWR: ajuste por fuerza, bePWR Score e Indice de Evolucion ──
+      var _ppRaw = (data&&data.ultimaValoracion&&data.ultimaValoracion.pruebaPeso)||(data&&data.pruebaPeso);
+      var _ppNum = 0;
+      if (_ppRaw) {
+        if (typeof _ppRaw==='object') _ppNum=((parseFloat(_ppRaw.min)||0)+(parseFloat(_ppRaw.max)||0))/2;
+        else { var _m=String(_ppRaw).match(/(\d+\.?\d*)/); if(_m) _ppNum=parseFloat(_m[1]); }
+      }
+      var _esMasc = data&&(data.genero==='masculino'||data.genero==='Masculino');
+      var _fuerzaAlta = _ppNum>=(_esMasc?22:14);
+      var _fuerzaBaja = _ppNum>0&&_ppNum<(_esMasc?12:7);
+      var _bepwr = 0;
+      try {
+        var _mAll = data._metricsAll||[];
+        var _mIni = _mAll.length>1?_mAll[_mAll.length-1]:null;
+        var _mAct = _mAll.length>0?_mAll[0]:(data.ultimaValoracion||null);
+        var _bObj = (data.objetivo&&typeof data.objetivo==='object')?data.objetivo:{meta:data.objetivo};
+        if (typeof window.calcBePWRScore==='function'&&_mAct) _bepwr=window.calcBePWRScore(_mIni,_mAct,_bObj)||0;
+      } catch(e) {}
+      var _tend = 0;
+      try {
+        var _mAll2 = data._metricsAll||[];
+        if (typeof calcTendencia==='function'&&_mAll2.length>=2) {
+          var _ini2=_mAll2[_mAll2.length-1], _act2=_mAll2[0];
+          var _dur=Math.max(1,Math.round(((_act2._ts||0)-(_ini2._ts||0))/(7*24*3600*1000)));
+          var _ts=calcTendencia(_ini2,_act2,data.objetivo,_dur);
+          if (_ts>3) _tend=1; else if (_ts<-3) _tend=-1;
+        }
+      } catch(e) {}
+      var _boost = 0;
+      if (nivelFitness>=2) {
+        if (_fuerzaAlta) _boost++;
+        if (_bepwr>=70) _boost++;
+        if (_tend===1) _boost++;
+        _boost = Math.min(_boost,1);
+      }
+      if (_fuerzaBaja||_tend===-1) _boost=Math.min(_boost,-1);
+      var etapaFinal = Math.max(1,Math.min(3,etapa+_boost));
+      // ────────────────────────────────────────────────────────────────
+      var rec = _getRec(meta, ge, etapaFinal, sa), ei = _ETAPAS_DEF[etapaFinal];
       var genero = (data&&data.genero)||'';
       rec.mix = rec.mix.map(function(t){ return (t==='women50'&&genero!=='Femenino')?'full_body_core':t; });
       var compl = (_COMPL[meta]||{})[ge]||'';
