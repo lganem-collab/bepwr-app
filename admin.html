@@ -3958,7 +3958,6 @@ async function abrirModalHorario(fecha, hora, slotId) {
         document.getElementById('mh-hora').value = s.hora || '07:00';
         document.getElementById('mh-dur').value = s.duracion || 45;
         document.getElementById('mh-cupo').value = s.cupoTotal || s.cupo || 17;
-        document.getElementById('mh-fitpass').value = s.cupoFitpass || 5;
         if (selClase && s.tipoClase) selClase.value = s.tipoClase;
         if (selCoach && s.coach) selCoach.value = s.coach;
       }
@@ -3970,7 +3969,6 @@ async function abrirModalHorario(fecha, hora, slotId) {
     document.getElementById('mh-hora').value = hora || '07:00';
     document.getElementById('mh-dur').value = 45;
     document.getElementById('mh-cupo').value = 17;
-    document.getElementById('mh-fitpass').value = 5;
     document.getElementById('mh-repetir').checked = false;
     document.getElementById('mh-repetir-opts').style.display = 'none';
     document.querySelectorAll('.mh-dia').forEach(function(cb) { cb.checked = false; });
@@ -4009,7 +4007,7 @@ async function guardarHorario() {
   if (btn) { btn.textContent = 'Guardando...'; btn.disabled = true; }
   try {
     var db = firebase.firestore();
-    var baseData = { tipoClase: tipoClase, coach: coach, hora: hora, duracion: duracion, cupoTotal: cupoTotal, cupoFitpass: cupoFitpass, activo: true };
+    var baseData = { tipoClase: tipoClase, coach: coach, hora: hora, duracion: duracion, cupoTotal: cupoTotal, activo: true };
     if (_horarioSlotId) {
       await db.collection('horario').doc(_horarioSlotId).update(Object.assign({}, baseData, { fecha: fecha }));
     } else if (repetir) {
