@@ -690,10 +690,20 @@
 </div>
 
   <div id="section-horario" style="display:none;padding:20px 28px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
       <h2 style="font-size:18px;font-weight:700">Horario Semanal</h2>
-      <button onclick="agregarSlot()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Agregar clase</button>
-    </div><div id="horario-grid" style="display:grid;gap:8px"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button onclick="cambiarSemana(-1)" style="background:#1a1a1a;border:1px solid #333;color:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:16px">&#8249;</button>
+        <span id="horario-semana-label" style="font-size:13px;font-weight:600;color:#ccc;min-width:180px;text-align:center"></span>
+        <button onclick="cambiarSemana(1)" style="background:#1a1a1a;border:1px solid #333;color:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:16px">&#8250;</button>
+        <button onclick="cambiarSemana(0)" style="background:#1a1a1a;border:1px solid #333;color:#ccc;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Hoy</button>
+        <button onclick="abrirModalHorario(null,null,null)" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">+ Nueva clase</button>
+      </div>
+    </div>
+    <div id="horario-loading" style="text-align:center;padding:40px;color:#666;font-size:13px">Cargando...</div>
+    <div id="horario-calendar" style="display:none;overflow-x:auto">
+      <table id="horario-table" style="width:100%;border-collapse:collapse;min-width:700px;font-size:12px"></table>
+    </div>
   </div>
   <div id="section-clases" style="display:none;padding:20px 28px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
