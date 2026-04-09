@@ -2749,7 +2749,7 @@ async function renderAnalisisCientifico(data, config) {
       var diasPasados = Math.floor((Date.now() - genDate.getTime()) / (24 * 60 * 60 * 1000));
       var valNoChanged = cachedValFecha && valFechaActual && (valFechaActual === cachedValFecha);
 
-      if (diasPasados < 7 && valNoChanged && cachedText.length >= 100) {
+      if (diasPasados < 7 && valNoChanged && metaOk && cachedText.length >= 100) {
         output.textContent = cachedText;
         output.style.opacity = '1';
         if (updatedEl) {
@@ -2844,7 +2844,8 @@ if (config && config.rutina) {
         await updateDoc(docRef, {
           analisisIA: text,
           analisisIA_fecha: hoy,
-          analisisIA_valFecha: valFechaActual || null
+          analisisIA_valFecha: valFechaActual || null,
+          analisisIA_meta: metaSlug || null
         });
       } catch (e) {
         console.warn('No se pudo guardar an\u00E1lisis en Firestore (usando localStorage):', e.message);

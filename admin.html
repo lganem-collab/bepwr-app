@@ -2013,7 +2013,9 @@ if (user && user.uid === MASTER_UID) {
       const activoVal = document.getElementById('edit-activo')?.value === 'false' ? false : true;
       const newMeta = document.getElementById('edit-meta').value;
       const newPesoIni = Number(document.getElementById('edit-peso-ini').value) || null;
-      await db.collection('usuarios').doc(uid).update({
+      const _metaOrig = _mOrig.objetivo?.meta || _mOrig.meta || '';
+      const _metaCambio = newMeta && newMeta !== _metaOrig;
+      const _updateData = {
         nombre: document.getElementById('edit-nombre').value,
         alias: document.getElementById('edit-alias').value,
         telefono: document.getElementById('edit-tel').value,
@@ -2026,7 +2028,14 @@ if (user && user.uid === MASTER_UID) {
         'objetivo.meta': newMeta,
         'objetivo.pesoInicial': newPesoIni,
         nivelFitness: parseInt(document.getElementById('edit-nivel').value) || 1
-      });
+      };
+      if (_metaCambio) {
+        _updateData.analisisIA = null;
+        _updateData.analisisIA_fecha = null;
+        _updateData.analisisIA_valFecha = null;
+        _updateData.analisisIA_meta = null;
+      }
+      await db.collection('usuarios').doc(uid).update(_updateData);
       const cambios = [];
       if (document.getElementById('edit-nombre').value !== (_mOrig.nombre||'')) cambios.push('nombre');
       if (newMeta !== (_mOrig.objetivo?.meta||'')) cambios.push('metaâ'+newMeta);
