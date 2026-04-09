@@ -2725,7 +2725,7 @@ async function renderAnalisisCientifico(data, config) {
 
   // --- Intentar cargar desde cache (Firestore data o localStorage) ---
   var cachedMeta = data.analisisIA_meta || null;
-  var metaOk = !cachedMeta || cachedMeta === metaSlug;
+  var metaOk = cachedMeta && cachedMeta === metaSlug;
   var cachedText = (data.analisisIA && metaOk) ? data.analisisIA : null;
   var cachedFecha = metaOk ? (data.analisisIA_fecha || null) : null;
   var cachedValFecha = metaOk ? (data.analisisIA_valFecha || null) : null;
