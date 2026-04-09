@@ -2271,6 +2271,18 @@ async function loadMetodoData() {
       if (gSnap.exists()) guiaUrls = gSnap.data() || {};
     } catch (e) {}
 
+    // Cargar todas las metricas para el motor de rutina
+    let _metricsAll = [];
+    try {
+      const mSnap = await getDocs(query(collection(db,'usuarios',uid,'metricas'),limit(20)));
+      const MESES3={ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
+      _metricsAll = mSnap.docs.map(doc2=>{
+        const dd=doc2.data();
+        let ts=0;
+        if(dd.fecha){const f=dd.fecha;if(f.toDate)ts=f.toDate().getTime();else if(typeof f==='string'){const mx=f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);if(mx&&MESES3[mx[2]]!==undefined)ts=new Date(parseInt(mx[3]),MESES3[mx[2]],parseInt(mx[1])).getTime();else try{ts=new Date(f).getTime();}catch(e){}}}
+        return {...dd,_ts:ts};
+      }).sort((a,b)=>b._ts-a._ts);
+    } catch(e) {}
 return {
   objetivo: (d.objetivo && d.objetivo.meta) ? d.objetivo.meta : (d.meta || null),
   nombre: d.nombre || d.name || '',
@@ -2287,7 +2299,8 @@ return {
   analisisIA_fecha: d.analisisIA_fecha || null,
   analisisIA_valFecha: d.analisisIA_valFecha || null,
   nivelFitness: d.nivelFitness || 1,
-  fechaAlta: d.fechaAlta || null
+  fechaAlta: d.fechaAlta || null,
+  _metricsAll: _metricsAll
 };
 
 
@@ -2357,6 +2370,7 @@ return {
 async function initMetodoTab() {
   if (_metodoData) { renderMetodo(_metodoData); return; }
   _metodoData = await loadMetodoData();
+  window._metodoData = _metodoData;
   if (!_metodoData) {
     document.getElementById('metodo-objetivo-desc').textContent = 'No se pudo cargar tu perfil';
     return;
