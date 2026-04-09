@@ -3754,69 +3754,257 @@ var _horarioCache = null;
 var _clasesCache = null;
 
 
-// === HORARIO ===
-var _clasesCache=null;
-async function cargarHorario(){
-  var grid=document.getElementById('horario-grid');
-  if(!grid)return;
-  grid.innerHTML='<div style="color:#888;font-size:13px">Cargando...</div>';
-  try{
-    var db=firebase.firestore();
-    var cSnap=await db.collection('config').doc('clases').get();
-    _clasesCache=cSnap.exists?(cSnap.data().lista||[]):[];
-    var snap=await db.collection('horario').orderBy('dia').orderBy('hora').get();
-    var slots=[];
-    snap.forEach(function(d){slots.push(Object.assign({_id:d.id},d.data()));});
-    var DIAS=['Dom','Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b'];
-    var html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">';
-    for(var d=0;d<=6;d++){
-      var ds=slots.filter(function(s){return s.dia===d;});
-      if(!ds.length)continue;
-      html+='<div style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:14px">';
-      html+='<div style="font-size:12px;font-weight:700;color:#FF5C1A;margin-bottom:8px">'+DIAS[d]+'</div>';
-      ds.forEach(function(s){
-        var cls=(_clasesCache||[]).find(function(c){return c.id===s.tipoClase;})||{};
-        html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222">';
-        html+='<div><div style="font-size:13px;font-weight:600;color:#f0f0f0">'+s.hora+' - '+(cls.nombre||s.tipoClase)+'</div>';
-        html+='<div style="font-size:11px;color:#888">'+(s.coach||'Sin coach')+' | Cupo: '+(s.cupo||17)+'</div></div>';
-        html+='<div style="display:flex;gap:4px">';
-        html+='<button onclick="editarSlot(\''+s._id+'\')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#ccc;font-size:11px;cursor:pointer">Edit</button>';
-        html+='<button onclick="eliminarSlot(\''+s._id+'\')" style="background:none;border:1px solid #444;border-radius:5px;padding:3px 8px;color:#f87171;font-size:11px;cursor:pointer">Del</button>';
-        html+='</div></div>';
-      });
-      html+='</div>';
+// === HORARIO SEMANAL ===
+var _horarioOffset = 0;
+var _horarioSlotId = null;
+
+function _getLunesDeSemana(offset) {
+  var hoy = new Date();
+  var dia = hoy.getDay();
+  var diff = (dia === 0) ? -6 : 1 - dia;
+  var lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() + diff + (offset * 7));
+  lunes.setHours(0,0,0,0);
+  return lunes;
+}
+
+function _fmtFechaISO(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function _fmtFechaLabel(d) {
+  var MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return d.getDate() + ' ' + MESES[d.getMonth()];
+}
+
+async function cargarHorario() {
+  var loading = document.getElementById('horario-loading');
+  var cal = document.getElementById('horario-calendar');
+  if (!loading) return;
+  loading.innerHTML = 'Cargando...';
+  loading.style.display = 'block';
+  if (cal) cal.style.display = 'none';
+  try {
+    var db = firebase.firestore();
+    if (!_clasesCache || !_clasesCache.length) {
+      var cSnap = await db.collection('config').doc('clases').get();
+      _clasesCache = cSnap.exists ? (cSnap.data().lista || []) : [];
     }
-    html+='</div>';
-    grid.innerHTML=html;
-  }catch(e){grid.innerHTML='<div style="color:#f87171">Error: '+e.message+'</div>';}
+    var lunes = _getLunesDeSemana(_horarioOffset);
+    var domingo = new Date(lunes); domingo.setDate(lunes.getDate() + 6);
+    var fechaIni = _fmtFechaISO(lunes);
+    var fechaFin = _fmtFechaISO(domingo);
+    var label = document.getElementById('horario-semana-label');
+    if (label) label.textContent = _fmtFechaLabel(lunes) + ' \u2013 ' + _fmtFechaLabel(domingo) + ' ' + domingo.getFullYear();
+    var snap = await db.collection('horario')
+      .where('fecha', '>=', fechaIni)
+      .where('fecha', '<=', fechaFin)
+      .orderBy('fecha').orderBy('hora').get();
+    var slots = [];
+    snap.forEach(function(d) { slots.push(Object.assign({ _id: d.id }, d.data())); });
+    _buildCalendario(slots, lunes);
+    loading.style.display = 'none';
+    if (cal) cal.style.display = 'block';
+  } catch(e) {
+    if (loading) loading.innerHTML = '<span style="color:#f87171">Error: ' + e.message + '</span>';
+  }
 }
-function agregarSlot(){editarSlot(null);}
-function editarSlot(id){
-  var cls=(_clasesCache||[]).map(function(c){return '<option value="'+c.id+'">'+c.nombre+'</option>';}).join('');
-  var dOpts=['Dom','Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b'].map(function(n,v){return '<option value="'+v+'">'+n+'</option>';}).join('');
-  var h='<div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:18px;margin-bottom:14px" id="slot-form">';
-  h+='<h3 style="font-size:14px;font-weight:700;margin-bottom:12px">'+(id?'Editar':'Nueva clase')+'</h3>';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
-  h+='<div><label style="font-size:11px;color:#888">D\u00eda</label><select id="sl-dia" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px">'+dOpts+'</select></div>';
-  h+='<div><label style="font-size:11px;color:#888">Hora</label><input id="sl-hora" type="time" value="07:00" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
-  h+='<div><label style="font-size:11px;color:#888">Clase</label><select id="sl-clase" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px">'+cls+'</select></div>';
-  h+='<div><label style="font-size:11px;color:#888">Coach</label><input id="sl-coach" type="text" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
-  h+='<div><label style="font-size:11px;color:#888">Cupo</label><input id="sl-cupo" type="number" value="17" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
-  h+='<div><label style="font-size:11px;color:#888">Dur (min)</label><input id="sl-dur" type="number" value="45" style="width:100%;background:#111;border:1px solid #333;border-radius:5px;padding:7px;color:#f0f0f0;font-size:12px"></div>';
-  h+='</div><div style="display:flex;gap:6px">';
-  h+='<button onclick="guardarSlot(\''+( id||'')+'\'  )" style="background:#FF5C1A;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer">Guardar</button>';
-  h+='<button onclick="document.getElementById(\'slot-form\').remove()" style="background:none;border:1px solid #444;border-radius:7px;padding:7px 12px;color:#ccc;font-size:12px;cursor:pointer">Cancelar</button></div></div>';
-  document.getElementById('horario-grid').insertAdjacentHTML('afterbegin',h);
+
+function _buildCalendario(slots, lunes) {
+  var table = document.getElementById('horario-table');
+  if (!table) return;
+  var DIAS = ['Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b','Dom'];
+  var HORAS = ['06:00','07:00','08:00','09:00','09:15','10:00','10:30','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
+  var thead = '<thead><tr><th style="width:55px;padding:8px;background:#0d0d0d;border-bottom:1px solid #2a2a2a;color:#555;font-size:10px;font-weight:400;font-family:Space Mono,monospace;text-align:left">HORA</th>';
+  for (var d = 0; d < 7; d++) {
+    var fecha = new Date(lunes); fecha.setDate(lunes.getDate() + d);
+    var esHoy = _fmtFechaISO(fecha) === _fmtFechaISO(new Date());
+    thead += '<th style="padding:8px 6px;background:#0d0d0d;border-bottom:1px solid #2a2a2a;border-left:1px solid #1a1a1a;text-align:center;font-size:12px;font-weight:600;color:' + (esHoy ? '#FF5C1A' : '#ccc') + '">' + DIAS[d] + '<br><span style="font-size:10px;font-weight:400;color:' + (esHoy ? '#FF5C1A' : '#555') + '">' + _fmtFechaLabel(fecha) + '</span></th>';
+  }
+  thead += '</tr></thead>';
+  var tbody = '<tbody>';
+  HORAS.forEach(function(hora) {
+    tbody += '<tr>';
+    tbody += '<td style="padding:4px 6px;color:#444;font-size:10px;font-family:Space Mono,monospace;white-space:nowrap;border-bottom:1px solid #111;vertical-align:top">' + hora + '</td>';
+    for (var d = 0; d < 7; d++) {
+      var fecha = new Date(lunes); fecha.setDate(lunes.getDate() + d);
+      var fechaStr = _fmtFechaISO(fecha);
+      var slotsDia = slots.filter(function(s) { return s.fecha === fechaStr && s.hora === hora; });
+      tbody += '<td style="padding:3px;border-bottom:1px solid #111;border-left:1px solid #1a1a1a;vertical-align:top;min-width:110px;cursor:pointer" onclick="abrirModalHorario(\'' + fechaStr + '\',\'' + hora + '\',null)">';
+      slotsDia.forEach(function(s) {
+        var cls = (_clasesCache || []).find(function(c) { return c.id === s.tipoClase; }) || {};
+        var col = cls.color || '#FF5C1A';
+        tbody += '<div onclick="event.stopPropagation();abrirModalHorario(\'' + fechaStr + '\',\'' + hora + '\',\'' + s._id + '\')" style="background:' + col + '18;border-left:3px solid ' + col + ';border-radius:6px;padding:5px 7px;margin-bottom:3px;cursor:pointer">';
+        tbody += '<div style="font-size:11px;font-weight:600;color:' + col + ';line-height:1.3">' + (cls.nombre || s.tipoClase) + '</div>';
+        tbody += '<div style="font-size:10px;color:#888;margin-top:1px">' + (s.coach || '') + '</div>';
+        tbody += '<div style="font-size:10px;color:#666">' + (s.duracion || 45) + 'min \u00b7 ' + (s.cupoTotal || s.cupo || 17) + ' cupos</div>';
+        tbody += '</div>';
+      });
+      tbody += '</td>';
+    }
+    tbody += '</tr>';
+  });
+  tbody += '</tbody>';
+  table.innerHTML = thead + tbody;
 }
-async function guardarSlot(id){
-  var data={dia:parseInt(document.getElementById('sl-dia').value),hora:document.getElementById('sl-hora').value,tipoClase:document.getElementById('sl-clase').value,coach:document.getElementById('sl-coach').value,cupo:parseInt(document.getElementById('sl-cupo').value)||17,duracion:parseInt(document.getElementById('sl-dur').value)||45,activo:true};
-  try{var db=firebase.firestore();if(id)await db.collection('horario').doc(id).set(data);else await db.collection('horario').add(data);_horarioCache=null;cargarHorario();}catch(e){alert('Error: '+e.message);}
-}
-async function eliminarSlot(id){
-  if(!confirm('\u00bfEliminar esta clase?'))return;
-  await firebase.firestore().collection('horario').doc(id).delete();
+
+function cambiarSemana(dir) {
+  if (dir === 0) _horarioOffset = 0;
+  else _horarioOffset += dir;
   cargarHorario();
 }
+
+async function abrirModalHorario(fecha, hora, slotId) {
+  var modal = document.getElementById('modal-horario');
+  if (!modal) return;
+  _horarioSlotId = slotId;
+  var errEl = document.getElementById('mh-error');
+  if (errEl) errEl.textContent = '';
+  var selClase = document.getElementById('mh-clase');
+  if (selClase) {
+    selClase.innerHTML = (_clasesCache || []).filter(function(c){return c.activa!==false;}).map(function(c) {
+      return '<option value="' + c.id + '">' + c.nombre + '</option>';
+    }).join('');
+  }
+  var selCoach = document.getElementById('mh-coach');
+  if (selCoach) {
+    selCoach.innerHTML = '<option value="">Sin asignar</option>';
+    try {
+      var staffSnap = await firebase.firestore().collection('staff').get();
+      staffSnap.forEach(function(d) {
+        var sd = d.data();
+        if (sd.nombre && sd.activo !== false) selCoach.innerHTML += '<option value="' + sd.nombre + '">' + sd.nombre + '</option>';
+      });
+    } catch(e) {}
+  }
+  var title = document.getElementById('modal-horario-title');
+  var elimBtn = document.getElementById('mh-eliminar-btn');
+  var btn = document.getElementById('mh-guardar-btn');
+  if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; }
+  if (slotId) {
+    if (title) title.textContent = 'Editar Clase';
+    if (elimBtn) elimBtn.style.display = 'block';
+    try {
+      var snap = await firebase.firestore().collection('horario').doc(slotId).get();
+      if (snap.exists) {
+        var s = snap.data();
+        document.getElementById('mh-fecha').value = s.fecha || '';
+        document.getElementById('mh-hora').value = s.hora || '07:00';
+        document.getElementById('mh-dur').value = s.duracion || 45;
+        document.getElementById('mh-cupo').value = s.cupoTotal || s.cupo || 17;
+        document.getElementById('mh-fitpass').value = s.cupoFitpass || 5;
+        if (selClase && s.tipoClase) selClase.value = s.tipoClase;
+        if (selCoach && s.coach) selCoach.value = s.coach;
+      }
+    } catch(e) {}
+  } else {
+    if (title) title.textContent = 'Nueva Clase';
+    if (elimBtn) elimBtn.style.display = 'none';
+    document.getElementById('mh-fecha').value = fecha || _fmtFechaISO(new Date());
+    document.getElementById('mh-hora').value = hora || '07:00';
+    document.getElementById('mh-dur').value = 45;
+    document.getElementById('mh-cupo').value = 17;
+    document.getElementById('mh-fitpass').value = 5;
+    document.getElementById('mh-repetir').checked = false;
+    document.getElementById('mh-repetir-opts').style.display = 'none';
+    document.querySelectorAll('.mh-dia').forEach(function(cb) { cb.checked = false; });
+    document.getElementById('mh-fecha-fin').value = '';
+  }
+  modal.style.display = 'block';
+}
+
+function cerrarModalHorario() {
+  var modal = document.getElementById('modal-horario');
+  if (modal) modal.style.display = 'none';
+  _horarioSlotId = null;
+}
+
+function toggleRepetir() {
+  var checked = document.getElementById('mh-repetir').checked;
+  document.getElementById('mh-repetir-opts').style.display = checked ? 'block' : 'none';
+}
+
+async function guardarHorario() {
+  var errEl = document.getElementById('mh-error');
+  var btn = document.getElementById('mh-guardar-btn');
+  if (errEl) errEl.textContent = '';
+  var tipoClase = document.getElementById('mh-clase').value;
+  var coach = document.getElementById('mh-coach').value;
+  var fecha = document.getElementById('mh-fecha').value;
+  var hora = document.getElementById('mh-hora').value;
+  var duracion = parseInt(document.getElementById('mh-dur').value) || 45;
+  var cupoTotal = parseInt(document.getElementById('mh-cupo').value) || 17;
+  var cupoFitpass = parseInt(document.getElementById('mh-fitpass').value) || 0;
+  var repetir = document.getElementById('mh-repetir').checked;
+  if (!tipoClase || !fecha || !hora) {
+    if (errEl) errEl.textContent = 'Completa tipo de clase, fecha y hora';
+    return;
+  }
+  if (btn) { btn.textContent = 'Guardando...'; btn.disabled = true; }
+  try {
+    var db = firebase.firestore();
+    var baseData = { tipoClase: tipoClase, coach: coach, hora: hora, duracion: duracion, cupoTotal: cupoTotal, cupoFitpass: cupoFitpass, activo: true };
+    if (_horarioSlotId) {
+      await db.collection('horario').doc(_horarioSlotId).update(Object.assign({}, baseData, { fecha: fecha }));
+    } else if (repetir) {
+      var diasSel = Array.from(document.querySelectorAll('.mh-dia:checked')).map(function(cb) { return parseInt(cb.value); });
+      var fechaFin = document.getElementById('mh-fecha-fin').value;
+      if (!diasSel.length || !fechaFin) {
+        if (errEl) errEl.textContent = 'Selecciona d\u00edas y fecha fin';
+        if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; }
+        return;
+      }
+      var serieId = Date.now().toString(36);
+      var cur = new Date(fecha + 'T12:00:00');
+      var fin = new Date(fechaFin + 'T12:00:00');
+      var batch = db.batch();
+      var count = 0;
+      while (cur <= fin) {
+        if (diasSel.includes(cur.getDay())) {
+          batch.set(db.collection('horario').doc(), Object.assign({}, baseData, { fecha: _fmtFechaISO(cur), serieId: serieId }));
+          count++;
+          if (count % 490 === 0) { await batch.commit(); batch = db.batch(); }
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+      if (count > 0) await batch.commit();
+      else { if (errEl) errEl.textContent = 'Ning\u00fan d\u00eda coincide con el rango'; if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; } return; }
+    } else {
+      await db.collection('horario').add(Object.assign({}, baseData, { fecha: fecha }));
+    }
+    cerrarModalHorario();
+    cargarHorario();
+  } catch(e) {
+    if (errEl) errEl.textContent = 'Error: ' + e.message;
+  } finally {
+    if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; }
+  }
+}
+
+async function eliminarHorarioSlot() {
+  if (!_horarioSlotId) return;
+  try {
+    var db = firebase.firestore();
+    var snap = await db.collection('horario').doc(_horarioSlotId).get();
+    var serieId = snap.exists ? snap.data().serieId : null;
+    if (serieId) {
+      var toda = confirm('Presiona OK para eliminar TODA la serie.\nPresiona Cancelar para eliminar solo esta clase.');
+      if (toda) {
+        var serieSnap = await db.collection('horario').where('serieId','==',serieId).get();
+        var batch = db.batch();
+        serieSnap.forEach(function(d) { batch.delete(d.ref); });
+        await batch.commit();
+      } else {
+        await db.collection('horario').doc(_horarioSlotId).delete();
+      }
+    } else {
+      await db.collection('horario').doc(_horarioSlotId).delete();
+    }
+    cerrarModalHorario();
+    cargarHorario();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
 // === CLASES ===
 async function cargarClases(){
   var list=document.getElementById('clases-list');
