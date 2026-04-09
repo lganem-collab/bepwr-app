@@ -2554,15 +2554,18 @@ function renderPruebaPeso(data) {
       var etapaVisitas = sa<=3?1:sa<=12?2:3;
       var etapa = Math.max(etapaVisitas, nivelFitness);
       // ── Motor bePWR: ajuste por fuerza, bePWR Score e Indice de Evolucion ──
-      var _ppRaw = (data&&data.ultimaValoracion&&data.ultimaValoracion.pruebaPeso)||(data&&data.pruebaPeso);
-      var _ppNum = 0;
+      // pruebaPeso siempre en lb — convertir a kg para umbrales
+      var _ppRaw = (data&&data._metricsAll&&data._metricsAll[0]&&data._metricsAll[0].pruebaPeso)||(data&&data.pruebaPeso);
+      var _ppLbs = 0;
       if (_ppRaw) {
-        if (typeof _ppRaw==='object') _ppNum=((parseFloat(_ppRaw.min)||0)+(parseFloat(_ppRaw.max)||0))/2;
-        else { var _m=String(_ppRaw).match(/(\d+\.?\d*)/); if(_m) _ppNum=parseFloat(_m[1]); }
+        if (typeof _ppRaw==='object') _ppLbs=((parseFloat(_ppRaw.min)||0)+(parseFloat(_ppRaw.max)||0))/2;
+        else { var _m=String(_ppRaw).match(/(\d+\.?\d*)/); if(_m) _ppLbs=parseFloat(_m[1]); }
       }
+      var _ppNum = Math.round(_ppLbs * 0.453592 * 10) / 10; // lb a kg
       var _esMasc = data&&(data.genero==='masculino'||data.genero==='Masculino');
-      var _fuerzaAlta = _ppNum>=(_esMasc?22:14);
-      var _fuerzaBaja = _ppNum>0&&_ppNum<(_esMasc?12:7);
+      // Umbrales en kg: hombre alta>=20kg(44lb), baja<8kg(18lb) / mujer alta>=10kg(22lb), baja<5kg(11lb)
+      var _fuerzaAlta = _ppNum>=(_esMasc?20:10);
+      var _fuerzaBaja = _ppNum>0&&_ppNum<(_esMasc?8:5);
       var _bepwr = 0;
       try {
         var _mAll = data._metricsAll||[];
