@@ -1635,7 +1635,17 @@ if (user && user.uid === MASTER_UID) {
     }
   };
 
-  function getRutinaHTML(meta, nacimiento, edad, genero) {
+  function getRutinaHTML(meta, nacimiento, edad, genero, nivelFitness, ultimaMetrica) {
+    nivelFitness = parseInt(nivelFitness) || 1;
+    var _ppRaw = (ultimaMetrica && ultimaMetrica.pruebaPeso) || null;
+    var _ppNum = 0;
+    if (_ppRaw) {
+      if (typeof _ppRaw === 'object') _ppNum = ((parseFloat(_ppRaw.min)||0) + (parseFloat(_ppRaw.max)||0)) / 2;
+      else { var _ppM = String(_ppRaw).match(/(\d+\.?\d*)/); if(_ppM) _ppNum = parseFloat(_ppM[1]); }
+    }
+    var _esMasc = (genero === 'masculino' || genero === 'Masculino');
+    var _fuerzaAlta = _ppNum >= (_esMasc ? 22 : 14);
+    var _inbody = (ultimaMetrica && ultimaMetrica.calificacion) ? parseFloat(ultimaMetrica.calificacion) : 0;
     if (!meta) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Sin rutina asignada (sin meta definida)</div>';
     var config = RUTINA_CONFIG[meta];
     if (!config) return '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;color:var(--gray);font-size:12px">Rutina no disponible para esta meta</div>';
@@ -1652,6 +1662,7 @@ if (user && user.uid === MASTER_UID) {
       if (edadNum < 30) bracket = 'sub30';
       else if (edadNum >= 45) bracket = 'senior';
     }
+    var _puedeMax5 = nivelFitness >= 2 && (_fuerzaAlta || _inbody >= 75);
     var plan = config[bracket];
     if (!plan) return '';
     // Deep copy plan to avoid mutating RUTINA_CONFIG
@@ -1671,7 +1682,13 @@ if (user && user.uid === MASTER_UID) {
     }
     var html = '<div style="background:#141414;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">';
     html += '<div style="font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">Mi Rutina Semanal</div>';
-    html += '<div style="font-size:12px;color:var(--gray);margin-bottom:10px">Total recomendado: <span style="color:#fff;font-weight:600">' + planCopy.total + '</span></div>';
+    if (_puedeMax5 && planCopy.total && !planCopy.total.includes('5')) {
+      planCopy.total = planCopy.total.replace(/3-4|4/, '4-5').replace(/2-3/, '3-4');
+    }
+    html += '<div style="font-size:12px;color:var(--gray);margin-bottom:10px">Total recomendado: <span style="color:#fff;font-weight:600">' + planCopy.total + '</span>';
+    if (_ppNum > 0) html += ' <span style="font-size:10px;color:#666;font-family:Space Mono,monospace">· Fuerza: ' + _ppNum + 'kg</span>';
+    if (_inbody > 0) html += ' <span style="font-size:10px;color:#666;font-family:Space Mono,monospace">· InBody: ' + _inbody + '</span>';
+    html += '</div>';
     html += '<table style="width:100%;border-collapse:collapse;font-size:12px">';
     html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--gray);font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:1px">FRECUENCIA</td><td style="padding:6px 8px;color:var(--gray);font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:1px">CLASE</td></tr>';
     for (var i = 0; i < planCopy.clases.length; i++) {
