@@ -4015,7 +4015,7 @@ async function guardarHorario() {
   var hora = document.getElementById('mh-hora').value;
   var duracion = parseInt(document.getElementById('mh-dur').value) || 45;
   var cupoTotal = parseInt(document.getElementById('mh-cupo').value) || 17;
-  var cupoFitpass = parseInt(document.getElementById('mh-fitpass').value) || 0;
+  var cupoFitpass = document.getElementById('mh-fitpass') ? parseInt(document.getElementById('mh-fitpass').value) || 0 : 0;
   var repetir = document.getElementById('mh-repetir').checked;
   if (!tipoClase || !fecha || !hora) {
     if (errEl) errEl.textContent = 'Completa tipo de clase, fecha y hora';
