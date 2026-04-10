@@ -588,7 +588,7 @@
 
         </div>
 
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" id="bottom-nav" style="display:none">
       <div class="nav-item on" id="nav-home" onclick="navigate('home')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="nav-label">Inicio</span>
@@ -888,7 +888,7 @@ onAuthStateChanged(auth, async user => {
           errorEl.style.color = '#f87171';
           errorEl.textContent = 'Este acceso es solo para miembros. El staff usa el panel de administraci\u00F3n.';
           appScr.classList.remove('active');
-          loginScr.classList.add('active');
+          loginScr.classList.add('active'); var bn=document.getElementById('bottom-nav'); if(bn) bn.style.display='none';
           authReady = true;
           return;
         }
@@ -899,7 +899,7 @@ onAuthStateChanged(auth, async user => {
       } catch(e) {
         console.error('loadUserData error:', e);
       }
-      loginScr.classList.remove('active');
+      loginScr.classList.remove('active'); document.getElementById('bottom-nav').style.display='flex';
       appScr.classList.add('active');
         loadAsistencias(user.uid);
       window._currentUid = user.uid;
@@ -934,10 +934,10 @@ onAuthStateChanged(auth, async user => {
       }
       if (authReady) {
         appScr.classList.remove('active');
-        loginScr.classList.add('active');
+        loginScr.classList.add('active'); var bn=document.getElementById('bottom-nav'); if(bn) bn.style.display='none';
       } else if (!user) {
         appScr.classList.remove('active');
-        loginScr.classList.add('active');
+        loginScr.classList.add('active'); var bn=document.getElementById('bottom-nav'); if(bn) bn.style.display='none';
         authReady = true;
       }
     }
@@ -1021,7 +1021,7 @@ onAuthStateChanged(auth, async user => {
         const nombreInact = data.nombre || user.email.split('@')[0];
         document.getElementById('avatar-initials').textContent = nombreInact.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
         document.getElementById('inactive-name').textContent = nombreInact.split(' ')[0].toUpperCase();
-        loginScr.classList.remove('active');
+        loginScr.classList.remove('active'); document.getElementById('bottom-nav').style.display='flex';
         appScr.classList.add('active');
         authReady = true;
         const inactScr = document.getElementById('screen-inactive');
