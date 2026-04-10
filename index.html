@@ -60,7 +60,7 @@
     .login-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:280px;height:280px;background:radial-gradient(circle,rgba(255,92,26,.1),transparent 70%);pointer-events:none}
 
     /* APP */
-    #screen-app{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateY(16px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+    #screen-app{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateY(16px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}#screen-app:not(.active) .bottom-nav{display:none!important}
     #screen-app.active{opacity:1;transform:none;pointer-events:all}
     .topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 24px 10px;padding-top:calc(18px + env(safe-area-inset-top,0px));background:var(--black);flex-shrink:0;z-index:50}
     .topbar-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1}
