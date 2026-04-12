@@ -1126,7 +1126,7 @@ onAuthStateChanged(auth, async user => {
             cadera: ultima.cadera||null, pantorrilla: ultima.pantorrilla||ultima.pantorrillaDer||null,
             bicepsDer: ultima.bicepsDer||null, bicepsIzq: ultima.bicepsIzq||null,
             musloDer: ultima.musloDer||null, musloIzq: ultima.musloIzq||null,
-            pantorrillaDer: ultima.pantorrillaDer||null, pantorrillaIzq: ultima.pantorrillaIzq||null
+            pantorrillaDer: ultima.pantorrillaDer||null, pantorrillaIzq: ultima.pantorrillaIzq||null,
             grasaCorporal: ultima.grasaCorporal||null, imc: ultima.imc||null, pgc: ultima.pgc||null,
             grasaVisceral: ultima.grasaVisceral||null, calificacion: ultima.calificacion||null,
           };
@@ -1278,7 +1278,6 @@ window._tendColor = califColor;
       { label:'Pantorrilla Izq.', ini:inicial.pantorrillaIzq||null, act:m.pantorrillaIzq||null, inv:false, unit:'cm' },
       { label:'Grasa Visceral', ini:inicial.grasaVisceral, act:m.grasaVisceral, inv:true, unit:'' },
       { label:'Calif. InBody', ini:inicial.calificacion, act:m.calificacion, inv:false, unit:'/100' },
-      { label:'Pantorrilla Izq.', ini:inicial.pantorrillaIzq||null, act:m.pantorrillaIzq||null, inv:false, unit:'cm' },
 { label:'Prueba de Peso', ini:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(inicial.pruebaPeso), act:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(m.pruebaPeso), inv:false, unit:'lb' },
     ];
     var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
@@ -1344,10 +1343,10 @@ window._tendColor = califColor;
         <polyline points="${pl}" fill="none" stroke="#FF5C1A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
         ${dots}${vals}${lbls}</svg>`;
   }
-  document.getElementById('val-biceps-der').innerHTML = (m.bicepsDer||m.brazo) != null ? (m.bicepsDer||m.brazo) + ' cm' : sd;
-  document.getElementById('val-biceps-izq').innerHTML = m.bicepsIzq != null ? m.bicepsIzq + ' cm' : sd;
 function renderProfileMetrics(m) {
   const sd = '<span style="font-size:11px;color:#666;font-family:\'Space Mono\',monospace;letter-spacing:1px">Sin datos</span>';
+  document.getElementById('val-biceps-der').innerHTML = (m.bicepsDer||m.brazo) != null ? (m.bicepsDer||m.brazo) + ' cm' : sd;
+  document.getElementById('val-biceps-izq').innerHTML = m.bicepsIzq != null ? m.bicepsIzq + ' cm' : sd;
   const gc = m.grasaCorporal ?? m.grasaPct;
   document.getElementById('val-muslo-der').innerHTML = m.musloDer != null ? m.musloDer + ' cm' : sd;
   document.getElementById('val-muslo-izq').innerHTML = m.musloIzq != null ? m.musloIzq + ' cm' : sd;
