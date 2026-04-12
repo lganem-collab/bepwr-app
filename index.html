@@ -2812,13 +2812,10 @@ async function renderAnalisisCientifico(data, config) {
           updatedEl.textContent = 'Actualizado hace ' + diasPasados +
             (diasPasados === 1 ? ' d\u00EDa' : ' d\u00EDas') +
             ' \u00B7 Se renueva con cada nueva valoraci\u00F3n o cada semana';
-  if (val.bicepsDer||val.brazo) lines.push('- Bíceps Der.: ' + (val.bicepsDer||val.brazo) + ' cm');
-  if (val.bicepsIzq) lines.push('- Bíceps Izq.: ' + val.bicepsIzq + ' cm');
         return; // Cache vigente, no regenerar
+        }
       }
     } catch(e) { console.warn('Error verificando cache analisis:', e); }
-  if (val.musloDer) lines.push('- Muslo Der.: ' + val.musloDer + ' cm');
-  if (val.pantorrillaDer||val.pantorrilla) lines.push('- Pantorrilla Der.: ' + (val.pantorrillaDer||val.pantorrilla) + ' cm');
 
   // --- Necesita regenerar ---
   output.textContent = 'Generando tu an\u00E1lisis personalizado...';
@@ -2833,6 +2830,10 @@ async function renderAnalisisCientifico(data, config) {
   if (val.peso || data.peso) lines.push('- Peso corporal: ' + (val.peso || data.peso) + ' kg');
   if (val.musculo) lines.push('- Masa muscular: ' + val.musculo + ' kg');
   if (val.grasa) lines.push('- Grasa corporal: ' + val.grasa + '%');
+  if (val.bicepsDer||val.brazo) lines.push('- Bíceps Der.: ' + (val.bicepsDer||val.brazo) + ' cm');
+  if (val.bicepsIzq) lines.push('- Bíceps Izq.: ' + val.bicepsIzq + ' cm');
+  if (val.musloDer) lines.push('- Muslo Der.: ' + val.musloDer + ' cm');
+  if (val.pantorrillaDer||val.pantorrilla) lines.push('- Pantorrilla Der.: ' + (val.pantorrillaDer||val.pantorrilla) + ' cm');
     var pp = typeof data.pruebaPeso === 'string' ? data.pruebaPeso + ' kg' :
       (data.pruebaPeso.min || '?') + ' - ' + (data.pruebaPeso.max || '?') + ' kg';
     lines.push('- Peso Base Mancuernas: ' + pp);
@@ -4467,18 +4468,6 @@ function generarTextoEvolucion(result,objKey){
   var cierre=cierres[objKey]||cierres.salud_general;
   return[ap,texP,texN,cierre].filter(Boolean).join(' ');
 }
-  var anterior={peso:ini.peso,masa_musculo:ini.musculo,grasa_corporal_kg:ini.grasaCorporal,imc:ini.imc,pgc:ini.pgc,grasa_visceral:ini.grasaVisceral,inbody_score:ini.calificacion,
-    biceps_cm:((ini.bicepsDer||ini.brazo||0)+(ini.bicepsIzq||ini.brazo||0))/2||null,
-    muslo_cm:((ini.musloDer||0)+(ini.musloIzq||0))/2||null,
-    abdomen_cm:ini.abdomen,cintura_cm:ini.cintura,cadera_cm:ini.cadera,
-    pantorrilla_cm:((ini.pantorrillaDer||ini.pantorrilla||0)+(ini.pantorrillaIzq||ini.pantorrilla||0))/2||null,
-    mancuerna_lb:pp(ini.pruebaPeso)};
-  var actual={peso:act.peso,masa_musculo:act.musculo,grasa_corporal_kg:act.grasaCorporal,imc:act.imc,pgc:act.pgc,grasa_visceral:act.grasaVisceral,inbody_score:act.calificacion,
-    biceps_cm:((act.bicepsDer||act.brazo||0)+(act.bicepsIzq||act.brazo||0))/2||null,
-    muslo_cm:((act.musloDer||0)+(act.musloIzq||0))/2||null,
-    abdomen_cm:act.abdomen,cintura_cm:act.cintura,cadera_cm:act.cadera,
-    pantorrilla_cm:((act.pantorrillaDer||act.pantorrilla||0)+(act.pantorrillaIzq||act.pantorrilla||0))/2||null,
-    mancuerna_lb:pp(act.pruebaPeso)};
 window._applyIndiceEvolucion=function(act,ini,valFecha){
   if(!ini||ini===act)return;
   var card=document.getElementById('card-indice');
@@ -4499,6 +4488,17 @@ window._applyIndiceEvolucion=function(act,ini,valFecha){
   function pp(v){if(!v)return null;if(typeof v==='number')return v;if(typeof v==='string'){var n=parseFloat(v);return isNaN(n)?null:n;}if(typeof v==='object'){var n=parseFloat(v.max||v.min||v.value);return isNaN(n)?null:n;}return null;}
 
   var anterior={peso:ini.peso,masa_musculo:ini.musculo,grasa_corporal_kg:ini.grasaCorporal,imc:ini.imc,pgc:ini.pgc,grasa_visceral:ini.grasaVisceral,inbody_score:ini.calificacion,
+    biceps_cm:((ini.bicepsDer||ini.brazo||0)+(ini.bicepsIzq||ini.brazo||0))/2||null,
+    muslo_cm:((ini.musloDer||0)+(ini.musloIzq||0))/2||null,
+    abdomen_cm:ini.abdomen,cintura_cm:ini.cintura,cadera_cm:ini.cadera,
+    pantorrilla_cm:((ini.pantorrillaDer||ini.pantorrilla||0)+(ini.pantorrillaIzq||ini.pantorrilla||0))/2||null,
+    mancuerna_lb:pp(ini.pruebaPeso)};
+  var actual={peso:act.peso,masa_musculo:act.musculo,grasa_corporal_kg:act.grasaCorporal,imc:act.imc,pgc:act.pgc,grasa_visceral:act.grasaVisceral,inbody_score:act.calificacion,
+    biceps_cm:((act.bicepsDer||act.brazo||0)+(act.bicepsIzq||act.brazo||0))/2||null,
+    muslo_cm:((act.musloDer||0)+(act.musloIzq||0))/2||null,
+    abdomen_cm:act.abdomen,cintura_cm:act.cintura,cadera_cm:act.cadera,
+    pantorrilla_cm:((act.pantorrillaDer||act.pantorrilla||0)+(act.pantorrillaIzq||act.pantorrilla||0))/2||null,
+    mancuerna_lb:pp(act.pruebaPeso)};
 
   var result=calcularEvolucion(anterior,actual,{edad:edad,genero:genero,altura:altura},objKey);
   window._indiceEvolucionResult=result;
