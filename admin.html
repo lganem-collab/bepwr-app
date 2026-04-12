@@ -876,15 +876,25 @@
   <div class="field"></div>
 </div>
 <div class="field-row">
-  <div class="field"><label>Brazo (cm)</label><input type="number" id="m-brazo" placeholder="32" step="0.1" /></div>
-  <div class="field"><label>Abdomen (cm)</label><input type="number" id="m-abdomen" placeholder="90" step="0.1" /></div>
+      <div class="field"><label>Bíceps Der. (cm)</label><input type="number" id="m-biceps-der" placeholder="32" step="0.1" /></div>
+      <div class="field"><label>Bíceps Izq. (cm)</label><input type="number" id="m-biceps-izq" placeholder="32" step="0.1" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Abdomen (cm)</label><input type="number" id="m-abdomen" placeholder="90" step="0.1" /></div>
 </div>
 <div class="field-row">
   <div class="field"><label>Cintura (cm)</label><input type="number" id="m-cintura" placeholder="80" step="0.1" /></div>
   <div class="field"><label>Cadera (cm)</label><input type="number" id="m-cadera" placeholder="95" step="0.1" /></div>
 </div>
 <div class="field-row">
-  <div class="field"><label>Pantorrilla (cm)</label><input type="number" id="m-pantorrilla" placeholder="36" step="0.1" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Muslo Der. (cm)</label><input type="number" id="m-muslo-der" placeholder="52" step="0.1" /></div>
+      <div class="field"><label>Muslo Izq. (cm)</label><input type="number" id="m-muslo-izq" placeholder="52" step="0.1" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Pantorrilla Der. (cm)</label><input type="number" id="m-pantorrilla-der" placeholder="36" step="0.1" /></div>
+      <div class="field"><label>Pantorrilla Izq. (cm)</label><input type="number" id="m-pantorrilla-izq" placeholder="36" step="0.1" /></div>
   <div class="field"><label>Peso Base Mancuernas</label>
     <select id="m-pruebaPeso" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#181818;color:#fff;font-family:DM Sans,sans-serif;font-size:.9rem">
       <option value="">Sin evaluar</option>
@@ -1880,11 +1890,15 @@ if (user && user.uid === MASTER_UID) {
       { label:'PGC (%)',             iniVal:inicial?.pgc,           actVal:ultima?.pgc,           inv:true  },
       { label:'Grasa Visceral',      iniVal:inicial?.grasaVisceral, actVal:ultima?.grasaVisceral, inv:true  },
       { label:'Calificación Inbody', iniVal:inicial?.calificacion,  actVal:ultima?.calificacion,  inv:false },
-      { label:'Brazo (cm)',          iniVal:inicial?.brazo,         actVal:ultima?.brazo,         inv:false },
-      { label:'Abdomen (cm)',        iniVal:inicial?.abdomen,       actVal:ultima?.abdomen,       inv:true  },
-      { label:'Cintura (cm)',        iniVal:inicial?.cintura,       actVal:ultima?.cintura,       inv:true  },
-      { label:'Cadera (cm)',         iniVal:inicial?.cadera,        actVal:ultima?.cadera,        inv:true  },
-      { label:'Pantorrilla (cm)',    iniVal:inicial?.pantorrilla,   actVal:ultima?.pantorrilla,   inv:false },
+      { label:'Bíceps Der. (cm)',    iniVal:inicial?.bicepsDer,     actVal:ultima?.bicepsDer,     inv:false },
+      { label:'Bíceps Izq. (cm)',    iniVal:inicial?.bicepsIzq,     actVal:ultima?.bicepsIzq,     inv:false },
+      { label:'Abdomen (cm)',         iniVal:inicial?.abdomen,       actVal:ultima?.abdomen,       inv:true  },
+      { label:'Cintura (cm)',         iniVal:inicial?.cintura,       actVal:ultima?.cintura,       inv:true  },
+      { label:'Cadera (cm)',          iniVal:inicial?.cadera,        actVal:ultima?.cadera,        inv:true  },
+      { label:'Muslo Der. (cm)',      iniVal:inicial?.musloDer,      actVal:ultima?.musloDer,      inv:false },
+      { label:'Muslo Izq. (cm)',      iniVal:inicial?.musloIzq,      actVal:ultima?.musloIzq,      inv:false },
+      { label:'Pantorrilla Der. (cm)',iniVal:inicial?.pantorrillaDer,actVal:ultima?.pantorrillaDer,inv:false },
+      { label:'Pantorrilla Izq. (cm)',iniVal:inicial?.pantorrillaIzq,actVal:ultima?.pantorrillaIzq,inv:false },
       { label:'Peso Base Mancuernas',iniVal:inicial?.pruebaPeso,    actVal:ultima?.pruebaPeso,    inv:false, isText:true },
     ];
 
@@ -2211,8 +2225,10 @@ if (user && user.uid === MASTER_UID) {
       const campos = {
         peso:'m-peso', musculo:'m-musculo', grasaCorporal:'m-grasa-corp',
         imc:'m-imc', pgc:'m-pgc', grasaVisceral:'m-grasa-visc',
-        calificacion:'m-calificacion', brazo:'m-brazo', abdomen:'m-abdomen',
-        cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla'
+        calificacion:'m-calificacion', bicepsDer:'m-biceps-der', bicepsIzq:'m-biceps-izq',
+        abdomen:'m-abdomen', cintura:'m-cintura', cadera:'m-cadera',
+        musloDer:'m-muslo-der', musloIzq:'m-muslo-izq',
+        pantorrillaDer:'m-pantorrilla-der', pantorrillaIzq:'m-pantorrilla-izq'
       };
       for (const [key, id] of Object.entries(campos)) {
         const el = document.getElementById(id);
@@ -2240,7 +2256,7 @@ if (user && user.uid === MASTER_UID) {
     document.getElementById('metrics-uid').value = uid;
     document.getElementById('metrics-modal-sub').textContent = nombre;
     document.getElementById('metrics-error').textContent = '';
-['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-brazo','m-abdomen','m-cintura','m-cadera','m-pantorrilla'].forEach(id => document.getElementById(id).value = '');
+['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-biceps-der','m-biceps-izq','m-abdomen','m-cintura','m-cadera','m-muslo-der','m-muslo-izq','m-pantorrilla-der','m-pantorrilla-izq'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('m-pruebaPeso').value = '';
     document.getElementById('m-pruebaPeso').value = '';
     const now = new Date();
@@ -2548,20 +2564,28 @@ var miembro = String(x.miembroNombre || '').replace(/</g,'&lt;');
     const grasaVisc  = parseFloat(document.getElementById('m-grasa-visc').value);
     const calific    = parseFloat(document.getElementById('m-calificacion').value);
     const fecha      = document.getElementById('m-fecha').value.trim();
-    const brazo      = parseFloat(document.getElementById('m-brazo').value);
+    const bicepsDer     = parseFloat(document.getElementById('m-biceps-der').value);
+    const bicepsIzq     = parseFloat(document.getElementById('m-biceps-izq').value);
     const abdomen    = parseFloat(document.getElementById('m-abdomen').value);
     const cintura    = parseFloat(document.getElementById('m-cintura').value);
     const cadera     = parseFloat(document.getElementById('m-cadera').value);
-    const pantorrilla= parseFloat(document.getElementById('m-pantorrilla').value);
+    const musloDer      = parseFloat(document.getElementById('m-muslo-der').value);
+    const musloIzq      = parseFloat(document.getElementById('m-muslo-izq').value);
+    const pantorrillaDer= parseFloat(document.getElementById('m-pantorrilla-der').value);
+    const pantorrillaIzq= parseFloat(document.getElementById('m-pantorrilla-izq').value);
     const pruebaPeso = document.getElementById('m-pruebaPeso').value;
     const errEl = document.getElementById('metrics-error');
     errEl.textContent = '';
     const medidasVal = [
-  { val: brazo,        nombre: 'Brazo',       min: 15, max: 60  },
-  { val: abdomen,      nombre: 'Abdomen',     min: 50, max: 200 },
-  { val: cintura,      nombre: 'Cintura',     min: 40, max: 180 },
-  { val: cadera,       nombre: 'Cadera',      min: 50, max: 200 },
-  { val: pantorrilla,  nombre: 'Pantorrilla', min: 20, max: 60  },
+  { val: bicepsDer,      nombre: 'Bíceps Der.',     min: 15, max: 60  },
+  { val: bicepsIzq,      nombre: 'Bíceps Izq.',     min: 15, max: 60  },
+  { val: abdomen,        nombre: 'Abdomen',         min: 50, max: 200 },
+  { val: cintura,        nombre: 'Cintura',         min: 40, max: 180 },
+  { val: cadera,         nombre: 'Cadera',          min: 50, max: 200 },
+  { val: musloDer,       nombre: 'Muslo Der.',       min: 30, max: 90  },
+  { val: musloIzq,       nombre: 'Muslo Izq.',       min: 30, max: 90  },
+  { val: pantorrillaDer, nombre: 'Pantorrilla Der.', min: 20, max: 60  },
+  { val: pantorrillaIzq, nombre: 'Pantorrilla Izq.', min: 20, max: 60  },
 ];
 for (const med of medidasVal) {
   if (!isNaN(med.val) && (med.val < med.min || med.val > med.max)) {
@@ -2582,7 +2606,8 @@ for (const med of medidasVal) {
         imc: isNaN(imc)?null:imc, pgc: isNaN(pgc)?null:pgc,
         grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
         calificacion: isNaN(calific)?null:calific,
-        brazo: isNaN(brazo)?null:brazo,
+        bicepsDer: isNaN(bicepsDer)?null:bicepsDer,
+        bicepsIzq: isNaN(bicepsIzq)?null:bicepsIzq,
         abdomen: isNaN(abdomen)?null:abdomen,
         cintura: isNaN(cintura)?null:cintura,
         cadera: isNaN(cadera)?null:cadera,
@@ -2603,11 +2628,15 @@ for (const med of medidasVal) {
         imc: isNaN(imc)?null:imc, pgc: isNaN(pgc)?null:pgc,
         grasaVisceral: isNaN(grasaVisc)?null:grasaVisc,
         calificacion: isNaN(calific)?null:calific,
-        brazo:       isNaN(brazo)       ? null : brazo,
-        abdomen:     isNaN(abdomen)     ? null : abdomen,
-        cintura:     isNaN(cintura)     ? null : cintura,
-        cadera:      isNaN(cadera)      ? null : cadera,
-        pantorrilla: isNaN(pantorrilla) ? null : pantorrilla,
+        bicepsDer:      isNaN(bicepsDer)      ? null : bicepsDer,
+        bicepsIzq:      isNaN(bicepsIzq)      ? null : bicepsIzq,
+        abdomen:        isNaN(abdomen)        ? null : abdomen,
+        cintura:        isNaN(cintura)        ? null : cintura,
+        cadera:         isNaN(cadera)         ? null : cadera,
+        musloDer:       isNaN(musloDer)       ? null : musloDer,
+        musloIzq:       isNaN(musloIzq)       ? null : musloIzq,
+        pantorrillaDer: isNaN(pantorrillaDer) ? null : pantorrillaDer,
+        pantorrillaIzq: isNaN(pantorrillaIzq) ? null : pantorrillaIzq,
         pruebaPeso: pruebaPeso || null,
         fecha, fechaTs: fecha ? new Date(fecha).getTime() : null, savedAt: firebase.firestore.FieldValue.serverTimestamp(), registradoPor: auth.currentUser?.uid || null, miembroNombre
       };
@@ -2688,13 +2717,13 @@ for (const med of medidasVal) {
     document.getElementById('metrics-modal-sub').textContent = 'Valoración inicial del nuevo miembro';
     document.getElementById('metrics-error').textContent = '';
     document.querySelector('#modal-metrics .modal-title').textContent = 'Nueva Valoración';
-    ['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-brazo','m-abdomen','m-cintura','m-cadera','m-pantorrilla'].forEach(id => document.getElementById(id).value = '');
+    ['m-peso','m-musculo','m-grasa-corp','m-imc','m-pgc','m-grasa-visc','m-calificacion','m-biceps-der','m-biceps-izq','m-abdomen','m-cintura','m-cadera','m-muslo-der','m-muslo-izq','m-pantorrilla-der','m-pantorrilla-izq'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('m-pruebaPeso').value = '';
     const now = new Date();
     document.getElementById('m-fecha').value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     if (window._pendingInitialMetrics) {
       const pm = window._pendingInitialMetrics;
-      const campos = {peso:'m-peso', musculo:'m-musculo', grasaCorporal:'m-grasa-corp', imc:'m-imc', pgc:'m-pgc', grasaVisceral:'m-grasa-visc', calificacion:'m-calificacion', brazo:'m-brazo', abdomen:'m-abdomen', cintura:'m-cintura', cadera:'m-cadera', pantorrilla:'m-pantorrilla'};
+      const campos = {peso:'m-peso', musculo:'m-musculo', grasaCorporal:'m-grasa-corp', imc:'m-imc', pgc:'m-pgc', grasaVisceral:'m-grasa-visc', calificacion:'m-calificacion', bicepsDer:'m-biceps-der', bicepsIzq:'m-biceps-izq', abdomen:'m-abdomen', cintura:'m-cintura', cadera:'m-cadera', musloDer:'m-muslo-der', musloIzq:'m-muslo-izq', pantorrillaDer:'m-pantorrilla-der', pantorrillaIzq:'m-pantorrilla-izq'};
       for (const [key, id] of Object.entries(campos)) {
         if (pm[key] != null) document.getElementById(id).value = pm[key];
       }
@@ -2768,7 +2797,8 @@ for (const med of medidasVal) {
           imc: pm.imc, pgc: pm.pgc,
           grasaVisceral: pm.grasaVisceral,
           calificacion: pm.calificacion,
-          brazo: pm.brazo, abdomen: pm.abdomen,
+          bicepsDer: pm.bicepsDer, bicepsIzq: pm.bicepsIzq,
+          abdomen: pm.abdomen,
           cintura: pm.cintura, cadera: pm.cadera,
           pantorrilla: pm.pantorrilla,
           pruebaPeso: pm.pruebaPeso,
