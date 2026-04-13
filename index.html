@@ -547,11 +547,15 @@
         <span id="val-pgc"></span>
         <span id="val-grasa-visc"></span>
         <span id="val-calificacion"></span>
-        <span id="val-brazo"></span>
+        <span id="val-biceps-der"></span>
+        <span id="val-biceps-izq"></span>
         <span id="val-abdomen"></span>
         <span id="val-cintura"></span>
         <span id="val-cadera"></span>
-        <span id="val-pantorrilla"></span>
+        <span id="val-muslo-der"></span>
+        <span id="val-muslo-izq"></span>
+        <span id="val-pantorrilla-der"></span>
+        <span id="val-pantorrilla-izq"></span>
         <span id="val-fecha"></span>
       </div>
       </div>
@@ -1270,11 +1274,15 @@ window._tendColor = califColor;
       { label:'PGC', ini:inicial.pgc, act:m.pgc, inv:true, unit:'%' },
       { label:'Grasa Visceral', ini:inicial.grasaVisceral, act:m.grasaVisceral, inv:true, unit:'' },
       { label:'Calif. InBody', ini:inicial.calificacion, act:m.calificacion, inv:false, unit:'/100' },
-      { label:'Brazo', ini:inicial.brazo, act:m.brazo, inv:false, unit:'cm' },
+      { label:'Bíceps Der.', ini:inicial.bicepsDer||(inicial.brazo||null), act:m.bicepsDer||(m.brazo||null), inv:false, unit:'cm' },
+      { label:'Bíceps Izq.', ini:inicial.bicepsIzq||null, act:m.bicepsIzq||null, inv:false, unit:'cm' },
       { label:'Abdomen', ini:inicial.abdomen, act:m.abdomen, inv:true, unit:'cm' },
       { label:'Cintura', ini:inicial.cintura, act:m.cintura, inv:true, unit:'cm' },
       { label:'Cadera', ini:inicial.cadera, act:m.cadera, inv:true, unit:'cm' },
-      { label:'Pantorrilla', ini:inicial.pantorrilla, act:m.pantorrilla, inv:false, unit:'cm' },
+      { label:'Muslo Der.', ini:inicial.musloDer||null, act:m.musloDer||null, inv:false, unit:'cm' },
+      { label:'Muslo Izq.', ini:inicial.musloIzq||null, act:m.musloIzq||null, inv:false, unit:'cm' },
+      { label:'Pantorrilla Der.', ini:inicial.pantorrillaDer||(inicial.pantorrilla||null), act:m.pantorrillaDer||(m.pantorrilla||null), inv:false, unit:'cm' },
+      { label:'Pantorrilla Izq.', ini:inicial.pantorrillaIzq||null, act:m.pantorrillaIzq||null, inv:false, unit:'cm' },
 { label:'Prueba de Peso', ini:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(inicial.pruebaPeso), act:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(m.pruebaPeso), inv:false, unit:'lb' },
     ];
     var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
@@ -1351,11 +1359,15 @@ function renderProfileMetrics(m) {
   document.getElementById('val-pgc').innerHTML = m.pgc != null ? m.pgc + '%' : sd;
   document.getElementById('val-grasa-visc').innerHTML = m.grasaVisceral || sd;
   document.getElementById('val-calificacion').innerHTML = m.calificacion ? m.calificacion + '/100' : sd;
-  document.getElementById('val-brazo').innerHTML = m.brazo != null ? m.brazo + ' cm' : sd;
+  document.getElementById('val-biceps-der').innerHTML = (m.bicepsDer||m.brazo) != null ? (m.bicepsDer||m.brazo) + ' cm' : sd;
+  document.getElementById('val-biceps-izq').innerHTML = m.bicepsIzq != null ? m.bicepsIzq + ' cm' : sd;
   document.getElementById('val-abdomen').innerHTML = m.abdomen != null ? m.abdomen + ' cm' : sd;
   document.getElementById('val-cintura').innerHTML = m.cintura != null ? m.cintura + ' cm' : sd;
   document.getElementById('val-cadera').innerHTML = m.cadera != null ? m.cadera + ' cm' : sd;
-  document.getElementById('val-pantorrilla').innerHTML = m.pantorrilla != null ? m.pantorrilla + ' cm' : sd;
+  document.getElementById('val-muslo-der').innerHTML = m.musloDer != null ? m.musloDer + ' cm' : sd;
+  document.getElementById('val-muslo-izq').innerHTML = m.musloIzq != null ? m.musloIzq + ' cm' : sd;
+  document.getElementById('val-pantorrilla-der').innerHTML = (m.pantorrillaDer||m.pantorrilla) != null ? (m.pantorrillaDer||m.pantorrilla) + ' cm' : sd;
+  document.getElementById('val-pantorrilla-izq').innerHTML = m.pantorrillaIzq != null ? m.pantorrillaIzq + ' cm' : sd;
   document.getElementById('val-fecha').innerHTML = m.fecha || sd;
 }
   // NOTIFICACIONES (modular Firestore API)
@@ -1864,11 +1876,15 @@ let cachedMetricas = [];
             <div class="hist-metric">PGC <span>${m.pgc ? m.pgc+'%' : 'Sin datos'}</span></div>
             <div class="hist-metric">G. Visceral <span>${m.grasaVisceral || 'Sin datos'}</span></div>
             <div class="hist-metric">Inbody <span>${m.calificacion ? m.calificacion+'/100' : 'Sin datos'}</span></div>
-<div class="hist-metric">Brazo <span>${m.brazo ? m.brazo+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Bíceps Der. <span>${(m.bicepsDer||m.brazo) ? (m.bicepsDer||m.brazo)+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Bíceps Izq. <span>${m.bicepsIzq ? m.bicepsIzq+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Abdomen <span>${m.abdomen ? m.abdomen+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Cintura <span>${m.cintura ? m.cintura+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Cadera <span>${m.cadera ? m.cadera+' cm' : 'Sin datos'}</span></div>
-<div class="hist-metric">Pantorrilla <span>${m.pantorrilla ? m.pantorrilla+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Muslo Der. <span>${m.musloDer ? m.musloDer+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Muslo Izq. <span>${m.musloIzq ? m.musloIzq+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Pantorrilla Der. <span>${(m.pantorrillaDer||m.pantorrilla) ? (m.pantorrillaDer||m.pantorrilla)+' cm' : 'Sin datos'}</span></div>
+<div class="hist-metric">Pantorrilla Izq. <span>${m.pantorrillaIzq ? m.pantorrillaIzq+' cm' : 'Sin datos'}</span></div>
 <div class="hist-metric">Prueba de Peso <span>${m.pruebaPeso || 'Sin datos'}</span></div>
           </div>
         </div>`).join('');
