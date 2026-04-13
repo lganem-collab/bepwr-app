@@ -4331,19 +4331,19 @@ function mapearObjetivo(m){return META_MAP[m]||'salud_general';}
 
 // ── Pesos por objetivo (suman 100 cada uno) ───────────────────────────
 var WEIGHTS={
-  bajar_grasa:{peso:8,masa_musculo:12,grasa_corporal_kg:13,imc:5,pgc:14,grasa_visceral:11,inbody_score:7,biceps_cm:2,abdomen_cm:9,cintura_cm:12,cadera_cm:1,pantorrilla_cm:3,mancuerna_lb:3},
-  ganar_musculo:{peso:3,masa_musculo:22,grasa_corporal_kg:7,imc:2,pgc:8,grasa_visceral:6,inbody_score:13,biceps_cm:8,abdomen_cm:4,cintura_cm:5,cadera_cm:4,pantorrilla_cm:7,mancuerna_lb:11},
-  salud_general:{peso:6,masa_musculo:11,grasa_corporal_kg:7,imc:5,pgc:11,grasa_visceral:18,inbody_score:9,biceps_cm:1,abdomen_cm:9,cintura_cm:14,cadera_cm:2,pantorrilla_cm:3,mancuerna_lb:4},
-  estetico:{peso:3,masa_musculo:14,grasa_corporal_kg:11,imc:2,pgc:13,grasa_visceral:6,inbody_score:9,biceps_cm:8,abdomen_cm:9,cintura_cm:10,cadera_cm:6,pantorrilla_cm:5,mancuerna_lb:4},
-  rendimiento:{peso:1,masa_musculo:18,grasa_corporal_kg:7,imc:1,pgc:8,grasa_visceral:7,inbody_score:15,biceps_cm:6,abdomen_cm:5,cintura_cm:6,cadera_cm:2,pantorrilla_cm:10,mancuerna_lb:14},
-  dep_ciclismo:{peso:8,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:11,grasa_visceral:7,inbody_score:12,biceps_cm:2,abdomen_cm:6,cintura_cm:6,cadera_cm:3,pantorrilla_cm:14,mancuerna_lb:5},
-  dep_correr:{peso:10,masa_musculo:13,grasa_corporal_kg:10,imc:5,pgc:12,grasa_visceral:8,inbody_score:11,biceps_cm:2,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:3},
-  dep_futbol:{peso:6,masa_musculo:15,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:13,biceps_cm:5,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:10,mancuerna_lb:4},
-  dep_golf:{peso:5,masa_musculo:12,grasa_corporal_kg:8,imc:4,pgc:9,grasa_visceral:9,inbody_score:11,biceps_cm:8,abdomen_cm:12,cintura_cm:12,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
-  dep_natacion:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:14,abdomen_cm:8,cintura_cm:7,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
-  dep_padel:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:12,abdomen_cm:8,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:1},
-  dep_tenis:{peso:5,masa_musculo:13,grasa_corporal_kg:8,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,biceps_cm:12,abdomen_cm:9,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:2},
-  dep_otro:{peso:5,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:8,inbody_score:13,biceps_cm:7,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:5}
+  bajar_grasa:{peso:8,masa_musculo:12,grasa_corporal_kg:13,imc:5,pgc:14,grasa_visceral:11,inbody_score:7,biceps_cm:2,muslo_cm:1,abdomen_cm:8,cintura_cm:12,cadera_cm:1,pantorrilla_cm:3,mancuerna_lb:3},
+  ganar_musculo:{peso:3,masa_musculo:19,muslo_cm:5,grasa_corporal_kg:7,imc:2,pgc:8,grasa_visceral:6,inbody_score:13,biceps_cm:8,abdomen_cm:4,cintura_cm:5,cadera_cm:4,pantorrilla_cm:7,mancuerna_lb:11},
+  salud_general:{peso:6,masa_musculo:11,grasa_corporal_kg:7,imc:5,pgc:11,grasa_visceral:18,inbody_score:9,biceps_cm:1,abdomen_cm:9,muslo_cm:2,cintura_cm:13,cadera_cm:2,pantorrilla_cm:3,mancuerna_lb:4},
+  estetico:{peso:3,masa_musculo:12,muslo_cm:6,grasa_corporal_kg:11,imc:2,pgc:13,grasa_visceral:6,inbody_score:9,biceps_cm:8,abdomen_cm:9,cintura_cm:10,cadera_cm:6,pantorrilla_cm:5,mancuerna_lb:4},
+  rendimiento:{peso:1,masa_musculo:18,grasa_corporal_kg:7,imc:1,pgc:8,grasa_visceral:7,inbody_score:15,biceps_cm:6,abdomen_cm:5,cintura_cm:6,cadera_cm:2,muslo_cm:6,pantorrilla_cm:7,mancuerna_lb:14},
+  dep_ciclismo:{peso:8,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:11,grasa_visceral:7,inbody_score:12,biceps_cm:2,abdomen_cm:6,cintura_cm:6,cadera_cm:3,muslo_cm:5,pantorrilla_cm:11,mancuerna_lb:5},
+  dep_correr:{peso:10,masa_musculo:13,grasa_corporal_kg:10,imc:5,pgc:12,grasa_visceral:8,inbody_score:11,biceps_cm:2,abdomen_cm:7,cintura_cm:7,cadera_cm:3,muslo_cm:5,pantorrilla_cm:7,mancuerna_lb:3},
+  dep_futbol:{peso:6,masa_musculo:15,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:13,biceps_cm:5,abdomen_cm:7,cintura_cm:7,cadera_cm:3,muslo_cm:5,pantorrilla_cm:7,mancuerna_lb:4},
+  dep_golf:{peso:5,masa_musculo:12,grasa_corporal_kg:8,imc:4,pgc:9,grasa_visceral:9,inbody_score:11,biceps_cm:8,muslo_cm:2,abdomen_cm:11,cintura_cm:12,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
+  dep_natacion:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,muslo_cm:3,biceps_cm:12,abdomen_cm:8,cintura_cm:7,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
+  dep_padel:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,muslo_cm:3,biceps_cm:10,abdomen_cm:8,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:1},
+  dep_tenis:{peso:5,masa_musculo:13,grasa_corporal_kg:8,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,muslo_cm:3,biceps_cm:10,abdomen_cm:9,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:2},
+  dep_otro:{peso:5,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:8,inbody_score:13,muslo_cm:3,biceps_cm:5,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:5}
 };
 
 // ── Definición de métricas ─────────────────────────────────────────────
@@ -4359,6 +4359,8 @@ var METRIC_DEFS=[
   {key:'abdomen_cm',label:'Abdomen',unit:'cm',direction:'down',threshold:2.0},
   {key:'cintura_cm',label:'Cintura',unit:'cm',direction:'down',threshold:2.0},
   {key:'cadera_cm',label:'Cadera',unit:'cm',direction:'compound',threshold:1.5},
+  {key:'muslo_cm',label:'Muslo',unit:'cm',direction:'up',threshold:1.5},
+  {key:'muslo_cm',label:'Muslo',unit:'cm',direction:'up',threshold:1.5},
   {key:'pantorrilla_cm',label:'Pantorrilla',unit:'cm',direction:'up',threshold:0.8},
   {key:'mancuerna_lb',label:'Prueba de Peso',unit:'lb',direction:'up',threshold:5.0}
 ];
@@ -4507,8 +4509,18 @@ window._applyIndiceEvolucion=function(act,ini,valFecha){
 
   function pp(v){if(!v)return null;if(typeof v==='number')return v;if(typeof v==='string'){var n=parseFloat(v);return isNaN(n)?null:n;}if(typeof v==='object'){var n=parseFloat(v.max||v.min||v.value);return isNaN(n)?null:n;}return null;}
 
-  var anterior={peso:ini.peso,masa_musculo:ini.musculo,grasa_corporal_kg:ini.grasaCorporal,imc:ini.imc,pgc:ini.pgc,grasa_visceral:ini.grasaVisceral,inbody_score:ini.calificacion,biceps_cm:ini.brazo,abdomen_cm:ini.abdomen,cintura_cm:ini.cintura,cadera_cm:ini.cadera,pantorrilla_cm:ini.pantorrilla,mancuerna_lb:pp(ini.pruebaPeso)};
-  var actual={peso:act.peso,masa_musculo:act.musculo,grasa_corporal_kg:act.grasaCorporal,imc:act.imc,pgc:act.pgc,grasa_visceral:act.grasaVisceral,inbody_score:act.calificacion,biceps_cm:act.brazo,abdomen_cm:act.abdomen,cintura_cm:act.cintura,cadera_cm:act.cadera,pantorrilla_cm:act.pantorrilla,mancuerna_lb:pp(act.pruebaPeso)};
+  var anterior={peso:ini.peso,masa_musculo:ini.musculo,grasa_corporal_kg:ini.grasaCorporal,imc:ini.imc,pgc:ini.pgc,grasa_visceral:ini.grasaVisceral,inbody_score:ini.calificacion,
+    biceps_cm:((ini.bicepsDer||ini.brazo||0)+(ini.bicepsIzq||ini.brazo||0))/2||null,
+    muslo_cm:((ini.musloDer||0)+(ini.musloIzq||0))/2||null,
+    abdomen_cm:ini.abdomen,cintura_cm:ini.cintura,cadera_cm:ini.cadera,
+    pantorrilla_cm:((ini.pantorrillaDer||ini.pantorrilla||0)+(ini.pantorrillaIzq||ini.pantorrilla||0))/2||null,
+    mancuerna_lb:pp(ini.pruebaPeso)};
+  var actual={peso:act.peso,masa_musculo:act.musculo,grasa_corporal_kg:act.grasaCorporal,imc:act.imc,pgc:act.pgc,grasa_visceral:act.grasaVisceral,inbody_score:act.calificacion,
+    biceps_cm:((act.bicepsDer||act.brazo||0)+(act.bicepsIzq||act.brazo||0))/2||null,
+    muslo_cm:((act.musloDer||0)+(act.musloIzq||0))/2||null,
+    abdomen_cm:act.abdomen,cintura_cm:act.cintura,cadera_cm:act.cadera,
+    pantorrilla_cm:((act.pantorrillaDer||act.pantorrilla||0)+(act.pantorrillaIzq||act.pantorrilla||0))/2||null,
+    mancuerna_lb:pp(act.pruebaPeso)};
 
   var result=calcularEvolucion(anterior,actual,{edad:edad,genero:genero,altura:altura},objKey);
   window._indiceEvolucionResult=result;
