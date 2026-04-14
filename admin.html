@@ -2035,6 +2035,9 @@ if (user && user.uid === MASTER_UID) {
         <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${(m.alias||'').replace(/"/g,'&quot;')}" /></div>
       </div>
       <div class="field-row">
+        <div class="field" style="grid-column:span 2"><label>Email</label><input type="email" id="edit-email" value="${(m.email||'').replace(/"/g,'&quot;')}" /></div>
+      </div>
+      <div class="field-row">
         <div class="field"><label>Teléfono</label><input type="tel" id="edit-tel" value="${m.telefono||''}" maxlength="10" /></div>
         <div class="field"><label>Nacimiento</label><input type="date" id="edit-dob" value="${m.nacimiento||''}" /></div>
       </div>
@@ -2119,6 +2122,7 @@ if (user && user.uid === MASTER_UID) {
       const _metaOrig = _mOrig.objetivo?.meta || _mOrig.meta || '';
       const _metaCambio = newMeta && newMeta !== _metaOrig;
       const _updateData = {
+        email: document.getElementById('edit-email').value,
         nombre: document.getElementById('edit-nombre').value,
         alias: document.getElementById('edit-alias').value,
         telefono: document.getElementById('edit-tel').value,
