@@ -189,6 +189,7 @@
     <div class="sidebar-item" id="tab-horario" onclick="switchTab('horario')" style="display:none"><span class="sidebar-icon">&#x1F5D3;&#xFE0F;</span><span class="sidebar-label">Horario</span></div>
     <div class="sidebar-item" id="tab-clases" onclick="switchTab('clases')" style="display:none"><span class="sidebar-icon">&#x1F3CB;&#xFE0F;</span><span class="sidebar-label">Clases</span></div>
     <div class="sidebar-item" id="tab-rutina" onclick="switchTab('rutina')" style="display:none"><span class="sidebar-icon">&#x1F4DD;</span><span class="sidebar-label">Rutina</span></div>
+    <div class="sidebar-item" id="tab-objetivos" onclick="switchTab('objetivos')" style="display:none"><span class="sidebar-icon">&#x1F3AF;</span><span class="sidebar-label">Objetivos</span></div>
     </div>
   </div>
   <div id="main-area">
@@ -635,6 +636,24 @@
 
     </div>
 
+<!-- ── TAB OBJETIVOS ──────────────────────────────────────────────────── -->
+<div id="tab-content-objetivos" style="display:none;max-width:960px;margin:0 auto;padding:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">&#x1F3AF; Tabla Maestra</div>
+      <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0">Objetivos bePWR</h2>
+    </div>
+    <div id="obj-fuente-badge" style="font-size:10px;font-family:'Space Mono',monospace;padding:4px 10px;border-radius:20px;background:#222;border:1px solid #333;color:#888">Cargando...</div>
+  </div>
+  <p style="font-size:12px;color:#666;margin:0 0 16px;font-family:'Space Mono',monospace">Solo el Admin Maestro puede modificar los objetivos. &#x1F512;</p>
+  <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+    <button id="btn-mod-obj" onclick="window.iniciarModObjetivos()" style="padding:10px 18px;background:#222;color:#aaa;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">&#x270F;&#xFE0F; MODIFICAR</button>
+    <button id="btn-save-obj" onclick="window.guardarObjetivos()" style="display:none;padding:10px 18px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;font-weight:700">&#x1F4BE; GUARDAR CAMBIOS</button>
+    <button id="btn-cancel-obj" onclick="window.cancelarEditObjetivos()" style="display:none;padding:10px 18px;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer">CANCELAR</button>
+  </div>
+  <div id="obj-tabla-container"></div>
+</div>
+
 <!-- ── TAB PESOS — Tabla Maestra del Índice de Evolución ────────────── -->
 <div id="tab-content-pesos" style="display:none;max-width:860px;margin:0 auto;padding:16px">
 
@@ -981,6 +1000,7 @@ if (user && user.uid === MASTER_UID) {
   document.getElementById('tab-horario').style.display='flex';
   document.getElementById('tab-clases').style.display='flex';
   document.getElementById('tab-rutina').style.display='flex';
+  document.getElementById('tab-objetivos').style.display='flex';
   if (tabDash) tabDash.style.display = 'flex';
 }
 
@@ -1648,6 +1668,172 @@ if (user && user.uid === MASTER_UID) {
   }
 
   // OPEN DETAIL
+  // === OBJETIVOS CONFIG ===
+(function(){
+  var _objs=null,_edit=false,_oCode=null;
+  var _NOM={upper_body:'Upper Body',lower_body:'Lower Body',full_body_core:'Full Body',full_body_glutes:'Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
+
+  function arrToText(arr){
+    if(!arr||!arr.length)return '';
+    var c={};arr.forEach(function(k){c[k]=(c[k]||0)+1;});
+    return Object.keys(c).map(function(k){var n=c[k];return n>1?(_NOM[k]||k)+' ('+n+'x)':(_NOM[k]||k);}).join(' + ');
+  }
+
+  function _renderTabla(){
+    var cont=document.getElementById('obj-tabla-container');
+    if(!cont||!_objs)return;
+    var lista=window._objListaAdmin||Object.keys(_objs);
+    var ages=['<30','30-45','45+'];
+    var h='';
+    lista.forEach(function(key){
+      var o=_objs[key];if(!o)return;
+      h+='<div style="background:#111;border:1px solid #222;border-radius:14px;margin-bottom:12px;overflow:hidden">';
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #1f1f1f">';
+      h+='<div style="width:10px;height:10px;border-radius:50%;background:'+o.color+';flex-shrink:0"></div>';
+      h+='<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#fff">'+o.label+'</div>';
+      h+='<div style="font-size:10px;color:#555;font-family:Space Mono,monospace;margin-top:2px">'+key+' · pdf: '+o.pdfKey+' · cada '+o.intervalo+' días</div></div>';
+      h+='<div style="width:8px;height:8px;border-radius:50%;background:'+(o.activo?'#4ade80':'#f87171')+'"></div>';
+      h+='</div>';
+      h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+      h+='<thead><tr style="background:#0d0d0d"><th style="padding:6px 10px;text-align:center;color:#555;width:52px">Edad</th>';
+      ['Etapa 1','Etapa 2','Etapa 3'].forEach(function(e){h+='<th style="padding:6px 10px;text-align:left;color:#555">'+e+'</th>';});
+      h+='</tr></thead><tbody>';
+      ages.forEach(function(ge,gi){
+        var row=(o.mix&&o.mix[ge])||{};
+        h+='<tr style="border-top:1px solid #1a1a1a'+(gi===2?';background:#0a0a0a':'')+'">';
+        h+='<td style="padding:6px 10px;text-align:center;color:#555;font-family:Space Mono,monospace;font-size:10px">'+ge+'</td>';
+        ['e1','e2','e3'].forEach(function(ek,ei){
+          var arr=row[ek]||[];
+          var txt=arrToText(arr);
+          var id='oe-'+key+'-'+gi+'-'+ei;
+          if(_edit){
+            h+='<td style="padding:3px 5px"><input id="'+id+'" type="text" value="'+txt.replace(/"/g,'&quot;')+'" style="width:100%;background:#111;border:1px solid #FF5C1A44;color:#fff;padding:5px 7px;border-radius:6px;font-size:11px;font-family:DM Sans,sans-serif;box-sizing:border-box"></td>';
+          }else{
+            h+='<td style="padding:6px 10px;color:#ccc">'+txt+'</td>';
+          }
+        });
+        h+='</tr>';
+      });
+      h+='</tbody></table></div>';
+      h+='<div style="padding:10px 16px;border-top:1px solid #1a1a1a">';
+      h+='<div style="font-size:9px;color:#555;font-family:Space Mono,monospace;letter-spacing:1px;margin-bottom:6px">COMPLEMENTO</div>';
+      ages.forEach(function(ge,gi){
+        var val=(o.complemento&&o.complemento[ge])||'';
+        var id2='oc-'+key+'-'+gi;
+        if(_edit){
+          h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">';
+          h+='<span style="font-size:10px;color:#555;font-family:Space Mono,monospace;width:40px;flex-shrink:0">'+ge+'</span>';
+          h+='<input id="'+id2+'" type="text" value="'+val.replace(/"/g,'&quot;')+'" style="flex:1;background:#111;border:1px solid #FF5C1A44;color:#fff;padding:5px 7px;border-radius:6px;font-size:11px;font-family:DM Sans,sans-serif">';
+          h+='</div>';
+        }else if(val){
+          h+='<div style="display:flex;gap:8px;margin-bottom:3px"><span style="font-size:10px;color:#555;font-family:Space Mono,monospace;width:40px;flex-shrink:0">'+ge+'</span><span style="font-size:11px;color:#aaa">'+val+'</span></div>';
+        }
+      });
+      h+='</div></div>';
+    });
+    cont.innerHTML=h||'<p style="color:#555;font-size:13px">Sin objetivos cargados</p>';
+  }
+
+  window.loadObjetivosTab=async function(){
+    if(!auth.currentUser||auth.currentUser.uid!==MASTER_UID)return;
+    var badge=document.getElementById('obj-fuente-badge'),btnM=document.getElementById('btn-mod-obj');
+    try{
+      var snap=await db.collection('config').doc('objetivos').get();
+      if(snap.exists){
+        var d=snap.data();_objs=d.objetivos||{};
+        window._objListaAdmin=d.lista||Object.keys(_objs);
+        window._objConfig=_objs;
+        var fecha=d.actualizado?new Date(d.actualizado).toLocaleDateString('es-MX'):'--';
+        if(badge){badge.textContent='Firestore v'+(d.version||1)+' · '+fecha;badge.style.borderColor='#4ade80';badge.style.color='#4ade80';}
+        if(btnM)btnM.style.display='inline-block';
+      }else{
+        if(badge){badge.textContent='Sin datos en Firestore';badge.style.borderColor='#f87171';badge.style.color='#f87171';}
+      }
+    }catch(e){if(badge){badge.textContent='Error al cargar';badge.style.color='#f87171';}}
+    _renderTabla();
+  };
+
+  window.iniciarModObjetivos=async function(){
+    if(!auth.currentUser||auth.currentUser.uid!==MASTER_UID){showToast('Solo el Admin Maestro puede modificar los objetivos','error');return;}
+    if(!await showConfirm('ATENCIÓN: Modificar los objetivos afecta el motor de rutinas de TODOS los miembros.
+Se enviará un código de verificación a tu email. ¿Continuar?'))return;
+    var code=Math.floor(100000+Math.random()*900000).toString();_oCode=code;
+    try{
+      var resp=await fetch('/api/send-delete-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,email:auth.currentUser.email,secret:'bepwr2026notify'})});
+      if(!resp.ok)throw new Error('Error al enviar código');
+      var ov=document.createElement('div');ov.id='obj-ov';
+      ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+      var box=document.createElement('div');box.style.cssText='background:#1a1a1a;border:1px solid #FF5C1A55;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center';
+      var lbl=document.createElement('div');lbl.style.cssText='font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:1.5px;margin-bottom:12px';lbl.textContent='VERIFICACIÓN DE IDENTIDAD';
+      var ttl=document.createElement('div');ttl.style.cssText='font-size:15px;color:#fff;font-weight:600;margin-bottom:8px';ttl.textContent='Código de confirmación';
+      var sub=document.createElement('div');sub.style.cssText='font-size:13px;color:#aaa;margin-bottom:20px';sub.innerHTML='Ingresa el código enviado a<br><strong>'+auth.currentUser.email+'</strong>';
+      var inp=document.createElement('input');inp.id='obj-ov-inp';inp.type='text';inp.maxLength=6;inp.placeholder='000000';
+      inp.style.cssText='width:100%;background:#111;border:1px solid #444;color:#fff;font-size:28px;text-align:center;padding:14px;border-radius:10px;margin-bottom:10px;font-family:Space Mono,monospace;box-sizing:border-box;letter-spacing:8px';
+      var err2=document.createElement('div');err2.id='obj-ov-err';err2.style.cssText='color:#f87171;font-size:12px;margin-bottom:14px;min-height:16px';
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:10px';
+      var bCan=document.createElement('button');bCan.textContent='CANCELAR';bCan.style.cssText='flex:1;background:#2a2a2a;border:1px solid #444;color:#aaa;padding:12px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace;font-size:11px';bCan.onclick=function(){var o=document.getElementById('obj-ov');if(o)o.remove();};
+      var bVer=document.createElement('button');bVer.textContent='VERIFICAR';bVer.style.cssText='flex:1;background:#FF5C1A;border:none;color:#fff;font-weight:700;padding:12px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace;font-size:11px';bVer.onclick=window.verificarObjetivos;
+      row.appendChild(bCan);row.appendChild(bVer);
+      box.appendChild(lbl);box.appendChild(ttl);box.appendChild(sub);box.appendChild(inp);box.appendChild(err2);box.appendChild(row);
+      ov.appendChild(box);document.body.appendChild(ov);
+      setTimeout(function(){var i=document.getElementById('obj-ov-inp');if(i)i.focus();},100);
+    }catch(e){showToast('Error: '+e.message,'error');}
+  };
+
+  window.verificarObjetivos=function(){
+    var val=(document.getElementById('obj-ov-inp')||{}).value||'';
+    var err=document.getElementById('obj-ov-err');
+    if(val.trim()!==_oCode){if(err)err.textContent='Código incorrecto';return;}
+    var ov=document.getElementById('obj-ov');if(ov)ov.remove();
+    _edit=true;_renderTabla();
+    var bM=document.getElementById('btn-mod-obj'),bS=document.getElementById('btn-save-obj'),bC=document.getElementById('btn-cancel-obj');
+    if(bM)bM.style.display='none';if(bS)bS.style.display='inline-block';if(bC)bC.style.display='inline-block';
+    showToast('Modo edición activado','success');
+  };
+
+  window.cancelarEditObjetivos=function(){
+    _edit=false;_renderTabla();
+    var bM=document.getElementById('btn-mod-obj'),bS=document.getElementById('btn-save-obj'),bC=document.getElementById('btn-cancel-obj');
+    if(bM)bM.style.display='inline-block';if(bS)bS.style.display='none';if(bC)bC.style.display='none';
+  };
+
+  var _KEY={'upper body':'upper_body','upper':'upper_body','lower body':'lower_body','lower':'lower_body','full body':'full_body_core','fullbody':'full_body_core','full':'full_body_core','glutes':'full_body_glutes','women 50+':'women50','women50':'women50','50+':'women50','pwr yoga':'pwr_yoga','yoga':'pwr_yoga'};
+  function textToArr(str){if(!str||!str.trim())return[];var r=[];str.split('+').forEach(function(p){p=p.trim();if(!p)return;var mM=p.match(/\((\d+)x\)/i);var mult=mM?parseInt(mM[1]):1;var n=p.replace(/\(\d+x\)/i,'').trim().toLowerCase();var k=_KEY[n]||null;if(!k){var ks=Object.keys(_KEY);for(var i=0;i<ks.length;i++){if(n.indexOf(ks[i])!==-1||ks[i].indexOf(n)!==-1){k=_KEY[ks[i]];break;}}}if(k){for(var j=0;j<Math.min(mult,6);j++)r.push(k);}});return r;}
+
+  window.guardarObjetivos=async function(){
+    if(!_edit)return;
+    var lista=window._objListaAdmin||Object.keys(_objs);
+    var ages=['<30','30-45','45+'];
+    var newObjs=JSON.parse(JSON.stringify(_objs));
+    lista.forEach(function(key,ki){
+      if(!newObjs[key])return;
+      if(!newObjs[key].mix)newObjs[key].mix={};
+      if(!newObjs[key].complemento)newObjs[key].complemento={};
+      ages.forEach(function(ge,gi){
+        if(!newObjs[key].mix[ge])newObjs[key].mix[ge]={};
+        ['e1','e2','e3'].forEach(function(ek,ei){
+          var inp=document.getElementById('oe-'+key+'-'+gi+'-'+ei);
+          if(inp){var arr=textToArr(inp.value);if(arr.length)newObjs[key].mix[ge][ek]=arr;}
+        });
+        var inpC=document.getElementById('oc-'+key+'-'+gi);
+        if(inpC)newObjs[key].complemento[ge]=inpC.value.trim()||null;
+      });
+    });
+    if(!await showConfirm('CONFIRMACIÓN FINAL: Los objetivos serán actualizados en Firestore.
+Esto afecta el motor de rutinas de TODOS los miembros. ¿Confirmar?'))return;
+    try{
+      var snap=await db.collection('config').doc('objetivos').get();
+      var ver=(snap.exists?(snap.data().version||1):0)+1;
+      await db.collection('config').doc('objetivos').set({objetivos:newObjs,lista:lista,version:ver,actualizado:new Date().toISOString(),actualizadoPor:auth.currentUser.uid});
+      await db.collection('bitacora').add({accion:'modificar_objetivos_config',descripcion:'Objetivos actualizados (v'+ver+')',fecha:new Date().toISOString(),autor:auth.currentUser.email});
+      _objs=newObjs;window._objConfig=newObjs;
+      window.cancelarEditObjetivos();
+      showToast('Objetivos guardados (v'+ver+')','success');
+      window.loadObjetivosTab();
+    }catch(e){showToast('Error: '+e.message,'error');}
+  };
+})();
+
   // --- Rutina Config (mirror of index.html OBJETIVO_CONFIG rutina data) ---
   var RUTINA_CONFIG = {
     'Bajar grasa / bajar de peso': {
@@ -2847,7 +3033,7 @@ for (const med of medidasVal) {
   }
 
   function switchTab(tab) {
-  var _sH=document.getElementById("section-horario"),_sC=document.getElementById("section-clases"),_sR=document.getElementById("section-rutina");if(_sH)_sH.style.display="none";if(_sC)_sC.style.display="none";if(_sR)_sR.style.display="none";
+  var _sH=document.getElementById("section-horario"),_sC=document.getElementById("section-clases"),_sR=document.getElementById("section-rutina");if(_sH)_sH.style.display="none";if(_sC)_sC.style.display="none";if(_sR)_sR.style.display="none";var _sOb=document.getElementById("tab-content-objetivos");if(_sOb)_sOb.style.display="none";
     const tabs = ['home','members','new','staff','notify','bitacora','dashboard','guias','citas','pesos'];
     tabs.forEach(t => {
       const tabEl = document.getElementById('tab-'+t);
@@ -2888,8 +3074,9 @@ for (const med of medidasVal) {
   if(tab==='horario'){var el=document.getElementById('section-horario');if(el)el.style.display='block';cargarHorario();}
   if(tab==='clases'){var el2=document.getElementById('section-clases');if(el2)el2.style.display='block';cargarClases();}
   if(tab==='rutina'){var el3=document.getElementById('section-rutina');if(el3)el3.style.display='block';cargarRutinaConfig();}
+  if(tab==='objetivos'){var elObj=document.getElementById('tab-content-objetivos');if(elObj)elObj.style.display='block';if(window.loadObjetivosTab)window.loadObjetivosTab();}
   // Mark sidebar active for horario/clases/rutina
-  ['horario','clases','rutina'].forEach(function(t){
+  ['horario','clases','rutina','objetivos'].forEach(function(t){
     var si=document.getElementById('tab-'+t);
     if(si) si.classList.toggle('active',t===tab);
   });
