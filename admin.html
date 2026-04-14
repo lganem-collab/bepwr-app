@@ -1755,8 +1755,7 @@ if (user && user.uid === MASTER_UID) {
 
   window.iniciarModObjetivos=async function(){
     if(!auth.currentUser||auth.currentUser.uid!==MASTER_UID){showToast('Solo el Admin Maestro puede modificar los objetivos','error');return;}
-    if(!await showConfirm('ATENCIÓN: Modificar los objetivos afecta el motor de rutinas de TODOS los miembros.
-Se enviará un código de verificación a tu email. ¿Continuar?'))return;
+    if(!await showConfirm('ATENCIÓN: Modificar los objetivos afecta el motor de rutinas de TODOS los miembros.\nSe enviará un código de verificación a tu email. ¿Continuar?'))return;
     var code=Math.floor(100000+Math.random()*900000).toString();_oCode=code;
     try{
       var resp=await fetch('/api/send-delete-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,email:auth.currentUser.email,secret:'bepwr2026notify'})});
@@ -1819,8 +1818,7 @@ Se enviará un código de verificación a tu email. ¿Continuar?'))return;
         if(inpC)newObjs[key].complemento[ge]=inpC.value.trim()||null;
       });
     });
-    if(!await showConfirm('CONFIRMACIÓN FINAL: Los objetivos serán actualizados en Firestore.
-Esto afecta el motor de rutinas de TODOS los miembros. ¿Confirmar?'))return;
+    if(!await showConfirm('CONFIRMACIÓN FINAL: Los objetivos serán actualizados en Firestore.\nEsto afecta el motor de rutinas de TODOS los miembros. ¿Confirmar?'))return;
     try{
       var snap=await db.collection('config').doc('objetivos').get();
       var ver=(snap.exists?(snap.data().version||1):0)+1;
