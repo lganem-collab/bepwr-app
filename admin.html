@@ -1,4 +1,147 @@
-<!DOCTYPE html>
+// === RUTINA CONFIG (FULL — Firestore + seguridad Admin Maestro) ===
+(function(){
+  var _mix=null,_edit=false,_rCode=null;
+  var _MIX_DEF={
+    'Bajar grasa / bajar de peso':{'<30':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','full_body_core','lower_body','upper_body']],'30-45':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','lower_body','upper_body']],'45+':[['women50','full_body_core'],['women50','women50','full_body_core'],['women50','women50','full_body_core','lower_body']]},
+    'Ganar m\u00fasculo / recomposici\u00f3n':{'<30':[['upper_body','lower_body'],['upper_body','upper_body','lower_body','lower_body'],['upper_body','upper_body','lower_body','lower_body','full_body_core']],'30-45':[['upper_body','lower_body'],['upper_body','lower_body','full_body_core'],['upper_body','upper_body','lower_body','lower_body']],'45+':[['upper_body','lower_body'],['upper_body','lower_body'],['upper_body','lower_body','full_body_core']]},
+    'Salud metab\u00f3lica / salud general':{'<30':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','lower_body','upper_body']],'30-45':[['full_body_core','women50'],['full_body_core','full_body_core','women50'],['full_body_core','lower_body','women50']],'45+':[['women50','full_body_core'],['women50','women50','full_body_core'],['women50','women50','women50']]},
+    'Est\u00e9tica / composici\u00f3n equilibrada':{'<30':[['full_body_core','lower_body'],['full_body_core','upper_body','lower_body'],['full_body_core','full_body_core','upper_body','lower_body']],'30-45':[['full_body_core','lower_body'],['full_body_core','upper_body','lower_body'],['full_body_core','upper_body','lower_body','full_body_glutes']],'45+':[['women50','full_body_core'],['women50','full_body_core'],['women50','full_body_core','upper_body']]},
+    'Rendimiento funcional':{'<30':[['full_body_core','full_body_core'],['full_body_core','full_body_core','full_body_core','full_body_glutes'],['full_body_core','full_body_core','full_body_core','full_body_glutes','upper_body']],'30-45':[['full_body_core','full_body_glutes'],['full_body_core','full_body_core','full_body_glutes'],['full_body_core','full_body_core','full_body_glutes','lower_body']],'45+':[['women50','full_body_core'],['full_body_core','full_body_core','women50'],['full_body_core','full_body_core','women50']]},
+    'Incrementar performance \u00b7 Ciclismo':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]},
+    'Incrementar performance \u00b7 Correr':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]},
+    'Incrementar performance \u00b7 Nataci\u00f3n':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','upper_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','upper_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','upper_body','full_body_core']]},
+    'Incrementar performance \u00b7 Padel':{'<30':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'30-45':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'45+':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']]},
+    'Incrementar performance \u00b7 Tenis':{'<30':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'30-45':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'45+':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']]},
+    'Incrementar performance \u00b7 Golf':{'<30':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'30-45':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']],'45+':[['full_body_core'],['upper_body','full_body_core'],['upper_body','full_body_core']]},
+    'Incrementar performance \u00b7 F\u00fatbol':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]},
+    'Incrementar performance \u00b7 Otro':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]}
+  };
+  var _NOM={upper_body:'Upper',lower_body:'Lower',full_body_core:'Full Body',full_body_glutes:'Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
+  var _KEY={'upper':'upper_body','lower':'lower_body','full body':'full_body_core','fullbody':'full_body_core','full':'full_body_core','glutes':'full_body_glutes','women 50+':'women50','women50':'women50','50+':'women50','pwr yoga':'pwr_yoga','yoga':'pwr_yoga'};
+  function mixToText(arr){if(!arr||!arr.length)return '';var c={};arr.forEach(function(k){c[k]=(c[k]||0)+1;});return Object.keys(c).map(function(k){var n=c[k];return n>1?(_NOM[k]||k)+' ('+n+'x)':(_NOM[k]||k);}).join(' + ');}
+  function textToMix(str){if(!str||!str.trim())return[];var result=[];str.split('+').forEach(function(part){part=part.trim();if(!part)return;var mMult=part.match(/\((\d+)x\)/i);var mult=mMult?parseInt(mMult[1]):1;var name=part.replace(/\(\d+x\)/i,'').trim().toLowerCase();var key=_KEY[name]||null;if(!key){var ks=Object.keys(_KEY);for(var i=0;i<ks.length;i++){if(name.indexOf(ks[i])!==-1||ks[i].indexOf(name)!==-1){key=_KEY[ks[i]];break;}}}if(key){for(var j=0;j<Math.min(mult,6);j++)result.push(key);}});return result;}
+  function _renderTable(){
+    var cont=document.getElementById('rutina-config-table');if(!cont||!_mix)return;
+    var objs=Object.keys(_MIX_DEF),ages=['<30','30-45','45+'];
+    var ley=document.getElementById('rutinas-leyenda');if(ley)ley.style.display=_edit?'block':'none';
+    var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    h+='<thead><tr style="background:#1a1a1a"><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a;min-width:190px">Objetivo</th><th style="padding:8px 10px;text-align:center;color:#888;border-bottom:1px solid #2a2a2a;width:52px">Edad</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 1</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 2</th><th style="padding:8px 10px;text-align:left;color:#888;border-bottom:1px solid #2a2a2a">Etapa 3</th></tr></thead><tbody>';
+    objs.forEach(function(obj,oi){
+      var row=(_mix[obj])||_MIX_DEF[obj]||{};
+      ages.forEach(function(ge,gi){
+        h+='<tr style="border-bottom:1px solid #1f1f1f'+(gi===2?';background:#0d0d0d':'')+(gi===0?';border-top:2px solid #2a2a2a':'')+'">';
+        if(gi===0)h+='<td style="padding:8px 10px;font-size:12px;font-weight:600;color:#f0f0f0;vertical-align:middle;border-right:1px solid #1f1f1f" rowspan="3">'+obj+'</td>';
+        h+='<td style="padding:6px 10px;color:#666;text-align:center;white-space:nowrap;font-family:Space Mono,monospace;font-size:10px;border-right:1px solid #1f1f1f">'+ge+'</td>';
+        var rowData=row[ge]||[];
+        for(var ei=0;ei<3;ei++){
+          var arr=rowData[ei]||[],txt=mixToText(arr),id='rc-'+oi+'-'+gi+'-'+ei;
+          if(_edit){h+='<td style="padding:3px 5px"><input id="'+id+'" type="text" value="'+txt.replace(/"/g,'&quot;')+'" placeholder="Upper + Lower" style="width:100%;background:#111;border:1px solid #FF5C1A44;color:#fff;padding:5px 7px;border-radius:6px;font-size:11px;font-family:DM Sans,sans-serif;box-sizing:border-box"></td>';}
+          else{h+='<td style="padding:6px 10px;color:#ccc;font-size:11px">'+txt+'</td>';}
+        }
+        h+='</tr>';
+      });
+    });
+    h+='</tbody></table>';cont.innerHTML=h;
+  }
+  window.loadRutinasTab=async function(){
+    if(!auth.currentUser||auth.currentUser.uid!==MASTER_UID)return;
+    var badge=document.getElementById('rutinas-fuente-badge'),btnI=document.getElementById('btn-init-rutinas'),btnM=document.getElementById('btn-mod-rutinas');
+    try{
+      var snap=await db.collection('config').doc('rutinas').get();
+      if(snap.exists){
+        var d=snap.data();_mix=d.mix||_MIX_DEF;window._rutinasMixFS=_mix;
+        var fecha=d.actualizado?new Date(d.actualizado).toLocaleDateString('es-MX'):'--';
+        if(badge){badge.textContent='Firestore v'+(d.version||1)+' \u00b7 '+fecha;badge.style.borderColor='#4ade80';badge.style.color='#4ade80';}
+        if(btnI)btnI.style.display='none';if(btnM)btnM.style.display='inline-block';
+      }else{
+        _mix=_MIX_DEF;
+        if(badge){badge.textContent='Sin inicializar en Firestore';badge.style.borderColor='#facc15';badge.style.color='#facc15';}
+        if(btnI)btnI.style.display='inline-block';if(btnM)btnM.style.display='none';
+      }
+    }catch(e){_mix=_MIX_DEF;if(badge){badge.textContent='Error -- usando hardcoded';badge.style.color='#f87171';}}
+    _renderTable();
+  };
+  window.cargarRutinaConfig=window.loadRutinasTab;
+  window.initRutinasFirestore=async function(){
+    if(!await showConfirm('Crear documento config/rutinas en Firestore con los valores actuales del motor. \u00bfContinuar?'))return;
+    try{
+      await db.collection('config').doc('rutinas').set({mix:_MIX_DEF,version:1,actualizado:new Date().toISOString(),actualizadoPor:auth.currentUser.uid});
+      await db.collection('bitacora').add({accion:'init_rutinas_config',descripcion:'Tabla de rutinas inicializada en Firestore',fecha:new Date().toISOString(),autor:auth.currentUser.email});
+      showToast('Rutinas inicializadas en Firestore','success');window.loadRutinasTab();
+    }catch(e){showToast('Error: '+e.message,'error');}
+  };
+  window.iniciarModRutinas=async function(){
+    if(!auth.currentUser||auth.currentUser.uid!==MASTER_UID){showToast('Solo el Admin Maestro puede modificar las rutinas','error');return;}
+    if(!await showConfirm('ATENCI\u00d3N: Modificar las rutinas afecta la recomendaci\u00f3n semanal de TODOS los miembros.\nSe enviar\u00e1 un c\u00f3digo de verificaci\u00f3n a tu email. \u00bfContinuar?'))return;
+    var code=Math.floor(100000+Math.random()*900000).toString();_rCode=code;
+    try{
+      var resp=await fetch('/api/send-delete-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,email:auth.currentUser.email,secret:'bepwr2026notify'})});
+      if(!resp.ok)throw new Error('Error al enviar c\u00f3digo');
+      var ov=document.createElement('div');ov.id='rutinas-ov';
+      ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+      var box=document.createElement('div');box.style.cssText='background:#1a1a1a;border:1px solid #FF5C1A55;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center';
+      var lbl=document.createElement('div');lbl.style.cssText='font-size:10px;color:#FF5C1A;font-family:Space Mono,monospace;letter-spacing:1.5px;margin-bottom:12px';lbl.textContent='VERIFICACI\u00d3N DE IDENTIDAD';
+      var ttl=document.createElement('div');ttl.style.cssText='font-size:15px;color:#fff;font-weight:600;margin-bottom:8px';ttl.textContent='C\u00f3digo de confirmaci\u00f3n';
+      var sub=document.createElement('div');sub.style.cssText='font-size:13px;color:#aaa;margin-bottom:20px';sub.innerHTML='Ingresa el c\u00f3digo enviado a<br><strong>'+auth.currentUser.email+'</strong>';
+      var inp=document.createElement('input');inp.id='rutinas-ov-inp';inp.type='text';inp.maxLength=6;inp.placeholder='000000';
+      inp.style.cssText='width:100%;background:#111;border:1px solid #444;color:#fff;font-size:28px;text-align:center;padding:14px;border-radius:10px;margin-bottom:10px;font-family:Space Mono,monospace;box-sizing:border-box;letter-spacing:8px';
+      var err2=document.createElement('div');err2.id='rutinas-ov-err';err2.style.cssText='color:#f87171;font-size:12px;margin-bottom:14px;min-height:16px';
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:10px';
+      var bCan=document.createElement('button');bCan.textContent='CANCELAR';bCan.style.cssText='flex:1;background:#2a2a2a;border:1px solid #444;color:#aaa;padding:12px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace;font-size:11px';bCan.onclick=function(){var o=document.getElementById('rutinas-ov');if(o)o.remove();};
+      var bVer=document.createElement('button');bVer.textContent='VERIFICAR';bVer.style.cssText='flex:1;background:#FF5C1A;border:none;color:#fff;font-weight:700;padding:12px;border-radius:10px;cursor:pointer;font-family:Space Mono,monospace;font-size:11px';bVer.onclick=window.verificarRutinas;
+      row.appendChild(bCan);row.appendChild(bVer);
+      box.appendChild(lbl);box.appendChild(ttl);box.appendChild(sub);box.appendChild(inp);box.appendChild(err2);box.appendChild(row);
+      ov.appendChild(box);document.body.appendChild(ov);
+      setTimeout(function(){var i=document.getElementById('rutinas-ov-inp');if(i)i.focus();},100);
+    }catch(e){showToast('Error: '+e.message,'error');}
+  };
+  window.verificarRutinas=function(){
+    var val=(document.getElementById('rutinas-ov-inp')||{}).value||'';
+    var err=document.getElementById('rutinas-ov-err');
+    if(val.trim()!==_rCode){if(err)err.textContent='C\u00f3digo incorrecto';return;}
+    var ov=document.getElementById('rutinas-ov');if(ov)ov.remove();
+    _edit=true;_renderTable();
+    var bM=document.getElementById('btn-mod-rutinas'),bS=document.getElementById('btn-save-rutinas'),bC=document.getElementById('btn-cancel-rutinas');
+    if(bM)bM.style.display='none';if(bS)bS.style.display='inline-block';if(bC)bC.style.display='inline-block';
+    showToast('Modo edici\u00f3n activado','success');
+  };
+  window.cancelarEditRutinas=function(){
+    _edit=false;_renderTable();
+    var bM=document.getElementById('btn-mod-rutinas'),bS=document.getElementById('btn-save-rutinas'),bC=document.getElementById('btn-cancel-rutinas');
+    if(bM)bM.style.display='inline-block';if(bS)bS.style.display='none';if(bC)bC.style.display='none';
+  };
+  window.guardarRutinas=async function(){
+    if(!_edit)return;
+    var objs=Object.keys(_MIX_DEF),ages=['<30','30-45','45+'],newMix={},errors=[];
+    objs.forEach(function(obj,oi){
+      newMix[obj]={};
+      ages.forEach(function(ge,gi){
+        newMix[obj][ge]=[];
+        for(var ei=0;ei<3;ei++){
+          var inp=document.getElementById('rc-'+oi+'-'+gi+'-'+ei);
+          if(!inp){newMix[obj][ge].push((_mix[obj]&&_mix[obj][ge]&&_mix[obj][ge][ei])||[]);return;}
+          var val=inp.value.trim();
+          if(!val){newMix[obj][ge].push([]);return;}
+          var arr=textToMix(val);
+          if(!arr||!arr.length){errors.push(obj+' / '+ge+' / E'+(ei+1)+': "'+val+'"');newMix[obj][ge].push((_mix[obj]&&_mix[obj][ge]&&_mix[obj][ge][ei])||[]);}
+          else{newMix[obj][ge].push(arr);}
+        }
+      });
+    });
+    if(errors.length){if(!await showConfirm('No se pudieron interpretar '+errors.length+' celda(s):\n'+errors.slice(0,5).join('\n')+'\n\nEsas celdas conservar\u00e1n su valor anterior. \u00bfContinuar de todos modos?'))return;}
+    if(!await showConfirm('CONFIRMACI\u00d3N FINAL: La tabla de rutinas ser\u00e1 actualizada en Firestore.\nEsto afecta las recomendaciones de TODOS los miembros. \u00bfConfirmar?'))return;
+    try{
+      var snap=await db.collection('config').doc('rutinas').get();
+      var ver=(snap.exists?(snap.data().version||1):0)+1;
+      await db.collection('config').doc('rutinas').set({mix:newMix,version:ver,actualizado:new Date().toISOString(),actualizadoPor:auth.currentUser.uid});
+      await db.collection('bitacora').add({accion:'modificar_rutinas_config',descripcion:'Tabla de rutinas actualizada (v'+ver+')',fecha:new Date().toISOString(),autor:auth.currentUser.email});
+      _mix=newMix;window._rutinasMixFS=newMix;
+      window.cancelarEditRutinas();
+      showToast('Rutinas guardadas en Firestore (v'+ver+')','success');
+      window.loadRutinasTab();
+    }catch(e){showToast('Error al guardar: '+e.message,'error');}
+  };
+})();<!DOCTYPE html>
 <html lang="es">
 <head>
 <script>
@@ -826,15 +969,25 @@
     </div>
   </div>
   <div id="section-rutina" style="display:none;padding:20px 28px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:10px">
       <div>
-        <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Rutinas por Objetivo</h2>
-        <p style="font-size:13px;color:#888;margin:0">Edita la rutina recomendada para cada objetivo y rango de edad.</p>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5C1A;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">&#x1F4DD; Tabla Maestra</div>
+        <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0">Rutinas por Objetivo</h2>
       </div>
-      <button onclick="guardarRutinas()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">Guardar cambios</button>
+      <div id="rutinas-fuente-badge" style="font-size:10px;font-family:'Space Mono',monospace;padding:4px 10px;border-radius:20px;background:#222;border:1px solid #333;color:#888">Cargando...</div>
     </div>
-    <div id="rutinas-status" style="display:none;font-size:12px;margin-bottom:8px"></div>
+    <p style="font-size:12px;color:#666;margin:0 0 16px;font-family:'Space Mono',monospace">Solo el Admin Maestro puede modificar esta tabla. &#x1F512;</p>
+    <div id="rutinas-acciones" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <button id="btn-init-rutinas" onclick="window.initRutinasFirestore()" style="padding:10px 18px;background:#FF5C1A22;color:#FF5C1A;border:1px solid #FF5C1A55;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">+ INICIALIZAR EN FIRESTORE</button>
+      <button id="btn-mod-rutinas" onclick="window.iniciarModRutinas()" style="padding:10px 18px;background:#222;color:#aaa;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;display:none">&#x270F;&#xFE0F; MODIFICAR RUTINAS</button>
+      <button id="btn-save-rutinas" onclick="window.guardarRutinas()" style="display:none;padding:10px 18px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;font-weight:700">&#x1F4BE; GUARDAR CAMBIOS</button>
+      <button id="btn-cancel-rutinas" onclick="window.cancelarEditRutinas()" style="display:none;padding:10px 18px;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:10px;font-family:'Space Mono',monospace;font-size:11px;cursor:pointer">CANCELAR</button>
+    </div>
     <div id="rutina-config-table" style="overflow-x:auto"></div>
+    <div id="rutinas-leyenda" style="margin-top:12px;padding:10px 14px;background:#0d0d0d;border:1px solid #1f1f1f;border-radius:10px;font-size:11px;font-family:'Space Mono',monospace;color:#555;line-height:1.7;display:none">
+      Clases: <span style="color:#ccc">Upper</span> &middot; <span style="color:#ccc">Lower</span> &middot; <span style="color:#ccc">Full Body</span> &middot; <span style="color:#ccc">Glutes</span> &middot; <span style="color:#ccc">Women 50+</span> &middot; <span style="color:#ccc">PWR Yoga</span><br>
+      Formato: <span style="color:#FF5C1A">Full Body (2x) + Lower</span> &nbsp;&middot;&nbsp; <span style="color:#FF5C1A">Upper + Lower + Full Body</span>
+    </div>
   </div>
 
 </div>

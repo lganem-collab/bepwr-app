@@ -2298,8 +2298,7 @@ async function loadMetodoData() {
         if(dd.fecha){const f=dd.fecha;if(f.toDate)ts=f.toDate().getTime();else if(typeof f==='string'){const mx=f.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);if(mx&&MESES3[mx[2]]!==undefined)ts=new Date(parseInt(mx[3]),MESES3[mx[2]],parseInt(mx[1])).getTime();else try{ts=new Date(f).getTime();}catch(e){}}}
         return {...dd,_ts:ts};
       }).sort((a,b)=>b._ts-a._ts);
-    } catch(e) {}
-return {
+
   objetivo: (d.objetivo && d.objetivo.meta) ? d.objetivo.meta : (d.meta || null),
   nombre: d.nombre || d.name || '',
   edad: d.edad || null,
@@ -2480,7 +2479,7 @@ function renderPruebaPeso(data) {
   var _CL_NOM = {upper_body:'Upper Body',lower_body:'Lower Body',full_body_core:'Full Body + Core',full_body_glutes:'Full Body + Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
   var _CL_COL = {upper_body:'#3B8BD4',lower_body:'#1D9E75',full_body_core:'#FF5C1A',full_body_glutes:'#9F7AEA',women50:'#F472B6',pwr_yoga:'#F59E0B'};
   var _ETAPAS_DEF = [null,{n:'Adaptación Neural',c:'#4ade80',d:'Semanas 1-3 · Base y técnica'},{n:'Adaptación Muscular',c:'#FF5C1A',d:'Semanas 4-12 · Construyendo fuerza'},{n:'Optimización',c:'#9F7AEA',d:'Semana 13+ · Variedad y progresión'}];
-  var _MIX = {
+  var _MIX = window._rutinasMixFS || {
     'Bajar grasa / bajar de peso':{'<30':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','full_body_core','lower_body','upper_body']],'30-45':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','lower_body','upper_body']],'45+':[['women50','full_body_core'],['women50','women50','full_body_core'],['women50','women50','full_body_core','lower_body']]},
     'Ganar músculo / recomposición':{'<30':[['upper_body','lower_body'],['upper_body','upper_body','lower_body','lower_body'],['upper_body','upper_body','lower_body','lower_body','full_body_core']],'30-45':[['upper_body','lower_body'],['upper_body','lower_body','full_body_core'],['upper_body','upper_body','lower_body','lower_body']],'45+':[['upper_body','lower_body'],['upper_body','lower_body'],['upper_body','lower_body','full_body_core']]},
     'Salud metabólica / salud general':{'<30':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','lower_body','upper_body']],'30-45':[['full_body_core','women50'],['full_body_core','full_body_core','women50'],['full_body_core','lower_body','women50']],'45+':[['women50','full_body_core'],['women50','women50','full_body_core'],['women50','women50','women50']]},
