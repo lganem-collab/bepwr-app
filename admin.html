@@ -2035,7 +2035,8 @@ if (user && user.uid === MASTER_UID) {
         <div class="field"><label>Alias</label><input type="text" id="edit-alias" value="${(m.alias||'').replace(/"/g,'&quot;')}" /></div>
       </div>
       <div class="field-row">
-        <div class="field" style="grid-column:span 2"><label>Email</label><input type="email" id="edit-email" value="${(m.email||'').replace(/"/g,'&quot;')}" /></div>
+        <div class="field"><label>Email</label><input type="email" id="edit-email" value="${(m.email||'').replace(/"/g,'&quot;')}" /></div>
+        <div class="field"><label>Confirmar email</label><input type="email" id="edit-email-confirm" value="${(m.email||'').replace(/"/g,'&quot;')}" /></div>
       </div>
       <div class="field-row">
         <div class="field"><label>Teléfono</label><input type="tel" id="edit-tel" value="${m.telefono||''}" maxlength="10" /></div>
@@ -2115,6 +2116,13 @@ if (user && user.uid === MASTER_UID) {
     const confirmed = await showConfirm('¿Confirmas que deseas editar los datos de este miembro?');
     if (!confirmed) return;
     try {
+      const _emailVal = document.getElementById('edit-email').value.trim();
+      const _emailConf = document.getElementById('edit-email-confirm').value.trim();
+      if (_emailVal !== _emailConf) {
+        const errEl = document.getElementById('edit-member-error');
+        if (errEl) errEl.textContent = 'Los emails no coinciden';
+        return;
+      }
       const _mOrig = (window._allMembers||[]).find(x=>x.uid===uid)||{};
       const activoVal = document.getElementById('edit-activo')?.value === 'false' ? false : true;
       const newMeta = document.getElementById('edit-meta').value;
