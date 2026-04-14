@@ -2306,6 +2306,17 @@ async function loadMetodoData() {
       if (gSnap.exists()) guiaUrls = gSnap.data() || {};
     } catch (e) {}
 
+    // Cargar config/clases desde Firestore
+    if (!window._clasesConfig) {
+      try {
+        const clSnap = await window.getDoc(window.doc(db, 'config', 'clases'));
+        if (clSnap.exists()) {
+          const cd = clSnap.data();
+          if (cd && cd.lista) window._clasesConfig = cd.lista.filter(function(c){ return c.activa; });
+        }
+      } catch(e) {}
+    }
+
     // Cargar config/objetivos desde Firestore (fuente única de verdad)
     if (!window._objConfig) {
       try {
@@ -2510,8 +2521,21 @@ function renderPruebaPeso(data) {
 
   // ── MOTOR DE RUTINA bePWR ──────────────────────────────────────
   var _DIAS_NOM = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  var _CL_NOM = {upper_body:'Upper Body',lower_body:'Lower Body',full_body:'Full Body',full_body_core:'Full Body + Core',full_body_glutes:'Full Body + Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
-  var _CL_COL = {upper_body:'#3B8BD4',lower_body:'#1D9E75',full_body:'#FF8C42',full_body_core:'#FF5C1A',full_body_glutes:'#9F7AEA',women50:'#F472B6',pwr_yoga:'#F59E0B'};
+  // _CL_NOM y _CL_COL se construyen desde config/clases (Firestore) con fallback hardcoded
+  var _CL_NOM_DEF = {upper_body:'Upper Body',lower_body:'Lower Body',full_body:'Full Body',full_body_core:'Full Body + Core',full_body_glutes:'Full Body + Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
+  var _CL_COL_DEF = {upper_body:'#3B8BD4',lower_body:'#1D9E75',full_body:'#FF8C42',full_body_core:'#FF5C1A',full_body_glutes:'#9F7AEA',women50:'#F472B6',pwr_yoga:'#F59E0B'};
+  var _CL_NOM = (function(){
+    if(!window._clasesConfig)return _CL_NOM_DEF;
+    var m={};
+    window._clasesConfig.forEach(function(c){if(c.id&&c.nombre)m[c.id]=c.nombre;});
+    return Object.keys(m).length?m:_CL_NOM_DEF;
+  })();
+  var _CL_COL = (function(){
+    if(!window._clasesConfig)return _CL_COL_DEF;
+    var m={};
+    window._clasesConfig.forEach(function(c){if(c.id&&c.color)m[c.id]=c.color;});
+    return Object.keys(m).length?m:_CL_COL_DEF;
+  })();
   var _ETAPAS_DEF = [null,{n:'Adaptación Neural',c:'#4ade80',d:'Semanas 1-3 · Base y técnica'},{n:'Adaptación Muscular',c:'#FF5C1A',d:'Semanas 4-12 · Construyendo fuerza'},{n:'Optimización',c:'#9F7AEA',d:'Semana 13+ · Variedad y progresión'}];
   // Construir _MIX y _COMPL desde Firestore si está disponible
   var _MIX = (function() {
