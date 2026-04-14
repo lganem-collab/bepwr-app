@@ -4360,7 +4360,6 @@ var METRIC_DEFS=[
   {key:'cintura_cm',label:'Cintura',unit:'cm',direction:'down',threshold:2.0},
   {key:'cadera_cm',label:'Cadera',unit:'cm',direction:'compound',threshold:1.5},
   {key:'muslo_cm',label:'Muslo',unit:'cm',direction:'up',threshold:1.5},
-  {key:'muslo_cm',label:'Muslo',unit:'cm',direction:'up',threshold:1.5},
   {key:'pantorrilla_cm',label:'Pantorrilla',unit:'cm',direction:'up',threshold:0.8},
   {key:'mancuerna_lb',label:'Prueba de Peso',unit:'lb',direction:'up',threshold:5.0}
 ];
@@ -4466,6 +4465,8 @@ function interpret(key,score){
     grasa_visceral:pos?'Reducción de grasa visceral — impacto cardiometabólico positivo':'⚠ Aumento de grasa visceral — riesgo cardiometabólico',
     inbody_score:pos?'InBody Score mejorando':'InBody Score bajando',
     biceps_cm:pos?'Ganancia de perímetro bíceps':'Reducción de bíceps',
+    muslo_cm:pos?'Ganancia de perímetro de muslo — tren inferior favorable':'Reducción de perímetro de muslo',
+    pantorrilla_cm:pos?'Ganancia de perímetro de pantorrilla':'Reducción de pantorrilla',
     abdomen_cm:pos?'Reducción de abdomen':'Aumento de abdomen',
     cintura_cm:pos?'Reducción de cintura — favorable':'⚠ Aumento de cintura',
     cadera_cm:pos?(Math.abs(score)>0.5?'Cadera: señal de ganancia muscular glútea':'Cadera: cambio levemente favorable'):(Math.abs(score)>0.5?'⚠ Cadera: señal de acumulación de grasa o pérdida de masa':'Cadera: cambio levemente desfavorable'),
