@@ -837,6 +837,28 @@
           </div>
         </div>
       </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Key interno <span style="color:#555">(usado por el motor)</span></label>
+        <input id="cls-key" type="text" placeholder="Ej: upper_body, women50" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box;font-family:Space Mono,monospace">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:6px">G&#xE9;nero</label>
+          <select id="cls-genero" style="width:100%;background:#111;border:1px solid #333;border-radius:6px;padding:8px;color:#f0f0f0;font-size:13px;box-sizing:border-box">
+            <option value="todos">Todos</option>
+            <option value="femenino">Solo femenino</option>
+            <option value="masculino">Solo masculino</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:6px">Grupos de edad</label>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-top:2px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;cursor:pointer"><input type="checkbox" id="cls-edad-sub30" value="<30" checked style="accent-color:#FF5C1A"> &lt;30</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;cursor:pointer"><input type="checkbox" id="cls-edad-mid" value="30-45" checked style="accent-color:#FF5C1A"> 30-45</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;cursor:pointer"><input type="checkbox" id="cls-edad-senior" value="45+" checked style="accent-color:#FF5C1A"> 45+</label>
+          </div>
+        </div>
+      </div>
       <div id="modal-clase-error" style="color:#f87171;font-size:12px;margin-bottom:8px;display:none"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button onclick="cerrarModalClase()" style="background:none;border:1px solid #444;border-radius:8px;padding:8px 16px;color:#ccc;font-size:13px;cursor:pointer">Cancelar</button>
@@ -4359,6 +4381,11 @@ function abrirModalClase(idx){
   document.getElementById('cls-activa-label').style.color='#4ade80';
   document.getElementById('cls-edit-idx').value='-1';
   document.getElementById('modal-clase-error').style.display='none';
+  document.getElementById('cls-key').value='';
+  document.getElementById('cls-genero').value='todos';
+  document.getElementById('cls-edad-sub30').checked=true;
+  document.getElementById('cls-edad-mid').checked=true;
+  document.getElementById('cls-edad-senior').checked=true;
   if(typeof idx==='number'&&idx>=0){
     var lista=window._clasesData||[];
     var c=lista[idx];
@@ -4373,6 +4400,11 @@ function abrirModalClase(idx){
       document.getElementById('cls-edit-idx').value=String(idx);
     }
     document.getElementById('modal-clase-title').textContent='Editar Clase';
+    document.getElementById('cls-key').value=c.id||'';
+    document.getElementById('cls-genero').value=c.genero||'todos';
+    document.getElementById('cls-edad-sub30').checked=!c.edades||c.edades.indexOf('<30')!==-1;
+    document.getElementById('cls-edad-mid').checked=!c.edades||c.edades.indexOf('30-45')!==-1;
+    document.getElementById('cls-edad-senior').checked=!c.edades||c.edades.indexOf('45+')!==-1;
   }else{
     document.getElementById('modal-clase-title').textContent='Nueva Clase';
   }
@@ -4395,18 +4427,25 @@ async function guardarClase(){
   var categoria=document.getElementById('cls-categoria').value;
   var color=document.getElementById('cls-color').value;
   var activa=document.getElementById('cls-activa').checked;
+  var keyInterno=(document.getElementById('cls-key').value||'').trim().toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/^_|_$/g,'');
+  var genero=document.getElementById('cls-genero').value;
+  var edades=[];
+  if(document.getElementById('cls-edad-sub30').checked)edades.push('<30');
+  if(document.getElementById('cls-edad-mid').checked)edades.push('30-45');
+  if(document.getElementById('cls-edad-senior').checked)edades.push('45+');
   var errEl=document.getElementById('modal-clase-error');
   if(!nombre){errEl.textContent='El nombre es obligatorio';errEl.style.display='block';_guardandoClase=false;return;}
   errEl.style.display='none';
-  var id=nombre.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+  var id=keyInterno||nombre.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
   try{
     var snap=await firebase.firestore().collection('config').doc('clases').get();
     var lista=snap.exists?(snap.data().lista||[]):[];
     var editIdx=parseInt(document.getElementById('cls-edit-idx').value);
+    var claseObj={id:id,nombre:nombre,descripcion:descripcion,categoria:categoria,color:color,activa:activa,genero:genero,edades:edades};
     if(editIdx>=0&&editIdx<lista.length){
-      lista[editIdx]={id:id,nombre:nombre,descripcion:descripcion,categoria:categoria,color:color,activa:activa};
+      lista[editIdx]=claseObj;
     }else{
-      lista.push({id:id,nombre:nombre,descripcion:descripcion,categoria:categoria,color:color,activa:activa});
+      lista.push(claseObj);
     }
     await firebase.firestore().collection('config').doc('clases').set({lista:lista},{merge:true});
     cerrarModalClase();
