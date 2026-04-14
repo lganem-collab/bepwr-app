@@ -2104,7 +2104,26 @@ let cachedMetricas = [];
     }
   };
 /* ── Configuración por objetivo ───────────────────────────── */
-const OBJETIVO_CONFIG = {
+// Construir OBJETIVO_CONFIG desde Firestore o usar hardcoded como fallback
+function _buildObjetivoConfig() {
+  if (window._objConfig) {
+    const cfg = {};
+    Object.values(window._objConfig).forEach(function(o) {
+      cfg[o.label] = {
+        label: o.label, color: o.color, pdf: o.pdfKey,
+        intervalo: o.intervalo || 14,
+        rutina: o.mix ? {
+          sub30: { total: (o.mix['<30']&&o.mix['<30'].e2) ? (o.mix['<30'].e2.length)+' clases/sem' : '3 clases/sem', clases: [], complemento: (o.complemento&&o.complemento['<30'])||null },
+          mid:   { total: (o.mix['30-45']&&o.mix['30-45'].e2) ? (o.mix['30-45'].e2.length)+' clases/sem' : '3 clases/sem', clases: [], complemento: (o.complemento&&o.complemento['30-45'])||null },
+          senior:{ total: (o.mix['45+']&&o.mix['45+'].e2) ? (o.mix['45+'].e2.length)+' clases/sem' : '3 clases/sem', clases: [], complemento: (o.complemento&&o.complemento['45+'])||null }
+        } : null
+      };
+    });
+    return cfg;
+  }
+  return null;
+}
+const OBJETIVO_CONFIG = _buildObjetivoConfig() || {
         'Bajar grasa / bajar de peso': {
           label: 'Bajar de Peso', color: '#FF6B35', pdf: 'bajar-de-peso',
           rutina: {
@@ -2286,6 +2305,20 @@ async function loadMetodoData() {
       const gSnap = await getDoc(doc(db, 'config', 'guias'));
       if (gSnap.exists()) guiaUrls = gSnap.data() || {};
     } catch (e) {}
+
+    // Cargar config/objetivos desde Firestore (fuente única de verdad)
+    if (!window._objConfig) {
+      try {
+        const objSnap = await window.getDoc(window.doc(db, 'config', 'objetivos'));
+        if (objSnap.exists()) {
+          const od = objSnap.data();
+          if (od && od.objetivos) {
+            window._objConfig = od.objetivos;
+            window._objLista = od.lista || Object.keys(od.objetivos);
+          }
+        }
+      } catch(e) { console.warn('config/objetivos no disponible, usando hardcoded'); }
+    }
 
     // Cargar todas las metricas para el motor de rutina
     let _metricsAll = [];
@@ -2480,7 +2513,20 @@ function renderPruebaPeso(data) {
   var _CL_NOM = {upper_body:'Upper Body',lower_body:'Lower Body',full_body_core:'Full Body + Core',full_body_glutes:'Full Body + Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
   var _CL_COL = {upper_body:'#3B8BD4',lower_body:'#1D9E75',full_body_core:'#FF5C1A',full_body_glutes:'#9F7AEA',women50:'#F472B6',pwr_yoga:'#F59E0B'};
   var _ETAPAS_DEF = [null,{n:'Adaptación Neural',c:'#4ade80',d:'Semanas 1-3 · Base y técnica'},{n:'Adaptación Muscular',c:'#FF5C1A',d:'Semanas 4-12 · Construyendo fuerza'},{n:'Optimización',c:'#9F7AEA',d:'Semana 13+ · Variedad y progresión'}];
-  var _MIX = {
+  // Construir _MIX y _COMPL desde Firestore si está disponible
+  var _MIX = (function() {
+    if (!window._objConfig) return null;
+    var m = {};
+    Object.values(window._objConfig).forEach(function(o) {
+      if (!o.mix) return;
+      m[o.label] = {
+        '<30':   [o.mix['<30'].e1||[],   o.mix['<30'].e2||[],   o.mix['<30'].e3||[]],
+        '30-45': [o.mix['30-45'].e1||[], o.mix['30-45'].e2||[], o.mix['30-45'].e3||[]],
+        '45+':   [o.mix['45+'].e1||[],   o.mix['45+'].e2||[],   o.mix['45+'].e3||[]]
+      };
+    });
+    return Object.keys(m).length ? m : null;
+  })() || {
     'Bajar grasa / bajar de peso':{'<30':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','full_body_core','lower_body','upper_body']],'30-45':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','lower_body','upper_body']],'45+':[['women50','full_body_core'],['women50','women50','full_body_core'],['women50','women50','full_body_core','lower_body']]},
     'Ganar músculo / recomposición':{'<30':[['upper_body','lower_body'],['upper_body','upper_body','lower_body','lower_body'],['upper_body','upper_body','lower_body','lower_body','full_body_core']],'30-45':[['upper_body','lower_body'],['upper_body','lower_body','full_body_core'],['upper_body','upper_body','lower_body','lower_body']],'45+':[['upper_body','lower_body'],['upper_body','lower_body'],['upper_body','lower_body','full_body_core']]},
     'Salud metabólica / salud general':{'<30':[['full_body_core','lower_body'],['full_body_core','full_body_core','lower_body'],['full_body_core','lower_body','upper_body']],'30-45':[['full_body_core','women50'],['full_body_core','full_body_core','women50'],['full_body_core','lower_body','women50']],'45+':[['women50','full_body_core'],['women50','women50','full_body_core'],['women50','women50','women50']]},
@@ -2495,7 +2541,15 @@ function renderPruebaPeso(data) {
     'Incrementar performance \u00B7 F\u00FAtbol':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]},
     'Incrementar performance \u00B7 Otro':{'<30':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'30-45':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']],'45+':[['full_body_core'],['lower_body','full_body_core'],['lower_body','full_body_core']]}
   };
-  var _COMPL = {
+  var _COMPL = (function() {
+    if (!window._objConfig) return null;
+    var c = {};
+    Object.values(window._objConfig).forEach(function(o) {
+      if (!o.complemento) return;
+      c[o.label] = o.complemento;
+    });
+    return Object.keys(c).length ? c : null;
+  })() || {
     'Bajar grasa / bajar de peso':{'<30':'Cardio zona 2: trotar suave o bicicleta, 30-40 min, 2x/sem','30-45':'Caminata diaria 30 min + cardio zona 2, 1-2x/sem','45+':'Caminata diaria 30 min'},
     'Salud metabólica / salud general':{'<30':'Caminata 5-6 días, 20-30 min','30-45':'Caminata diaria 30 min','45+':'Caminata diaria 30 min'},
     'Rendimiento funcional':{'<30':'Hidratación 40-50 ml/kg \u00B7 Sueño 8h \u00B7 Carbos altos','30-45':'Recuperación activa \u00B7 Sueño no negociable','45+':'Movilidad diaria \u00B7 Sueño 8h \u00B7 Evitar lesiones'},
