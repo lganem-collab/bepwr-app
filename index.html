@@ -4331,19 +4331,19 @@ function mapearObjetivo(m){return META_MAP[m]||'salud_general';}
 
 // ── Pesos por objetivo (suman 100 cada uno) ───────────────────────────
 var WEIGHTS={
-  bajar_grasa:{peso:8,masa_musculo:12,grasa_corporal_kg:13,imc:5,pgc:14,grasa_visceral:11,inbody_score:7,biceps_cm:2,muslo_cm:1,abdomen_cm:8,cintura_cm:12,cadera_cm:1,pantorrilla_cm:3,mancuerna_lb:3},
-  ganar_musculo:{peso:3,masa_musculo:19,muslo_cm:5,grasa_corporal_kg:7,imc:2,pgc:8,grasa_visceral:6,inbody_score:13,biceps_cm:8,abdomen_cm:4,cintura_cm:5,cadera_cm:4,pantorrilla_cm:7,mancuerna_lb:11},
-  salud_general:{peso:6,masa_musculo:11,grasa_corporal_kg:7,imc:5,pgc:11,grasa_visceral:18,inbody_score:9,biceps_cm:1,abdomen_cm:9,muslo_cm:2,cintura_cm:13,cadera_cm:2,pantorrilla_cm:3,mancuerna_lb:4},
-  estetico:{peso:3,masa_musculo:12,muslo_cm:6,grasa_corporal_kg:11,imc:2,pgc:13,grasa_visceral:6,inbody_score:9,biceps_cm:8,abdomen_cm:9,cintura_cm:10,cadera_cm:6,pantorrilla_cm:5,mancuerna_lb:4},
-  rendimiento:{peso:1,masa_musculo:18,grasa_corporal_kg:7,imc:1,pgc:8,grasa_visceral:7,inbody_score:15,biceps_cm:6,abdomen_cm:5,cintura_cm:6,cadera_cm:2,muslo_cm:6,pantorrilla_cm:7,mancuerna_lb:14},
-  dep_ciclismo:{peso:8,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:11,grasa_visceral:7,inbody_score:12,biceps_cm:2,abdomen_cm:6,cintura_cm:6,cadera_cm:3,muslo_cm:5,pantorrilla_cm:11,mancuerna_lb:5},
-  dep_correr:{peso:10,masa_musculo:13,grasa_corporal_kg:10,imc:5,pgc:12,grasa_visceral:8,inbody_score:11,biceps_cm:2,abdomen_cm:7,cintura_cm:7,cadera_cm:3,muslo_cm:5,pantorrilla_cm:7,mancuerna_lb:3},
-  dep_futbol:{peso:6,masa_musculo:15,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:13,biceps_cm:5,abdomen_cm:7,cintura_cm:7,cadera_cm:3,muslo_cm:5,pantorrilla_cm:7,mancuerna_lb:4},
-  dep_golf:{peso:5,masa_musculo:12,grasa_corporal_kg:8,imc:4,pgc:9,grasa_visceral:9,inbody_score:11,biceps_cm:8,muslo_cm:2,abdomen_cm:11,cintura_cm:12,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
-  dep_natacion:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,muslo_cm:3,biceps_cm:12,abdomen_cm:8,cintura_cm:7,cadera_cm:4,pantorrilla_cm:4,mancuerna_lb:2},
-  dep_padel:{peso:5,masa_musculo:14,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,muslo_cm:3,biceps_cm:10,abdomen_cm:8,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:1},
-  dep_tenis:{peso:5,masa_musculo:13,grasa_corporal_kg:8,imc:4,pgc:10,grasa_visceral:7,inbody_score:12,muslo_cm:3,biceps_cm:10,abdomen_cm:9,cintura_cm:8,cadera_cm:3,pantorrilla_cm:7,mancuerna_lb:2},
-  dep_otro:{peso:5,masa_musculo:13,grasa_corporal_kg:9,imc:4,pgc:10,grasa_visceral:8,inbody_score:13,muslo_cm:3,biceps_cm:5,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:5}
+  bajar_grasa:{peso:6,masa_musculo:10,grasa_corporal_kg:12,imc:4,pgc:15,grasa_visceral:10,inbody_score:6,muslo_cm:2,biceps_cm:2,abdomen_cm:8,cintura_cm:11,cadera_cm:2,pantorrilla_cm:4,mancuerna_lb:8},
+  ganar_musculo:{peso:3,masa_musculo:24,grasa_corporal_kg:5,imc:2,pgc:6,grasa_visceral:4,inbody_score:6,muslo_cm:6,biceps_cm:11,abdomen_cm:3,cintura_cm:4,cadera_cm:3,pantorrilla_cm:9,mancuerna_lb:14},
+  salud_general:{peso:5,masa_musculo:10,grasa_corporal_kg:6,imc:5,pgc:10,grasa_visceral:19,inbody_score:6,muslo_cm:2,biceps_cm:1,abdomen_cm:11,cintura_cm:14,cadera_cm:2,pantorrilla_cm:4,mancuerna_lb:5},
+  estetico:{peso:3,masa_musculo:13,grasa_corporal_kg:10,imc:2,pgc:15,grasa_visceral:4,inbody_score:6,muslo_cm:7,biceps_cm:9,abdomen_cm:10,cintura_cm:9,cadera_cm:6,pantorrilla_cm:4,mancuerna_lb:2},
+  rendimiento:{peso:2,masa_musculo:21,grasa_corporal_kg:5,imc:1,pgc:7,grasa_visceral:5,inbody_score:7,muslo_cm:9,biceps_cm:6,abdomen_cm:5,cintura_cm:5,cadera_cm:2,pantorrilla_cm:11,mancuerna_lb:14},
+  dep_ciclismo:{peso:8,masa_musculo:12,grasa_corporal_kg:7,imc:4,pgc:10,grasa_visceral:6,inbody_score:7,muslo_cm:9,biceps_cm:1,abdomen_cm:5,cintura_cm:5,cadera_cm:2,pantorrilla_cm:18,mancuerna_lb:6},
+  dep_correr:{peso:13,masa_musculo:12,grasa_corporal_kg:8,imc:5,pgc:12,grasa_visceral:6,inbody_score:6,muslo_cm:6,biceps_cm:1,abdomen_cm:5,cintura_cm:5,cadera_cm:2,pantorrilla_cm:13,mancuerna_lb:6},
+  dep_futbol:{peso:5,masa_musculo:14,grasa_corporal_kg:7,imc:3,pgc:9,grasa_visceral:6,inbody_score:7,muslo_cm:11,biceps_cm:4,abdomen_cm:6,cintura_cm:6,cadera_cm:2,pantorrilla_cm:14,mancuerna_lb:6},
+  dep_golf:{peso:4,masa_musculo:9,grasa_corporal_kg:6,imc:3,pgc:8,grasa_visceral:8,inbody_score:6,muslo_cm:4,biceps_cm:8,abdomen_cm:14,cintura_cm:13,cadera_cm:3,pantorrilla_cm:3,mancuerna_lb:11},
+  dep_natacion:{peso:4,masa_musculo:18,grasa_corporal_kg:7,imc:3,pgc:9,grasa_visceral:5,inbody_score:7,muslo_cm:4,biceps_cm:12,abdomen_cm:6,cintura_cm:5,cadera_cm:3,pantorrilla_cm:6,mancuerna_lb:11},
+  dep_padel:{peso:4,masa_musculo:15,grasa_corporal_kg:7,imc:3,pgc:9,grasa_visceral:5,inbody_score:6,muslo_cm:5,biceps_cm:9,abdomen_cm:7,cintura_cm:7,cadera_cm:2,pantorrilla_cm:9,mancuerna_lb:12},
+  dep_tenis:{peso:5,masa_musculo:14,grasa_corporal_kg:7,imc:3,pgc:9,grasa_visceral:5,inbody_score:6,muslo_cm:5,biceps_cm:9,abdomen_cm:7,cintura_cm:6,cadera_cm:2,pantorrilla_cm:10,mancuerna_lb:12},
+  dep_otro:{peso:5,masa_musculo:14,grasa_corporal_kg:8,imc:3,pgc:9,grasa_visceral:7,inbody_score:6,muslo_cm:5,biceps_cm:8,abdomen_cm:7,cintura_cm:7,cadera_cm:3,pantorrilla_cm:10,mancuerna_lb:8}
 };
 
 // ── Definición de métricas ─────────────────────────────────────────────
@@ -4377,6 +4377,32 @@ function parsePesoP(v){
   return null;
 }
 
+function applyDemographicModifiers(basePesos,edad,genero){
+  var e=edad||35,g=genero||'Masculino';
+  var mods={};
+  // Edad >= 50: sarcopenia + riesgo cardiometabolico (Studenski 2011, IDF)
+  if(e>=50){mods.grasa_visceral=(mods.grasa_visceral||1)*1.20;mods.masa_musculo=(mods.masa_musculo||1)*1.15;mods.mancuerna_lb=(mods.mancuerna_lb||1)*1.10;mods.imc=(mods.imc||1)*0.70;}
+  // Edad >= 60: amplifica sarcopenia + predictor de marcha (pantorrilla)
+  if(e>=60){mods.grasa_visceral=(mods.grasa_visceral||1)*1.10;mods.masa_musculo=(mods.masa_musculo||1)*1.09;mods.pantorrilla_cm=(mods.pantorrilla_cm||1)*1.10;}
+  // Genero femenino: WHR (cadera), PGC norms distintas, grasa visceral android (WHO)
+  if(g==='Femenino'){mods.cadera_cm=(mods.cadera_cm||1)*1.40;mods.pgc=(mods.pgc||1)*1.10;mods.grasa_visceral=(mods.grasa_visceral||1)*1.10;}
+  // Genero masculino: distribucion android — cintura es predictor primario (IDF)
+  else if(g==='Masculino'){mods.cintura_cm=(mods.cintura_cm||1)*1.10;mods.grasa_visceral=(mods.grasa_visceral||1)*1.10;}
+  if(!Object.keys(mods).length)return basePesos;
+  var keys=Object.keys(basePesos);
+  var p={};
+  keys.forEach(function(k){p[k]=Math.max(1,Math.round(basePesos[k]*(mods[k]||1)));});
+  // Renormalizar al total original para preservar suma=100
+  var origTotal=keys.reduce(function(s,k){return s+basePesos[k];},0);
+  var newTotal=keys.reduce(function(s,k){return s+p[k];},0);
+  var diff=origTotal-newTotal;
+  if(diff!==0){
+    var unmod=keys.filter(function(k){return !mods[k];}).sort(function(a,b){return basePesos[b]-basePesos[a];});
+    var absorb=unmod.length?unmod[0]:keys.slice().sort(function(a,b){return basePesos[b]-basePesos[a];})[0];
+    p[absorb]=Math.max(1,p[absorb]+diff);
+  }
+  return p;
+}
 function getRanges(edad,genero,altura){
   var altM=(altura||170)/100, esH=genero==='Masculino', esM=genero==='Femenino';
   var imcMin=edad>=50?(esH?23:22):(esH?22:21), imcMax=edad>=50?(esH?27:26):(esH?25:24);
@@ -4454,6 +4480,7 @@ function calcularEvolucion(ant,act,perfil,objKey){
   // Usa pesos de Firestore si están disponibles, si no usa hardcoded
   var pesosFS = window._PESOS_FIRESTORE;
   var pesos=(pesosFS&&pesosFS[objKey])||(pesosFS&&pesosFS.salud_general)||WEIGHTS[objKey]||WEIGHTS.salud_general;
+  pesos=applyDemographicModifiers(pesos,edad,genero);
   var ranges=getRanges(edad,genero,altura);
   var breakdown=[],sumWS=0,sumW=0;
   METRIC_DEFS.forEach(function(def){
