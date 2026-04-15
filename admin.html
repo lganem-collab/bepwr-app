@@ -2025,6 +2025,7 @@ if (user && user.uid === MASTER_UID) {
     } catch(e) { console.error('Error cargando métricas:', e); }
 
     const ultima = metricsAll[0] || null;
+    const anterior = metricsAll.length > 1 ? metricsAll[1] : null;
     const inicial = metricsAll.length > 0 ? metricsAll[metricsAll.length - 1] : null;
 
     function fmtF(f) {
@@ -2066,37 +2067,42 @@ if (user && user.uid === MASTER_UID) {
       </div>`;
     }
 
+    const _ant = anterior || {};
+    const _ult = ultima || {};
     const metricRows = [
-      { label:'Peso (kg)',           iniVal:inicial?.peso,          actVal:ultima?.peso,          inv:!['Ganar m\u00FAsculo / recomposici\u00F3n','Rendimiento funcional'].includes(m.objetivo?.meta||m.meta||'') },
-      { label:'Músculo Esq. (kg)',   iniVal:inicial?.musculo,       actVal:ultima?.musculo,       inv:false },
-      { label:'Grasa Corporal (kg)', iniVal:inicial?.grasaCorporal, actVal:ultima?.grasaCorporal, inv:true  },
-      { label:'IMC',                 iniVal:inicial?.imc,           actVal:ultima?.imc,           inv:true  },
-      { label:'PGC (%)',             iniVal:inicial?.pgc,           actVal:ultima?.pgc,           inv:true  },
-      { label:'Grasa Visceral',      iniVal:inicial?.grasaVisceral, actVal:ultima?.grasaVisceral, inv:true  },
-      { label:'Calificación Inbody', iniVal:inicial?.calificacion,  actVal:ultima?.calificacion,  inv:false },
-      { label:'Bíceps Der. (cm)',    iniVal:inicial?.bicepsDer,     actVal:ultima?.bicepsDer,     inv:false },
-      { label:'Bíceps Izq. (cm)',    iniVal:inicial?.bicepsIzq,     actVal:ultima?.bicepsIzq,     inv:false },
-      { label:'Abdomen (cm)',         iniVal:inicial?.abdomen,       actVal:ultima?.abdomen,       inv:true  },
-      { label:'Cintura (cm)',         iniVal:inicial?.cintura,       actVal:ultima?.cintura,       inv:true  },
-      { label:'Cadera (cm)',          iniVal:inicial?.cadera,        actVal:ultima?.cadera,        inv:true  },
-      { label:'Muslo Der. (cm)',      iniVal:inicial?.musloDer,      actVal:ultima?.musloDer,      inv:false },
-      { label:'Muslo Izq. (cm)',      iniVal:inicial?.musloIzq,      actVal:ultima?.musloIzq,      inv:false },
-      { label:'Pantorrilla Der. (cm)',iniVal:inicial?.pantorrillaDer,actVal:ultima?.pantorrillaDer,inv:false },
-      { label:'Pantorrilla Izq. (cm)',iniVal:inicial?.pantorrillaIzq,actVal:ultima?.pantorrillaIzq,inv:false },
-      { label:'Peso Base Mancuernas',iniVal:inicial?.pruebaPeso,    actVal:ultima?.pruebaPeso,    inv:false, isText:true },
+      { label:'Peso',             iniVal:_ant.peso,           actVal:_ult.peso,           inv:!['Ganar músculo / recomposición','Rendimiento funcional'].includes(m.objetivo?.meta||m.meta||''), unit:'kg' },
+      { label:'Músculo Esq.',     iniVal:_ant.musculo,        actVal:_ult.musculo,        inv:false, unit:'kg' },
+      { label:'Grasa Corporal',   iniVal:_ant.grasaCorporal,  actVal:_ult.grasaCorporal,  inv:true,  unit:'kg' },
+      { label:'IMC',              iniVal:_ant.imc,            actVal:_ult.imc,            inv:true,  unit:'' },
+      { label:'PGC',              iniVal:_ant.pgc,            actVal:_ult.pgc,            inv:true,  unit:'%' },
+      { label:'Grasa Visceral',   iniVal:_ant.grasaVisceral,  actVal:_ult.grasaVisceral,  inv:true,  unit:'' },
+      { label:'Calif. InBody',    iniVal:_ant.calificacion,   actVal:_ult.calificacion,   inv:false, unit:'/100' },
+      { label:'Bíceps Der.',      iniVal:_ant.bicepsDer,      actVal:_ult.bicepsDer,      inv:false, unit:'cm' },
+      { label:'Bíceps Izq.',      iniVal:_ant.bicepsIzq,      actVal:_ult.bicepsIzq,      inv:false, unit:'cm' },
+      { label:'Abdomen',          iniVal:_ant.abdomen,        actVal:_ult.abdomen,        inv:true,  unit:'cm' },
+      { label:'Cintura',          iniVal:_ant.cintura,        actVal:_ult.cintura,        inv:true,  unit:'cm' },
+      { label:'Cadera',           iniVal:_ant.cadera,         actVal:_ult.cadera,         inv:true,  unit:'cm' },
+      { label:'Muslo Der.',       iniVal:_ant.musloDer,       actVal:_ult.musloDer,       inv:false, unit:'cm' },
+      { label:'Muslo Izq.',       iniVal:_ant.musloIzq,       actVal:_ult.musloIzq,       inv:false, unit:'cm' },
+      { label:'Pantorrilla Der.', iniVal:_ant.pantorrillaDer, actVal:_ult.pantorrillaDer, inv:false, unit:'cm' },
+      { label:'Pantorrilla Izq.', iniVal:_ant.pantorrillaIzq, actVal:_ult.pantorrillaIzq, inv:false, unit:'cm' },
+      { label:'Prueba de Peso',   iniVal:_ant.pruebaPeso,     actVal:_ult.pruebaPeso,     inv:false, unit:'lb' },
     ];
 
-    let metricasTableHTML = metricRows.map(r => {
-      const prog = r.isText
-        ? (r.actVal && r.iniVal && r.actVal !== r.iniVal ? `<span style="color:#4ade80">Cambio</span>` : '\u2014')
-        : progreso(r.iniVal, r.actVal, r.inv);
-      return `<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;align-items:center">
-        <div style="color:var(--gray);font-family:Space Mono,monospace;font-size:10px">${r.label}</div>
-        <div style="text-align:center">${v(r.iniVal)}</div>
-        <div style="text-align:center">${v(r.actVal)}</div>
-        <div style="text-align:center">${prog}</div>
-      </div>`;
-    }).join('');
+    const visibleMetricRows = metricRows.filter(r => r.iniVal != null || r.actVal != null);
+    let metricasTableHTML = visibleMetricRows.length === 0
+      ? '<div style="text-align:center;padding:20px;color:var(--gray);font-size:11px">Sin m\u00e9tricas registradas</div>'
+      : visibleMetricRows.map(r => {
+        const iniStr = r.iniVal != null ? r.iniVal + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">'+r.unit+'</span>' : '') : '\u2014';
+        const actStr = r.actVal != null ? r.actVal + (r.unit ? ' <span style="font-size:10px;color:var(--gray)">'+r.unit+'</span>' : '') : '\u2014';
+        const pg = progreso(r.iniVal, r.actVal, r.inv);
+        return `<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;align-items:center">
+          <div style="color:var(--gray);font-family:Space Mono,monospace;font-size:10px">${r.label}</div>
+          <div style="text-align:center">${iniStr}</div>
+          <div style="text-align:center">${actStr}</div>
+          <div style="text-align:center">${pg}</div>
+        </div>`;
+      }).join('');
 
     document.getElementById('modal-detail-content').innerHTML = `
       <div class="detail-header">
@@ -2169,10 +2175,10 @@ if (user && user.uid === MASTER_UID) {
       <div style="font-size:10px;color:var(--gray);margin:-10px 0 12px;font-family:Space Mono,monospace">Haz clic en una valoración para consultarla o editarla</div>
       ${histHTML}
 
-      <div class="modal-section" style="margin-top:20px">Métricas Iniciales y Actuales</div>
+      <div class="modal-section" style="margin-top:20px">Métrica Anterior vs. Actual</div>
       <div style="background:#141414;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
-        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px;padding:10px 12px;background:#0a0a0a;font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:2px;font-family:Space Mono,monospace;border-bottom:1px solid var(--border)">
-          <div>Métrica</div><div style="text-align:center">Inicial</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:4px;padding:10px 12px;background:#0f0f0f;font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;font-family:Space Mono,monospace;border-bottom:1px solid var(--border)">
+          <div>Métrica</div><div style="text-align:center">Anterior</div><div style="text-align:center">Actual</div><div style="text-align:center">Progreso</div>
         </div>
         ${metricasTableHTML}
       </div>
