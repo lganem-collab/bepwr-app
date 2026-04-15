@@ -2329,6 +2329,14 @@ async function loadMetodoData() {
           if (od && od.objetivos) {
             window._objConfig = od.objetivos;
             window._objLista = od.lista || Object.keys(od.objetivos);
+            // Reconstruir _COMPL desde Firestore
+            var _c = {};
+            Object.values(od.objetivos).forEach(function(o) {
+              if (!o.complemento) return;
+              var hasVal = Object.values(o.complemento).some(function(v){return v;});
+              if (hasVal) _c[o.label] = o.complemento;
+            });
+            if (Object.keys(_c).length) window._complFS = _c;
           }
         }
       } catch(e) { console.warn('config/objetivos no disponible, usando hardcoded'); }
@@ -2568,7 +2576,9 @@ function renderPruebaPeso(data) {
     var c = {};
     Object.values(window._objConfig).forEach(function(o) {
       if (!o.complemento) return;
-      c[o.label] = o.complemento;
+      // Solo agregar si tiene al menos un valor no nulo
+      var hasVal = Object.values(o.complemento).some(function(v){return v;});
+      if (hasVal) c[o.label] = o.complemento;
     });
     return Object.keys(c).length ? c : null;
   })() || {
@@ -2698,7 +2708,7 @@ function renderPruebaPeso(data) {
       var rec = _getRec(meta, ge, etapaFinal, sa), ei = _ETAPAS_DEF[etapaFinal];
       var genero = (data&&data.genero)||'';
       rec.mix = rec.mix.map(function(t){ return (t==='women50'&&genero!=='Femenino')?'full_body_core':t; });
-      var compl = (_COMPL[meta]||{})[ge]||'';
+      var compl = (window._complFS ? (window._complFS[meta]||{}) : (_COMPL[meta]||{}))[ge]||'';
       if (compl && compl.indexOf('PWR Yoga') === -1) compl += ' \u00B7 PWR Yoga';
       var _esDeportivo = meta && meta.indexOf('Incrementar') !== -1;
       if (etapaFinal >= 2) {
