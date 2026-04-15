@@ -1730,7 +1730,7 @@ if (user && user.uid === MASTER_UID) {
           var id='oe-'+key+'-'+gi+'-'+ei;
           if(_edit){
             var btnLabel=txt||'+ Agregar';
-            h+='<td style="padding:3px 5px"><button onclick="abrirModalMix(''+id+'',''+key+'','+gi+','+ei+')" style="width:100%;text-align:left;background:'+(arr.length?'#1a1a1a':'#0d0d0d')+';border:1px solid '+(arr.length?'#FF5C1A44':'#2a2a2a')+';color:'+(arr.length?'#fff':'#555')+';padding:6px 10px;border-radius:8px;font-size:11px;cursor:pointer;font-family:DM Sans,sans-serif">'+btnLabel+'</button></td>';
+            h+='<td style="padding:3px 5px"><button data-mid="'+id+'" data-key="'+key+'" data-gi="'+gi+'" data-ei="'+ei+'" onclick="abrirModalMix(this.dataset.mid,this.dataset.key,parseInt(this.dataset.gi),parseInt(this.dataset.ei))" style="width:100%;text-align:left;background:'+(arr.length?'#1a1a1a':'#0d0d0d')+';border:1px solid '+(arr.length?'#FF5C1A44':'#2a2a2a')+';color:'+(arr.length?'#fff':'#555')+';padding:6px 10px;border-radius:8px;font-size:11px;cursor:pointer;font-family:DM Sans,sans-serif" id="'+id+'">'+btnLabel+'</button></td>';
           }else{
             h+='<td style="padding:6px 10px;color:#ccc">'+txt+'</td>';
           }
