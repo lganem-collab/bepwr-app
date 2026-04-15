@@ -1693,6 +1693,7 @@ if (user && user.uid === MASTER_UID) {
   // === OBJETIVOS CONFIG ===
 (function(){
   var _objs=null,_edit=false,_oCode=null;
+  window._getObjs=function(){return _objs;};
   var _NOM={upper_body:'Upper Body',lower_body:'Lower Body',full_body:'Full Body',full_body_core:'Full Body + Core',full_body_glutes:'Full Body + Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
 
   function arrToText(arr){
@@ -4481,7 +4482,7 @@ window.abrirModalMix=function(id,key,gi,ei){
   var ages=['<30','30-45','45+'],ageLabels=['Menores de 30','Entre 30 y 45','Mayores de 45'];
   var etapas=['E1','E2','E3'];
   var clases=window._clasesAdminLista||[];
-  var obj=(_objs&&_objs[key])||{};
+  var _objs2=window._getObjs?window._getObjs():{};var obj=(_objs2&&_objs2[key])||{};
   var age=ages[gi],ek='e'+(ei+1);
   var currentArr=(window._mixEdits[id]!==undefined)?window._mixEdits[id]:((obj.mix&&obj.mix[age]&&obj.mix[age][ek])||[]);
   var ov=document.createElement('div');ov.id='mix-modal-ov';
