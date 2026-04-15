@@ -1,0 +1,24 @@
+{
+  "name": "bePWR Recepción",
+  "short_name": "Recepción",
+  "start_url": "/recepcion.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ff4500",
+  "theme_color": "#ff4500",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/ICONO_Recepcion.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/ICONO_Recepcion.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
