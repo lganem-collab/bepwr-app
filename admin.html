@@ -306,26 +306,7 @@
       <div class="field-row">
         <div class="field">
 <label>Meta principal</label>
-<select id="new-meta">
-  <option value="">Selecciona...</option>
-
-  <option value="Bajar grasa / bajar de peso">🔥 Bajar grasa / bajar de peso</option>
-  <option value="Ganar músculo / recomposición">💪 Ganar músculo / recomposición</option>
-  <option value="Salud metabólica / salud general">&#x1F33F; Salud metabólica / salud general</option>
-  <option value="Rendimiento funcional">&#x26A1; Rendimiento funcional</option>
-  <option value="Estética / composición equilibrada">&#x2728; Estética / composición equilibrada</option>
-
-  <optgroup label="Incrementar mi performance">
-    <option value="Incrementar performance · Ciclismo">🚴 Ciclismo</option>
-    <option value="Incrementar performance · Correr">🏃 Correr</option>
-    <option value="Incrementar performance · Golf">&#x26F3; Golf</option>
-    <option value="Incrementar performance · Natación">🏊 Natación</option>
-    <option value="Incrementar performance · Padel">&#x1F3BE; Padel</option>
-    <option value="Incrementar performance · Tenis">&#x1F3F8; Tenis</option>
-    <option value="Incrementar performance · Fútbol">&#x26BD; Fútbol</option>
-    <option value="Incrementar performance · Otro">🏅 Otro</option>
-  </optgroup>
-</select>
+<select id="new-meta"><option value="">Selecciona objetivo...</option></select>
 
         </div>
           <div class="field">
@@ -2994,6 +2975,7 @@ for (const med of medidasVal) {
     const emailConfirm = document.getElementById('new-email-confirm')?.value.trim();
     if (email !== emailConfirm) { errEl.textContent = 'Los emails no coinciden'; return; }
     if (!nombre || !apellido || !email || !tel) { errEl.textContent = 'Nombre, apellido, teléfono y email son obligatorios'; return; }
+    if (!meta) { errEl.textContent = 'El objetivo es obligatorio'; document.getElementById('new-meta').focus(); return; }
 
     const pm = window._pendingInitialMetrics;
 
@@ -3101,6 +3083,26 @@ for (const med of medidasVal) {
     if (tab === 'new') {
       const adminOpt = document.getElementById('ns-rol-admin');
       if (adminOpt) adminOpt.style.display = window.currentStaffRole === 'admin' ? '' : 'none';
+      // Cargar opciones de objetivo desde Firestore
+      var selMeta = document.getElementById('new-meta');
+      if (selMeta && selMeta.options.length <= 1) {
+        try {
+          var objSnap = await db.collection('config').doc('objetivos').get();
+          if (objSnap.exists) {
+            var od = objSnap.data();
+            var lista = od.lista || Object.keys(od.objetivos || {});
+            var objs = od.objetivos || {};
+            selMeta.innerHTML = '<option value="">Selecciona objetivo...</option>';
+            lista.forEach(function(key) {
+              var o = objs[key]; if (!o || !o.activo) return;
+              var opt = document.createElement('option');
+              opt.value = o.label;
+              opt.textContent = o.label;
+              selMeta.appendChild(opt);
+            });
+          }
+        } catch(e) {}
+      }
     }
 
   
