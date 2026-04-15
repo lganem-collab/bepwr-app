@@ -1,6 +1,7 @@
 {
   "name": "bePWR Recepción",
   "short_name": "Recepción",
+  "description": "Recepción bePWR",
   "start_url": "/recepcion.html",
   "scope": "/",
   "display": "standalone",
