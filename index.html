@@ -2637,7 +2637,16 @@ function renderPruebaPeso(data) {
   // Load horario if needed
   var horarioP = window._horarioSlots ? Promise.resolve() :
     (db && window.getDocs && window.collection ? window.getDocs(window.collection(db,'horario')).then(function(snap) {
-      window._horarioSlots = snap.docs.map(function(d) { return d.data(); });
+      window._horarioSlots = snap.docs.map(function(d) {
+        var s = d.data();
+        // Si el slot tiene fecha pero no dia, calcular dia de semana
+        if (s.fecha && s.dia === undefined) {
+          var parts = s.fecha.split('-');
+          var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+          s.dia = fd.getDay(); // 0=Dom, 1=Lun...
+        }
+        return s;
+      });
     }).catch(function() { window._horarioSlots = []; }) : Promise.resolve());
   Promise.all([visitasP, horarioP]).then(function(results) {
     try {
