@@ -2721,6 +2721,8 @@ function renderPruebaPeso(data) {
         }).join(' \u00B7 ');
       }
       
+      var _pwrYogaActiva = window._clasesConfig && window._clasesConfig.some(function(c){ return c.id==='pwr_yoga'; });
+      if (_pwrYogaActiva && compl.indexOf('PWR Yoga') === -1) compl = (compl ? compl + ' · ' : '') + 'PWR Yoga';
       var _esDeportivo = meta && meta.indexOf('Incrementar') !== -1;
       if (etapaFinal >= 2) {
         if (sa >= 6 || etapaFinal === 3) {
