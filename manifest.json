@@ -2,7 +2,7 @@
   "name": "bePWR",
   "short_name": "bePWR",
   "description": "Tu progreso, tus m\u00e9tricas, tu poder.",
-  "start_url": "/recepcion.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
