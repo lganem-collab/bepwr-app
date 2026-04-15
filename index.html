@@ -2704,7 +2704,7 @@ function renderPruebaPeso(data) {
       if (_boost < 0) etapaNote = 'Progresando a tu ritmo';
       else if (_boost > 0) etapaNote = '¡Tu rendimiento te lleva más lejos!';
       var h = '<div style="display:flex;flex-direction:column;gap:12px">';
-      h += '<div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px"><span style="background:'+ei.c+'22;color:'+ei.c+';border:1px solid '+ei.c+'44;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:600">Etapa '+etapaFinal+' · '+ei.n+'</span>'+(etapaNote?'<span style="font-size:11px;color:#888">'+etapaNote.replace(' · ','')+'</span>':'')+'</div>';
+      h += '<div style="margin-bottom:4px"><span style="color:#FF5C1A;font-size:13px;font-weight:600">Etapa '+etapaFinal+' · '+ei.n+'</span></div>';
       h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
       h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:14px"><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Semanas activas</div><div style="font-size:28px;font-weight:700;color:#FF5C1A">'+sa+'</div><div style="font-size:12px;color:#888">con al menos 1 clase</div></div>';
       h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:14px"><div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Clases / semana</div><div style="font-size:28px;font-weight:700;color:#FF5C1A">'+rec.n+'</div><div style="font-size:12px;color:#888">recomendadas</div></div></div>';
