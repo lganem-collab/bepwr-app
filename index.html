@@ -1161,7 +1161,7 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
     document.getElementById('greeting-name').innerHTML = primerNombre + '<br>' + (nombre.split(' ')[1] || '');
   }
 
-  function calcProgreso(meta,m,obj){const cl=v=>(isNaN(v)||!isFinite(v))?null:Math.max(0,Math.min(100,v));const wavg=pairs=>{const ok=pairs.filter(([v])=>v!==null);if(!ok.length)return null;const tw=ok.reduce((s,[,w])=>s+w,0);return Math.round(ok.reduce((s,[v,w])=>s+v*(w/tw),0));};const pgcP=(obj.pgcInicial!=null&&obj.pgcMeta!=null&&m.pgc!=null&&obj.pgcInicial!==obj.pgcMeta)?cl(((obj.pgcInicial-m.pgc)/(obj.pgcInicial-obj.pgcMeta))*100):null;const gvP=(obj.gvInicial!=null&&obj.gvMeta!=null&&m.grasaVisceral!=null&&obj.gvInicial!==obj.gvMeta)?cl(((obj.gvInicial-m.grasaVisceral)/(obj.gvInicial-obj.gvMeta))*100):null;const mmP=(obj.mmInicial!=null&&obj.mmMeta!=null&&m.musculo!=null&&obj.mmInicial!==obj.mmMeta)?cl(((m.musculo-obj.mmInicial)/(obj.mmMeta-obj.mmInicial))*100):null;const ibP=(obj.inbodyInicial!=null&&obj.inbodyMeta!=null&&m.calificacion!=null&&obj.inbodyInicial!==obj.inbodyMeta)?cl(((m.calificacion-obj.inbodyInicial)/(obj.inbodyMeta-obj.inbodyInicial))*100):null;const imcP=(obj.imcInicial!=null&&obj.imcMeta!=null&&m.imc!=null&&Math.abs(obj.imcInicial-obj.imcMeta)>0)?cl(((Math.abs(obj.imcInicial-obj.imcMeta)-Math.abs(m.imc-obj.imcMeta))/Math.abs(obj.imcInicial-obj.imcMeta))*100):null;const mt=(meta||'').toLowerCase();if(mt.includes('grasa')||mt.includes('peso'))return wavg([[pgcP,0.4],[gvP,0.3],[ibP,0.3]]);if(mt.includes('m\u00FAsculo')||mt.includes('recomposici'))return wavg([[mmP,0.4],[pgcP,0.3],[ibP,0.3]]);if(mt.includes('salud')||mt.includes('metab'))return wavg([[pgcP,0.3],[gvP,0.3],[imcP,0.2],[ibP,0.2]]);if(mt.includes('rendimiento')||mt.includes('funcional'))return wavg([[mmP,0.5],[pgcP,0.2],[ibP,0.3]]);if(mt.includes('est\u00E9tica')||mt.includes('composici'))return wavg([[mmP,0.3],[pgcP,0.3],[imcP,0.2],[ibP,0.2]]);return null;}
+  function calcProgreso(meta,m,obj){const cl=v=>(isNaN(v)||!isFinite(v))?null:Math.max(0,Math.min(100,v));const wavg=pairs=>{const ok=pairs.filter(([v])=>v!==null);if(!ok.length)return null;const tw=ok.reduce((s,[w])=>s+w,0);return Math.round(ok.reduce((s,[v,w])=>s+v*(w/tw),0));};const pgcP=(obj.pgcInicial!=null&&obj.pgcMeta!=null&&m.pgc!=null&&obj.pgcInicial!==obj.pgcMeta)?cl(((obj.pgcInicial-m.pgc)/(obj.pgcInicial-obj.pgcMeta))*100):null;const gvP=(obj.gvInicial!=null&&obj.gvMeta!=null&&m.grasaVisceral!=null&&obj.gvInicial!==obj.gvMeta)?cl(((obj.gvInicial-m.grasaVisceral)/(obj.gvInicial-obj.gvMeta))*100):null;const mmP=(obj.mmInicial!=null&&obj.mmMeta!=null&&m.musculo!=null&&obj.mmInicial!==obj.mmMeta)?cl(((m.musculo-obj.mmInicial)/(obj.mmMeta-obj.mmInicial))*100):null;const ibP=(obj.inbodyInicial!=null&&obj.inbodyMeta!=null&&m.calificacion!=null&&obj.inbodyInicial!==obj.inbodyMeta)?cl(((m.calificacion-obj.inbodyInicial)/(obj.inbodyMeta-obj.inbodyInicial))*100):null;const imcP=(obj.imcInicial!=null&&obj.imcMeta!=null&&m.imc!=null&&Math.abs(obj.imcInicial-obj.imcMeta)>0)?cl(((Math.abs(obj.imcInicial-obj.imcMeta)-Math.abs(m.imc-obj.imcMeta))/Math.abs(obj.imcInicial-obj.imcMeta))*100):null;const mt=(meta||'').toLowerCase();if(mt.includes('grasa')||mt.includes('peso'))return wavg([[pgcP,0.4],[gvP,0.3],[ibP,0.3]]);if(mt.includes('m\u00FAsculo')||mt.includes('recomposici'))return wavg([[mmP,0.4],[pgcP,0.3],[ibP,0.3]]);if(mt.includes('salud')||mt.includes('metab'))return wavg([[pgcP,0.3],[gvP,0.3],[imcP,0.2],[ibP,0.2]]);if(mt.includes('rendimiento')||mt.includes('funcional'))return wavg([[mmP,0.5],[pgcP,0.2],[ibP,0.3]]);if(mt.includes('est\u00E9tica')||mt.includes('composici'))return wavg([[mmP,0.3],[pgcP,0.3],[imcP,0.2],[ibP,0.2]]);return null;}
 
   function calcBePWRScore(inicial, actual, obj) {
     const meta = obj?.meta || '';
@@ -1171,8 +1171,7 @@ generateAIMessage(nombre, ultima, obj, (typeof calcBePWRScore==="function" ? cal
       { ini: 'grasaCorporal', act: 'grasaCorporal', inv: true, key: 'grasa' },
       { ini: 'pgc', act: 'pgc', inv: true, key: 'pgc' },
       { ini: 'grasaVisceral', act: 'grasaVisceral', inv: true, key: 'gvisc' },
-      { ini: 'calificacion', act: 'calificacion', inv: false, key: 'inbody' },
-    ];
+      { ini: 'calificacion', act: 'calificacion', inv: false, key: 'inbody' }];
     const WEIGHTS = {
       'Bajar grasa / bajar de peso': { pgc:30, grasa:20, peso:15, gvisc:15, musculo:10, inbody:10 },
       'Ganar m\u00FAsculo / recomposici\u00F3n': { musculo:30, inbody:20, peso:5, pgc:15, grasa:15, gvisc:15 },
@@ -1283,8 +1282,7 @@ window._tendColor = califColor;
       { label:'Muslo Izq.', ini:inicial.musloIzq||null, act:m.musloIzq||null, inv:false, unit:'cm' },
       { label:'Pantorrilla Der.', ini:inicial.pantorrillaDer||(inicial.pantorrilla||null), act:m.pantorrillaDer||(m.pantorrilla||null), inv:false, unit:'cm' },
       { label:'Pantorrilla Izq.', ini:inicial.pantorrillaIzq||null, act:m.pantorrillaIzq||null, inv:false, unit:'cm' },
-{ label:'Prueba de Peso', ini:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(inicial.pruebaPeso), act:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(m.pruebaPeso), inv:false, unit:'lb' },
-    ];
+{ label:'Prueba de Peso', ini:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(inicial.pruebaPeso), act:(function(v){if(!v)return null;if(typeof v==='string')return parseFloat(v)||v;return v.min||v;})(m.pruebaPeso), inv:false, unit:'lb' }];
     var visibleRows = rows.filter(function(r) { return r.ini != null || r.act != null; });
     var bodyEl = document.getElementById('metricas-comparativa-body');
     if (bodyEl) {
@@ -2151,81 +2149,81 @@ const OBJETIVO_CONFIG = _buildObjetivoConfig() || {
         'Estética / composición equilibrada': {
           label: 'Estético', color: '#F7DC6F', pdf: 'estetico',
           rutina: {
-            sub30: { total: '3-4 clases/sem', clases: [{tipo:'FullBody',freq:'2 / sem'},{tipo:'UpperBody',freq:'1 / sem'},{tipo:'LowerBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'0-1 / sem'}], complemento: null },
-            mid:   { total: '3-4 clases/sem', clases: [{tipo:'FullBody',freq:'2 / sem'},{tipo:'UpperBody',freq:'1 / sem'},{tipo:'LowerBody',freq:'0-1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: null },
-            senior:{ total: '2-3 clases/sem', clases: [{tipo:'50+',freq:'1-2 / sem'},{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: null }
+            sub30: { total: '3-4 clases/sem', clases: [{tipo:'FullBody',freq:'2 / sem'},{tipo:'UpperBody',freq:'1 / sem'},{tipo:'LowerBody',freq:'1 / sem'}], complemento: null },
+            mid:   { total: '3-4 clases/sem', clases: [{tipo:'FullBody',freq:'2 / sem'},{tipo:'UpperBody',freq:'1 / sem'},{tipo:'LowerBody',freq:'0-1 / sem'}], complemento: null },
+            senior:{ total: '2-3 clases/sem', clases: [{tipo:'50+',freq:'1-2 / sem'},{tipo:'FullBody',freq:'1 / sem'}], complemento: null }
           }
         },
         'Rendimiento funcional': {
           label: 'Rendimiento Funcional', color: '#E74C3C', pdf: 'rendimiento-funcional',
           rutina: {
-            sub30: { total: '4-5 clases/sem', clases: [{tipo:'FullBody intenso',freq:'3-4 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: null },
-            mid:   { total: '3-4 clases/sem', clases: [{tipo:'FullBody',freq:'2-3 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: null },
-            senior:{ total: '3 clases/sem', clases: [{tipo:'FullBody',freq:'2 / sem'},{tipo:'50+ o PWR Yoga',freq:'1 / sem'}], complemento: null }
+            sub30: { total: '4-5 clases/sem', clases: [{tipo:'FullBody intenso',freq:'3-4 / sem'}], complemento: null },
+            mid:   { total: '3-4 clases/sem', clases: [{tipo:'FullBody',freq:'2-3 / sem'}], complemento: null },
+            senior:{ total: '3 clases/sem', clases: [{tipo:'FullBody',freq:'2 / sem'},{tipo:'50+',freq:'1 / sem'}], complemento: null }
           }
         },
         'Incrementar performance · Ciclismo': {
           label: 'Deportivo - Ciclismo', color: '#9B59B6', pdf: 'ciclismo',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Ciclismo (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Ciclismo (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Ciclismo (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Ciclismo (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Ciclismo (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Ciclismo (2-3 / sem)' }
           }
         },
         'Incrementar performance · Correr': {
           label: 'Deportivo - Correr', color: '#9B59B6', pdf: 'deportivo',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Correr (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Correr (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Correr (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Correr (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Correr (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Correr (2-3 / sem)' }
           }
         },
         'Incrementar performance · Natación': {
           label: 'Deportivo - Natación', color: '#9B59B6', pdf: 'natacion',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Natación (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Natación (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Natación (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Natación (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Natación (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Natación (2-3 / sem)' }
           }
         },
         'Incrementar performance · Padel': {
           label: 'Deportivo - Padel', color: '#9B59B6', pdf: 'deportivo',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Padel (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Padel (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Padel (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Padel (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Padel (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Padel (2-3 / sem)' }
           }
         },
         'Incrementar performance · Tenis': {
           label: 'Deportivo - Tenis', color: '#9B59B6', pdf: 'deportivo',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Tenis (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Tenis (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Tenis (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Tenis (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Tenis (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Tenis (2-3 / sem)' }
           }
         },
         'Incrementar performance · Golf': {
           label: 'Deportivo - Golf', color: '#9B59B6', pdf: 'deportivo',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Golf (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Golf (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Golf (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Golf (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Golf (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Golf (2-3 / sem)' }
           }
         },
         'Incrementar performance · Fútbol': {
           label: 'Deportivo - Fútbol', color: '#9B59B6', pdf: 'deportivo',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Fútbol (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Fútbol (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Fútbol (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Fútbol (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Fútbol (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Fútbol (2-3 / sem)' }
           }
         },
         'Incrementar performance · Otro': {
           label: 'Deportivo - Otro', color: '#9B59B6', pdf: 'deportivo',
           rutina: {
-            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Deporte principal (3-5 / sem)' },
-            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem'}], complemento: 'Deporte principal (3-4 / sem)' },
-            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'},{tipo:'PWR Yoga',freq:'1 / sem (opcional)'}], complemento: 'Deporte principal (2-3 / sem)' }
+            sub30: { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Deporte principal (3-5 / sem)' },
+            mid:   { total: '2 clases/sem', clases: [{tipo:'FullBody',freq:'1 / sem'}], complemento: 'Deporte principal (3-4 / sem)' },
+            senior:{ total: '1-2 clases/sem', clases: [{tipo:'50+',freq:'1 / sem'}], complemento: 'Deporte principal (2-3 / sem)' }
           }
         }
       };
@@ -2585,17 +2583,17 @@ function renderPruebaPeso(data) {
     'Bajar grasa / bajar de peso':{'<30':'Cardio zona 2: trotar suave o bicicleta, 30-40 min, 2x/sem','30-45':'Caminata diaria 30 min + cardio zona 2, 1-2x/sem','45+':'Caminata diaria 30 min'},
     'Salud metabólica / salud general':{'<30':'Caminata 5-6 días, 20-30 min','30-45':'Caminata diaria 30 min','45+':'Caminata diaria 30 min'},
     'Rendimiento funcional':{'<30':'Hidratación 40-50 ml/kg \u00B7 Sueño 8h \u00B7 Carbos altos','30-45':'Recuperación activa \u00B7 Sueño no negociable','45+':'Movilidad diaria \u00B7 Sueño 8h \u00B7 Evitar lesiones'},
-    'Incrementar performance \u00B7 Ciclismo':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 Nataci\u00F3n':{'<30':'PWR Yoga \u00B7 Trote m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 Correr':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 Padel':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 Tenis':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 Golf':{'<30':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 F\u00FAtbol':{'<30':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
-    'Incrementar performance \u00B7 Otro':{'<30':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'PWR Yoga \u00B7 Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'PWR Yoga \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'}
+    'Incrementar performance \u00B7 Ciclismo':{'<30':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Nataci\u00F3n':{'<30':'Trote m\u00EDnimo 30 min','30-45':'Caminata m\u00EDnimo 30 min','45+':'Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Correr':{'<30':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Padel':{'<30':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Tenis':{'<30':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Golf':{'<30':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 F\u00FAtbol':{'<30':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'},
+    'Incrementar performance \u00B7 Otro':{'<30':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','30-45':'Nadar \u00B7 Estiramientos \u00B7 Caminata m\u00EDnimo 30 min','45+':'Estiramientos \u00B7 Caminata m\u00EDnimo 30 min'}
   };
   function _getRec(meta, ge, etapa, sa) {
-    var r = _MIX[meta]; if (!r) { return meta&&meta.includes('Incrementar')?{n:2,mix:['full_body_core','pwr_yoga']}:{n:3,mix:['full_body_core','lower_body','upper_body']}; }
+    var r = _MIX[meta]; if (!r) { return meta&&meta.includes('Incrementar')?{n:1,mix:['full_body_core']}:{n:3,mix:['full_body_core','lower_body','upper_body']}; }
     // Rotación etapa 3: deportes de tren inferior (Ciclismo, Correr, Fútbol, Otro)
     var _deporteInferior = ['Ciclismo','Correr','F\u00FAtbol','Otro'];
     if (etapa === 3 && meta && _deporteInferior.some(function(d){return meta.indexOf(d)!==-1;})) {
@@ -2615,7 +2613,7 @@ function renderPruebaPeso(data) {
     }
     var arr = r[ge]||r['30-45'];
     var mix = arr[Math.min(etapa-1,2)];
-    if (!mix) mix = ['full_body_core','pwr_yoga'];
+    if (!mix) mix = ['full_body_core'];
     return {n:mix.length,mix:mix};
   }
   function renderRutina(config, data) {
@@ -2709,7 +2707,7 @@ function renderPruebaPeso(data) {
       var genero = (data&&data.genero)||'';
       rec.mix = rec.mix.map(function(t){ return (t==='women50'&&genero!=='Femenino')?'full_body_core':t; });
       var compl = (window._complFS ? (window._complFS[meta]||{}) : (_COMPL[meta]||{}))[ge]||'';
-      if (compl && compl.indexOf('PWR Yoga') === -1) compl += ' \u00B7 PWR Yoga';
+      
       var _esDeportivo = meta && meta.indexOf('Incrementar') !== -1;
       if (etapaFinal >= 2) {
         if (sa >= 6 || etapaFinal === 3) {
@@ -4205,8 +4203,7 @@ window._LOGROS_DEF = [
   { id:'ano-perfecto',       titulo:'Año Perfecto',       desc:'50 de 60 semanas con 3+ clases por semana',       img:'/medals/ano-perfecto.png' },
   // bePWR Score
   { id:'bepwr-85',           titulo:'bePWR Score 85',     desc:'Alcanzaste 85 puntos en el bePWR Score',          img:'/medals/bepwr-85.png' },
-  { id:'bepwr-90',           titulo:'bePWR Score 90',     desc:'Alcanzaste 90 puntos en el bePWR Score',          img:'/medals/bepwr-90.png' },
-];
+  { id:'bepwr-90',           titulo:'bePWR Score 90',     desc:'Alcanzaste 90 puntos en el bePWR Score',          img:'/medals/bepwr-90.png' }];
 function abrirMisLogros(){
   const m=document.getElementById('modal-mis-logros');
   m.style.display='flex';
