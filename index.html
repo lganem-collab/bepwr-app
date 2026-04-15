@@ -2706,7 +2706,20 @@ function renderPruebaPeso(data) {
       var rec = _getRec(meta, ge, etapaFinal, sa), ei = _ETAPAS_DEF[etapaFinal];
       var genero = (data&&data.genero)||'';
       rec.mix = rec.mix.map(function(t){ return (t==='women50'&&genero!=='Femenino')?'full_body_core':t; });
+      if (window._clasesConfig && window._clasesConfig.length) {
+        var _idsActivos = window._clasesConfig.map(function(c){ return c.id; });
+        rec.mix = rec.mix.filter(function(t){ return _idsActivos.indexOf(t) !== -1; });
+      }
       var compl = (window._complFS ? (window._complFS[meta]||{}) : (_COMPL[meta]||{}))[ge]||'';
+      if (window._clasesConfig && window._clasesConfig.length) {
+        var _nomActivos = window._clasesConfig.map(function(c){ return c.nombre||''; });
+        var _nomTodos = Object.values ? Object.values(_CL_NOM_DEF||{}) : Object.keys(_CL_NOM_DEF||{}).map(function(k){return _CL_NOM_DEF[k];});
+        compl = compl.split(' \u00B7 ').filter(function(p){
+          var pBase = p.replace(/\s*\([^)]*\)/g,'').trim();
+          var esClase = _nomTodos.indexOf(pBase) !== -1;
+          return !esClase || _nomActivos.indexOf(pBase) !== -1;
+        }).join(' \u00B7 ');
+      }
       
       var _esDeportivo = meta && meta.indexOf('Incrementar') !== -1;
       if (etapaFinal >= 2) {
