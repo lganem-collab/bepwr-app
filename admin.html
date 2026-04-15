@@ -3086,22 +3086,24 @@ for (const med of medidasVal) {
       // Cargar opciones de objetivo desde Firestore
       var selMeta = document.getElementById('new-meta');
       if (selMeta && selMeta.options.length <= 1) {
-        try {
-          var objSnap = await db.collection('config').doc('objetivos').get();
-          if (objSnap.exists) {
-            var od = objSnap.data();
-            var lista = od.lista || Object.keys(od.objetivos || {});
-            var objs = od.objetivos || {};
-            selMeta.innerHTML = '<option value="">Selecciona objetivo...</option>';
-            lista.forEach(function(key) {
-              var o = objs[key]; if (!o || !o.activo) return;
-              var opt = document.createElement('option');
-              opt.value = o.label;
-              opt.textContent = o.label;
-              selMeta.appendChild(opt);
-            });
-          }
-        } catch(e) {}
+        (async function(){
+          try {
+            var objSnap = await db.collection('config').doc('objetivos').get();
+            if (objSnap.exists) {
+              var od = objSnap.data();
+              var lista = od.lista || Object.keys(od.objetivos || {});
+              var objs = od.objetivos || {};
+              selMeta.innerHTML = '<option value="">Selecciona objetivo...</option>';
+              lista.forEach(function(key) {
+                var o = objs[key]; if (!o || !o.activo) return;
+                var opt = document.createElement('option');
+                opt.value = o.label;
+                opt.textContent = o.label;
+                selMeta.appendChild(opt);
+              });
+            }
+          } catch(e) {}
+        })();
       }
     }
 
