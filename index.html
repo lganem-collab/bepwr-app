@@ -4219,7 +4219,19 @@ function abrirMisLogros(){
       const desbloqueados={};
       snap.forEach(d=>{ desbloqueados[d.id]=d.data(); });
       if(!window._LOGROS_DEF.length){ grid.innerHTML='<div style="color:#666;text-align:center;padding:40px 0;grid-column:1/-1">Sin logros disponibles</div>'; return; }
-      grid.innerHTML=window._LOGROS_DEF.map(l=>{
+      // Ordenar: desbloqueadas por fecha desc, luego bloqueadas
+      const logrosOrdenados = [...window._LOGROS_DEF].sort((a,b)=>{
+        const tA = desbloqueados[a.id], tB = desbloqueados[b.id];
+        if (tA && tB) {
+          const fA = tA.fecha ? (tA.fecha.toDate ? tA.fecha.toDate() : new Date(tA.fecha)) : new Date(0);
+          const fB = tB.fecha ? (tB.fecha.toDate ? tB.fecha.toDate() : new Date(tB.fecha)) : new Date(0);
+          return fB - fA;
+        }
+        if (tA) return -1;
+        if (tB) return 1;
+        return 0;
+      });
+      grid.innerHTML=logrosOrdenados.map(l=>{
         const tiene=!!desbloqueados[l.id];
         const fecha=tiene&&desbloqueados[l.id].fecha?new Date(desbloqueados[l.id].fecha.toDate?desbloqueados[l.id].fecha.toDate():desbloqueados[l.id].fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):'';
         window._logrosRender = window._logrosRender || {};
