@@ -34,7 +34,7 @@
     window._Firestore = { collection, addDoc, query, where, getDocs, getDoc, docRef: firestoreDoc, Timestamp };
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebase-ready'));
-  getDocs(collection(db, 'horario')).then(function(snap) {
+  window._horarioReady = getDocs(collection(db, 'horario')).then(function(snap) {
     window._horarioSlots = snap.docs.map(function(d) { return d.data(); });
   }).catch(function() { window._horarioSlots = []; });
   </script>
@@ -412,7 +412,8 @@
       return date.getFullYear() + '-W' + String(getISOWeek(date)).padStart(2,'0');
     }
 
-  function getClaseDelMomento(date) {
+  async function getClaseDelMomento(date) {
+    if (window._horarioReady) await window._horarioReady;
     var slots = window._horarioSlots || [];
     if (!slots.length) return 'desconocida';
     var dia = date.getDay();
@@ -495,7 +496,7 @@
       await F.addDoc(F.collection(db, 'visitas'), {
         uid: uid, nombre: nombre, timestamp: F.Timestamp.now(),
         semana: weekKey, semanaNum: getISOWeek(), anio: new Date().getFullYear(),
-    tipoClase: getClaseDelMomento(new Date())
+    tipoClase: await getClaseDelMomento(new Date())
       });
       showCard({ nombre: nombre, meta: meta, totalVisitas: totalVisitas, weekVisitas: weekVisitas });
     }
