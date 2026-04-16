@@ -10,13 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/Logo_para_fondo_negro.png",
+      "src": "/icons/logo-bepwr.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/Logo_para_fondo_negro.png",
+      "src": "/icons/logo-bepwr.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
