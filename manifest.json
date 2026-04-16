@@ -10,13 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/ICONO_Recepcion.png",
+      "src": "/icons/Logo fondo negro.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/ICONO_Recepcion.png",
+      "src": "/icons/Logo fondo negro.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
