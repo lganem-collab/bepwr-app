@@ -1591,16 +1591,46 @@ function renderProfileMetrics(m) {
     }
 
     try {
-      const pick = Math.floor(Date.now() / 86400000) % 3;
+      // Rotación: 75% bePWR/Índice (picks 0-2), 25% InBody (pick 3)
+      const pick = Math.floor(Date.now() / 86400000) % 4;
+      const diaSemana = new Date().getDay();
       const indiceResult = window._indiceEvolucionResult;
       const indiceVal = indiceResult ? indiceResult.finalIndex : null;
       const indiceLabel = indiceResult ? indiceResult.statusLabel : null;
-      const extraMetrica = pick === 0 && bepwrScore !== null
-        ? ' bePWR Score (metrica propia de bePWR que mide progreso integral): ' + bepwrScore + '/100.'
-        : pick === 1 && indiceVal !== null
-        ? ' Índice de Evolución bePWR (índice de evolución entre valoraciones del 1 al 100): ' + indiceVal + '/100 — ' + indiceLabel + '.'
+
+      // Nivel bePWR Score
+      const nivelBepwr = bepwrScore >= 88 ? 'Destacado' : bepwrScore >= 73 ? 'Avanzado' : bepwrScore >= 56 ? 'Óptimo' : 'En Proceso';
+
+      // Días hasta próxima valoración
+      let diasHastaProxima = null;
+      if (metrica && metrica.fecha) {
+        const freqDias = (objetivo && objetivo.frecuencia) ? objetivo.frecuencia : 14;
+        const ultimaVal = new Date(String(metrica.fecha).slice(0,10));
+        const proxima = new Date(ultimaVal.getTime() + freqDias * 86400000);
+        diasHastaProxima = Math.max(0, Math.ceil((proxima - new Date()) / 86400000));
+      }
+      const urgencia = diasHastaProxima !== null && diasHastaProxima <= 3
+        ? ' Próxima valoración en ' + diasHastaProxima + ' día(s) — momento clave.'
         : '';
-      const prompt = 'Genera un mensaje motivacional personalizado y breve (maximo 3 oraciones) para un miembro de un gimnasio de ejercicio funcional llamado ' + nombre + '. Sus metricas recientes: peso ' + (metrica.peso||'--') + 'kg, musculo ' + (metrica.musculo||'--') + 'kg, grasa ' + (metrica.grasaCorporal||'--') + 'kg, PGC ' + (metrica.pgc||'--') + '%, InBody ' + (metrica.calificacion||'--') + '/100.' + extraMetrica + ' Objetivo: ' + (objetivo.meta||'general') + '. Incluye: 1) dato util, 2) consejo, 3) motivacion. Espanol. Sin comillas. LIMITE ESTRICTO: tu respuesta completa no debe superar 300 caracteres.';
+
+      // Ángulo según día de la semana
+      const angulos = ['recarga y mentalidad', 'arranque e intención de semana', 'consistencia y acumulación', 'consistencia y acumulación', 'el esfuerzo se refleja en métricas', 'cierre fuerte de semana', 'recuperación activa'];
+      const anguloDia = angulos[diaSemana];
+
+      // Dato principal según rotación
+      let temaTema, datoExtra;
+      if (pick <= 1 && bepwrScore !== null) {
+        datoExtra = 'bePWR Score: ' + bepwrScore + '/100 — nivel ' + nivelBepwr + '.';
+        temaTema = 'bePWR Score';
+      } else if (pick === 2 && indiceVal !== null) {
+        datoExtra = 'Índice de Evolución: ' + indiceVal + '/100 — ' + indiceLabel + '.';
+        temaTema = 'Índice de Evolución';
+      } else {
+        datoExtra = 'InBody ' + (metrica.calificacion||'--') + '/100, PGC ' + (metrica.pgc||'--') + '%, músculo ' + (metrica.musculo||'--') + 'kg.';
+        temaTema = 'métricas InBody';
+      }
+
+      const prompt = 'Eres coach de bePWR, gimnasio funcional premium en Querétaro. Escribe un mensaje motivacional personalizado para ' + nombre + '. Objetivo: ' + (objetivo.meta||'general') + '. Peso actual: ' + (metrica.peso||'--') + 'kg. Métrica del día (' + temaTema + '): ' + datoExtra + urgencia + ' Ángulo: ' + anguloDia + '. Tono directo y cercano. En español. Sin comillas ni títulos. LÍMITE ESTRICTO: máximo 400 caracteres.';
 
       const res = await fetch('/api/chat', {
         method: 'POST',
