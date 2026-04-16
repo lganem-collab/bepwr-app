@@ -3080,7 +3080,15 @@ if (config && config.rutina) {
   }
 }
 
-  var prompt = 'Eres un experto en ciencias del ejercicio, fisiolog\u00EDa deportiva y nutrici\u00F3n deportiva. Trabajas en bePWR, un centro de entrenamiento funcional premium en Quer\u00E9taro, M\u00E9xico.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nGenera un an\u00E1lisis cient\u00EDfico personalizado y detallado que incluya:\n1. Interpretaci\u00F3n de sus m\u00E9tricas actuales\n2. Relaci\u00F3n entre su composici\u00F3n corporal y su objetivo\n3. Recomendaciones espec\u00EDficas basadas en evidencia\n4. Proyecci\u00F3n de progreso si mantiene consistencia\n\nTono cient\u00EDfico pero accesible, motivador y directo. En espa\u00F1ol. M\u00EDnimo 500 caracteres. Sin t\u00EDtulos ni bullets, redacci\u00F3n fluida en p\u00E1rrafos. No uses asteriscos ni formato markdown. IMPORTANTE: Usa exactamente las sesiones y clases del plan bePWR indicado arriba, Usa exactamente las sesiones del plan bePWR indicado. Escribe EXACTAMENTE 2 p\u00E1rrafos cortos. Cada p\u00E1rrafo m\u00E1ximo 2 oraciones. OBLIGATORIO: termina con punto final. LIMITE ESTRICTO: el texto completo no debe superar 900 caracteres.';
+  // Agregar bePWR Score e Índice de Evolución al análisis
+  var indiceResultAI = window._indiceEvolucionResult;
+  var bepwrScoreAI = (data && data.bepwrScore != null) ? data.bepwrScore : null;
+  var nivelBepwrAI = bepwrScoreAI >= 88 ? 'Destacado' : bepwrScoreAI >= 73 ? 'Avanzado' : bepwrScoreAI >= 56 ? 'Óptimo' : 'En Proceso';
+  if (bepwrScoreAI !== null) lines.push('- bePWR Score (índice integral bePWR 0-100): ' + bepwrScoreAI + '/100 \u2014 nivel ' + nivelBepwrAI);
+  if (indiceResultAI && indiceResultAI.finalIndex != null) lines.push('- Índice de Evolución bePWR (comparación entre valoraciones): ' + indiceResultAI.finalIndex + '/100 \u2014 ' + indiceResultAI.statusLabel);
+  if (val.calificacion) lines.push('- Calificación InBody: ' + val.calificacion + '/100');
+
+  var prompt = 'Eres el coach cient\u00EDfico de bePWR, centro de entrenamiento funcional premium en Quer\u00E9taro, M\u00E9xico. Tu rol es educar, orientar y aportar valor basado en evidencia cient\u00EDfica.\n\nDatos del miembro:\n' + lines.join('\n') + '\n\nEscribe un an\u00E1lisis personalizado siguiendo estas reglas:\n1. Interpreta sus m\u00E9tricas en positivo \u2014 enf\u00F3cate en oportunidades y lo que est\u00E1 funcionando, nunca uses lenguaje negativo sobre su cuerpo o n\u00FAmeros.\n2. Menciona el bePWR Score e \u00CDndice de Evoluci\u00F3n como herramientas propias de bePWR que miden su progreso integral.\n3. Incluye al menos una referencia cient\u00EDfica real y espec\u00EDfica (OMS, ACSM, Harvard, NSCA u otro organismo reconocido) aplicada directamente a su situaci\u00F3n.\n4. Da 1-2 consejos concretos y sustentables para avanzar hacia su objetivo.\n5. Puedes mencionar h\u00E1bitos de sue\u00F1o, hidrataci\u00F3n, nutrici\u00F3n o recuperaci\u00F3n si son relevantes para su objetivo.\n\nFormato: 3 p\u00E1rrafos fluidos, sin t\u00EDtulos, sin bullets, sin asteriscos, sin markdown. Tono experto pero accesible, como un coach que sabe de lo que habla. En espa\u00F1ol. L\u00CDMITE ESTRICTO: m\u00E1ximo 1100 caracteres. Termina con punto final.';
 
   try {
     var resp = await fetch('/api/chat', {
