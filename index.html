@@ -3076,7 +3076,7 @@ if (config && config.rutina) {
   if (rutina) {
     lines.push('- Clases recomendadas por semana: ' + rutina.total);
     if (rutina.clases) {
-      var nombreClase = { full_body: 'Full Body', upper_body: 'Upper Body', lower_body: 'Lower Body', full_body_core: 'Full Body + Core', full_body_glutes: 'Full Body + Glutes', women50: 'Women 50+', pwr_yoga: 'PWR Yoga' };
+      var nombreClase = { full_body: 'Full Body', upper_body: 'Upper Body', lower_body: 'Lower Body', full_body_core: 'Full Body + Core', full_body_glutes: 'Full Body + Glutes', women50: 'Women 50+', '50+': 'Women 50+', pwr_yoga: 'PWR Yoga', 'FullBody': 'Full Body', 'LowerBody': 'Lower Body', 'UpperBody': 'Upper Body' };
       var clasesTexto = rutina.clases.map(function(c){ return (nombreClase[c.tipo] || c.tipo) + ' ' + c.freq; }).join(', ');
       lines.push('- Clases del plan: ' + clasesTexto);
     }
