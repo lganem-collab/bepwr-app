@@ -2656,7 +2656,7 @@ function renderPruebaPeso(data) {
     visitasP = Promise.race([
       window.getDocs(window.query(window.collection(db,'visitas'), window.where('uid','==',uid))).then(function(snap) {
         var s = new Set(), f = {}, wf = {}, _wk = getWeekKey();
-        snap.forEach(function(d) { var dd = d.data(); if (dd.semana) s.add(dd.semana); if (dd.tipoClase) f[dd.tipoClase] = (f[dd.tipoClase]||0)+1; if (dd.semana===_wk&&dd.tipoClase) { var _tc=_CLASE_FAMILIA[dd.tipoClase]||dd.tipoClase; wf[_tc]=(wf[_tc]||0)+1; } });
+        snap.forEach(function(d) { var dd = d.data(); if (dd.semana) s.add(dd.semana); if (dd.tipoClase) f[dd.tipoClase] = (f[dd.tipoClase]||0)+1; if (dd.semana===_wk&&dd.tipoClase) { var _tc=dd.tipoClase; if (_CLASE_FAMILIA[_tc] && uniqKeys.indexOf(_CLASE_FAMILIA[_tc])!==-1) _tc=_CLASE_FAMILIA[_tc]; wf[_tc]=(wf[_tc]||0)+1; } });
         var saReal = s.size, saFinal = saReal;
         if (saReal < 4 && config && config.fechaAlta) {
           try { var ms = config.fechaAlta.toDate ? config.fechaAlta.toDate().getTime() : new Date(config.fechaAlta).getTime(); saFinal = Math.max(saReal, Math.min(Math.floor((Date.now()-ms)/(7*24*3600*1000)), 104)); } catch(ex) {}
@@ -2760,6 +2760,7 @@ function renderPruebaPeso(data) {
       var dias = {};
       rec.mix.forEach(function(t) { if (!dias[t]) { var d = slots.filter(function(s) { return s.tipoClase===t&&s.activo; }).map(function(s) { return s.dia; }); dias[t] = Array.from ? Array.from(new Set(d)).sort() : d.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(); } });
       var uniq = {}; rec.mix.forEach(function(t) { uniq[t] = (uniq[t]||0)+1; });
+      var uniqKeys = Object.keys(uniq);
       var weekFreq = r.weekFreq||{};
       var topC = null, topN = 0; Object.keys(freq).forEach(function(t) { if (t==='desconocida') return; if (freq[t]>topN){topN=freq[t];topC=t;} });
       var tip = '';
