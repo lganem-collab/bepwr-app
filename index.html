@@ -3084,6 +3084,21 @@ if (config && config.rutina) {
   }
 }
 
+  // Calcular hidratación con la misma fórmula que la tarjeta
+  var hidEdad = data.edad || 30;
+  var hidPeso = (val && val.peso) || data.peso || null;
+  var hidGenero = (data.genero || '').toLowerCase();
+  var hidLitros = null;
+  if (hidPeso) {
+    var hidFactores = hidEdad < 30 ? {f:37.5,m:39.5} : hidEdad <= 45 ? {f:35.5,m:37.5} : {f:37.5,m:38.5};
+    var hidFactor = hidGenero === 'masculino' ? hidFactores.m : hidGenero === 'femenino' ? hidFactores.f : (hidFactores.f + hidFactores.m) / 2;
+    var hidMl = Math.round(hidPeso * hidFactor);
+    hidLitros = (hidMl / 1000).toFixed(1);
+    lines.push('- Hidratación diaria recomendada (calculada por bePWR): ' + hidLitros + ' litros (' + hidMl + ' ml) — NO uses otro número de hidratación');
+  }
+  lines.push('- Horas de sueño recomendadas: 7 a 9 horas diarias');
+  lines.push('- Recuperación: 1 día de descanso activo por semana');
+
   // Agregar bePWR Score e Índice de Evolución al análisis
   var indiceResultAI = window._indiceEvolucionResult;
   var bepwrScoreAI = (data && data.bepwrScore != null) ? data.bepwrScore : null;
