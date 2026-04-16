@@ -35,7 +35,7 @@
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebase-ready'));
   window._horarioReady = getDocs(collection(db, 'horario')).then(function(snap) {
-    window._horarioSlots = snap.docs.map(function(d) { return d.data(); });
+    window._horarioSlots = snap.docs.map(function(d) { var s = d.data(); if (s.fecha && s.dia === undefined) { var parts = s.fecha.split("-"); var fd = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2])); s.dia = fd.getDay(); } return s; });
   }).catch(function() { window._horarioSlots = []; });
   </script>
 
