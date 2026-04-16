@@ -2457,7 +2457,7 @@ return {
     }
 
 async function initMetodoTab() {
-  if (_metodoData) { renderMetodo(_metodoData); return; }
+  if (_metodoData) { window._metodoData = _metodoData; renderMetodo(_metodoData); return; }
   _metodoData = await loadMetodoData();
   window._metodoData = _metodoData;
   if (!_metodoData) {
