@@ -2304,18 +2304,38 @@ async function loadMetodoData() {
       if (gSnap.exists()) guiaUrls = gSnap.data() || {};
     } catch (e) {}
 
-    // Cargar config/clases desde Firestore
-    if (!window._clasesConfig) {
-      try {
-        const clSnap = await window.getDoc(window.doc(db, 'config', 'clases'));
-        if (clSnap.exists()) {
+    // Cargar config/clases desde Firestore (siempre fresco)
+    try {
+      const clSnap = await window.getDoc(window.doc(db, 'config', 'clases'));
+      if (clSnap.exists()) {
           const cd = clSnap.data();
           if (cd && cd.lista) {
-            window._clasesConfig = cd.lista.filter(function(c){ return c.activa; });
-            _rebuildClasesConfig();
+              window._clasesConfig = cd.lista.filter(function(c){ return c.activa; });
+              _rebuildClasesConfig();
           }
-        }
-      } catch(e) {}
+      }
+    } catch(e) {}
+    if (window.onSnapshot && window.doc && !window._clasesConfigUnsub) {
+      window._clasesConfigUnsub = window.onSnapshot(
+          window.doc(db, 'config', 'clases'),
+          function(snap) {
+              if (!snap.exists()) return;
+              var cd = snap.data();
+              if (!cd || !cd.lista) return;
+              var newCfg = cd.lista.filter(function(c){ return c.activa; });
+              var changed = JSON.stringify(newCfg) !== JSON.stringify(window._clasesConfig);
+              window._clasesConfig = newCfg;
+              _rebuildClasesConfig();
+              if (changed && window._metodoData) {
+                  try {
+                      var ok = typeof normalizeObjetivo==='function' ? normalizeObjetivo(window._metodoData.objetivo) : null;
+                      var cfg = ok ? (OBJETIVO_CONFIG[ok]||null) : null;
+                      renderRutina(cfg, window._metodoData);
+                  } catch(ex) {}
+              }
+          },
+          function(e) {}
+      );
     }
 
     // Cargar config/objetivos desde Firestore (fuente única de verdad)
