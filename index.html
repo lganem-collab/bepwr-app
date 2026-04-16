@@ -2553,6 +2553,10 @@ function renderPruebaPeso(data) {
   var _CL_NOM_DEF = {upper_body:'Upper Body',lower_body:'Lower Body',full_body:'Full Body',full_body_core:'Full Body + Core',full_body_glutes:'Full Body + Glutes',women50:'Women 50+',pwr_yoga:'PWR Yoga'};
   var _CL_COL_DEF = {upper_body:'#3B8BD4',lower_body:'#1D9E75',full_body:'#FF8C42',full_body_core:'#FF5C1A',full_body_glutes:'#9F7AEA',women50:'#F472B6',pwr_yoga:'#F59E0B'};
   var _CL_NOM = _CL_NOM_DEF;
+  var _CLASE_FAMILIA = {
+    'full_body_core':   'full_body',
+    'full_body_glutes': 'full_body'
+  };
   var _CL_COL = _CL_COL_DEF;
   function _rebuildClasesConfig(){
     if(!window._clasesConfig||!window._clasesConfig.length)return;
@@ -2652,7 +2656,7 @@ function renderPruebaPeso(data) {
     visitasP = Promise.race([
       window.getDocs(window.query(window.collection(db,'visitas'), window.where('uid','==',uid))).then(function(snap) {
         var s = new Set(), f = {}, wf = {}, _wk = getWeekKey();
-        snap.forEach(function(d) { var dd = d.data(); if (dd.semana) s.add(dd.semana); if (dd.tipoClase) f[dd.tipoClase] = (f[dd.tipoClase]||0)+1; if (dd.semana===_wk&&dd.tipoClase) wf[dd.tipoClase]=(wf[dd.tipoClase]||0)+1; });
+        snap.forEach(function(d) { var dd = d.data(); if (dd.semana) s.add(dd.semana); if (dd.tipoClase) f[dd.tipoClase] = (f[dd.tipoClase]||0)+1; if (dd.semana===_wk&&dd.tipoClase) { var _tc=_CLASE_FAMILIA[dd.tipoClase]||dd.tipoClase; wf[_tc]=(wf[_tc]||0)+1; } });
         var saReal = s.size, saFinal = saReal;
         if (saReal < 4 && config && config.fechaAlta) {
           try { var ms = config.fechaAlta.toDate ? config.fechaAlta.toDate().getTime() : new Date(config.fechaAlta).getTime(); saFinal = Math.max(saReal, Math.min(Math.floor((Date.now()-ms)/(7*24*3600*1000)), 104)); } catch(ex) {}
