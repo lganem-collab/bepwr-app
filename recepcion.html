@@ -422,7 +422,7 @@
       var parts = s.hora.split(':');
       var minSlot = parseInt(parts[0]) * 60 + parseInt(parts[1]);
       var diff = Math.abs(minActual - minSlot);
-      if (diff < menorDiff && diff <= 15) { menorDiff = diff; mejor = s; }
+      if (diff < menorDiff && diff <= 43) { menorDiff = diff; mejor = s; }
     });
     return mejor ? mejor.tipoClase : 'desconocida';
   }
