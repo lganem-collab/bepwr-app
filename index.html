@@ -2631,13 +2631,13 @@ function renderPruebaPeso(data) {
     var timeout = new Promise(function(resolve) { setTimeout(function() { resolve({sa:0, freq:{}}); }, 8000); });
     visitasP = Promise.race([
       window.getDocs(window.query(window.collection(db,'visitas'), window.where('uid','==',uid))).then(function(snap) {
-        var s = new Set(), f = {};
-        snap.forEach(function(d) { var dd = d.data(); if (dd.semana) s.add(dd.semana); if (dd.tipoClase) f[dd.tipoClase] = (f[dd.tipoClase]||0)+1; });
+        var s = new Set(), f = {}, wf = {}, _wk = getWeekKey();
+        snap.forEach(function(d) { var dd = d.data(); if (dd.semana) s.add(dd.semana); if (dd.tipoClase) f[dd.tipoClase] = (f[dd.tipoClase]||0)+1; if (dd.semana===_wk&&dd.tipoClase) wf[dd.tipoClase]=(wf[dd.tipoClase]||0)+1; });
         var saReal = s.size, saFinal = saReal;
         if (saReal < 4 && config && config.fechaAlta) {
           try { var ms = config.fechaAlta.toDate ? config.fechaAlta.toDate().getTime() : new Date(config.fechaAlta).getTime(); saFinal = Math.max(saReal, Math.min(Math.floor((Date.now()-ms)/(7*24*3600*1000)), 104)); } catch(ex) {}
         }
-        return {sa: saFinal, freq: f};
+        return {sa: saFinal, freq: f, weekFreq: wf};
       }).catch(function() { return {sa:0, freq:{}}; }),
       timeout
     ]);
@@ -2736,6 +2736,7 @@ function renderPruebaPeso(data) {
       var dias = {};
       rec.mix.forEach(function(t) { if (!dias[t]) { var d = slots.filter(function(s) { return s.tipoClase===t&&s.activo; }).map(function(s) { return s.dia; }); dias[t] = Array.from ? Array.from(new Set(d)).sort() : d.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(); } });
       var uniq = {}; rec.mix.forEach(function(t) { uniq[t] = (uniq[t]||0)+1; });
+      var weekFreq = r.weekFreq||{};
       var topC = null, topN = 0; Object.keys(freq).forEach(function(t) { if (freq[t]>topN){topN=freq[t];topC=t;} });
       var tip = etapa===3&&topC&&topN>4?'Llevas '+topN+' visitas de '+(_CL_NOM[topC]||topC)+'. Varía para seguir progresando.':'';
       var DIAS_N = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -2757,6 +2758,21 @@ function renderPruebaPeso(data) {
         h += '<div style="display:flex;align-items:center;gap:12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="width:4px;height:36px;border-radius:2px;background:'+col+';flex-shrink:0"></div><div style="flex:1"><div style="font-size:14px;font-weight:600;color:#f0f0f0">'+(n>1?n+'x ':'')+nom+'</div><div style="font-size:12px;color:#888;margin-top:2px">'+ds+'</div></div></div>';
       });
       h += '</div>';
+      // -- Seguimiento semana actual --
+      var _seg=[],_pend=[];
+      Object.keys(uniq).forEach(function(t){
+        var veces=uniq[t],hechas=weekFreq[t]||0;
+        if(hechas>=veces)_seg.push({t:t,veces:veces,hechas:hechas});
+        else _pend.push({t:t,veces:veces,hechas:hechas});
+      });
+      if(_seg.length||_pend.length){
+        h+='<div style="background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:14px">';
+        h+='<div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Esta semana</div>';
+        _seg.forEach(function(c){var nom=_CL_NOM[c.t]||c.t;h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">\u2705</span><span style="font-size:13px;color:#4ade80">'+(c.veces>1?c.veces+'x ':'')+nom+'</span></div>';});
+        _pend.forEach(function(p){var nom=_CL_NOM[p.t]||p.t,falta=p.veces-p.hechas;h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">\u26a0\ufe0f</span><span style="font-size:13px;color:#FFA940">'+(falta>1?falta+'x ':'')+nom+'</span></div>';});
+        if(_pend.length){var _nom=_pend.map(function(p){return _CL_NOM[p.t]||p.t;}).join(' y ');h+='<div style="margin-top:10px;font-size:12px;color:#888;border-top:1px solid #222;padding-top:8px">\u26a0\ufe0f Te falta '+_nom+' \u00B7 El balance es lo m\u00E1s importante</div>';}
+        h+='</div>';
+      }
       if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento \u00B7 1 vez por semana m\u00EDn.</div><div style="font-size:13px;color:#ccc">Elige al menos una opci\u00F3n \u00B7 '+compl+'</div></div>';
       if (tip) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-left:3px solid #9F7AEA;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#9F7AEA;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consejo</div><div style="font-size:13px;color:#ccc">'+tip+'</div></div>';
       h += '</div>';
