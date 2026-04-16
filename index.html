@@ -1585,7 +1585,7 @@ function renderProfileMetrics(m) {
     const count = usage.count || 0;
 
     // If limit reached, show cached message
-    if (count >= 3 && usage.lastMessage) {
+    if (count >= 3 && usage.lastMessage && usage.lastMessage !== 'No se pudo generar el mensaje.' && usage.lastMessage !== 'No se pudo generar el mensaje. Verifica tu conexion.') {
       if (el) el.innerHTML = usage.lastMessage;
       return;
     }
@@ -1608,15 +1608,13 @@ function renderProfileMetrics(m) {
         body: JSON.stringify({ prompt })
       });
       const aiData = await res.json();
-      const msg = aiData.message || 'No se pudo generar el mensaje.';
-      logEvento('mensaje_ia');
-
-      // Save to localStorage
-      try {
-        localStorage.setItem(storageKey, JSON.stringify({ count: count + 1, lastMessage: msg, date: today }));
-      } catch(e) {}
-
-      if (el) el.innerHTML = msg;
+      const msg = aiData.message;
+        if (!msg || msg.trim() === '') throw new Error('empty');
+        logEvento('mensaje_ia');
+        try {
+          localStorage.setItem(storageKey, JSON.stringify({ count: count + 1, lastMessage: msg, date: today }));
+        } catch(e) {}
+        if (el) el.innerHTML = msg;
     } catch(e) {
       if (el) el.innerHTML = 'No se pudo generar el mensaje. Verifica tu conexion.';
     }
