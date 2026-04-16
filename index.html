@@ -2799,7 +2799,7 @@ function renderPruebaPeso(data) {
         h+='<div style="background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:14px">';
         h+='<div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Esta semana</div>';
         _seg.forEach(function(c){var nom=_CL_NOM[c.t]||c.t;h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">\u2705</span><span style="font-size:13px;color:#4ade80">'+(c.veces>1?c.veces+'x ':'')+nom+'</span></div>';});
-        _pend.forEach(function(p){var nom=_CL_NOM[p.t]||p.t,falta=p.veces-p.hechas;h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">\u26a0\ufe0f</span><span style="font-size:13px;color:#FFA940">'+(falta>1?falta+'x ':'')+nom+'</span></div>';});
+        _pend.forEach(function(p){var nom=_CL_NOM[p.t]||p.t,falta=p.veces-p.hechas;var label=(p.hechas>0?p.hechas+'/'+p.veces+' ':( falta>1?falta+'x ':''))+nom;h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">\u26a0\ufe0f</span><span style="font-size:13px;color:#FFA940">'+label+'</span></div>';});
         if(_pend.length){var _nom=_pend.map(function(p){return _CL_NOM[p.t]||p.t;}).join(' y ');h+='<div style="margin-top:10px;font-size:12px;color:#888;border-top:1px solid #222;padding-top:8px">\u26a0\ufe0f Te falta '+_nom+' \u00B7 El balance es lo m\u00E1s importante</div>';}
         h+='</div>';
       }
