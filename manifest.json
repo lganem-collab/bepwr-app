@@ -11,13 +11,13 @@
   "icons": [
     {
       "src": "/icons/logo-bepwr.png",
-      "sizes": "938x938",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "/icons/logo-bepwr.png",
-      "sizes": "938x938",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
