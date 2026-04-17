@@ -3076,7 +3076,7 @@ if (config && config.rutina) {
   if (rutina) {
     lines.push('- Clases recomendadas por semana: ' + rutina.total);
     if (rutina.clases) {
-      var nombreClase = { full_body: 'Full Body', upper_body: 'Upper Body', lower_body: 'Lower Body', full_body_core: 'Full Body + Core', full_body_glutes: 'Full Body + Glutes', women50: 'Women 50+', '50+': 'Women 50+', pwr_yoga: 'PWR Yoga', 'FullBody': 'Full Body', 'LowerBody': 'Lower Body', 'UpperBody': 'Upper Body' };
+      var nombreClase = { full_body: 'Full Body', upper_body: 'Upper Body', lower_body: 'Lower Body', full_body_core: 'Full Body + Core', full_body_glutes: 'Full Body + Glutes', women50: 'Funcional 50+', '50+': 'Funcional 50+', pwr_yoga: 'PWR Yoga', 'FullBody': 'Full Body', 'LowerBody': 'Lower Body', 'UpperBody': 'Upper Body' };
       var clasesTexto = rutina.clases.map(function(c){ return (nombreClase[c.tipo] || c.tipo) + ' ' + c.freq; }).join(', ');
       lines.push('- Clases del plan: ' + clasesTexto);
     }
@@ -3096,6 +3096,14 @@ if (config && config.rutina) {
     hidLitros = (hidMl / 1000).toFixed(1);
     lines.push('- Hidratación diaria recomendada (calculada por bePWR): ' + hidLitros + ' litros (' + hidMl + ' ml) — NO uses otro número de hidratación');
   }
+  // Datos personales completos
+  var generoLabel = (data.genero||'').toLowerCase() === 'masculino' ? 'Masculino' : (data.genero||'').toLowerCase() === 'femenino' ? 'Femenino' : 'No especificado';
+  var nombreMiembro = data.alias || (data.nombre ? data.nombre.split(' ')[0] : null);
+  var alturaLabel = data.altura ? data.altura + ' cm' : null;
+  lines.unshift('- Género: ' + generoLabel + ' — adapta pronombres y referencias fisiológicas al género indicado');
+  lines.unshift('- Nombre: ' + (nombreMiembro || 'Miembro'));
+  if (data.edad) lines.push('- Edad: ' + data.edad + ' años');
+  if (alturaLabel) lines.push('- Altura: ' + alturaLabel);
   lines.push('- Horas de sueño recomendadas: 7 a 9 horas diarias');
   lines.push('- Recuperación: 1 día de descanso activo por semana');
 
