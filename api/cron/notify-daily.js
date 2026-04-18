@@ -20,7 +20,7 @@ const messaging = getMessaging();
 async function sendPush(token, title, body, uid = null) {
   if (!token) return;
   try {
-    await messaging.send({ token, notification: { title, body }, android: { priority: 'high', notification: { channelId: 'bepwr-default', sound: 'default' } }, apns: { headers: { 'apns-priority': '10' }, payload: { aps: { sound: 'default', badge: 1 } } }, webpush: { notification: { icon: '/icons/icon-192.png' } } });
+    await messaging.send({ token, notification: { title, body }, android: { priority: 'high', notification: { channelId: 'bepwr-default', sound: 'default' } }, apns: { headers: { 'apns-priority': '10' }, payload: { aps: { sound: 'default', badge: 1 } } }, webpush: { notification: { icon: '/icons/logo-bepwr.png' } } });
     if (uid) {
       const ref = db.collection('usuarios').doc(uid).collection('notificaciones').doc();
       await ref.set({ titulo: title, cuerpo: body, fecha: new Date(), leida: false, tipo: 'aviso' });

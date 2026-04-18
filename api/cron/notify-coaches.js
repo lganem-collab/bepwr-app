@@ -40,7 +40,7 @@ export default async function handler(req, res) {
       },
       webpush: {
         fcmOptions: { link: 'https://bepwr-app.vercel.app/admin.html' },
-        notification: { title, body, icon: 'https://bepwr-app.vercel.app/icons/icon-192.png' }
+        notification: { title, body, icon: 'https://bepwr-app.vercel.app/icons/logo-bepwr.png' }
       }
     });
     const batchC = db.batch();

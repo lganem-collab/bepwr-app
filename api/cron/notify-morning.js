@@ -48,8 +48,8 @@ export default async function handler(req, res) {
       webpush: {
         notification: {
           title, body,
-          icon: 'https://bepwr-app.vercel.app/icons/icon-192.png',
-          badge: 'https://bepwr-app.vercel.app/icons/icon-192.png',
+          icon: 'https://bepwr-app.vercel.app/icons/logo-bepwr.png',
+          badge: 'https://bepwr-app.vercel.app/icons/logo-bepwr.png',
           requireInteraction: false,
         },
         fcmOptions: { link: 'https://bepwr-app.vercel.app' }
