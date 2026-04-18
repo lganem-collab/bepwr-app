@@ -1144,7 +1144,7 @@ if(window._applyIndiceEvolucion) window._applyIndiceEvolucion(ultima, anterior, 
         window.verificarLogros && window.verificarLogros(user.uid, metricas, data.genero || '');
 
         // Generar mensaje IA
-generateAIMessage(nombre, ultima, obj, (data.bepwrScore != null ? data.bepwrScore : (typeof calcBePWRScore==="function" ? calcBePWRScore(anterior, ultima, obj) : null)), null);
+generateAIMessage(nombre, ultima, obj, (window._bepwrScoreActual != null ? window._bepwrScoreActual : (data.bepwrScore != null ? data.bepwrScore : null)), null);
       } else {
         renderMetricsEmpty();
         document.getElementById('ai-message').innerHTML = '\u00A1Hola <b>' + nombre.split(' ')[0] + '</b>! Tu primera valoraci\u00F3n a\u00FAn no ha sido registrada. Habla con el staff para comenzar. &#x1F4AA;';
@@ -3625,6 +3625,7 @@ var edad=35;
 try{var nac=window.cachedUserData&&window.cachedUserData.nacimiento;if(nac){var dn=nac.toDate?nac.toDate():new Date(nac);edad=Math.floor((Date.now()-dn.getTime())/(365.25*24*3600*1000));}}catch(e){}
 var sc=ivfScore(ini||m,m,gen,edad);
 if(sc===null)return;
+window._bepwrScoreActual=sc;
 var circ=2*Math.PI*42;
 var el=document.getElementById('bepwr-score-value');
 var ring=document.getElementById('bepwr-score-ring');
