@@ -1,11 +1,6 @@
 name: bePWR Notificaciones Programadas
 
 on:
-  schedule:
-    - cron: '0 12 * * 1,5'
-    - cron: '0 1 * * 3,0'
-    - cron: '30 11 * * 1-5'
-    - cron: '0 15 * * *'
   workflow_dispatch:
     inputs:
       endpoint:
