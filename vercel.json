@@ -36,7 +36,7 @@
     },
     {
       "path": "/api/cron/notify-evening",
-      "schedule": "0 1 * * 4,1"
+      "schedule": "0 23 * * 3,0"
     },
     {
       "path": "/api/cron/notify-coaches",
