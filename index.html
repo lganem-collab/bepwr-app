@@ -2669,7 +2669,96 @@ function renderPruebaPeso(data) {
     if (!mix) mix = ['full_body_core'];
     return {n:mix.length,mix:mix};
   }
-  // Guardar snapshot de la rutina semanal en Firestore (subcolección del miembro)
+  // Abrir modal Mi Proceso bePWR y cargar historial
+async function abrirMiProceso() {
+  var modal = document.getElementById('modal-mi-proceso');
+  var cont = document.getElementById('mi-proceso-contenido');
+  if (!modal || !cont) return;
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:13px">Cargando historial...</div>';
+
+  var uid = window._currentUid;
+  if (!uid || !window.getDocs || !window.collection || !window.query || !window.orderBy || !window.limit) {
+    cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:13px">No se pudo cargar el historial.</div>';
+    return;
+  }
+
+  try {
+    var q = window.query(
+      window.collection(window.db, 'usuarios', uid, 'rutinasSemanales'),
+      window.orderBy('weekKey', 'desc'),
+      window.limit(200)
+    );
+    var snap = await window.getDocs(q);
+    if (snap.empty) {
+      cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:13px">Aún no tienes semanas registradas. Tu primera semana se guardará automáticamente.</div>';
+      return;
+    }
+    var semanas = [];
+    snap.forEach(function(d) { semanas.push(d.data()); });
+    renderHistorialSemanas(semanas);
+  } catch(e) {
+    console.error('Error cargando historial:', e);
+    cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:13px">Error: '+e.message+'</div>';
+  }
+}
+
+function cerrarMiProceso() {
+  var modal = document.getElementById('modal-mi-proceso');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderHistorialSemanas(semanas) {
+  var cont = document.getElementById('mi-proceso-contenido');
+  if (!cont) return;
+  var html = '';
+  semanas.forEach(function(s) {
+    var cumplida = s.cumplida;
+    var borderColor = cumplida ? '#4ade80' : '#444';
+    var statusBadge = cumplida
+      ? '<span style="background:#4ade80;color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">CUMPLIDA</span>'
+      : '<span style="background:#2a2a2a;color:#FFA940;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">'+(s.totalClasesHechas||0)+'/'+(s.totalClasesObjetivo||0)+'</span>';
+
+    // Parsear weekKey formato "2026-W17" a fecha legible
+    var labelSemana = s.weekKey || '';
+    try {
+      var m = s.weekKey.match(/(\d{4})-W(\d{2})/);
+      if (m) {
+        var y = parseInt(m[1]), w = parseInt(m[2]);
+        var d = new Date(y, 0, 1 + (w - 1) * 7);
+        var mesesAbr = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        labelSemana = 'Sem ' + w + ' · ' + d.getDate() + ' ' + mesesAbr[d.getMonth()] + ' ' + y;
+      }
+    } catch(e) {}
+
+    var clasesHtml = '';
+    (s.clases||[]).forEach(function(c) {
+      var circulos = '';
+      for (var i = 0; i < c.veces; i++) {
+        if (i < c.hechas) {
+          circulos += '<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#4ade80;color:#000;font-size:9px;font-weight:700;margin-right:3px">\u2713</span>';
+        } else {
+          circulos += '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:1px dashed #666;margin-right:3px;vertical-align:middle"></span>';
+        }
+      }
+      clasesHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="display:flex;align-items:center;flex-shrink:0">'+circulos+'</div><span style="font-size:11px;color:#ccc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+c.nombre+'</span></div>';
+    });
+
+    html += '<div style="background:#0d0d0d;border:1px solid '+borderColor+';border-radius:10px;padding:12px">'+
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+              '<div style="font-size:11px;color:#FF5C1A;font-weight:600">'+labelSemana+'</div>'+
+              statusBadge+
+            '</div>'+
+            '<div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Etapa '+(s.etapa||'?')+' · '+(s.etapaNombre||'')+'</div>'+
+            clasesHtml+
+            '</div>';
+  });
+  cont.innerHTML = html;
+}
+
+// Guardar snapshot de la rutina semanal en Firestore (subcolección del miembro)
 async function guardarSnapshotSemanal(uid, weekKey, snapshot) {
   if (!uid || !weekKey || !window.setDoc || !window.doc || !window.db) return;
   try {
@@ -4981,6 +5070,22 @@ re:["El cuerpo puede cambiar. Ya lo ha hecho antes. Lo hará de nuevo.","Esta va
 })();
 </script>
 <!-- Modal Aviso -->
+<!-- Modal Mi Proceso bePWR -->
+<div id="modal-mi-proceso" style="display:none;position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,0.95);overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <div style="max-width:900px;margin:0 auto;padding:20px 16px 40px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;position:sticky;top:0;background:#000;padding:12px 0;z-index:10;border-bottom:1px solid #222">
+      <div>
+        <div style="font-size:18px;font-weight:700;color:#FF5C1A">Mi Proceso bePWR</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">Historial de tus rutinas semanales</div>
+      </div>
+      <button onclick="cerrarMiProceso()" style="background:transparent;border:1px solid #444;color:#ccc;font-size:13px;padding:8px 14px;border-radius:20px;cursor:pointer">Cerrar</button>
+    </div>
+    <div id="mi-proceso-contenido" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:13px">Cargando historial...</div>
+    </div>
+  </div>
+</div>
+
 <div id="modal-aviso" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;padding:20px">
   <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:24px;max-width:440px;width:100%;position:relative">
     <button onclick="document.getElementById('modal-aviso').style.display='none'" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#555;font-size:26px;cursor:pointer;line-height:1">&#xD7;</button>
