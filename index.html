@@ -2669,7 +2669,21 @@ function renderPruebaPeso(data) {
     if (!mix) mix = ['full_body_core'];
     return {n:mix.length,mix:mix};
   }
-  // Semana bePWR: corte domingo 17:00. Antes del corte = semana actual, después = siguiente semana.
+  // Guardar snapshot de la rutina semanal en Firestore (subcolección del miembro)
+async function guardarSnapshotSemanal(uid, weekKey, snapshot) {
+  if (!uid || !weekKey || !window.setDoc || !window.doc || !window.db) return;
+  try {
+    await window.setDoc(
+      window.doc(window.db, 'usuarios', uid, 'rutinasSemanales', weekKey),
+      snapshot,
+      { merge: true }
+    );
+  } catch(e) {
+    console.warn('No se pudo guardar snapshot semanal:', e.message);
+  }
+}
+
+// Semana bePWR: corte domingo 17:00. Antes del corte = semana actual, después = siguiente semana.
 function getWeekKeyBePWR(date) {
   var d = date ? new Date(date) : new Date();
   // Si es domingo (0) y son >= 17:00, suma 1 día para caer en lunes siguiente
@@ -2821,6 +2835,39 @@ function renderRutina(config, data) {
         semanasActivas: sa
       };
 
+      // Guardar snapshot de esta semana bePWR en Firestore
+      try {
+        var _weekKeyActual = getWeekKeyBePWR();
+        var _mixConCuentas = {};
+        rec.mix.forEach(function(t){ _mixConCuentas[t] = (_mixConCuentas[t]||0)+1; });
+        var _clasesSnapshot = Object.keys(_mixConCuentas).map(function(t){
+          return {
+            tipo: t,
+            nombre: _CL_NOM[t] || t,
+            color: _CL_COL[t] || '#888',
+            veces: _mixConCuentas[t],
+            hechas: Math.min(weekFreq[t] || 0, _mixConCuentas[t])
+          };
+        });
+        var _totalHechas = _clasesSnapshot.reduce(function(a,c){return a+c.hechas;},0);
+        var _totalObj = _clasesSnapshot.reduce(function(a,c){return a+c.veces;},0);
+        var _snapshot = {
+          weekKey: _weekKeyActual,
+          fechaSnapshot: new Date().toISOString(),
+          etapa: etapaFinal,
+          etapaNombre: ei && ei.n ? ei.n : 'Etapa ' + etapaFinal,
+          grupoEdad: ge,
+          objetivo: meta,
+          semanasActivas: sa,
+          clases: _clasesSnapshot,
+          totalClasesObjetivo: _totalObj,
+          totalClasesHechas: _totalHechas,
+          cumplida: _totalHechas >= _totalObj,
+          complemento: compl || ''
+        };
+        if (uid) guardarSnapshotSemanal(uid, _weekKeyActual, _snapshot);
+      } catch(e) { console.warn('snapshot rutina:', e.message); }
+
       var slots = window._horarioSlots||[];
       var dias = {};
       rec.mix.forEach(function(t) { if (!dias[t]) { var d = slots.filter(function(s) { return s.tipoClase===t&&s.activo; }).map(function(s) { return s.dia; }); dias[t] = Array.from ? Array.from(new Set(d)).sort() : d.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(); } });
@@ -2859,7 +2906,7 @@ function renderRutina(config, data) {
       });
       if(_seg.length||_pend.length){
         h+='<div style="background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:14px">';
-        h+='<div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Esta semana</div>';
+        h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px">Esta semana</div><button onclick="abrirMiProceso()" style="background:transparent;border:1px solid #444;color:#FF5C1A;font-size:10px;font-weight:600;padding:4px 10px;border-radius:12px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px">Mi Proceso</button></div>';
         // Renderiza cada clase con N círculos: verdes los hechos, blancos los pendientes
         var _todas = _seg.concat(_pend);
         _todas.forEach(function(c){
