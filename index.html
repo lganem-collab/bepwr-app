@@ -2860,9 +2860,29 @@ function renderRutina(config, data) {
       if(_seg.length||_pend.length){
         h+='<div style="background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:14px">';
         h+='<div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Esta semana</div>';
-        _seg.forEach(function(c){var nom=_CL_NOM[c.t]||c.t;h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#4ade80;color:#000;font-size:11px;font-weight:700">\u2713</span><span style="font-size:13px;color:#4ade80">'+(c.veces>1?c.veces+'x ':'')+nom+'</span></div>';});
-        _pend.forEach(function(p){var nom=_CL_NOM[p.t]||p.t,falta=p.veces-p.hechas;var label=(p.hechas>0?p.hechas+' de '+p.veces+' ':( falta>1?falta+'x ':''))+nom;h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px dashed #666;background:transparent"></span><span style="font-size:13px;color:#FFA940">'+label+'</span></div>';});
-        if(_pend.length){var _nom=_pend.map(function(p){return _CL_NOM[p.t]||p.t;}).join(' y ');h+='<div style="margin-top:10px;font-size:12px;color:#888;border-top:1px solid #222;padding-top:8px">\u26a0\ufe0f Te falta '+_nom+' \u00B7 El balance es lo m\u00E1s importante</div>';} else if(_seg.length){h+='<div style="margin-top:10px;font-size:12px;color:#4ade80;border-top:1px solid #222;padding-top:8px;font-weight:500">\u{1F389} Cumpliste tu rutina de la semana \u00B7 \u00A1Bien hecho!</div>';}
+        // Renderiza cada clase con N círculos: verdes los hechos, blancos los pendientes
+        var _todas = _seg.concat(_pend);
+        _todas.forEach(function(c){
+          var nom=_CL_NOM[c.t]||c.t;
+          var hechas=c.hechas||c.veces;
+          var total=c.veces;
+          var circulos='';
+          for(var i=0;i<total;i++){
+            if(i<hechas){
+              circulos+='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#4ade80;color:#000;font-size:12px;font-weight:700;margin-right:4px">\u2713</span>';
+            } else {
+              circulos+='<span style="display:inline-block;width:18px;height:18px;border-radius:50%;border:1.5px dashed #666;background:transparent;margin-right:4px;vertical-align:middle"></span>';
+            }
+          }
+          var color = hechas>=total ? '#4ade80' : '#FFA940';
+          h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="display:flex;align-items:center">'+circulos+'</div><span style="font-size:13px;color:'+color+'">'+nom+'</span></div>';
+        });
+        if(_pend.length){
+          var _totalFalta = _pend.reduce(function(a,p){return a+(p.veces-p.hechas);},0);
+          h+='<div style="margin-top:10px;font-size:12px;color:#888;border-top:1px solid #222;padding-top:8px">\u26a0\ufe0f Te falta '+_totalFalta+' clase'+(_totalFalta>1?'s':'')+' \u00B7 El balance es lo m\u00E1s importante</div>';
+        } else if(_seg.length){
+          h+='<div style="margin-top:10px;font-size:12px;color:#4ade80;border-top:1px solid #222;padding-top:8px;font-weight:500">\u{1F389} \u00A1Cumpliste tu rutina de la semana! Bien hecho.</div>';
+        } else if(_seg.length){h+='<div style="margin-top:10px;font-size:12px;color:#4ade80;border-top:1px solid #222;padding-top:8px;font-weight:500">\u{1F389} Cumpliste tu rutina de la semana \u00B7 \u00A1Bien hecho!</div>';}
         h+='</div>';
       }
       if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento \u00B7 1 vez por semana m\u00EDn.</div><div style="font-size:13px;color:#ccc">Elige al menos una opci\u00F3n \u00B7 '+compl+'</div></div>';
