@@ -2835,18 +2835,26 @@ function renderRutina(config, data) {
         semanasActivas: sa
       };
 
-      // Guardar snapshot de esta semana bePWR en Firestore
+
+
+      var slots = window._horarioSlots||[];
+      var dias = {};
+      rec.mix.forEach(function(t) { if (!dias[t]) { var d = slots.filter(function(s) { return s.tipoClase===t&&s.activo; }).map(function(s) { return s.dia; }); dias[t] = Array.from ? Array.from(new Set(d)).sort() : d.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(); } });
+      var uniq = {}; rec.mix.forEach(function(t) { uniq[t] = (uniq[t]||0)+1; });
+      var uniqKeys = Object.keys(uniq);
+      var weekFreq = {};
+      Object.keys(r.weekFreq||{}).forEach(function(t){ var _tc=t; if(_CLASE_FAMILIA[t]&&uniqKeys.indexOf(_CLASE_FAMILIA[t])!==-1) _tc=_CLASE_FAMILIA[t]; weekFreq[_tc]=(weekFreq[_tc]||0)+(r.weekFreq[t]||0); });
+
+      // Guardar snapshot de esta semana bePWR en Firestore (weekFreq ya poblado)
       try {
         var _weekKeyActual = getWeekKeyBePWR();
-        var _mixConCuentas = {};
-        rec.mix.forEach(function(t){ _mixConCuentas[t] = (_mixConCuentas[t]||0)+1; });
-        var _clasesSnapshot = Object.keys(_mixConCuentas).map(function(t){
+        var _clasesSnapshot = Object.keys(uniq).map(function(t){
           return {
             tipo: t,
             nombre: _CL_NOM[t] || t,
             color: _CL_COL[t] || '#888',
-            veces: _mixConCuentas[t],
-            hechas: Math.min(weekFreq[t] || 0, _mixConCuentas[t])
+            veces: uniq[t],
+            hechas: Math.min(weekFreq[t] || 0, uniq[t])
           };
         });
         var _totalHechas = _clasesSnapshot.reduce(function(a,c){return a+c.hechas;},0);
@@ -2867,14 +2875,6 @@ function renderRutina(config, data) {
         };
         if (uid) guardarSnapshotSemanal(uid, _weekKeyActual, _snapshot);
       } catch(e) { console.warn('snapshot rutina:', e.message); }
-
-      var slots = window._horarioSlots||[];
-      var dias = {};
-      rec.mix.forEach(function(t) { if (!dias[t]) { var d = slots.filter(function(s) { return s.tipoClase===t&&s.activo; }).map(function(s) { return s.dia; }); dias[t] = Array.from ? Array.from(new Set(d)).sort() : d.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(); } });
-      var uniq = {}; rec.mix.forEach(function(t) { uniq[t] = (uniq[t]||0)+1; });
-      var uniqKeys = Object.keys(uniq);
-      var weekFreq = {};
-      Object.keys(r.weekFreq||{}).forEach(function(t){ var _tc=t; if(_CLASE_FAMILIA[t]&&uniqKeys.indexOf(_CLASE_FAMILIA[t])!==-1) _tc=_CLASE_FAMILIA[t]; weekFreq[_tc]=(weekFreq[_tc]||0)+(r.weekFreq[t]||0); });
       var topC = null, topN = 0; Object.keys(freq).forEach(function(t) { if (t==='desconocida') return; if (freq[t]>topN){topN=freq[t];topC=t;} });
       var tip = '';
       if (topN>4) {
