@@ -2785,6 +2785,25 @@ function renderPruebaPeso(data) {
         }
         if (compl.indexOf('Full Body + Glutes') === -1) compl = (compl ? compl + ' \u00B7 ' : '') + 'Full Body + Glutes (fin de semana)';
       }
+      // Snapshot para IA: mismo mix que ve el miembro en su tarjeta
+      var _cuentaClases = {};
+      rec.mix.forEach(function(t){ _cuentaClases[t] = (_cuentaClases[t]||0)+1; });
+      var _NOM_CLASE_IA = { full_body: 'Full Body', upper_body: 'Upper Body', lower_body: 'Lower Body', full_body_core: 'Full Body + Core', full_body_glutes: 'Full Body + Glutes', women50: 'Funcional 50+', pwr_yoga: 'PWR Yoga' };
+      var _mixLegible = Object.keys(_cuentaClases).map(function(t){
+        var n = _cuentaClases[t];
+        return n + 'x ' + (_NOM_CLASE_IA[t] || t);
+      }).join(', ');
+      window._rutinaActual = {
+        totalClases: rec.mix.length,
+        etapa: etapaFinal,
+        etapaNombre: ei && ei.nombre ? ei.nombre : 'Etapa ' + etapaFinal,
+        grupoEdad: ge,
+        mixRaw: rec.mix.slice(),
+        mixLegible: _mixLegible,
+        complemento: compl,
+        semanasActivas: sa
+      };
+
       var slots = window._horarioSlots||[];
       var dias = {};
       rec.mix.forEach(function(t) { if (!dias[t]) { var d = slots.filter(function(s) { return s.tipoClase===t&&s.activo; }).map(function(s) { return s.dia; }); dias[t] = Array.from ? Array.from(new Set(d)).sort() : d.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(); } });
@@ -3059,29 +3078,14 @@ async function renderAnalisisCientifico(data, config) {
       lines.push('- Tiempo desde \u00FAltima valoraci\u00F3n: ' + semanas + ' semanas');
     } catch(e) {}
   }
-if (config && config.rutina) {
-  // Calcular edad real desde nacimiento, con fallback a data.edad
-  var edadReal = data.edad || 30;
-  if (data.nacimiento) {
-    try {
-      var nacDate = new Date(data.nacimiento);
-      var hoyDate = new Date();
-      edadReal = hoyDate.getFullYear() - nacDate.getFullYear();
-      if (hoyDate.getMonth() < nacDate.getMonth() ||
-         (hoyDate.getMonth() === nacDate.getMonth() && hoyDate.getDate() < nacDate.getDate())) edadReal--;
-    } catch(e) {}
-  }
-  var ageKey = edadReal < 30 ? 'sub30' : edadReal < 50 ? 'mid' : 'senior';
-  var rutina = config.rutina[ageKey] || config.rutina['mid'];
-  if (rutina) {
-    lines.push('- Clases recomendadas por semana: ' + rutina.total);
-    if (rutina.clases) {
-      var nombreClase = { full_body: 'Full Body', upper_body: 'Upper Body', lower_body: 'Lower Body', full_body_core: 'Full Body + Core', full_body_glutes: 'Full Body + Glutes', women50: 'Funcional 50+', '50+': 'Funcional 50+', pwr_yoga: 'PWR Yoga', 'FullBody': 'Full Body', 'LowerBody': 'Lower Body', 'UpperBody': 'Upper Body' };
-      var clasesTexto = rutina.clases.map(function(c){ return (nombreClase[c.tipo] || c.tipo) + ' ' + c.freq; }).join(', ');
-      lines.push('- Clases del plan: ' + clasesTexto);
-    }
-    if (rutina.complemento) lines.push('- Complemento sugerido (actividad adicional fuera del gym): ' + rutina.complemento);
-  }
+// Usar snapshot real de renderRutina (misma fuente que la tarjeta del miembro)
+if (window._rutinaActual) {
+  var ra = window._rutinaActual;
+  lines.push('- Etapa del miembro: ' + ra.etapaNombre);
+  lines.push('- Semanas activas: ' + ra.semanasActivas);
+  lines.push('- Total clases por semana (EXACTO, no inventar): ' + ra.totalClases);
+  lines.push('- Mix semanal (EXACTO): ' + ra.mixLegible);
+  if (ra.complemento) lines.push('- Complemento sugerido (actividad adicional): ' + ra.complemento);
 }
 
   // Calcular hidratación con la misma fórmula que la tarjeta
