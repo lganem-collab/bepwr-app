@@ -2669,7 +2669,24 @@ function renderPruebaPeso(data) {
     if (!mix) mix = ['full_body_core'];
     return {n:mix.length,mix:mix};
   }
-  function renderRutina(config, data) {
+  // Semana bePWR: corte domingo 17:00. Antes del corte = semana actual, después = siguiente semana.
+function getWeekKeyBePWR(date) {
+  var d = date ? new Date(date) : new Date();
+  // Si es domingo (0) y son >= 17:00, suma 1 día para caer en lunes siguiente
+  if (d.getDay() === 0 && d.getHours() >= 17) {
+    d.setDate(d.getDate() + 1);
+  }
+  // Usar lunes como inicio (ISO-like) pero con el ajuste del domingo 17:00
+  var day = d.getDay() || 7; // 0 (dom) → 7
+  if (day !== 1) d.setDate(d.getDate() - (day - 1));
+  d.setHours(0,0,0,0);
+  var year = d.getFullYear();
+  var firstJan = new Date(year, 0, 1);
+  var weekNum = Math.ceil((((d - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
+  return year + '-W' + String(weekNum).padStart(2, '0');
+}
+
+function renderRutina(config, data) {
   var el = document.getElementById('metodo-rutina-container'); if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;font-size:14px">Calculando tu rutina...</div>';
   var uid = window._currentUid, db = window.db;
