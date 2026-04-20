@@ -834,7 +834,7 @@
   };
 
   const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  const auth = window.auth = getAuth(app);
   const db = window.db = getFirestore(app);
   window.getDoc = getDoc;
   window.doc = doc;
@@ -4196,7 +4196,7 @@ window._applyIVF=applyIVF;
     // Obtener horas ocupadas desde endpoint server-side (no expone PII de otros miembros)
     let ocupadas=[];
     try {
-      const token=await auth.currentUser.getIdToken();
+      const token=await window.auth.currentUser.getIdToken();
       const r=await fetch('/api/citas?fecha='+encodeURIComponent(fecha),{
         headers:{'Authorization':'Bearer '+token}
       });
@@ -4259,7 +4259,7 @@ window._applyIVF=applyIVF;
     btn.disabled=true; btn.textContent='Agendando…'; msgEl.textContent='';
     try {
       const rango=getCitaRango(window._citasFechaSeleccionada);
-      const token=await auth.currentUser.getIdToken();
+      const token=await window.auth.currentUser.getIdToken();
       // Creacion atomica server-side: valida slot + cancela cita previa + crea nueva en una transaccion
       const r=await fetch('/api/citas',{
         method:'POST',
