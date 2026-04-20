@@ -4179,7 +4179,10 @@ function _buildCalendario(slots, lunes) {
   var table = document.getElementById('horario-table');
   if (!table) return;
   var DIAS = ['Lun','Mar','Mi\u00e9','Jue','Vie','S\u00e1b','Dom'];
-  var HORAS = ['06:00','07:00','08:00','08:10','09:00','09:15','09:30','10:00','10:30','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','20:10','21:00'];
+  var HORAS_BASE = ['06:00','07:00','08:00','08:10','09:00','09:15','09:30','10:00','10:30','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','20:10','21:00'];
+  // Merge horas base con cualquier hora presente en slots (evita ocultar slots con horario no estándar)
+  var _horasEnSlots = (slots || []).map(function(s){return s.hora;}).filter(function(h){return h;});
+  var HORAS = Array.from(new Set(HORAS_BASE.concat(_horasEnSlots))).sort();
   var thead = '<thead><tr><th style="width:55px;padding:8px;background:#0d0d0d;border-bottom:1px solid #2a2a2a;color:#555;font-size:10px;font-weight:400;font-family:Space Mono,monospace;text-align:left">HORA</th>';
   for (var d = 0; d < 7; d++) {
     var fecha = new Date(lunes); fecha.setDate(lunes.getDate() + d);
