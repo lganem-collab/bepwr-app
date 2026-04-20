@@ -42,8 +42,9 @@ export default async function handler(req, res) {
       if (!nombre || !fecha || !hora) return res.status(400).json({ error: 'Faltan datos' });
       const fl = fechaLegible(fecha, hora);
       const cancel = tipo === 'cancelacion';
-      to = ['lganem@gmail.com'];
-      if (emailMiembro && emailMiembro !== 'lganem@gmail.com') to.push(emailMiembro);
+      to = ['blanuza@bepwr.com'];
+      if (emailMiembro && emailMiembro !== 'blanuza@bepwr.com') to.push(emailMiembro);
+      const cc = ['lganem@terrasola.mx'];
       subject = cancel ? `Cita cancelada \u00B7 ${nombre} \u00B7 ${fl}` : `Valoraci\u00F3n agendada \u00B7 ${nombre} \u00B7 ${fl}`;
       html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto">
         <div style="background:#ffffff;padding:20px;border-radius:12px 12px 0 0;text-align:center;border-bottom:1px solid ${cancel?'#f5c6c6':'#c8e6c9'}">
@@ -72,7 +73,7 @@ export default async function handler(req, res) {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: FROM, to, subject, html })
+      body: JSON.stringify(tipo === 'reporte' ? { from: FROM, to, subject, html } : { from: FROM, to, cc, subject, html })
     });
     const result = await r.json();
     if (!r.ok) throw new Error(result.message || 'Error Resend');
