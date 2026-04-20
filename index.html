@@ -2772,21 +2772,48 @@ async function guardarSnapshotSemanal(uid, weekKey, snapshot) {
   }
 }
 
-// Semana bePWR: corte domingo 17:00. Antes del corte = semana actual, después = siguiente semana.
+// Semana bePWR: lunes como inicio. Si es domingo >= 17:00, muestra preview de la semana siguiente.
 function getWeekKeyBePWR(date) {
   var d = date ? new Date(date) : new Date();
-  // Si es domingo (0) y son >= 17:00, suma 1 día para caer en lunes siguiente
+  // Preview: domingo >= 17:00, adelantar al lunes
   if (d.getDay() === 0 && d.getHours() >= 17) {
     d.setDate(d.getDate() + 1);
   }
-  // Usar lunes como inicio (ISO-like) pero con el ajuste del domingo 17:00
-  var day = d.getDay() || 7; // 0 (dom) → 7
+  // Retroceder al lunes de esa semana
+  var day = d.getDay() || 7;
   if (day !== 1) d.setDate(d.getDate() - (day - 1));
-  d.setHours(0,0,0,0);
-  var year = d.getFullYear();
-  var firstJan = new Date(year, 0, 1);
-  var weekNum = Math.ceil((((d - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
-  return year + '-W' + String(weekNum).padStart(2, '0');
+  d.setHours(0, 0, 0, 0);
+  // ISO week number
+  var target = new Date(d.valueOf());
+  var dayNr = (d.getDay() + 6) % 7;
+  target.setDate(target.getDate() - dayNr + 3);
+  var firstThursday = target.valueOf();
+  target.setMonth(0, 1);
+  if (target.getDay() !== 4) {
+    target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+  }
+  var weekNum = 1 + Math.ceil((firstThursday - target) / 604800000);
+  return d.getFullYear() + '-W' + String(weekNum).padStart(2, '0');
+}
+
+// Rango de fechas legible de un weekKey (lunes a domingo)
+function getWeekRange(weekKey) {
+  var m = weekKey.match(/(\d{4})-W(\d{2})/);
+  if (!m) return weekKey;
+  var y = parseInt(m[1]), w = parseInt(m[2]);
+  var jan4 = new Date(y, 0, 4);
+  var jan4Day = jan4.getDay() || 7;
+  var mondayW1 = new Date(jan4);
+  mondayW1.setDate(jan4.getDate() - jan4Day + 1);
+  var monday = new Date(mondayW1);
+  monday.setDate(mondayW1.getDate() + (w - 1) * 7);
+  var sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  if (monday.getMonth() === sunday.getMonth()) {
+    return monday.getDate() + '–' + sunday.getDate() + ' ' + meses[monday.getMonth()];
+  }
+  return monday.getDate() + ' ' + meses[monday.getMonth()] + '–' + sunday.getDate() + ' ' + meses[sunday.getMonth()];
 }
 
 function renderRutina(config, data) {
@@ -2948,6 +2975,22 @@ function renderRutina(config, data) {
         });
         var _totalHechas = _clasesSnapshot.reduce(function(a,c){return a+c.hechas;},0);
         var _totalObj = _clasesSnapshot.reduce(function(a,c){return a+c.veces;},0);
+        // Todas las visitas de la semana actual (rutina + extras)
+        var _visitasSemana = {};
+        var _totalVisitasSemana = 0;
+        Object.keys(r.weekFreq||{}).forEach(function(t){
+          if (t === 'desconocida') return;
+          var nombreClase = _CL_NOM[t] || t;
+          var cant = r.weekFreq[t] || 0;
+          if (cant > 0) {
+            _visitasSemana[nombreClase] = (_visitasSemana[nombreClase]||0) + cant;
+            _totalVisitasSemana += cant;
+          }
+        });
+        var _visitasLista = Object.keys(_visitasSemana).map(function(nom){
+          return { nombre: nom, cantidad: _visitasSemana[nom] };
+        });
+
         var _snapshot = {
           weekKey: _weekKeyActual,
           fechaSnapshot: new Date().toISOString(),
@@ -2960,7 +3003,9 @@ function renderRutina(config, data) {
           totalClasesObjetivo: _totalObj,
           totalClasesHechas: _totalHechas,
           cumplida: _totalHechas >= _totalObj,
-          complemento: compl || ''
+          complemento: compl || '',
+          visitasSemana: _visitasLista,
+          totalVisitasSemana: _totalVisitasSemana
         };
         if (uid) guardarSnapshotSemanal(uid, _weekKeyActual, _snapshot);
       } catch(e) { console.warn('snapshot rutina:', e.message); }
