@@ -4327,7 +4327,9 @@ async function ejecutarCopiarSemana() {
   for (var s = 1; s <= _csNSemanas; s++) {
     for (var i = 0; i < _csSlotsActual.length; i++) {
       var orig = _csSlotsActual[i];
-      var origFecha = new Date(orig.fecha);
+      // Parsear YYYY-MM-DD manualmente para evitar interpretación UTC (que restaba 1 día en CST)
+      var _p = orig.fecha.split('-');
+      var origFecha = new Date(parseInt(_p[0]), parseInt(_p[1])-1, parseInt(_p[2]));
       var nuevaFecha = new Date(origFecha); nuevaFecha.setDate(origFecha.getDate() + s * 7);
       var nueva = {
         tipoClase: orig.tipoClase,
