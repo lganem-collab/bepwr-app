@@ -2723,36 +2723,67 @@ async function abrirMiProceso() {
         // Usar snapshot pero sobrescribir visitasSemana con datos frescos desde visitas (más confiable)
         var s = Object.assign({}, snapshotsPorSemana[wk]);
         if (visitasPorSemana[wk]) {
-          var _vis = [], _tot = 0;
+          var _vis = [], _tot = 0, _desc = 0;
           Object.keys(visitasPorSemana[wk]).forEach(function(t) {
             var cant = visitasPorSemana[wk][t];
-            if (t === 'desconocida') { _tot += cant; return; }
+            if (t === 'desconocida') { _tot += cant; _desc += cant; return; }
             var nom = (typeof _CL_NOM !== 'undefined' && _CL_NOM[t]) ? _CL_NOM[t] : t;
             _vis.push({ nombre: nom, cantidad: cant });
             _tot += cant;
           });
           s.visitasSemana = _vis;
           s.totalVisitasSemana = _tot;
+          s.desconocidasSemana = _desc;
         }
         semanas.push(s);
       } else {
         // Reconstruir al vuelo desde visitas (no existe snapshot para esta semana)
-        var _vis = [], _tot = 0;
-        Object.keys(visitasPorSemana[wk]).forEach(function(t) {
-          var cant = visitasPorSemana[wk][t];
-          if (t === 'desconocida') { _tot += cant; return; }
+        var _vis = [], _tot = 0, _desc = 0;
+        var _visRaw = visitasPorSemana[wk];
+        Object.keys(_visRaw).forEach(function(t) {
+          var cant = _visRaw[t];
+          if (t === 'desconocida') { _tot += cant; _desc += cant; return; }
           var nom = (typeof _CL_NOM !== 'undefined' && _CL_NOM[t]) ? _CL_NOM[t] : t;
           _vis.push({ nombre: nom, cantidad: cant });
           _tot += cant;
         });
+        // Construir clases usando rutina ACTUAL como plantilla (pinta círculos retroactivamente)
+        var _clasesRec = [];
+        var _totHech = 0, _totObj = 0;
+        var _rutinaActual = window._currentRutinaUniq;
+        if (_rutinaActual && typeof _CL_NOM !== 'undefined') {
+          // Agrupar visitas de esa semana por clase/familia (core -> full_body)
+          var _visPorTipo = {};
+          Object.keys(_visRaw).forEach(function(t) {
+            if (t === 'desconocida') return;
+            var destino = t;
+            var fam = (typeof _CLASE_FAMILIA !== 'undefined' && _CLASE_FAMILIA[t]) ? _CLASE_FAMILIA[t] : null;
+            if (fam && _rutinaActual[fam] && !_rutinaActual[t]) destino = fam;
+            _visPorTipo[destino] = (_visPorTipo[destino] || 0) + _visRaw[t];
+          });
+          Object.keys(_rutinaActual).forEach(function(t) {
+            var veces = _rutinaActual[t];
+            var hechas = Math.min(_visPorTipo[t] || 0, veces);
+            _clasesRec.push({
+              tipo: t,
+              nombre: _CL_NOM[t] || t,
+              color: (typeof _CL_COL !== 'undefined' && _CL_COL[t]) ? _CL_COL[t] : '#888',
+              veces: veces,
+              hechas: hechas
+            });
+            _totHech += hechas;
+            _totObj += veces;
+          });
+        }
         semanas.push({
           weekKey: wk,
           visitasSemana: _vis,
           totalVisitasSemana: _tot,
-          clases: [],
-          totalClasesHechas: 0,
-          totalClasesObjetivo: 0,
-          cumplida: false,
+          desconocidasSemana: _desc,
+          clases: _clasesRec,
+          totalClasesHechas: _totHech,
+          totalClasesObjetivo: _totObj,
+          cumplida: _totObj > 0 && _totHech >= _totObj,
           _reconstruido: true
         });
       }
@@ -2815,6 +2846,9 @@ function renderHistorialSemanas(semanas) {
     } catch(e) {}
 
     var clasesHtml = '';
+    if (s._reconstruido && s.clases && s.clases.length) {
+      clasesHtml += '<div style="font-size:9px;color:#666;font-style:italic;margin-bottom:6px">Según tu rutina actual</div>';
+    }
     (s.clases||[]).forEach(function(c) {
       var circulos = '';
       for (var i = 0; i < c.veces; i++) {
@@ -2828,8 +2862,13 @@ function renderHistorialSemanas(semanas) {
     });
 
     var visitasHtml = '';
-    if (s.visitasSemana && s.visitasSemana.length) {
-      var listaVisitas = s.visitasSemana.map(function(v){return v.cantidad + 'x ' + v.nombre;}).join('<br>');
+    var _visList = (s.visitasSemana && s.visitasSemana.length) ? s.visitasSemana.slice() : [];
+    var _desc = s.desconocidasSemana || 0;
+    if (_visList.length || _desc > 0) {
+      var listaVisitas = _visList.map(function(v){return v.cantidad + 'x ' + v.nombre;}).join('<br>');
+      if (_desc > 0) {
+        listaVisitas += (listaVisitas ? '<br>' : '') + '<span style="color:#888">'+_desc+' sin clasificar</span>';
+      }
       var totalV = s.totalVisitasSemana || 0;
       visitasHtml = '<div style="border-top:1px solid #222;padding-top:8px;margin-top:8px">'+
                     '<div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Clases de la semana \u00B7 '+totalV+' visita'+(totalV===1?'':'s')+'</div>'+
@@ -3048,6 +3087,8 @@ function renderRutina(config, data) {
       var weekFreq = {};
       Object.keys(r.weekFreq||{}).forEach(function(t){ var _tc=t; if(_CLASE_FAMILIA[t]&&uniqKeys.indexOf(_CLASE_FAMILIA[t])!==-1) _tc=_CLASE_FAMILIA[t]; weekFreq[_tc]=(weekFreq[_tc]||0)+(r.weekFreq[t]||0); });
 
+      // Exponer rutina actual al window para que Mi Proceso pueda aplicarla retroactivamente a semanas sin snapshot
+      try { window._currentRutinaUniq = Object.assign({}, uniq); } catch(e){}
       // Guardar snapshot de esta semana bePWR en Firestore (weekFreq ya poblado)
       try {
         var _weekKeyActual = getWeekKeyBePWR();
