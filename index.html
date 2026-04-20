@@ -2737,7 +2737,7 @@ async function abrirMiProceso() {
         }
         semanas.push(s);
       } else {
-        // Reconstruir al vuelo desde visitas (no existe snapshot para esta semana)
+        // Reconstruir al vuelo — calculamos la rutina de ESA SEMANA según sa acumulado hasta ese punto
         var _vis = [], _tot = 0, _desc = 0;
         var _visRaw = visitasPorSemana[wk];
         Object.keys(_visRaw).forEach(function(t) {
@@ -2747,26 +2747,63 @@ async function abrirMiProceso() {
           _vis.push({ nombre: nom, cantidad: cant });
           _tot += cant;
         });
-        // Construir clases usando rutina ACTUAL como plantilla (pinta círculos retroactivamente)
+
+        // Calcular sa al final de ESTA semana: # de semanas ISO con visitas <= wk
+        var _saAtEnd = Object.keys(visitasPorSemana).filter(function(w){ return w <= wk; }).length;
+        // Ajuste por fechaAlta si sa<4 (miembros nuevos): semanas calendario hasta fin-de-esa-semana
+        var _ctx = window._currentRutinaCtx || {};
+        if (_saAtEnd < 4 && _ctx.fechaAlta) {
+          try {
+            var _faMs = _ctx.fechaAlta.toDate ? _ctx.fechaAlta.toDate().getTime() : new Date(_ctx.fechaAlta).getTime();
+            var _wm = wk.match(/(\d{4})-W(\d{2})/);
+            if (_wm) {
+              var _yr = parseInt(_wm[1]), _wn = parseInt(_wm[2]);
+              var _jan4 = new Date(_yr, 0, 4);
+              var _j4d = _jan4.getDay() || 7;
+              var _mon = new Date(_jan4); _mon.setDate(_jan4.getDate() - _j4d + 1);
+              _mon.setDate(_mon.getDate() + (_wn - 1) * 7);
+              var _sun = new Date(_mon); _sun.setDate(_mon.getDate() + 6); _sun.setHours(23,59,59);
+              var _calWeeks = Math.floor((_sun.getTime() - _faMs) / (7*24*3600*1000));
+              _saAtEnd = Math.max(_saAtEnd, Math.min(_calWeeks, 104));
+            }
+          } catch(e){}
+        }
+
+        // Calcular etapa de esa semana (sin boost - aproximación conservadora)
+        var _etapaVis = _saAtEnd<=3 ? 1 : _saAtEnd<=12 ? 2 : 3;
+        var _etapaRetro = Math.max(_etapaVis, _ctx.nivelFitness || 1);
+
+        // Obtener mix correcto desde _MIX usando meta + ge + etapa DE ESA SEMANA
         var _clasesRec = [];
         var _totHech = 0, _totObj = 0;
-        var _rutinaActual = window._currentRutinaUniq;
-        if (_rutinaActual && typeof _CL_NOM !== 'undefined') {
-          // Agrupar visitas de esa semana por clase/familia (core -> full_body)
+        var _etapaNombreRetro = '';
+        if (_ctx.meta && typeof _MIX !== 'undefined' && typeof _getRec === 'function') {
+          var _rec = _getRec(_ctx.meta, _ctx.ge || '30-45', _etapaRetro, _saAtEnd);
+          var _mixRetro = (_rec && _rec.mix) ? _rec.mix.slice() : [];
+          // Mapear women50 → full_body si género no es femenino
+          if (_ctx.genero !== 'Femenino') {
+            _mixRetro = _mixRetro.map(function(t){ return t === 'women50' ? 'full_body' : t; });
+          }
+          // Construir uniq desde mix (contar repeticiones)
+          var _uniqRetro = {};
+          _mixRetro.forEach(function(t){ _uniqRetro[t] = (_uniqRetro[t] || 0) + 1; });
+
+          // Agrupar visitas por clase/familia (core/glutes → full_body, etc.)
           var _visPorTipo = {};
           Object.keys(_visRaw).forEach(function(t) {
             if (t === 'desconocida') return;
             var destino = t;
             var fam = (typeof _CLASE_FAMILIA !== 'undefined' && _CLASE_FAMILIA[t]) ? _CLASE_FAMILIA[t] : null;
-            if (fam && _rutinaActual[fam] && !_rutinaActual[t]) destino = fam;
+            if (fam && _uniqRetro[fam] && !_uniqRetro[t]) destino = fam;
             _visPorTipo[destino] = (_visPorTipo[destino] || 0) + _visRaw[t];
           });
-          Object.keys(_rutinaActual).forEach(function(t) {
-            var veces = _rutinaActual[t];
+
+          Object.keys(_uniqRetro).forEach(function(t) {
+            var veces = _uniqRetro[t];
             var hechas = Math.min(_visPorTipo[t] || 0, veces);
             _clasesRec.push({
               tipo: t,
-              nombre: _CL_NOM[t] || t,
+              nombre: (typeof _CL_NOM !== 'undefined' && _CL_NOM[t]) ? _CL_NOM[t] : t,
               color: (typeof _CL_COL !== 'undefined' && _CL_COL[t]) ? _CL_COL[t] : '#888',
               veces: veces,
               hechas: hechas
@@ -2774,7 +2811,12 @@ async function abrirMiProceso() {
             _totHech += hechas;
             _totObj += veces;
           });
+
+          if (typeof _ETAPAS_DEF !== 'undefined' && _ETAPAS_DEF[_etapaRetro]) {
+            _etapaNombreRetro = _ETAPAS_DEF[_etapaRetro].n || '';
+          }
         }
+
         semanas.push({
           weekKey: wk,
           visitasSemana: _vis,
@@ -2784,6 +2826,9 @@ async function abrirMiProceso() {
           totalClasesHechas: _totHech,
           totalClasesObjetivo: _totObj,
           cumplida: _totObj > 0 && _totHech >= _totObj,
+          etapa: _etapaRetro,
+          etapaNombre: _etapaNombreRetro,
+          semanasActivas: _saAtEnd,
           _reconstruido: true
         });
       }
@@ -2846,9 +2891,6 @@ function renderHistorialSemanas(semanas) {
     } catch(e) {}
 
     var clasesHtml = '';
-    if (s._reconstruido && s.clases && s.clases.length) {
-      clasesHtml += '<div style="font-size:9px;color:#666;font-style:italic;margin-bottom:6px">Según tu rutina actual</div>';
-    }
     (s.clases||[]).forEach(function(c) {
       var circulos = '';
       for (var i = 0; i < c.veces; i++) {
@@ -3087,8 +3129,17 @@ function renderRutina(config, data) {
       var weekFreq = {};
       Object.keys(r.weekFreq||{}).forEach(function(t){ var _tc=t; if(_CLASE_FAMILIA[t]&&uniqKeys.indexOf(_CLASE_FAMILIA[t])!==-1) _tc=_CLASE_FAMILIA[t]; weekFreq[_tc]=(weekFreq[_tc]||0)+(r.weekFreq[t]||0); });
 
-      // Exponer rutina actual al window para que Mi Proceso pueda aplicarla retroactivamente a semanas sin snapshot
-      try { window._currentRutinaUniq = Object.assign({}, uniq); } catch(e){}
+      // Exponer rutina actual y datos del miembro al window para que Mi Proceso pueda recalcular retroactivamente
+      try {
+        window._currentRutinaUniq = Object.assign({}, uniq);
+        window._currentRutinaCtx = {
+          meta: meta,
+          ge: ge,
+          nivelFitness: nivelFitness,
+          genero: genero,
+          fechaAlta: (config && config.fechaAlta) ? config.fechaAlta : null
+        };
+      } catch(e){}
       // Guardar snapshot de esta semana bePWR en Firestore (weekFreq ya poblado)
       try {
         var _weekKeyActual = getWeekKeyBePWR();
