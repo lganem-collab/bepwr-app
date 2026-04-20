@@ -418,12 +418,35 @@
     if (!slots.length) return 'desconocida';
     var dia = date.getDay();
     var minActual = date.getHours() * 60 + date.getMinutes();
-    var mejor = null, menorDiff = 999;
-    slots.filter(function(s) { return s.dia === dia && s.activo; }).forEach(function(s) {
+    // Fecha de hoy en formato YYYY-MM-DD para match exacto
+    var hoyISO = date.getFullYear() + '-' +
+                 String(date.getMonth()+1).padStart(2,'0') + '-' +
+                 String(date.getDate()).padStart(2,'0');
+    // Preferir slots con fecha específica de hoy (desambigua entre lunes distintos)
+    var slotsHoy = slots.filter(function(s) { return s.activo && s.fecha === hoyISO; });
+    // Fallback: slots sin fecha específica pero con día de semana (legado)
+    if (!slotsHoy.length) {
+      slotsHoy = slots.filter(function(s) { return s.activo && !s.fecha && s.dia === dia; });
+    }
+    // 1) Prioridad: clase EN CURSO (minActual dentro del rango [hora_inicio, hora_inicio + duracion])
+    var enCurso = null, menorDiffCurso = 999;
+    slotsHoy.forEach(function(s) {
       var parts = s.hora.split(':');
       var minSlot = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-      var diff = Math.abs(minActual - minSlot);
-      if (diff < menorDiff && diff <= 15) { menorDiff = diff; mejor = s; }
+      var duracion = parseInt(s.duracion) || 45;
+      if (minActual >= minSlot && minActual <= minSlot + duracion) {
+        var diff = minActual - minSlot;
+        if (diff < menorDiffCurso) { menorDiffCurso = diff; enCurso = s; }
+      }
+    });
+    if (enCurso) return enCurso.tipoClase;
+    // 2) Fallback: slot más cercano dentro de 15 min PREVIOS al inicio (miembro llegó temprano)
+    var mejor = null, menorDiff = 999;
+    slotsHoy.forEach(function(s) {
+      var parts = s.hora.split(':');
+      var minSlot = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+      var diff = minSlot - minActual;
+      if (diff >= 0 && diff <= 15 && diff < menorDiff) { menorDiff = diff; mejor = s; }
     });
     return mejor ? mejor.tipoClase : 'desconocida';
   }
