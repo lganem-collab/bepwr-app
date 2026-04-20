@@ -100,7 +100,8 @@ export default async function handler(req,res){
       headers:{Authorization:`Bearer ${RESEND_API_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({
         from:'bePWR <citas@bepwr.vip>',
-        to:['lganem@gmail.com'],
+        to:['blanuza@bepwr.com'],
+        cc:['lganem@terrasola.mx'],
         subject:`📅 Reporte bePWR · ${totalCitas} cita${totalCitas!==1?'s':''} próximos 7 días · ${fechaLabel(hoyStr)}`,
         html
       })
