@@ -2685,18 +2685,86 @@ async function abrirMiProceso() {
   }
 
   try {
+    // 1) Cargar snapshots guardados en Firestore
     var q = window.query(
       window.collection(window.db, 'usuarios', uid, 'rutinasSemanales'),
       window.orderBy('weekKey', 'desc'),
       window.limit(200)
     );
     var snap = await window.getDocs(q);
-    if (snap.empty) {
+    var snapshotsPorSemana = {};
+    snap.forEach(function(d) {
+      var data = d.data();
+      if (data.weekKey) snapshotsPorSemana[data.weekKey] = data;
+    });
+
+    // 2) Cargar visitas del miembro y agrupar por semana ISO
+    var visSnap = await window.getDocs(window.query(
+      window.collection(window.db, 'visitas'),
+      window.where('uid', '==', uid)
+    ));
+    var visitasPorSemana = {};
+    visSnap.forEach(function(d) {
+      var v = d.data();
+      if (!v.semana) return;
+      if (!visitasPorSemana[v.semana]) visitasPorSemana[v.semana] = {};
+      var t = v.tipoClase || 'desconocida';
+      visitasPorSemana[v.semana][t] = (visitasPorSemana[v.semana][t] || 0) + 1;
+    });
+
+    // 3) Merge: para cada semana con snapshot O con visitas, construir entrada
+    var allWeeks = {};
+    Object.keys(snapshotsPorSemana).forEach(function(k){ allWeeks[k] = true; });
+    Object.keys(visitasPorSemana).forEach(function(k){ allWeeks[k] = true; });
+
+    var semanas = [];
+    Object.keys(allWeeks).forEach(function(wk) {
+      if (snapshotsPorSemana[wk]) {
+        // Usar snapshot pero sobrescribir visitasSemana con datos frescos desde visitas (más confiable)
+        var s = Object.assign({}, snapshotsPorSemana[wk]);
+        if (visitasPorSemana[wk]) {
+          var _vis = [], _tot = 0;
+          Object.keys(visitasPorSemana[wk]).forEach(function(t) {
+            var cant = visitasPorSemana[wk][t];
+            if (t === 'desconocida') { _tot += cant; return; }
+            var nom = (typeof _CL_NOM !== 'undefined' && _CL_NOM[t]) ? _CL_NOM[t] : t;
+            _vis.push({ nombre: nom, cantidad: cant });
+            _tot += cant;
+          });
+          s.visitasSemana = _vis;
+          s.totalVisitasSemana = _tot;
+        }
+        semanas.push(s);
+      } else {
+        // Reconstruir al vuelo desde visitas (no existe snapshot para esta semana)
+        var _vis = [], _tot = 0;
+        Object.keys(visitasPorSemana[wk]).forEach(function(t) {
+          var cant = visitasPorSemana[wk][t];
+          if (t === 'desconocida') { _tot += cant; return; }
+          var nom = (typeof _CL_NOM !== 'undefined' && _CL_NOM[t]) ? _CL_NOM[t] : t;
+          _vis.push({ nombre: nom, cantidad: cant });
+          _tot += cant;
+        });
+        semanas.push({
+          weekKey: wk,
+          visitasSemana: _vis,
+          totalVisitasSemana: _tot,
+          clases: [],
+          totalClasesHechas: 0,
+          totalClasesObjetivo: 0,
+          cumplida: false,
+          _reconstruido: true
+        });
+      }
+    });
+
+    if (!semanas.length) {
       cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:13px">Aún no tienes semanas registradas. Tu primera semana se guardará automáticamente.</div>';
       return;
     }
-    var semanas = [];
-    snap.forEach(function(d) { semanas.push(d.data()); });
+
+    // Ordenar descendente (semana más reciente primero)
+    semanas.sort(function(a, b) { return (b.weekKey||'').localeCompare(a.weekKey||''); });
     renderHistorialSemanas(semanas);
   } catch(e) {
     console.error('Error cargando historial:', e);
@@ -2724,9 +2792,16 @@ function renderHistorialSemanas(semanas) {
   semanas.forEach(function(s) {
     var cumplida = s.cumplida;
     var borderColor = cumplida ? '#4ade80' : '#444';
-    var statusBadge = cumplida
-      ? '<span style="background:#4ade80;color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">CUMPLIDA</span>'
-      : '<span style="background:#2a2a2a;color:#FFA940;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">'+(s.totalClasesHechas||0)+'/'+(s.totalClasesObjetivo||0)+'</span>';
+    var totalV = s.totalVisitasSemana || 0;
+    var statusBadge;
+    if (s._reconstruido || !s.totalClasesObjetivo) {
+      // Semana sin rutina registrada (reconstruida desde visitas): mostrar solo total
+      statusBadge = '<span style="background:#2a2a2a;color:#ccc;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">'+totalV+' visita'+(totalV===1?'':'s')+'</span>';
+    } else {
+      statusBadge = cumplida
+        ? '<span style="background:#4ade80;color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">CUMPLIDA</span>'
+        : '<span style="background:#2a2a2a;color:#FFA940;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">'+(s.totalClasesHechas||0)+'/'+(s.totalClasesObjetivo||0)+'</span>';
+    }
 
     // Parsear weekKey formato "2026-W17" a fecha legible
     var labelSemana = s.weekKey || '';
@@ -2766,7 +2841,7 @@ function renderHistorialSemanas(semanas) {
               '<div style="font-size:11px;color:#FF5C1A;font-weight:600">'+labelSemana+'</div>'+
               statusBadge+
             '</div>'+
-            '<div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Etapa '+(s.etapa||'?')+' · '+(s.etapaNombre||'')+'</div>'+
+            (s.etapa ? '<div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Etapa '+s.etapa+' · '+(s.etapaNombre||'')+'</div>' : '')+
             clasesHtml+
             visitasHtml+
             '</div>';
