@@ -3054,7 +3054,7 @@ function renderRutina(config, data) {
         var _todas = _seg.concat(_pend);
         _todas.forEach(function(c){
           var nom=_CL_NOM[c.t]||c.t;
-          var hechas=c.hechas||c.veces;
+          var hechas=(c.hechas!=null?c.hechas:0);
           var total=c.veces;
           var circulos='';
           for(var i=0;i<total;i++){
