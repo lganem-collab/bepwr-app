@@ -4546,17 +4546,20 @@ async function eliminarHorarioSlot() {
     if (serieId) {
       var overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:900;display:flex;align-items:center;justify-content:center';
-      overlay.innerHTML = '<div style="background:#1a1a1a;border:1px solid #333;border-radius:14px;padding:24px;max-width:300px;width:90%;text-align:center">'
+      var _fechaActual = snap.data().fecha;
+      overlay.innerHTML = '<div style="background:#1a1a1a;border:1px solid #333;border-radius:14px;padding:24px;max-width:320px;width:90%;text-align:center">'
         + '<div style="font-size:15px;font-weight:700;margin-bottom:8px">Eliminar clase</div>'
         + '<div style="font-size:13px;color:#888;margin-bottom:20px">¿Qué deseas eliminar?</div>'
         + '<div style="display:flex;flex-direction:column;gap:10px">'
-        + '<button id="del-todas" style="background:#f87171;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer">Toda la serie</button>'
         + '<button id="del-una" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer">Solo esta clase</button>'
-        + '<button id="del-cancel" style="background:#111;border:1px solid #444;color:#ccc;border-radius:8px;padding:11px;font-size:13px;cursor:pointer">Cancelar</button>'
+        + '<button id="del-futuras" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;opacity:0.9">Esta y las siguientes</button>'
+        + '<button id="del-todas" style="background:#f87171;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer">Toda la serie (pasadas + futuras)</button>'
+        + '<button id="del-cancel" style="background:#111;border:1px solid #444;color:#ccc;border-radius:8px;padding:11px;font-size:13px;cursor:pointer;margin-top:4px">Cancelar</button>'
         + '</div></div>';
       document.body.appendChild(overlay);
       var opcion = await new Promise(function(resolve) {
         document.getElementById('del-todas').onclick = function() { resolve('todas'); };
+        document.getElementById('del-futuras').onclick = function() { resolve('futuras'); };
         document.getElementById('del-una').onclick = function() { resolve('una'); };
         document.getElementById('del-cancel').onclick = function() { resolve('cancelar'); };
       });
@@ -4564,6 +4567,13 @@ async function eliminarHorarioSlot() {
       if (opcion === 'cancelar') return;
       if (opcion === 'todas') {
         var serieSnap = await db.collection('horario').where('serieId','==',serieId).get();
+        var batch = db.batch();
+        serieSnap.forEach(function(d) { batch.delete(d.ref); });
+        await batch.commit();
+      } else if (opcion === 'futuras') {
+        var serieSnap = await db.collection('horario')
+          .where('serieId','==',serieId)
+          .where('fecha','>=',_fechaActual).get();
         var batch = db.batch();
         serieSnap.forEach(function(d) { batch.delete(d.ref); });
         await batch.commit();
