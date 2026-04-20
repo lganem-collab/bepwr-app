@@ -4285,7 +4285,9 @@ async function verificarCopiarSemana() {
     var conflictosPorSemana = {};
     snap.forEach(function(d) {
       var s = d.data();
-      var f = new Date(s.fecha);
+      // Parsear YYYY-MM-DD en zona local (evita bug UTC que agrupaba mal semanas)
+      var _p2 = s.fecha.split('-');
+      var f = new Date(parseInt(_p2[0]), parseInt(_p2[1])-1, parseInt(_p2[2]));
       var diff = Math.floor((f - _csLunesActual) / (7 * 24 * 3600 * 1000));
       var semIdx = diff;
       if (!conflictosPorSemana[semIdx]) conflictosPorSemana[semIdx] = 0;
