@@ -140,6 +140,23 @@
     .member-name { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
     .member-meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
 
+    .class-banner {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255, 140, 66, 0.1); border-left: 4px solid var(--accent);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .class-banner-label {
+      font-size: 10px; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.6px; font-weight: 600; margin-bottom: 4px;
+    }
+    .class-banner-name {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.2px;
+    }
+    .class-banner.unknown {
+      background: rgba(148, 163, 184, 0.08); border-left-color: var(--muted);
+    }
+    .class-banner.unknown .class-banner-name { color: var(--muted); font-size: 15px; font-weight: 500; }
+
     .member-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .stat-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
     .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
@@ -286,6 +303,12 @@
             <div class="member-meta" id="member-meta">-</div>
           </div>
         </div>
+        <div class="class-banner" id="class-banner">
+          <div style="flex:1">
+            <div class="class-banner-label">Clase del momento</div>
+            <div class="class-banner-name" id="class-banner-name">-</div>
+          </div>
+        </div>
         <div class="member-stats">
           <div class="stat-box">
             <div class="stat-label">Visitas totales</div>
@@ -412,6 +435,17 @@
       return date.getFullYear() + '-W' + String(getISOWeek(date)).padStart(2,'0');
     }
 
+  // Metadata de clases (nombre + color) - sincronizar con _CL_NOM_DEF/_CL_COL_DEF de index.html
+  var _CL_META = {
+    upper_body:       { nombre: 'Upper Body',         color: '#3B8BD4' },
+    lower_body:       { nombre: 'Lower Body',         color: '#1D9E75' },
+    full_body:        { nombre: 'Full Body',          color: '#FF8C42' },
+    full_body_core:   { nombre: 'Full Body + Core',   color: '#FF5C1A' },
+    full_body_glutes: { nombre: 'Full Body + Glutes', color: '#9F7AEA' },
+    women50:          { nombre: 'Women 50+',          color: '#F472B6' },
+    pwr_yoga:         { nombre: 'PWR Yoga',           color: '#F59E0B' }
+  };
+
   async function getClaseDelMomento(date) {
     if (window._horarioReady) await window._horarioReady;
     var slots = window._horarioSlots || [];
@@ -461,6 +495,21 @@
       document.getElementById('stat-total').textContent    = data.totalVisitas;
       document.getElementById('stat-week').textContent     = data.weekVisitas;
       document.getElementById('stat-week-label').textContent = 'Semana ' + getISOWeek();
+      // Class banner: mostrar clase del momento con color según tipo
+      var banner = document.getElementById('class-banner');
+      var nameEl = document.getElementById('class-banner-name');
+      var tc = data.tipoClase;
+      if (tc && tc !== 'desconocida' && _CL_META[tc]) {
+        nameEl.textContent = _CL_META[tc].nombre;
+        banner.classList.remove('unknown');
+        banner.style.borderLeftColor = _CL_META[tc].color;
+        banner.style.backgroundColor = _CL_META[tc].color + '1A';
+      } else {
+        nameEl.textContent = 'Sin clase programada';
+        banner.classList.add('unknown');
+        banner.style.borderLeftColor = '';
+        banner.style.backgroundColor = '';
+      }
       document.getElementById('member-card').classList.add('visible');
       document.getElementById('error-card').classList.remove('visible');
       var flash = document.getElementById('scanner-flash');
@@ -516,12 +565,13 @@
       }
 
       // Registrar visita
+      var tipoClase = await getClaseDelMomento(new Date());
       await F.addDoc(F.collection(db, 'visitas'), {
         uid: uid, nombre: nombre, timestamp: F.Timestamp.now(),
         semana: weekKey, semanaNum: getISOWeek(), anio: new Date().getFullYear(),
-    tipoClase: await getClaseDelMomento(new Date())
+        tipoClase: tipoClase
       });
-      showCard({ nombre: nombre, meta: meta, totalVisitas: totalVisitas, weekVisitas: weekVisitas });
+      showCard({ nombre: nombre, meta: meta, totalVisitas: totalVisitas, weekVisitas: weekVisitas, tipoClase: tipoClase });
     }
 
     var physicalBuffer = '', physicalTimer = null;
