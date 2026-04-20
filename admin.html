@@ -3925,9 +3925,12 @@ window.filterNotifUsers = function (q) {
   window.enviarReporteHistorial = async function() {
     const msg=document.getElementById('hist-report-msg');
     if(!_histTodas.length){if(msg){msg.style.color='#f55';msg.textContent='Filtra primero un rango de citas.';setTimeout(()=>msg.textContent='',3000);}return;}
+    const destinatario=prompt('¿A qué email mandar el reporte?','blanuza@bepwr.com');
+    if(destinatario===null) return;
+    if(!/.+@.+\..+/.test(destinatario.trim())){if(msg){msg.style.color='#f55';msg.textContent='Email inválido.';setTimeout(()=>msg.textContent='',3000);}return;}
     if(msg){msg.style.color='var(--gray)';msg.textContent='Enviando reporte…';}
     try {
-      const res=await fetch('/api/send-cita',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:'reporte',citas:_histTodas})});
+      const res=await fetch('/api/send-cita',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:'reporte',citas:_histTodas,destinatario:destinatario.trim()})});
       const data=await res.json();
       if(res.ok){if(msg){msg.style.color='var(--green)';msg.textContent='✅ Reporte enviado ('+_histTodas.length+' citas)';}}
       else{if(msg){msg.style.color='#f55';msg.textContent=data.error||'Error al enviar.';}}
@@ -3960,12 +3963,15 @@ window.filterNotifUsers = function (q) {
   async function enviarReporteCitas() {
     const msg = document.getElementById('citas-report-msg');
     if(!msg) return;
+    const destinatario=prompt('¿A qué email mandar el reporte?','blanuza@bepwr.com');
+    if(destinatario===null) return;
+    if(!/.+@.+\..+/.test(destinatario.trim())){msg.style.color='#f55';msg.textContent='Email inválido.';setTimeout(()=>msg.textContent='',3000);return;}
     msg.style.color='var(--gray)'; msg.textContent='Enviando reporte…';
     try {
       const res = await fetch('/api/send-cita',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({tipo:'reporte',citas:window._citasProximas||[]})
+        body:JSON.stringify({tipo:'reporte',citas:window._citasProximas||[],destinatario:destinatario.trim()})
       });
       const data = await res.json();
       if(res.ok){ msg.style.color='var(--green)'; msg.textContent='✅ Reporte enviado.'; }
