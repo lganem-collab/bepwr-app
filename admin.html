@@ -4576,11 +4576,12 @@ async function eliminarHorarioSlot() {
         serieSnap.forEach(function(d) { batch.delete(d.ref); });
         await batch.commit();
       } else if (opcion === 'futuras') {
-        var serieSnap = await db.collection('horario')
-          .where('serieId','==',serieId)
-          .where('fecha','>=',_fechaActual).get();
+        // Filtrar fecha en cliente para evitar índice compuesto en Firestore
+        var serieSnap = await db.collection('horario').where('serieId','==',serieId).get();
         var batch = db.batch();
-        serieSnap.forEach(function(d) { batch.delete(d.ref); });
+        serieSnap.forEach(function(d) {
+          if ((d.data().fecha || '') >= _fechaActual) batch.delete(d.ref);
+        });
         await batch.commit();
       } else {
         await db.collection('horario').doc(_horarioSlotId).delete();
