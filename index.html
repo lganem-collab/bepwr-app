@@ -4193,8 +4193,22 @@ window._applyIVF=applyIVF;
     }
     slotsEl.innerHTML='<div style="text-align:center;color:var(--gray);font-size:12px;padding:8px">Cargando horarios…</div>';
     const slots=generarSlotsHorario(rango.horaInicio,rango.horaFin,rango.duracion);
-    const snap=await getDocs(query(collection(db,'citas'),where('fecha','==',fecha),where('estado','==','confirmada')));
-    const ocupadas=snap.docs.map(d=>d.data().hora);
+    // Obtener horas ocupadas desde endpoint server-side (no expone PII de otros miembros)
+    let ocupadas=[];
+    try {
+      const token=await auth.currentUser.getIdToken();
+      const r=await fetch('/api/slots-ocupados?fecha='+encodeURIComponent(fecha),{
+        headers:{'Authorization':'Bearer '+token}
+      });
+      if(r.ok){
+        const j=await r.json();
+        ocupadas=Array.isArray(j.ocupadas)?j.ocupadas:[];
+      } else {
+        console.warn('slots-ocupados error', r.status);
+      }
+    } catch(e){
+      console.warn('slots-ocupados fetch:', e);
+    }
     if(!slots.length){ slotsEl.innerHTML='<div style="text-align:center;color:var(--gray);font-size:13px;padding:12px">Sin horarios disponibles.</div>'; return; }
     slotsEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 0">
       ${slots.map(s=>{
@@ -4244,34 +4258,27 @@ window._applyIVF=applyIVF;
     if(!window._slotSeleccionado||!window._citasFechaSeleccionada) return;
     btn.disabled=true; btn.textContent='Agendando…'; msgEl.textContent='';
     try {
-      // Verificar que no se haya reservado en este momento
-      const snap=await getDocs(query(collection(db,'citas'),
-        where('fecha','==',window._citasFechaSeleccionada),
-        where('hora','==',window._slotSeleccionado),
-        where('estado','==','confirmada')));
-      if(!snap.empty){
-        msgEl.style.color='#f55'; msgEl.textContent='Este horario ya fue reservado. Elige otro.';
-        btn.disabled=false; btn.textContent='Confirmar cita';
-        await onFechaAgendarChange(); return;
-      }
-      const userDoc=await getDoc(doc(db,'usuarios',window._currentUid));
-      const nombre=userDoc.data()?.nombre||'Miembro';
       const rango=getCitaRango(window._citasFechaSeleccionada);
-      const citaRef=await addDoc(collection(db,'citas'),{
-        uid:window._currentUid, nombre,
-        fecha:window._citasFechaSeleccionada,
-        hora:window._slotSeleccionado,
-        duracion:rango?.duracion||15,
-        estado:'confirmada',
-        recordatorioEnviado:false,
-        creadaEn:serverTimestamp()
+      const token=await auth.currentUser.getIdToken();
+      // Creacion atomica server-side: valida slot + cancela cita previa + crea nueva en una transaccion
+      const r=await fetch('/api/crear-cita',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({
+          fecha:window._citasFechaSeleccionada,
+          hora:window._slotSeleccionado,
+          duracion:rango?.duracion||15
+        })
       });
-      try {
-        await fetch('/api/notify-cita',{method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({nombre,fecha:window._citasFechaSeleccionada,
-            hora:window._slotSeleccionado,duracion:rango?.duracion||15,citaId:citaRef.id})});
-      } catch(e){ console.warn('notify-cita:',e); }
+      const j=await r.json().catch(()=>({}));
+      if(!r.ok){
+        if(j.code==='SLOT_OCUPADO'){
+          msgEl.style.color='#f55'; msgEl.textContent='Este horario ya fue reservado. Elige otro.';
+          btn.disabled=false; btn.textContent='Confirmar cita';
+          await onFechaAgendarChange(); return;
+        }
+        throw new Error(j.error||('Error '+r.status));
+      }
       // Mostrar confirmacion
       document.getElementById('agendar-step1').style.display='none';
       document.getElementById('agendar-step2').style.display='block';

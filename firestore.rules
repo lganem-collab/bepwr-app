@@ -67,9 +67,6 @@ service cloud.firestore {
     match /citas/{citaId} {
       // Staff puede leer y escribir todas las citas
       allow read, write: if isStaff();
-      // Miembro autenticado puede crear su propia cita
-      allow create: if request.auth != null
-        && request.resource.data.uid == request.auth.uid;
       // Miembro puede leer sus propias citas
       allow read: if request.auth != null
         && resource.data.uid == request.auth.uid;
@@ -77,6 +74,7 @@ service cloud.firestore {
       allow update: if request.auth != null
         && resource.data.uid == request.auth.uid
         && request.resource.data.uid == request.auth.uid;
+      // Create solo via /api/crear-cita (Admin SDK, atomic transaction)
     }
 
     // ── Catálogo de clases ─────────────────────────────────────────────
