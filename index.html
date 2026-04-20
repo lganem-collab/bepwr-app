@@ -197,8 +197,10 @@
     /* ── Card Asistencias ── */
     .asist-dia { display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
     .asist-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--border); display: block; transition: background 0.2s;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff; line-height: 1;
+      transition: background 0.2s;
     }
     .asist-dot.on { background: var(--orange); }
     .asist-label { font-size: 10px; color: var(--gray); font-weight: 500; }
@@ -2453,32 +2455,39 @@ return {
           window.where('uid', '==', uid),
           window.where('semana', '==', weekKey)
         ));
-        var diasConVisita = new Set();
+        var visitasPorDia = {};  // {idx: count}
         visitSnap.forEach(function(d) {
           var ts = d.data().timestamp;
           if(ts) {
             var fecha = ts.toDate ? ts.toDate() : new Date(ts);
-            // JS: 0=Dom, 1=Lun ... convertir a L=0,M=1,X=2,J=3,V=4,S=5,D=6
-            var jsDay = fecha.getDay(); // 0=Dom
+            var jsDay = fecha.getDay();
             var idx = jsDay === 0 ? 6 : jsDay - 1;
-            diasConVisita.add(idx);
+            visitasPorDia[idx] = (visitasPorDia[idx] || 0) + 1;
           }
         });
-        var total = diasConVisita.size;
+        var diasConVisita = Object.keys(visitasPorDia).length;
+        var totalVisitas = 0;
+        Object.keys(visitasPorDia).forEach(function(k){ totalVisitas += visitasPorDia[k]; });
         // Actualizar UI
         var semLabel = document.getElementById('asist-semana-label');
         var mensaje  = document.getElementById('asist-mensaje');
         var dots     = document.querySelectorAll('.asist-dot');
         if(semLabel) semLabel.textContent = 'Semana ' + weekNum;
         dots.forEach(function(dot, i) {
-          dot.classList.toggle('on', diasConVisita.has(i));
+          var count = visitasPorDia[i] || 0;
+          dot.classList.toggle('on', count > 0);
+          // Mostrar número solo si hay más de 1 visita (caso poco común: 2+ clases en el día)
+          dot.textContent = count > 1 ? String(count) : '';
         });
         if(mensaje) {
-          if(total === 0) {
+          if(totalVisitas === 0) {
             mensaje.textContent = 'Tu meta te está esperando 💪';
             mensaje.style.color = 'var(--gray)';
+          } else if(totalVisitas === diasConVisita) {
+            mensaje.textContent = totalVisitas + (totalVisitas === 1 ? ' visita' : ' visitas') + ' esta semana';
+            mensaje.style.color = 'var(--orange)';
           } else {
-            mensaje.textContent = total + (total === 1 ? ' visita' : ' visitas') + ' esta semana';
+            mensaje.textContent = totalVisitas + ' visitas en ' + diasConVisita + (diasConVisita === 1 ? ' día' : ' días');
             mensaje.style.color = 'var(--orange)';
           }
         }
