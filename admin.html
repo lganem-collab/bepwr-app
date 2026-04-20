@@ -4483,25 +4483,30 @@ async function guardarHorario() {
     if (_horarioSlotId && !repetir) {
       await db.collection('horario').doc(_horarioSlotId).update(Object.assign({}, baseData, { fecha: fecha }));
     } else if (_horarioSlotId && repetir) {
-      // Editar con repetir: actualizar este slot y crear los siguientes
-      await db.collection('horario').doc(_horarioSlotId).update(Object.assign({}, baseData, { fecha: fecha }));
+      // Editar con repetir: validar campos, actualizar este slot y crear los siguientes
       var diasSel = Array.from(document.querySelectorAll('.mh-dia:checked')).map(function(cb){ return parseInt(cb.value); });
       var fechaFin = document.getElementById('mh-fecha-fin').value;
-      if (diasSel.length && fechaFin) {
-        var serieId = (await db.collection('horario').doc(_horarioSlotId).get()).data().serieId || Date.now().toString(36);
-        var cur = new Date(fecha + 'T12:00:00'); cur.setDate(cur.getDate()+1);
-        var fin = new Date(fechaFin + 'T12:00:00');
-        var batch2 = db.batch(); var count2 = 0;
-        while (cur <= fin) {
-          if (diasSel.includes(cur.getDay())) {
-            batch2.set(db.collection('horario').doc(), Object.assign({}, baseData, { fecha: _fmtFechaISO(cur), serieId: serieId }));
-            count2++;
-            if (count2 % 490 === 0) { await batch2.commit(); batch2 = db.batch(); }
-          }
-          cur.setDate(cur.getDate()+1);
-        }
-        if (count2 > 0) await batch2.commit();
+      if (!diasSel.length || !fechaFin) {
+        if (errEl) errEl.textContent = 'Selecciona días y fecha fin para repetir';
+        if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; }
+        return;
       }
+      // Asignar serieId al slot actual si no lo tenía, y actualizar sus campos
+      var origSlot = (await db.collection('horario').doc(_horarioSlotId).get()).data();
+      var serieId = origSlot.serieId || Date.now().toString(36);
+      await db.collection('horario').doc(_horarioSlotId).update(Object.assign({}, baseData, { fecha: fecha, serieId: serieId }));
+      var cur = new Date(fecha + 'T12:00:00'); cur.setDate(cur.getDate()+1);
+      var fin = new Date(fechaFin + 'T12:00:00');
+      var batch2 = db.batch(); var count2 = 0;
+      while (cur <= fin) {
+        if (diasSel.includes(cur.getDay())) {
+          batch2.set(db.collection('horario').doc(), Object.assign({}, baseData, { fecha: _fmtFechaISO(cur), serieId: serieId }));
+          count2++;
+          if (count2 % 490 === 0) { await batch2.commit(); batch2 = db.batch(); }
+        }
+        cur.setDate(cur.getDate()+1);
+      }
+      if (count2 > 0) await batch2.commit();
     } else if (repetir) {
       var diasSel = Array.from(document.querySelectorAll('.mh-dia:checked')).map(function(cb) { return parseInt(cb.value); });
       var fechaFin = document.getElementById('mh-fecha-fin').value;
