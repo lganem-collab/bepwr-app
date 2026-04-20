@@ -710,7 +710,7 @@
           <div id="agendar-btn-confirm" style="display:none;background:#111;border-radius:12px;padding:14px;margin-top:4px">
             <div style="font-size:12px;color:var(--gray);margin-bottom:4px">Confirmar cita:</div>
             <div style="font-size:15px;font-weight:700;margin-bottom:12px"><span id="agendar-confirm-fecha"></span> &middot; <span id="agendar-confirm-hora" style="color:var(--orange)"></span></div>
-            <button class="btn btn-primary" onclick="confirmarCita()" style="width:100%">&#x2714;&#xFE0F; Confirmar cita</button>
+            <button class="btn btn-primary" onclick="confirmarCitaAgendar()" style="width:100%">&#x2714;&#xFE0F; Confirmar cita</button>
           </div>
         </div>
         <div id="agendar-msg" style="text-align:center;font-size:13px;margin-top:10px;min-height:18px;color:#f55"></div>
@@ -4252,7 +4252,7 @@ window._applyIVF=applyIVF;
     document.getElementById('agendar-btn-confirm').style.display='block';
   }
 
-  async function confirmarCita() {
+  window.confirmarCitaAgendar = async function confirmarCitaAgendar() {
     const btn=document.getElementById('agendar-btn-confirm');
     const msgEl=document.getElementById('agendar-msg');
     if(!window._slotSeleccionado||!window._citasFechaSeleccionada) return;
