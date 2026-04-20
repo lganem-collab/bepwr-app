@@ -2483,48 +2483,6 @@ return {
           }
         }
       } catch(e) { console.warn('asistencias:', e); }
-      // Actualizar snapshot de Mi Proceso con visitas frescas (sin reescribir todo)
-      try {
-        var _weekKeyAct = (typeof getWeekKeyBePWR === 'function') ? getWeekKeyBePWR() : weekKey;
-        var _ref = window.doc(window.db, 'usuarios', uid, 'rutinasSemanales', _weekKeyAct);
-        var _snap = await window.getDoc(_ref);
-        if (_snap.exists()) {
-          var _data = _snap.data();
-          if (_data.clases && Array.isArray(_data.clases)) {
-            // Recontar visitas por tipoClase desde visitSnap
-            var _visitasPorTipo = {};
-            var _visitasLista = [];
-            var _totalVisitasSem = 0;
-            visitSnap.forEach(function(d){
-              var v = d.data();
-              if (!v.tipoClase || v.tipoClase === 'desconocida') return;
-              _visitasPorTipo[v.tipoClase] = (_visitasPorTipo[v.tipoClase]||0) + 1;
-              _totalVisitasSem++;
-            });
-            // Actualizar hechas en cada clase del snapshot
-            var _clasesActualizadas = _data.clases.map(function(c){
-              var h = Math.min(_visitasPorTipo[c.tipo]||0, c.veces);
-              return Object.assign({}, c, { hechas: h });
-            });
-            var _totHech = _clasesActualizadas.reduce(function(a,c){return a+(c.hechas||0);},0);
-            var _totObj = _clasesActualizadas.reduce(function(a,c){return a+(c.veces||0);},0);
-            // Construir lista de visitas reales (todas, con nombre legible)
-            Object.keys(_visitasPorTipo).forEach(function(tipo){
-              var nom = (typeof _CL_NOM !== 'undefined' && _CL_NOM[tipo]) ? _CL_NOM[tipo] : tipo;
-              _visitasLista.push({ nombre: nom, cantidad: _visitasPorTipo[tipo] });
-            });
-            await window.setDoc(_ref, {
-              clases: _clasesActualizadas,
-              totalClasesHechas: _totHech,
-              totalClasesObjetivo: _totObj,
-              cumplida: _totHech >= _totObj,
-              visitasSemana: _visitasLista,
-              totalVisitasSemana: _totalVisitasSem,
-              fechaSnapshot: new Date().toISOString()
-            }, { merge: true });
-          }
-        }
-      } catch(e) { console.warn('refresh snapshot desde inicio:', e.message); }
     }
 
 async function initMetodoTab() {
@@ -2755,6 +2713,13 @@ function cerrarMiProceso() {
 function renderHistorialSemanas(semanas) {
   var cont = document.getElementById('mi-proceso-contenido');
   if (!cont) return;
+  // Filtrar semana actual bePWR: Mi Proceso es histórico puro (solo semanas cerradas, dom 17:00+)
+  var _weekActual = (typeof getWeekKeyBePWR === 'function') ? getWeekKeyBePWR() : '';
+  semanas = semanas.filter(function(s) { return s.weekKey && s.weekKey !== _weekActual; });
+  if (!semanas.length) {
+    cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:13px">A\u00FAn no has cerrado una semana. Tu historial aparecer\u00E1 aqu\u00ED cada domingo a las 5pm.</div>';
+    return;
+  }
   var html = '';
   semanas.forEach(function(s) {
     var cumplida = s.cumplida;
