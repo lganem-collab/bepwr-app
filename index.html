@@ -4445,6 +4445,8 @@ window._applyIVF=applyIVF;
       const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
       document.getElementById('cita-confirmada-info').textContent=
         `${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y} · ${window._slotSeleccionado}`;
+      // Refrescar tarjeta y countdown en Mi Metodo
+      if(window.cargarProximaCita) window.cargarProximaCita();
     } catch(e){
       console.error('confirmarCita:',e);
       msgEl.style.color='#f55'; msgEl.textContent='Error al agendar: '+e.message;
@@ -4480,6 +4482,8 @@ window._applyIVF=applyIVF;
       document.getElementById('agendar-mi-cita').style.display='none';
       await loadConfigCitasParaMiembro();
       document.getElementById('agendar-step1').style.display='block';
+      // Refrescar tarjeta y countdown en Mi Metodo
+      if(window.cargarProximaCita) window.cargarProximaCita();
       // Feedback visual: confirmar cancelacion y guiar al siguiente paso
       const msg = document.getElementById('agendar-msg');
       if(msg) {
