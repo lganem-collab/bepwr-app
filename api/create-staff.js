@@ -18,9 +18,31 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { nombre, email, rol, secret } = req.body || {};
+  const { secret, action } = req.body || {};
 
   if (secret !== process.env.NOTIFY_SECRET) return res.status(401).json({ error: 'No autorizado' });
+
+  // Accion: actualizar email de un miembro existente en Firebase Auth
+  // (el update en Firestore lo hace el cliente; este endpoint solo toca Auth)
+  if (action === 'update-member-email') {
+    const { uid, newEmail } = req.body || {};
+    if (!uid || !newEmail) return res.status(400).json({ error: 'uid y newEmail son requeridos' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) return res.status(400).json({ error: 'Email invalido' });
+    try {
+      await getAuth().updateUser(uid, { email: newEmail });
+      return res.status(200).json({ ok: true });
+    } catch(e) {
+      const msg = e.code === 'auth/email-already-exists' ? 'Este email ya tiene una cuenta'
+                : e.code === 'auth/invalid-email' ? 'Email invalido'
+                : e.code === 'auth/user-not-found' ? 'Usuario no encontrado en Auth'
+                : e.message;
+      return res.status(500).json({ error: msg });
+    }
+  }
+
+  // Flujo original: crear staff
+  const { nombre, email, rol } = req.body || {};
+
   if (!nombre || !email || !rol) return res.status(400).json({ error: 'nombre, email y rol son requeridos' });
 
   try {

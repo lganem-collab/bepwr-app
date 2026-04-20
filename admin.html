@@ -2367,6 +2367,35 @@ if (user && user.uid === MASTER_UID) {
       const newPesoIni = Number(document.getElementById('edit-peso-ini').value) || null;
       const _metaOrig = _mOrig.objetivo?.meta || _mOrig.meta || '';
       const _metaCambio = newMeta && newMeta !== _metaOrig;
+
+      // Si el email cambio, actualizar Firebase Auth server-side ANTES de tocar Firestore
+      // (si falla Auth, abortamos sin dejar datos inconsistentes)
+      const _emailOrig = (_mOrig.email || '').trim();
+      if (_emailVal && _emailVal !== _emailOrig) {
+        try {
+          const _authResp = await fetch('/api/create-staff', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'update-member-email',
+              uid: uid,
+              newEmail: _emailVal,
+              secret: 'bepwr2026notify'
+            })
+          });
+          const _authJson = await _authResp.json().catch(()=>({}));
+          if (!_authResp.ok) {
+            const errEl = document.getElementById('edit-member-error');
+            if (errEl) errEl.textContent = 'No se pudo cambiar el email: ' + (_authJson.error || _authResp.status);
+            return;
+          }
+        } catch(netErr) {
+          const errEl = document.getElementById('edit-member-error');
+          if (errEl) errEl.textContent = 'Error de red al cambiar email: ' + netErr.message;
+          return;
+        }
+      }
+
       const _updateData = {
         email: document.getElementById('edit-email').value,
         nombre: document.getElementById('edit-nombre').value,
