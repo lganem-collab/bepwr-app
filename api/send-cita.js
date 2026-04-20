@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { tipo = 'confirmacion', nombre, fecha, hora, emailMiembro, citas } = req.body || {};
+  const { tipo = 'confirmacion', nombre, fecha, hora, emailMiembro, citas, destinatario } = req.body || {};
   console.log('SEND_CITA_BODY:', JSON.stringify({tipo,nombre,fecha,hora,emailMiembro}));
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
   if (!RESEND_API_KEY) return res.status(500).json({ error: 'RESEND_API_KEY no configurado' });
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
     if (tipo === 'reporte') {
       const lista = citas || [];
-      to = ['lganem@gmail.com'];
+      to = destinatario && /.+@.+\..+/.test(destinatario) ? [destinatario] : ['blanuza@bepwr.com'];
       subject = 'Reporte de citas pr\u00F3ximas \u00B7 bePWR';
       html = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#ffffff;padding:20px;border-radius:12px 12px 0 0;text-align:center;border-bottom:1px solid #e0e0e0">
