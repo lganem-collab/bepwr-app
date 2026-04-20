@@ -50,5 +50,19 @@
       "path": "/api/cron/report-daily",
       "schedule": "0 2 * * *"
     }
+  ],
+  "headers": [
+    {
+      "source": "/(index|admin|recepcion).html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
+    },
+    {
+      "source": "/(sw|firebase-messaging-sw|sw-recepcion).js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
+    }
   ]
 }
