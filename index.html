@@ -1376,8 +1376,14 @@ function renderProfileMetrics(m) {
     const listEl=document.getElementById('notif-list');
     if(!listEl)return;
     try{
-      const snap=await getDocs(query(collection(db,'usuarios',uid,'notificaciones'),orderBy('fecha','desc')));
-      const fresh=snap.docs;
+      // Traer todas y ordenar client-side: robusto contra docs sin campo 'fecha' (crons legados) o con tipos distintos
+      const snap=await getDocs(collection(db,'usuarios',uid,'notificaciones'));
+      const fresh=snap.docs.slice().sort((a,b)=>{
+        const fa=a.data().fecha, fb=b.data().fecha;
+        const ma=fa?(fa.toMillis?fa.toMillis():new Date(fa).getTime()):0;
+        const mb=fb?(fb.toMillis?fb.toMillis():new Date(fb).getTime()):0;
+        return mb-ma;
+      });
       const unread=fresh.filter(d=>!d.data().leida).length;
       const badge=document.getElementById('notif-badge');
       if(badge){badge.textContent=unread>9?'9+':unread;badge.style.display=unread?'flex':'none';}
