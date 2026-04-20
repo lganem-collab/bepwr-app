@@ -2917,7 +2917,7 @@ function renderRutina(config, data) {
         _boost = Math.min(_boost,1);
       }
       if (_fuerzaBaja||_tend===-1) _boost=Math.min(_boost,-1);
-      var etapaFinal = Math.max(1,Math.min(3,etapa+_boost));
+      var etapaFinal = Math.max(etapaVisitas, Math.min(3, etapa + _boost));
       // ────────────────────────────────────────────────────────────────
       var rec = _getRec(meta, ge, etapaFinal, sa), ei = _ETAPAS_DEF[etapaFinal];
       var genero = (data&&data.genero)||'';
