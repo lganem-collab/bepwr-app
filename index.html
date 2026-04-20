@@ -4142,8 +4142,26 @@ window._applyIVF=applyIVF;
       const snap = await getDocs(q);
       if(loading) loading.style.display='none';
       if(!snap.empty) {
-        const cita = snap.docs[0].data();
-        window._miCitaActiva = { id:snap.docs[0].id, ...cita };
+        // Ordenar por fecha+hora ascendente para identificar la mas proxima
+        const docsOrdenados = snap.docs.slice().sort((a,b)=>{
+          const da=a.data(), dbv=b.data();
+          return (da.fecha+' '+da.hora).localeCompare(dbv.fecha+' '+dbv.hora);
+        });
+        // Auto-limpieza: si hay duplicados, cancelar todos menos el primero
+        if(docsOrdenados.length > 1) {
+          console.warn('Citas duplicadas detectadas, auto-cancelando', docsOrdenados.length-1, 'extras');
+          try {
+            await Promise.all(docsOrdenados.slice(1).map(dx => updateDoc(dx.ref, {
+              estado:'cancelada',
+              canceladaPor:'sistema_autolimpieza',
+              canceladaEn:serverTimestamp()
+            })));
+          } catch(cleanupErr) {
+            console.warn('auto-cancelacion duplicados fallo:', cleanupErr.message);
+          }
+        }
+        const cita = docsOrdenados[0].data();
+        window._miCitaActiva = { id:docsOrdenados[0].id, ...cita };
         const [y,m,d] = cita.fecha.split('-');
         const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
         const fLbl=`${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y}`;
@@ -4441,13 +4459,39 @@ window._applyIVF=applyIVF;
     const fLbl=`${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y} a las ${window._miCitaActiva.hora}`;
     if(!confirm('¿Cancelar tu cita del '+fLbl+'?')) return;
     try {
-      await updateDoc(doc(db,'citas',window._miCitaActiva.id),{
-        estado:'cancelada',canceladaPor:'miembro',canceladaEn:serverTimestamp()
-      });
+      const hoy = new Date().toISOString().split('T')[0];
+      // Cancelar TODAS las confirmadas futuras del miembro (blindaje contra duplicados)
+      const q = query(collection(db,'citas'),
+        where('uid','==',window._currentUid),
+        where('estado','==','confirmada'),
+        where('fecha','>=',hoy));
+      const snap = await getDocs(q);
+      if(snap.empty) {
+        // Fallback: cancelar solo la registrada si la query no trajo nada
+        await updateDoc(doc(db,'citas',window._miCitaActiva.id),{
+          estado:'cancelada',canceladaPor:'miembro',canceladaEn:serverTimestamp()
+        });
+      } else {
+        await Promise.all(snap.docs.map(d => updateDoc(d.ref, {
+          estado:'cancelada', canceladaPor:'miembro', canceladaEn:serverTimestamp()
+        })));
+      }
       window._miCitaActiva=null;
       document.getElementById('agendar-mi-cita').style.display='none';
       await loadConfigCitasParaMiembro();
       document.getElementById('agendar-step1').style.display='block';
+      // Feedback visual: confirmar cancelacion y guiar al siguiente paso
+      const msg = document.getElementById('agendar-msg');
+      if(msg) {
+        msg.textContent = '\u2713 Cita cancelada. Elige una nueva fecha abajo.';
+        msg.style.color = '#4ade80';
+        setTimeout(() => {
+          if(msg && msg.textContent.indexOf('\u2713') === 0) {
+            msg.textContent = '';
+            msg.style.color = '';
+          }
+        }, 6000);
+      }
     } catch(e){ alert('Error al cancelar: '+e.message); }
   }
 
