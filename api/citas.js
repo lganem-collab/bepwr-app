@@ -135,12 +135,43 @@ export default async function handler(req, res) {
   const db = getFirestore();
 
   // ─────────────────────────────────────────────────────
-  // GET: devuelve horas ocupadas de una fecha (sin PII)
+  // GET: devuelve horas ocupadas (sin PII)
+  //  - ?fecha=YYYY-MM-DD   -> { ocupadas: ["09:00","10:15",...] }
+  //  - ?mes=YYYY-MM        -> { dias: { "2026-04-21": ["09:00","10:15"], ... } }
   // ─────────────────────────────────────────────────────
   if (req.method === 'GET') {
     const fecha = req.query.fecha;
+    const mes = req.query.mes;
+
+    // Modo mes (para pintar calendario)
+    if (mes && /^\d{4}-\d{2}$/.test(mes)) {
+      try {
+        const [y, m] = mes.split('-').map(Number);
+        const ini = `${y}-${String(m).padStart(2,'0')}-01`;
+        const nextY = m === 12 ? y + 1 : y;
+        const nextM = m === 12 ? 1 : m + 1;
+        const fin = `${nextY}-${String(nextM).padStart(2,'0')}-01`;
+        const snap = await db.collection('citas')
+          .where('fecha', '>=', ini)
+          .where('fecha', '<', fin)
+          .get();
+        const dias = {};
+        snap.docs.forEach(doc => {
+          const data = doc.data();
+          if (!data.fecha || !data.hora || data.estado !== 'confirmada') return;
+          if (!dias[data.fecha]) dias[data.fecha] = [];
+          dias[data.fecha].push(data.hora);
+        });
+        return res.status(200).json({ dias });
+      } catch (e) {
+        console.error('GET /citas (mes):', e);
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
+    // Modo dia (retrocompat)
     if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-      return res.status(400).json({ error: 'fecha requerida en formato YYYY-MM-DD' });
+      return res.status(400).json({ error: 'fecha (YYYY-MM-DD) o mes (YYYY-MM) requeridos' });
     }
     try {
       const snap = await db.collection('citas')

@@ -699,11 +699,31 @@
       <div id="agendar-step1" style="display:none;overflow-y:auto;flex:1;padding-bottom:8px">
         <div id="agendar-no-config" style="display:none;text-align:center;padding:24px;color:var(--gray);font-size:13px">No hay fechas disponibles. Cont&#xE1;ctanos para agendar.</div>
         <div id="agendar-fecha-picker" style="display:none">
-          <div style="margin-bottom:14px">
-            <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:6px;letter-spacing:1px">SELECCIONA FECHA</label>
-            <input type="date" id="agendar-fecha" onchange="onFechaAgendarChange()" style="width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-size:15px">
+          <!-- Navegador de mes -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <button id="cal-prev" onclick="navMesAgendar(-1)" style="background:transparent;border:1px solid var(--border);color:#fff;border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;line-height:1">&#x2039;</button>
+            <div id="cal-label" style="font-size:14px;font-weight:600;letter-spacing:1px;color:#fff;font-family:'DM Sans',sans-serif">&nbsp;</div>
+            <button id="cal-next" onclick="navMesAgendar(1)" style="background:transparent;border:1px solid var(--border);color:#fff;border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;line-height:1">&#x203A;</button>
           </div>
-          <div style="margin-bottom:8px">
+          <!-- Cabecera dias de semana -->
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px">
+            <div style="text-align:center;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">L</div>
+            <div style="text-align:center;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">M</div>
+            <div style="text-align:center;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">X</div>
+            <div style="text-align:center;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">J</div>
+            <div style="text-align:center;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">V</div>
+            <div style="text-align:center;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">S</div>
+            <div style="text-align:center;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:1px">D</div>
+          </div>
+          <!-- Grid dias -->
+          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px"></div>
+          <!-- Leyenda -->
+          <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px;font-size:10px;color:var(--gray);font-family:'Space Mono',monospace;letter-spacing:0.5px">
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:10px;height:10px;background:rgba(74,222,128,0.18);border:1px solid rgba(74,222,128,0.5);border-radius:3px"></span>Disponible</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:10px;height:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:3px"></span>Sin cupo</span>
+          </div>
+          <!-- Horarios (aparecen al tocar un dia) -->
+          <div id="agendar-slots-wrap" style="display:none;margin-bottom:8px">
             <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:8px;letter-spacing:1px">HORARIO DISPONIBLE</label>
             <div id="agendar-slots"></div>
           </div>
@@ -4157,12 +4177,21 @@ window._applyIVF=applyIVF;
       }
       if(noConf) noConf.style.display='none';
       if(picker) picker.style.display='block';
-      const fechaInput = document.getElementById('agendar-fecha');
-      const hoy = new Date().toISOString().split('T')[0];
-      const maxF = window._citasConfigRangos.map(r=>r.fechaFin).sort().reverse()[0];
-      fechaInput.min=hoy; fechaInput.max=maxF; fechaInput.value='';
+      // Inicializar mes visible: el primer mes con disponibilidad desde hoy
+      const hoy = new Date();
+      const hoyStr = hoy.toISOString().split('T')[0];
+      const rangosOrdenados = window._citasConfigRangos.slice().sort((a,b)=>a.fechaInicio.localeCompare(b.fechaInicio));
+      const primerRangoActivo = rangosOrdenados.find(r=>r.fechaFin>=hoyStr) || rangosOrdenados[0];
+      const fechaBase = primerRangoActivo.fechaInicio > hoyStr ? primerRangoActivo.fechaInicio : hoyStr;
+      const [fY,fM] = fechaBase.split('-');
+      window._agendarMesVisible = { year: parseInt(fY), month: parseInt(fM)-1 };
+      // Reset estado
+      window._citasFechaSeleccionada = null;
+      window._slotSeleccionado = null;
       document.getElementById('agendar-slots').innerHTML='';
+      document.getElementById('agendar-slots-wrap').style.display='none';
       document.getElementById('agendar-btn-confirm').style.display='none';
+      await renderCalendarioAgendar();
     } catch(e){
       console.error('loadConfigCitasParaMiembro error:', e.code, e.message);
       const noConf2 = document.getElementById('agendar-no-config');
@@ -4172,6 +4201,118 @@ window._applyIVF=applyIVF;
     }
   }
 
+  // Pinta el calendario del mes visible. Verde = hay cupo, rojo = sin cupo, gris = fuera de rango/pasado.
+  async function renderCalendarioAgendar() {
+    if(!window._agendarMesVisible) return;
+    const { year, month } = window._agendarMesVisible;
+    const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const label = document.getElementById('cal-label');
+    if(label) label.textContent = MESES[month]+' '+year;
+
+    // Habilitar/deshabilitar flechas segun rango disponible
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const rangos = window._citasConfigRangos || [];
+    const maxFechaStr = rangos.length ? rangos.map(r=>r.fechaFin).sort().reverse()[0] : null;
+    const maxDate = maxFechaStr ? new Date(maxFechaStr+'T00:00:00') : null;
+    const prevBtn = document.getElementById('cal-prev');
+    const nextBtn = document.getElementById('cal-next');
+    const sePuedeIrAtras = (year>hoy.getFullYear()) || (year===hoy.getFullYear() && month>hoy.getMonth());
+    if(prevBtn){ prevBtn.disabled=!sePuedeIrAtras; prevBtn.style.opacity=sePuedeIrAtras?'1':'0.3'; prevBtn.style.cursor=sePuedeIrAtras?'pointer':'default'; }
+    const sePuedeIrAdelante = maxDate ? (year<maxDate.getFullYear() || (year===maxDate.getFullYear() && month<maxDate.getMonth())) : false;
+    if(nextBtn){ nextBtn.disabled=!sePuedeIrAdelante; nextBtn.style.opacity=sePuedeIrAdelante?'1':'0.3'; nextBtn.style.cursor=sePuedeIrAdelante?'pointer':'default'; }
+
+    // Pedir ocupadas del mes al servidor (una sola llamada)
+    const mesStr = year+'-'+String(month+1).padStart(2,'0');
+    let ocupadosPorDia = {};
+    try {
+      const token = await window.auth.currentUser.getIdToken();
+      const r = await fetch('/api/citas?mes='+mesStr,{ headers:{'Authorization':'Bearer '+token} });
+      if(r.ok){ const j=await r.json(); ocupadosPorDia = j.dias || {}; }
+    } catch(e){ console.warn('carga mes citas:', e); }
+
+    // Pintar grid
+    const grid = document.getElementById('cal-grid');
+    if(!grid) return;
+    grid.innerHTML='';
+    // ISO: lunes = primer dia. getDay() = 0 dom, 1 lun... → offset = (getDay()+6)%7
+    const primerDia = new Date(year, month, 1);
+    const offset = (primerDia.getDay()+6)%7;
+    for(let i=0;i<offset;i++){
+      const e=document.createElement('div'); e.style.height='38px'; grid.appendChild(e);
+    }
+    const diasEnMes = new Date(year, month+1, 0).getDate();
+    for(let d=1; d<=diasEnMes; d++){
+      const fechaObj = new Date(year, month, d);
+      const fechaStr = year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      const esPasado = fechaObj < hoy;
+      const esHoy = fechaObj.getTime() === hoy.getTime();
+      const rango = getCitaRango(fechaStr);
+      const diaHabilitado = rango !== null && !esPasado;
+      let slotsTotal=0, slotsOcupados=0;
+      if(diaHabilitado){
+        const slots = generarSlotsHorario(rango.horaInicio, rango.horaFin, rango.duracion);
+        slotsTotal = slots.length;
+        const ocupadas = ocupadosPorDia[fechaStr] || [];
+        slotsOcupados = slots.filter(s=>ocupadas.includes(s)).length;
+      }
+      const diaFull = diaHabilitado && slotsTotal>0 && slotsOcupados>=slotsTotal;
+      const diaLibre = diaHabilitado && !diaFull;
+
+      const cell = document.createElement('button');
+      cell.type='button';
+      let bg, color, border, cursor;
+      if(diaLibre){
+        bg='rgba(74,222,128,0.18)'; color='#fff'; border='1px solid rgba(74,222,128,0.5)'; cursor='pointer';
+      } else if(diaFull){
+        bg='rgba(248,113,113,0.1)'; color='#f87171'; border='1px solid rgba(248,113,113,0.3)'; cursor='not-allowed';
+      } else {
+        bg='transparent'; color='#444'; border='1px solid #1a1a1a'; cursor='default';
+      }
+      if(esHoy) border='2px solid var(--orange)';
+      cell.style.cssText=`height:38px;border-radius:8px;background:${bg};color:${color};border:${border};cursor:${cursor};font-size:13px;font-family:'Space Mono',monospace;font-weight:600;padding:0;transition:all 0.15s`;
+      cell.textContent=d;
+      if(diaLibre){
+        cell.dataset.fecha=fechaStr;
+        cell.onclick=()=>seleccionarDiaAgendar(fechaStr);
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  function navMesAgendar(dir) {
+    if(!window._agendarMesVisible) return;
+    window._agendarMesVisible.month += dir;
+    if(window._agendarMesVisible.month>11){ window._agendarMesVisible.month=0; window._agendarMesVisible.year++; }
+    else if(window._agendarMesVisible.month<0){ window._agendarMesVisible.month=11; window._agendarMesVisible.year--; }
+    // Reset seleccion al cambiar de mes
+    window._citasFechaSeleccionada=null;
+    window._slotSeleccionado=null;
+    document.getElementById('agendar-slots-wrap').style.display='none';
+    document.getElementById('agendar-btn-confirm').style.display='none';
+    renderCalendarioAgendar();
+  }
+
+  function seleccionarDiaAgendar(fecha) {
+    // Resetear estilos de todos los dias disponibles
+    document.querySelectorAll('#cal-grid button[data-fecha]').forEach(b=>{
+      b.style.background='rgba(74,222,128,0.18)';
+      b.style.color='#fff';
+      b.style.border='1px solid rgba(74,222,128,0.5)';
+    });
+    // Marcar seleccion actual
+    const sel = document.querySelector('#cal-grid button[data-fecha="'+fecha+'"]');
+    if(sel){
+      sel.style.background='var(--orange)';
+      sel.style.color='#fff';
+      sel.style.border='1px solid var(--orange)';
+    }
+    document.getElementById('agendar-slots-wrap').style.display='block';
+    onFechaAgendarChange(fecha);
+  }
+
+  window.navMesAgendar = navMesAgendar;
+  window.seleccionarDiaAgendar = seleccionarDiaAgendar;
+
   function getCitaRango(fecha) {
     const dm={0:'domingo',1:'lunes',2:'martes',3:'miercoles',4:'jueves',5:'viernes',6:'sabado'};
     const [y,m,d]=fecha.split('-');
@@ -4179,8 +4320,8 @@ window._applyIVF=applyIVF;
     return window._citasConfigRangos.find(r=>fecha>=r.fechaInicio&&fecha<=r.fechaFin&&r.dias.includes(dia))||null;
   }
 
-  async function onFechaAgendarChange() {
-    const fecha=document.getElementById('agendar-fecha').value;
+  async function onFechaAgendarChange(fechaParam) {
+    const fecha = fechaParam || '';
     window._citasFechaSeleccionada=fecha;
     window._slotSeleccionado=null;
     const slotsEl=document.getElementById('agendar-slots');
