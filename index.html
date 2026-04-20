@@ -3077,6 +3077,31 @@ function renderRutina(config, data) {
         } else if(_seg.length){
           h+='<div style="margin-top:10px;font-size:12px;color:#4ade80;border-top:1px solid #222;padding-top:8px;font-weight:500">\u{1F389} \u00A1Cumpliste tu rutina de la semana! Bien hecho.</div>';
         } else if(_seg.length){h+='<div style="margin-top:10px;font-size:12px;color:#4ade80;border-top:1px solid #222;padding-top:8px;font-weight:500">\u{1F389} Cumpliste tu rutina de la semana \u00B7 \u00A1Bien hecho!</div>';}
+        // Lista completa de clases tomadas esta semana (rutina + extras + sin clasificar)
+        var _todasTomadas = [];
+        var _totalTomadas = 0;
+        var _desconocidasCount = 0;
+        Object.keys(r.weekFreq||{}).forEach(function(t){
+          var cant = r.weekFreq[t] || 0;
+          if (cant <= 0) return;
+          if (t === 'desconocida') {
+            _desconocidasCount += cant;
+            _totalTomadas += cant;
+          } else {
+            _todasTomadas.push({ nombre: _CL_NOM[t] || t, cantidad: cant });
+            _totalTomadas += cant;
+          }
+        });
+        if (_totalTomadas > 0) {
+          var _listaTomadas = _todasTomadas.map(function(v){ return v.cantidad + 'x ' + v.nombre; }).join(' \u00B7 ');
+          if (_desconocidasCount > 0) {
+            _listaTomadas += (_listaTomadas ? ' \u00B7 ' : '') + _desconocidasCount + ' sin clasificar';
+          }
+          h += '<div style="border-top:1px solid #222;padding-top:10px;margin-top:10px">' +
+               '<div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Clases tomadas \u00B7 ' + _totalTomadas + ' visita' + (_totalTomadas===1?'':'s') + '</div>' +
+               '<div style="font-size:12px;color:#ccc;line-height:1.6">' + _listaTomadas + '</div>' +
+               '</div>';
+        }
         h+='</div>';
       }
       if (compl) h += '<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Complemento \u00B7 1 vez por semana m\u00EDn.</div><div style="font-size:13px;color:#ccc">Elige al menos una opci\u00F3n \u00B7 '+compl+'</div></div>';
