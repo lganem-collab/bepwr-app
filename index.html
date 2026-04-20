@@ -4197,7 +4197,7 @@ window._applyIVF=applyIVF;
     let ocupadas=[];
     try {
       const token=await auth.currentUser.getIdToken();
-      const r=await fetch('/api/slots-ocupados?fecha='+encodeURIComponent(fecha),{
+      const r=await fetch('/api/citas?fecha='+encodeURIComponent(fecha),{
         headers:{'Authorization':'Bearer '+token}
       });
       if(r.ok){
@@ -4261,7 +4261,7 @@ window._applyIVF=applyIVF;
       const rango=getCitaRango(window._citasFechaSeleccionada);
       const token=await auth.currentUser.getIdToken();
       // Creacion atomica server-side: valida slot + cancela cita previa + crea nueva en una transaccion
-      const r=await fetch('/api/crear-cita',{
+      const r=await fetch('/api/citas',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
         body:JSON.stringify({
