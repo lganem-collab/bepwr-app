@@ -4406,9 +4406,19 @@ window._applyIVF=applyIVF;
     const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const [y,m,d]=window._citasFechaSeleccionada.split('-');
     const fLbl=`${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y}`;
-    document.getElementById('agendar-confirm-fecha').textContent=fLbl;
-    document.getElementById('agendar-confirm-hora').textContent=hora;
-    document.getElementById('agendar-btn-confirm').style.display='block';
+    // Diagnostico defensivo: capturar elementos antes de tocarlos
+    const fechaEl=document.getElementById('agendar-confirm-fecha');
+    const horaEl=document.getElementById('agendar-confirm-hora');
+    const btnEl=document.getElementById('agendar-btn-confirm');
+    console.log('[selectSlotCita] hora=',hora,'fecha=',window._citasFechaSeleccionada,'fechaEl=',!!fechaEl,'horaEl=',!!horaEl,'btnEl=',!!btnEl,'modalActive=',document.getElementById('modal-agendar')?.classList.contains('active'),'step1Display=',document.getElementById('agendar-step1')?.style.display,'pickerDisplay=',document.getElementById('agendar-fecha-picker')?.style.display);
+    if(!fechaEl||!horaEl||!btnEl){
+      console.error('[selectSlotCita] DOM roto. modal-agendar HTML:',document.getElementById('modal-agendar')?.innerHTML?.slice(0,500));
+      alert('Error temporal en el modal. Cierra y vuelve a abrir Agendar Valoracion.');
+      return;
+    }
+    fechaEl.textContent=fLbl;
+    horaEl.textContent=hora;
+    btnEl.style.display='block';
   }
 
   window.confirmarCitaAgendar = async function confirmarCitaAgendar() {
