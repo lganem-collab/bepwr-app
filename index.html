@@ -4406,37 +4406,18 @@ window._applyIVF=applyIVF;
     const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const [y,m,d]=window._citasFechaSeleccionada.split('-');
     const fLbl=`${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y}`;
-    // Diagnostico defensivo: capturar elementos antes de tocarlos
-    const fechaEl=document.getElementById('agendar-confirm-fecha');
-    const horaEl=document.getElementById('agendar-confirm-hora');
-    const btnEl=document.getElementById('agendar-btn-confirm');
-    if(!fechaEl||!horaEl||!btnEl){
-      const modal=document.getElementById('modal-agendar');
-      const step1=document.getElementById('agendar-step1');
-      const picker=document.getElementById('agendar-fecha-picker');
-      const ids=['agendar-loading','agendar-mi-cita','agendar-step1','agendar-no-config','agendar-fecha-picker','cal-grid','agendar-slots-wrap','agendar-slots','agendar-btn-confirm','agendar-confirm-fecha','agendar-confirm-hora','agendar-step2'];
-      const presentes=ids.filter(id=>!!document.getElementById(id));
-      const faltantes=ids.filter(id=>!document.getElementById(id));
-      console.error('[selectSlotCita] DOM roto.',
-        '\n  modal exists:',!!modal,
-        '\n  step1 exists:',!!step1,
-        '\n  picker exists:',!!picker,
-        '\n  IDs presentes:',presentes,
-        '\n  IDs faltantes:',faltantes,
-        '\n  modal childCount:',modal?.children?.[0]?.childElementCount,
-        '\n  modal-sheet hijos:',Array.from(modal?.querySelector('.modal-sheet')?.children||[]).map(c=>({tag:c.tagName,id:c.id,display:c.style.display})));
-      alert('Error en modal. Cierra y reabre Agendar Valoracion. (revisa consola)');
-      return;
-    }
-    fechaEl.textContent=fLbl;
-    horaEl.textContent=hora;
-    btnEl.style.display='block';
+    document.getElementById('agendar-confirm-fecha').textContent=fLbl;
+    document.getElementById('agendar-confirm-hora').textContent=hora;
+    document.getElementById('agendar-btn-confirm').style.display='block';
   }
 
   window.confirmarCitaAgendar = async function confirmarCitaAgendar() {
-    const btn=document.getElementById('agendar-btn-confirm');
+    const btnWrap=document.getElementById('agendar-btn-confirm');
+    const btn=btnWrap?.querySelector('button');
     const msgEl=document.getElementById('agendar-msg');
     if(!window._slotSeleccionado||!window._citasFechaSeleccionada) return;
+    if(!btn) return;
+    const textoOriginal=btn.innerHTML;
     btn.disabled=true; btn.textContent='Agendando…'; msgEl.textContent='';
     try {
       const rango=getCitaRango(window._citasFechaSeleccionada);
@@ -4455,7 +4436,7 @@ window._applyIVF=applyIVF;
       if(!r.ok){
         if(j.code==='SLOT_OCUPADO'){
           msgEl.style.color='#f55'; msgEl.textContent='Este horario ya fue reservado. Elige otro.';
-          btn.disabled=false; btn.textContent='Confirmar cita';
+          btn.disabled=false; btn.innerHTML=textoOriginal;
           await onFechaAgendarChange(); return;
         }
         throw new Error(j.error||('Error '+r.status));
@@ -4469,10 +4450,12 @@ window._applyIVF=applyIVF;
         `${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y} · ${window._slotSeleccionado}`;
       // Refrescar tarjeta y countdown en Mi Metodo
       if(window.cargarProximaCita) window.cargarProximaCita();
+      // Restaurar estado del boton para proxima apertura (no queda "Agendando..." stuck)
+      btn.disabled=false; btn.innerHTML=textoOriginal;
     } catch(e){
       console.error('confirmarCita:',e);
       msgEl.style.color='#f55'; msgEl.textContent='Error al agendar: '+e.message;
-      btn.disabled=false; btn.textContent='Confirmar cita';
+      btn.disabled=false; btn.innerHTML=textoOriginal;
     }
   }
 
