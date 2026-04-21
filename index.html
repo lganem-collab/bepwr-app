@@ -4410,10 +4410,22 @@ window._applyIVF=applyIVF;
     const fechaEl=document.getElementById('agendar-confirm-fecha');
     const horaEl=document.getElementById('agendar-confirm-hora');
     const btnEl=document.getElementById('agendar-btn-confirm');
-    console.log('[selectSlotCita] hora=',hora,'fecha=',window._citasFechaSeleccionada,'fechaEl=',!!fechaEl,'horaEl=',!!horaEl,'btnEl=',!!btnEl,'modalActive=',document.getElementById('modal-agendar')?.classList.contains('active'),'step1Display=',document.getElementById('agendar-step1')?.style.display,'pickerDisplay=',document.getElementById('agendar-fecha-picker')?.style.display);
     if(!fechaEl||!horaEl||!btnEl){
-      console.error('[selectSlotCita] DOM roto. modal-agendar HTML:',document.getElementById('modal-agendar')?.innerHTML?.slice(0,500));
-      alert('Error temporal en el modal. Cierra y vuelve a abrir Agendar Valoracion.');
+      const modal=document.getElementById('modal-agendar');
+      const step1=document.getElementById('agendar-step1');
+      const picker=document.getElementById('agendar-fecha-picker');
+      const ids=['agendar-loading','agendar-mi-cita','agendar-step1','agendar-no-config','agendar-fecha-picker','cal-grid','agendar-slots-wrap','agendar-slots','agendar-btn-confirm','agendar-confirm-fecha','agendar-confirm-hora','agendar-step2'];
+      const presentes=ids.filter(id=>!!document.getElementById(id));
+      const faltantes=ids.filter(id=>!document.getElementById(id));
+      console.error('[selectSlotCita] DOM roto.',
+        '\n  modal exists:',!!modal,
+        '\n  step1 exists:',!!step1,
+        '\n  picker exists:',!!picker,
+        '\n  IDs presentes:',presentes,
+        '\n  IDs faltantes:',faltantes,
+        '\n  modal childCount:',modal?.children?.[0]?.childElementCount,
+        '\n  modal-sheet hijos:',Array.from(modal?.querySelector('.modal-sheet')?.children||[]).map(c=>({tag:c.tagName,id:c.id,display:c.style.display})));
+      alert('Error en modal. Cierra y reabre Agendar Valoracion. (revisa consola)');
       return;
     }
     fechaEl.textContent=fLbl;
