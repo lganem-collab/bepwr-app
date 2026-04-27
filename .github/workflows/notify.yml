@@ -1,6 +1,11 @@
 name: bePWR Notificaciones Programadas
 
 on:
+  schedule:
+    - cron: '0 12 * * 1,5'   # morning: Lun y Vie 6am CST
+    - cron: '0 23 * * 3,0'   # evening: Mie y Dom 5pm CST
+    - cron: '30 11 * * 1-5'  # coaches: Lun-Vie 5:30am CST
+    - cron: '0 15 * * *'     # daily:   todos los dias 9am CST
   workflow_dispatch:
     inputs:
       endpoint:
@@ -22,7 +27,7 @@ jobs:
             MIN=$(date -u +%M)
             if [ "$HOUR" = "12" ] && [ "$MIN" = "00" ]; then
               echo "path=/api/cron/notify-morning" >> $GITHUB_OUTPUT
-            elif [ "$HOUR" = "01" ] && [ "$MIN" = "00" ]; then
+            elif [ "$HOUR" = "23" ] && [ "$MIN" = "00" ]; then
               echo "path=/api/cron/notify-evening" >> $GITHUB_OUTPUT
             elif [ "$HOUR" = "11" ] && [ "$MIN" = "30" ]; then
               echo "path=/api/cron/notify-coaches" >> $GITHUB_OUTPUT
