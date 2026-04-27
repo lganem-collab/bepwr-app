@@ -38,7 +38,6 @@ jobs:
             const snap = await db.collection('citas')
               .where('fecha', '==', mananaStr)
               .where('estado', '==', 'confirmada')
-              .where('recordatorioEnviado', '==', false)
               .get();
 
             if (snap.empty) { console.log('Sin citas manana.'); return; }
