@@ -4462,7 +4462,7 @@ window._applyIVF=applyIVF;
       // Push FCM al dispositivo
       try{
         fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-          body:JSON.stringify({title:'Cita confirmada ✅',body:'Tu valoración: '+window._citasFechaSeleccionada+' · '+window._slotSeleccionado+'. Recuerda: ayuno 2-4h, sin ejercicio intenso 12h antes.',target:'uid',uid:window._currentUid})
+          body:JSON.stringify({title:'Cita confirmada ✅',body:'Tu valoración: '+_labelCita({fecha:window._citasFechaSeleccionada,hora:window._slotSeleccionado})+'. Recuerda: ayuno 2-4h, sin ejercicio intenso 12h antes.',target:'uid',uid:window._currentUid})
         }).catch(function(e){console.log('push cita err',e);});
       }catch(pn){console.log('push cita err',pn);}
       // Restaurar estado del boton para proxima apertura (no queda "Agendando..." stuck)
