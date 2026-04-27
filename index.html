@@ -4450,6 +4450,21 @@ window._applyIVF=applyIVF;
         `${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y} · ${window._slotSeleccionado}`;
       // Refrescar tarjeta y countdown en Mi Metodo
       if(window.cargarProximaCita) window.cargarProximaCita();
+      // Email de confirmacion al miembro
+      try{
+        var _cd=window.cachedUserData||{};
+        var _nombre=_cd.nombre||(_cd.name)||'Miembro';
+        var _email=_cd.email||(window._authUser&&window._authUser.email)||'';
+        if(_email) fetch('/api/send-cita',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({nombre:_nombre,fecha:window._citasFechaSeleccionada,hora:window._slotSeleccionado,emailMiembro:_email})
+        }).catch(function(e){console.log('email cita err',e);});
+      }catch(em){console.log('email cita err',em);}
+      // Push FCM al dispositivo
+      try{
+        fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+          body:JSON.stringify({title:'Cita confirmada ✅',body:'Tu valoración: '+window._citasFechaSeleccionada+' · '+window._slotSeleccionado+'. Recuerda: ayuno 2-4h, sin ejercicio intenso 12h antes.',target:'uid',uid:window._currentUid})
+        }).catch(function(e){console.log('push cita err',e);});
+      }catch(pn){console.log('push cita err',pn);}
       // Restaurar estado del boton para proxima apertura (no queda "Agendando..." stuck)
       btn.disabled=false; btn.innerHTML=textoOriginal;
     } catch(e){
