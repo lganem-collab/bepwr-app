@@ -4462,7 +4462,7 @@ window._applyIVF=applyIVF;
       // Push FCM al dispositivo
       try{
         fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-          body:JSON.stringify({title:'Cita confirmada ✅',body:'Tu valoración: '+_labelCita({fecha:window._citasFechaSeleccionada,hora:window._slotSeleccionado})+'. Recuerda: ayuno 2-4h, sin ejercicio intenso 12h antes.',target:'uid',uid:window._currentUid})
+          body:JSON.stringify({title:'Cita confirmada ✅',body:(function(){var _p=window._citasFechaSeleccionada.split('-'),_fd=new Date(+_p[0],+_p[1]-1,+_p[2]),_dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],_meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];return _dias[_fd.getDay()]+' '+parseInt(_p[2])+' de '+_meses[+_p[1]-1]+' a las '+window._slotSeleccionado;})(),target:'uid',uid:window._currentUid})
         }).catch(function(e){console.log('push cita err',e);});
       }catch(pn){console.log('push cita err',pn);}
       // Restaurar estado del boton para proxima apertura (no queda "Agendando..." stuck)
