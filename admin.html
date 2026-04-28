@@ -3107,7 +3107,6 @@ for (const med of medidasVal) {
       const msgs = {'auth/email-already-in-use':'Ese email ya está registrado','auth/invalid-email':'Email inválido','auth/weak-password':'Contraseña muy débil'};
       errEl.textContent = msgs[e.code] || 'Error: ' + e.message;
     }
-    switchTab('members'); loadMembers();
     btn.textContent = 'Guardar Miembro'; btn.disabled = false;
   }
 
