@@ -490,6 +490,19 @@
     function showCard(data) {
       var initials = data.nombre.trim().split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
       document.getElementById('member-avatar').textContent = initials;
+        (function(){
+          var photoUrl = 'https://firebasestorage.googleapis.com/v0/b/bepwr-app.firebasestorage.app/o/fotos%2F' + uid + '%2Fprofile.jpg?alt=media';
+          var testImg = new Image();
+          testImg.onload = function() {
+            var el = document.getElementById('member-avatar');
+            if (!el) return;
+            el.textContent = '';
+            el.style.backgroundImage = 'url(' + photoUrl + ')';
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+          };
+          testImg.src = photoUrl;
+        })();
       document.getElementById('member-name').textContent   = data.nombre;
       document.getElementById('member-meta').textContent   = data.meta || 'Sin objetivo definido';
       document.getElementById('stat-total').textContent    = data.totalVisitas;

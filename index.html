@@ -526,7 +526,10 @@
       <div class="view" id="view-profile">
 <div style="padding:16px 16px 120px">
         <div class="profile-head">
-          <div class="profile-av" id="profile-av">?</div>
+          <div style="position:relative;display:inline-block;cursor:pointer" onclick="abrirFotoModal()">
+            <div class="profile-av" id="profile-av">?</div>
+            <div style="position:absolute;bottom:0;right:0;background:#FF5C1A;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.4)">&#x1F4F7;</div>
+          </div>
           <div class="profile-name-big" id="profile-name-big">...</div>
           <div class="profile-since" id="profile-since">...</div>
         </div>
@@ -574,6 +577,97 @@
         </div>
 
             </div><!-- scroll-area -->
+
+    <script type="module">
+var _storageMod = null;
+async function _getFotoSDK() {
+  if (!_storageMod) _storageMod = await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js');
+  return _storageMod;
+}
+function _aplicarFoto(url) {
+  ['avatar-initials','profile-av'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = '';
+    el.style.backgroundImage = 'url(' + url + ')';
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.style.color = 'transparent';
+  });
+}
+function _resizeFoto(file, maxPx) {
+  return new Promise(function(res) {
+    var r = new FileReader();
+    r.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var c = document.createElement('canvas'), w = img.width, h = img.height;
+        if (w > h) { if (w > maxPx) { h = Math.round(h * maxPx / w); w = maxPx; } }
+        else { if (h > maxPx) { w = Math.round(w * maxPx / h); h = maxPx; } }
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        c.toBlob(function(b) { res(b); }, 'image/jpeg', 0.85);
+      };
+      img.src = e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+window.abrirFotoModal = function() {
+  document.getElementById('modal-foto').style.display = 'flex';
+};
+window.cerrarFotoModal = function() {
+  document.getElementById('modal-foto').style.display = 'none';
+};
+window.subirFotoPerfil = async function(file) {
+  if (!file) return;
+  cerrarFotoModal();
+  var uid = window._currentUid;
+  if (!uid) return;
+  try {
+    var s = await _getFotoSDK();
+    var storage = s.getStorage();
+    var blob = await _resizeFoto(file, 400);
+    var ref = s.ref(storage, 'fotos/' + uid + '/profile.jpg');
+    await s.uploadBytes(ref, blob, { contentType: 'image/jpeg' });
+    var url = await s.getDownloadURL(ref);
+    localStorage.setItem('bepwr_foto_' + uid, url);
+    _aplicarFoto(url);
+  } catch(e) {
+    console.error('Error subiendo foto:', e);
+    alert('No se pudo subir la foto. Intenta de nuevo.');
+  }
+};
+window.cargarFotoPerfil = async function(uid) {
+  var cached = localStorage.getItem('bepwr_foto_' + uid);
+  if (cached) { _aplicarFoto(cached); return; }
+  try {
+    var s = await _getFotoSDK();
+    var storage = s.getStorage();
+    var ref = s.ref(storage, 'fotos/' + uid + '/profile.jpg');
+    var url = await s.getDownloadURL(ref);
+    localStorage.setItem('bepwr_foto_' + uid, url);
+    _aplicarFoto(url);
+  } catch(e) { /* sin foto, mantener iniciales */ }
+};
+    </script>
+
+    <!-- Modal Foto Perfil -->
+    <div id="modal-foto" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.75);align-items:flex-end" onclick="if(event.target===this)cerrarFotoModal()">
+      <div style="background:#1a1a1a;border-radius:20px 20px 0 0;padding:28px 20px 44px;width:100%;box-sizing:border-box">
+        <div style="width:36px;height:4px;background:#444;border-radius:2px;margin:0 auto 20px"></div>
+        <div style="text-align:center;font-size:11px;color:var(--gray);margin-bottom:20px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase">Foto de perfil</div>
+        <button onclick="document.getElementById('input-foto-galeria').click()" style="width:100%;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">&#x1F5BC;&#xFE0F;</span><span>Elegir de galer&#xED;a</span>
+        </button>
+        <button onclick="document.getElementById('input-foto-camara').click()" style="width:100%;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">&#x1F933;</span><span>Tomar selfie</span>
+        </button>
+        <button onclick="cerrarFotoModal()" style="width:100%;padding:14px;background:transparent;border:none;color:var(--gray);font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer">Cancelar</button>
+        <input type="file" id="input-foto-galeria" accept="image/*" style="display:none" onchange="subirFotoPerfil(this.files[0]);this.value=''">
+        <input type="file" id="input-foto-camara" accept="image/*" capture="user" style="display:none" onchange="subirFotoPerfil(this.files[0]);this.value=''">
+      </div>
+    </div>
 
     <!-- Modal visor PDF -->
     <div id="modal-pdf" style="display:none;position:fixed;inset:0;z-index:3000;background:#000;flex-direction:column">
@@ -1065,8 +1159,10 @@ onAuthStateChanged(auth, async user => {
 
       // Greeting & avatar
       setGreeting(nombre.toUpperCase(), data.fechaInicio || '');
+      window._currentUid = user.uid;
       document.getElementById('avatar-initials').textContent = initials;
       document.getElementById('profile-av').textContent = initials;
+      if(window.cargarFotoPerfil) cargarFotoPerfil(user.uid);
       document.getElementById('profile-name-big').textContent = nombreReal.toUpperCase();
       if (data.alias) {
         document.getElementById('profile-since').textContent = (data.fechaInicio ? 'Miembro desde ' + fmtFecha(data.fechaInicio) : 'Miembro bePWR') + ' · "' + data.alias + '"';      } else {
