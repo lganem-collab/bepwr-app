@@ -3565,9 +3565,9 @@ function renderGuiaNutrimental(data, config) {
     unavail.style.display = 'block';
     return;
   }
-  const url = (data.guiaUrls && data.guiaUrls[config.pdf])
+  const url = ((data.guiaUrls && data.guiaUrls[config.pdf])
     ? data.guiaUrls[config.pdf]
-    : '/pdfs/'+config.pdf+'.pdf';
+    : '/pdfs/'+config.pdf+'.pdf') + '?t=' + Date.now();
   descEl.textContent    = 'Guia nutricional para tu objetivo: '+config.label;
     btn.onclick = () => window.abrirPdfModal(url)
   btn.style.display     = 'inline-flex';
