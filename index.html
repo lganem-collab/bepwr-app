@@ -1193,7 +1193,11 @@ onAuthStateChanged(auth, async user => {
     const email = document.getElementById('inp-email').value.trim();
     if (!email) { errorEl.style.color='#fb923c'; errorEl.textContent = 'Escribe tu email primero'; return; }
     try {
-      await sendPasswordResetEmail(auth, email);
+      const r = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
       errorEl.style.color = '#4ade80';
       errorEl.textContent = 'Te enviamos un correo para restablecer tu contrase\u00F1a';
     } catch(e) {
