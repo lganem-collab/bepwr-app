@@ -851,7 +851,7 @@ window.cerrarCropModal=function(){document.getElementById('modal-crop').style.di
           </div>
         </div>
         <div style="font-size:11px;color:var(--gray);font-family:'Space Mono',monospace;line-height:1.6">
-          Debe tener: may&#xFA;scula &#xB7; min&#xFA;scula &#xB7; n&#xFA;mero &#xB7; s&#xED;mbolo
+          Debe tener: m&#xED;nimo 6 caracteres &#xB7; may&#xFA;scula &#xB7; min&#xFA;scula &#xB7; n&#xFA;mero &#xB7; s&#xED;mbolo (. ! * @ #)
         </div>
       </div>
       <div id="edit-error" style="color:#f87171;font-size:13px;margin-bottom:12px;min-height:18px"></div>
@@ -1999,6 +1999,31 @@ function renderProfileMetrics(m) {
       if (!/^\d{10}$/.test(tel)) {
         throw new Error('El teléfono debe tener 10 dígitos.');
       }
+    }
+
+    // VALIDACIÓN Y CAMBIO DE CONTRASEÑA
+    const algunPass = passCurrent || passNew || passConfirm;
+    if (algunPass) {
+      if (!passCurrent || !passNew || !passConfirm) {
+        throw new Error('Para cambiar la contraseña, llena los 3 campos.');
+      }
+      if (passNew !== passConfirm) {
+        throw new Error('La nueva contraseña y su confirmación no coinciden.');
+      }
+      const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{6,}$/;
+      if (!passRegex.test(passNew)) {
+        throw new Error('La contraseña debe tener mínimo 6 caracteres, mayúscula, minúscula, número y símbolo.');
+      }
+      try {
+        const cred = EmailAuthProvider.credential(user.email, passCurrent);
+        await reauthenticateWithCredential(user, cred);
+      } catch (err) {
+        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          throw new Error('La contraseña actual es incorrecta.');
+        }
+        throw new Error('No se pudo verificar tu contraseña actual: ' + err.message);
+      }
+      await updatePassword(user, passNew);
     }
 
     // ARMAR UPDATES A FIRESTORE
