@@ -2323,15 +2323,22 @@ let cachedMetricas = [];
   history.replaceState({ view: 'home' }, '', '');
 
   window.guardarPassMiembro = async function() {
+    var elactual = document.getElementById('mp-actual');
     var elnueva = document.getElementById('mp-nueva');
     var elconfirma = document.getElementById('mp-confirma');
     var errEl = document.getElementById('mp-error');
-    if (!elnueva || !elconfirma) return;
+    if (!elactual || !elnueva || !elconfirma) return;
+    var actual = elactual.value;
     var nueva = elnueva.value;
     var confirma = elconfirma.value;
     if (errEl) errEl.textContent = '';
-    if (!nueva || nueva.length < 8) {
-      if (errEl) errEl.textContent = 'M\u00EDnimo 8 caracteres';
+    if (!actual) {
+      if (errEl) errEl.textContent = 'Escribe tu contrase\u00F1a actual';
+      return;
+    }
+    var passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!*@#$%^&+=_\-?])[A-Za-z\d.!*@#$%^&+=_\-?]{8,}$/;
+    if (!nueva || !passRegex.test(nueva)) {
+      if (errEl) errEl.textContent = 'M\u00EDnimo 8 caracteres con may\u00FAscula, min\u00FAscula, n\u00FAmero y s\u00EDmbolo';
       return;
     }
     if (nueva !== confirma) {
@@ -2340,14 +2347,20 @@ let cachedMetricas = [];
     }
     try {
       const user = auth.currentUser;
-      await user.updatePassword(nueva);
-      await doc(db, 'usuarios', user.uid);
-      await updateDoc(doc(db, 'usuarios', user.uid), { primerIngreso: false });
+      if (!user) { if (errEl) errEl.textContent = 'Sesi\u00F3n expirada. Vuelve a entrar.'; return; }
+      const cred = EmailAuthProvider.credential(user.email, actual);
+      await reauthenticateWithCredential(user, cred);
+      await updatePassword(user, nueva);
       var modal = document.getElementById('modal-cambio-pass-member');
       if (modal) { modal.classList.remove('active'); setTimeout(function(){ modal.style.display='none'; }, 300); }
-      showToast('\u00A1Contrase\u00F1a creada! Ya puedes usar tu nueva contrase\u00F1a. \u2713', 'success');
+      elactual.value = ''; elnueva.value = ''; elconfirma.value = '';
+      showToast('\u00A1Contrase\u00F1a actualizada! \u2713', 'success');
     } catch(e) {
-      if (errEl) errEl.textContent = 'Error: ' + e.message;
+      var msg = 'Error: ' + e.message;
+      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'La contrase\u00F1a actual es incorrecta';
+      else if (e.code === 'auth/weak-password') msg = 'La nueva contrase\u00F1a es muy d\u00E9bil';
+      else if (e.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera unos minutos.';
+      if (errEl) errEl.textContent = msg;
     }
   };
 /* ── Configuración por objetivo ───────────────────────────── */
@@ -3828,6 +3841,13 @@ if (window._rutinaActual) {
       <div class="modal-title">Crea tu contrase&#xF1;a</div>
       <p style="font-size:13px;color:#888;margin:12px 0 20px;line-height:1.6">Por seguridad, establece tu propia contrase&#xF1;a antes de continuar.</p>
       <div style="display:grid;gap:16px">
+        <div class="field">
+          <label>CONTRASEÑA ACTUAL</label>
+          <div style="position:relative;display:flex;align-items:center">
+            <input type="password" id="mp-actual" placeholder="Tu contraseña actual" style="flex:1;padding-right:44px"/>
+            <span onclick="var e=document.getElementById('mp-actual');e.type=e.type==='password'?'text':'password';this.textContent=e.type==='password'?'VER':'OK'" style="position:absolute;right:12px;cursor:pointer;font-size:18px;user-select:none">VER</span>
+          </div>
+        </div>
         <div class="field">
           <label>NUEVA CONTRASE&#xD1;A</label>
           <div style="position:relative;display:flex;align-items:center">
