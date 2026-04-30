@@ -21,7 +21,7 @@
 ## 2. Estado del proyecto (29/04/2026)
 
 - **Lanzamiento a usuarios finales: 01/05/2026** (pasado mañana).
-- **`index.html` (app del miembro): 100%** funcional para usuarios. Solo quedan detalles mínimos como bug de cambio de contraseña en perfil.
+- **`index.html` (app del miembro): 100%** funcional para usuarios. **V1 cerrada el 29/04/2026.**
 - **`admin.html` (panel staff): 95%** funcional. Faltan detalles de uso interno que NO ven los usuarios finales.
 - App estuvo 15 días en pruebas funcionando bien.
 - **Implicación operacional:** cualquier cambio en `index.html` debe ser mínimo, probado y reversible. No refactors en lado usuario hasta después del lanzamiento.
@@ -131,9 +131,9 @@ Casi todos los tabs tienen `style="display:none"` por defecto. Se hacen visibles
 
 | Archivo | SDK | Sintaxis correcta | Sintaxis incorrecta |
 |---|---|---|---|
-| `index.html` | Modular v9 | `updatePassword(user, nueva)` | `user.updatePassword(nueva)` |
-| `admin.html` | Compat v8 | `db.collection('x').doc(y)` | `doc(db,'x',y)` |
-| `recepcion.html` | Modular v9 | `getDoc(docRef(db,'x',y))` | `db.collection('x')` |
+| `index.html` | Modular v9 | updatePassword(user, nueva) | user.updatePassword(nueva) |
+| `admin.html` | Compat v8 | db.collection('x').doc(y) | doc(db,'x',y) |
+| `recepcion.html` | Modular v9 | getDoc(docRef(db,'x',y)) | db.collection('x') |
 
 **Antes de tocar Auth/Firestore en cualquier archivo, confirmar el SDK del archivo.** Mezclar sintaxis es bug recurrente que falla silenciosamente.
 
@@ -175,16 +175,12 @@ Casi todos los tabs tienen `style="display:none"` por defecto. Se hacen visibles
 
 ## 9. Frente activo único (al 29/04/2026)
 
-### 🔴 Auditar Dashboard antes del lanzamiento
+### Auditar Dashboard antes del lanzamiento
 
 - Ubicado en `admin.html` → tab Dashboard (item 6 del sidebar).
 - **Síntoma observado:** muestra datos del "día XXX" y de "semana cero" — no cuadra con la realidad operativa.
 - **Objetivo:** validar si los datos son valiosos para uso interno y corregir los conteos que no cuadran.
 - Es uso interno (Luis/Brandon), no impacta a usuarios finales.
-
-### Bugs menores conocidos en `index.html` (post-lanzamiento)
-
-- Cambio de contraseña en Mi Perfil no se guarda en Firebase Auth. Diagnóstico parcial en chat del 29/04. Atacar en chat dedicado.
 
 ---
 
@@ -196,3 +192,48 @@ Casi todos los tabs tienen `style="display:none"` por defecto. Se hacen visibles
 4. **Solo después de tener datos reales:** proponer plan.
 5. **Una instrucción a la vez.** Luis copia comando, pega en VS Code, devuelve resultado. Repetir.
 
+---
+
+## 11. Plantilla para reportar bugs
+
+Al abrir chat de bug, dar a Claude:
+- **BUG:** una frase
+- **DÓNDE:** archivo + ruta UI completa hasta la sección exacta
+- **CAPTURA:** adjunta desde el primer mensaje (regla #10)
+- **TEXTO ÚNICO EN PANTALLA:** una frase del UI que no aparezca en otra sección
+- **PASOS PARA REPRODUCIR:** 1, 2, 3...
+- **QUÉ ESPERABA / QUÉ PASA**
+
+Esto evita que Claude asuma ubicación y arranque a parchar la sección equivocada (problema real ocurrido el 29/04/2026 con el bug de cambio de contraseña: tardamos 3 chats en localizar la función correcta porque CONTEXT.md describía el síntoma sin ubicación).
+
+---
+
+## 12. Aprendizajes técnicos del proyecto
+
+### Política de contraseñas (alineada en toda la app)
+
+Regla legible: **mínimo 6 caracteres + mayúscula + minúscula + número + símbolo (. ! * @ # $ % ^ & + = _ - ?)**.
+
+Implementada en dos funciones de `index.html`:
+- `savePrimerIngreso` (onboarding)
+- `saveEditInfo` (Mi Perfil → Editar información)
+
+Si alguna vez se sube a 8 caracteres mínimo, cambiar la regex en ambas funciones a la vez para no desalinear.
+
+### Cambio de contraseña en `index.html` requiere re-autenticación
+
+Firebase rechaza `updatePassword` si la sesión no es reciente. Patrón correcto en modular v9:
+
+1. Construir credencial: `EmailAuthProvider.credential(user.email, passActual)`
+2. Re-autenticar: `await reauthenticateWithCredential(user, cred)`
+3. Cambiar password: `await updatePassword(user, passNueva)`
+
+Manejar específicamente los códigos `auth/wrong-password` y `auth/invalid-credential` para mensaje claro al usuario.
+
+### Bug recurrente: UI sin lógica detrás
+
+`saveEditInfo` (al 29/04/2026, antes del fix) leía 3 campos de password pero nunca los usaba — el flujo terminaba en éxito visible sin tocar Firebase Auth. Patrón a vigilar en otras secciones: input + botón + mensaje de éxito ≠ función completa. Antes de declarar "no funciona Firebase", verificar que la función realmente llame a Firebase con `grep` sobre el nombre del SDK que debería usarse.
+
+### Pegado de código a chat puede mostrar artefactos falsos
+
+Al copiar JS desde la terminal y pegar al chat, propiedades como `user.email` pueden renderizarse como `[user.email](http://user.email)` — es filtro del cliente del chat, NO está en el archivo. Verificar siempre con `od -c` antes de asumir corrupción del disco.
