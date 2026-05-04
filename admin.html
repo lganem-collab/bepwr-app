@@ -501,6 +501,11 @@
     <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:10px;letter-spacing:.5px">HEATMAP DE ACTIVIDAD &middot; &Uacute;LTIMOS 30 D&Iacute;AS</div>
     <div id="dash-heatmap"></div>
   </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px;overflow-x:auto">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">RETENCI&Oacute;N POR COHORTE</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:10px">% DE CADA GRUPO QUE REGRES&Oacute; EN SU SEMANA N (S0=ALTA, S1=SIGUIENTE, ETC)</div>
+    <div id="dash-cohort"></div>
+  </div>
 </div>
 
 <div id="tab-content-guias" style="display:none;max-width:680px;margin:0 auto;padding:16px">
@@ -3721,6 +3726,124 @@ window.filterNotifUsers = function (q) {
     el.innerHTML = html;
   }
 
+  function renderCohort(allEventos, allMembers) {
+    const el = document.getElementById('dash-cohort');
+    if (!el) return;
+
+    const NCOHORTS = 6;
+    const NPERIODS = 6;
+
+    function mondayOf(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      const m = new Date(d);
+      m.setDate(d.getDate() + diff);
+      m.setHours(0,0,0,0);
+      return m;
+    }
+    function weekKey(date) {
+      return mondayOf(date).toISOString().slice(0,10);
+    }
+
+    const now = new Date();
+    const currentMonday = mondayOf(now);
+
+    const cohortWeeks = [];
+    for (let i = NCOHORTS - 1; i >= 0; i--) {
+      const w = new Date(currentMonday);
+      w.setDate(currentMonday.getDate() - i*7);
+      cohortWeeks.push(weekKey(w));
+    }
+
+    const cohortMap = {};
+    cohortWeeks.forEach(w => cohortMap[w] = []);
+
+    (allMembers || []).forEach(m => {
+      if (!m.fechaInicio || !m.uid) return;
+      const fi = m.fechaInicio.toDate ? m.fechaInicio.toDate() : new Date(m.fechaInicio);
+      if (isNaN(fi.getTime())) return;
+      const wk = weekKey(fi);
+      if (cohortMap[wk]) cohortMap[wk].push(m.uid);
+    });
+
+    const totalMembers = Object.values(cohortMap).reduce((s, arr) => s + arr.length, 0);
+    if (totalMembers === 0) {
+      el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin altas en las &uacute;ltimas 6 semanas</div>';
+      return;
+    }
+
+    const visits = (allEventos || []).filter(e => e.tipo === 'visita' && e.dia && e.uid);
+    const userWeeks = {};
+    visits.forEach(e => {
+      const dt = new Date(e.dia + 'T12:00:00');
+      const wk = weekKey(dt);
+      if (!userWeeks[e.uid]) userWeeks[e.uid] = new Set();
+      userWeeks[e.uid].add(wk);
+    });
+
+    function pctColor(pct) {
+      if (pct === null) return '#1a1a1a';
+      if (pct >= 80) return '#16a34a';
+      if (pct >= 60) return '#65a30d';
+      if (pct >= 40) return '#ca8a04';
+      if (pct >= 20) return '#dc2626';
+      return '#7f1d1d';
+    }
+
+    function fmtWeekLabel(wk) {
+      const d = new Date(wk + 'T12:00:00');
+      const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      const ddStart = ('' + d.getDate()).padStart(2, '0');
+      const dEnd = new Date(d); dEnd.setDate(d.getDate() + 6);
+      const ddEnd = ('' + dEnd.getDate()).padStart(2, '0');
+      return ddStart + '-' + ddEnd + ' ' + months[d.getMonth()];
+    }
+
+    let html = `<div style="display:grid;grid-template-columns:auto auto repeat(${NPERIODS}, 1fr);gap:4px;font-family:'Space Mono',monospace;font-size:11px;min-width:520px">`;
+
+    html += '<div style="color:#666;font-size:9px;padding:4px 8px">SEMANA DE ALTA</div>';
+    html += '<div style="color:#666;font-size:9px;padding:4px 8px;text-align:center">N</div>';
+    for (let s = 0; s < NPERIODS; s++) {
+      html += `<div style="color:#666;font-size:9px;padding:4px 4px;text-align:center">S${s}</div>`;
+    }
+
+    cohortWeeks.forEach(wk => {
+      const members = cohortMap[wk] || [];
+      const n = members.length;
+
+      html += `<div style="color:#ddd;padding:4px 8px;white-space:nowrap">${fmtWeekLabel(wk)}</div>`;
+      html += `<div style="color:#888;padding:4px 8px;text-align:center">${n}</div>`;
+
+      for (let s = 0; s < NPERIODS; s++) {
+        const cohortStart = new Date(wk + 'T12:00:00');
+        const targetWeek = new Date(cohortStart);
+        targetWeek.setDate(cohortStart.getDate() + s*7);
+
+        if (targetWeek > now) {
+          html += '<div style="color:#444;padding:4px 4px;text-align:center;background:#0d0d0d;border-radius:3px">&ndash;</div>';
+          continue;
+        }
+        if (n === 0) {
+          html += '<div style="color:#444;padding:4px 4px;text-align:center">&ndash;</div>';
+          continue;
+        }
+
+        const targetKey = weekKey(targetWeek);
+        let count = 0;
+        members.forEach(uid => {
+          if (userWeeks[uid] && userWeeks[uid].has(targetKey)) count++;
+        });
+        const pct = Math.round((count / n) * 100);
+        html += `<div style="color:#fff;padding:4px 4px;text-align:center;background:${pctColor(pct)};border-radius:3px;font-weight:600" title="${count}/${n} regresaron">${pct}%</div>`;
+      }
+    });
+
+    html += '</div>';
+
+    el.innerHTML = html;
+  }
+
   async function loadDashboard() {
     const period = window._dashPeriod || 'day';
 
@@ -3817,6 +3940,9 @@ window.filterNotifUsers = function (q) {
 
       // Heatmap de actividad (siempre últimos 30 días, independiente del período seleccionado)
       try { renderHeatmap(eventos); } catch(he) { console.error('renderHeatmap:', he); }
+
+      // Retención por cohorte (últimas 6 semanas de altas)
+      try { renderCohort(eventos, window._allMembers); } catch(ce) { console.error('renderCohort:', ce); }
 
     } catch(e) {
       console.error('loadDashboard:', e);
