@@ -3813,25 +3813,25 @@ window.filterNotifUsers = function (q) {
     const dows = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const dowText = s.visitsByDow.map((v,i) => dows[i] + ':' + v).join(', ');
     const top5Text = s.top5.map(x => x.nombre + '(' + x.count + ')').join(', ') || 'ninguno';
-    const top5RiskText = s.top5Risk.map(x => x.nombre + '(' + x.days + 'd)').join(', ') || 'ninguno';
+    const top5RiskText = s.top5Risk.map(x => x.nombre + '(' + (x.days >= 999 ? 'nunca entró' : 'hace ' + x.days + 'd') + ')').join(', ') || 'ninguno';
     const total = s.totalActivos;
     const pct = (n) => total > 0 ? Math.round((n/total)*100) + '%' : '0%';
 
-    const prompt = 'Eres analista del gimnasio funcional bePWR (Querétaro, México). Lee los datos y da 3-4 insights accionables al staff en español mexicano natural, tono directo y útil. NO uses bullets, encabezados ni emojis. Escribe 1-2 párrafos cortos. Empieza por lo más urgente o relevante. Sé concreto con nombres y números.\n\n' +
+    const prompt = 'Eres analista del gimnasio funcional bePWR (Querétaro, México). La app se lanzó el 01/05/2026 (con 15 días previos de pruebas con miembros reales), por lo que los datos abarcan máximo ~3 semanas. Lee los datos y da 3-4 insights accionables al staff en español mexicano natural, tono directo y útil. NO uses bullets, encabezados ni emojis. Escribe 1-2 párrafos cortos. Empieza por lo más urgente o relevante. Sé concreto con nombres y números. NUNCA inventes números que no aparezcan en los datos.\n\n' +
       'DATOS HOY (' + new Date().toLocaleDateString('es-MX') + '):\n\n' +
       'MIEMBROS:\n' +
       '- Total activos: ' + total + '\n' +
       '- Nuevos en últimos 7 días: ' + s.nuevosSemana + '\n' +
       '- Abrieron app últimos 7 días: ' + s.activosSemana + ' (' + pct(s.activosSemana) + ')\n' +
-      '- En riesgo (no entran +7d): ' + s.enRiesgo + ' (' + pct(s.enRiesgo) + ')\n\n' +
+      '- En riesgo (no entran +7d O nunca entraron): ' + s.enRiesgo + ' (' + pct(s.enRiesgo) + ')\n\n' +
       'VISITAS POR DÍA DE LA SEMANA: ' + dowText + '\n\n' +
       'TOP 5 MÁS ACTIVOS (visitas totales): ' + top5Text + '\n\n' +
-      'TOP 5 EN RIESGO (días sin entrar): ' + top5RiskText + '\n\n' +
+      'TOP 5 EN RIESGO (estado de su última visita; "nunca entró" = miembro registrado pero que jamás abrió la app): ' + top5RiskText + '\n\n' +
       'FUNNEL:\n' +
       '- Han abierto app: ' + s.visitedAny + ' (' + pct(s.visitedAny) + ')\n' +
       '- Hicieron reserva: ' + s.reservedAny + ' (' + pct(s.reservedAny) + ')\n' +
       '- Usaron chat IA: ' + s.usedIA + ' (' + pct(s.usedIA) + ')\n\n' +
-      'Da 3-4 insights útiles para tomar decisión.';
+      'Da 3-4 insights útiles para tomar decisión. Diferencia entre "se enfriaron" (entraron pero ya no) y "nunca entraron" (problema de onboarding/email de bienvenida).';
 
     try {
       const res = await fetch('/api/chat', {
