@@ -506,6 +506,11 @@
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:10px">% DE CADA GRUPO QUE REGRES&Oacute; EN SU SEMANA N (S0=ALTA, S1=SIGUIENTE, ETC)</div>
     <div id="dash-cohort"></div>
   </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">FUNNEL DE ACTIVACI&Oacute;N</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:14px">DEL ALTA AL ENGAGEMENT &middot; CADA PASO ES INDEPENDIENTE</div>
+    <div id="dash-funnel"></div>
+  </div>
 </div>
 
 <div id="tab-content-guias" style="display:none;max-width:680px;margin:0 auto;padding:16px">
@@ -3844,6 +3849,63 @@ window.filterNotifUsers = function (q) {
     el.innerHTML = html;
   }
 
+  function renderFunnel(allEventos, allMembers) {
+    const el = document.getElementById('dash-funnel');
+    if (!el) return;
+
+    const members = (allMembers || []).filter(m => m.activo !== false);
+    const total = members.length;
+    if (total === 0) {
+      el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin miembros activos</div>';
+      return;
+    }
+    const memberUids = new Set(members.map(m => m.uid).filter(Boolean));
+
+    const visited = new Set();
+    const reserved = new Set();
+    const usedIA = new Set();
+    const visitedThisWeek = new Set();
+
+    const now = new Date();
+    const weekAgo = new Date(now);
+    weekAgo.setDate(now.getDate() - 7);
+    const weekAgoStr = weekAgo.toISOString().slice(0,10);
+
+    (allEventos || []).forEach(e => {
+      if (!e.uid || !memberUids.has(e.uid)) return;
+      if (e.tipo === 'visita') {
+        visited.add(e.uid);
+        if (e.dia && e.dia >= weekAgoStr) visitedThisWeek.add(e.uid);
+      }
+      if (e.tipo === 'reserva') reserved.add(e.uid);
+      if (e.tipo === 'mensaje_ia' || e.tipo === 'analisis_cientifico') usedIA.add(e.uid);
+    });
+
+    const steps = [
+      { label: 'TOTAL MIEMBROS ACTIVOS', count: total, color: '#888' },
+      { label: 'HAN ABIERTO LA APP', count: visited.size, color: '#FF5C1A' },
+      { label: 'HICIERON UNA RESERVA', count: reserved.size, color: '#FF5C1A' },
+      { label: 'USARON CHAT IA / AN&Aacute;LISIS', count: usedIA.size, color: '#FF5C1A' },
+      { label: 'ACTIVOS ESTA SEMANA', count: visitedThisWeek.size, color: '#4ade80' }
+    ];
+
+    let html = '<div style="display:flex;flex-direction:column;gap:8px">';
+    steps.forEach(s => {
+      const pct = Math.round((s.count / total) * 100);
+      const fillPct = Math.max(2, pct);
+      html += `<div style="display:grid;grid-template-columns:160px 1fr auto;gap:10px;align-items:center">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">${s.label}</div>
+        <div style="background:#1a1a1a;border-radius:6px;height:20px;position:relative;overflow:hidden">
+          <div style="background:${s.color};height:100%;width:${fillPct}%;border-radius:6px"></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#fff;min-width:70px;text-align:right"><span style="color:#FF5C1A;font-weight:700">${s.count}</span>&nbsp;<span style="color:#666">${pct}%</span></div>
+      </div>`;
+    });
+    html += '</div>';
+
+    el.innerHTML = html;
+  }
+
   async function loadDashboard() {
     const period = window._dashPeriod || 'day';
 
@@ -3943,6 +4005,9 @@ window.filterNotifUsers = function (q) {
 
       // Retención por cohorte (últimas 6 semanas de altas)
       try { renderCohort(eventos, window._allMembers); } catch(ce) { console.error('renderCohort:', ce); }
+
+      // Funnel de activación
+      try { renderFunnel(eventos, window._allMembers); } catch(fe) { console.error('renderFunnel:', fe); }
 
     } catch(e) {
       console.error('loadDashboard:', e);
