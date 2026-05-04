@@ -2,7 +2,7 @@
 
 > Manual de uso del Dashboard del panel admin (`admin.html` → tab Dashboard).
 > Audiencia: Luis y Brandon. Sin tecnicismos.
-> Última actualización: 04/05/2026.
+> Última actualización: 04/05/2026 (con heatmap por hora del día).
 
 ---
 
@@ -40,9 +40,11 @@ Cinco tarjetas grandes con números clave:
 - **DÍA PICO** — el día de la semana con más visitas (Lun, Mar, Mié, etc.)
 
 #### Botón "Generar interpretación IA"
-Cuando le das click, Claude (IA) lee todos los datos del dashboard y te escribe **3-4 insights accionables en español** (1-2 párrafos cortos). Tarda 3-5 segundos. Cuesta ~1 centavo de dólar por click.
+Cuando le das click, Claude (IA) lee todos los datos del dashboard y te escribe **3-4 insights coloquiales** (1-2 párrafos cortos). Tarda 3-5 segundos. Cuesta ~1 centavo de dólar por click.
 
-**Cuándo usarlo:** cuando quieres una "lectura ejecutiva" sin tener que interpretar tú las gráficas. Por ejemplo, cada lunes en la mañana.
+**Cuándo usarlo:** cuando quieres una "lectura rápida" sin interpretar tú las gráficas. Ideal cada lunes en la mañana.
+
+**Tono:** la IA está configurada para sonar coloquial mexicano — como un coach o asesor que te habla derecho. Verás frases tipo "Aguas con Ana, lleva 2 semanas sin meterse", "Los martes 7pm es tu momento, ahí pega un push fuerte", "Brandon va bien chido con 22 visitas". NO suena a reporte corporativo.
 
 ---
 
@@ -105,7 +107,26 @@ Tabla en formato calendario:
 
 ---
 
-### 7. Retención por cohorte
+### 7. Cuándo se conectan · Hora por día de la semana
+
+Tabla en formato calendario, distinta al heatmap anterior:
+- **Filas:** los 7 días de la semana (Lun, Mar, Mié, Jue, Vie, Sáb, Dom)
+- **Columnas:** las 24 horas del día (0 a 23, en horario de México)
+- **Celdas:** color naranja según número de visitas en esa franja específica
+- **Etiqueta abajo:** te dice automáticamente cuál es tu **hora pico** (ej: `Mar 19:00 es tu hora pico (47 visitas en 30d)`)
+
+**Lo que te dice:**
+- **Hora pico exacta:** sabes que los miembros se conectan más, por ejemplo, los lunes a las 7pm — ahí es perfecto programar un push
+- **Patrón semanal:** ¿usan más la app entre semana o fin de semana?
+- **Patrón horario:** ¿se conectan en la mañana antes del gym, o en la noche para revisar progreso?
+- **Horarios muertos:** si los domingos en la mañana nadie entra, no programes ahí avisos
+
+**Ejemplo de uso real:**
+Si la tabla muestra que el martes a las 7pm es tu pico, y tu cron actual de notificaciones está programado para mandar a las 9am, considera moverlo a las 6:45pm — vas a tener mejor tasa de apertura.
+
+---
+
+### 8. Retención por cohorte
 
 Tabla donde cada fila es un grupo de miembros que se dieron de alta en la misma semana.
 
@@ -131,7 +152,7 @@ Tabla donde cada fila es un grupo de miembros que se dieron de alta en la misma 
 
 ---
 
-### 8. Funnel de activación
+### 9. Funnel de activación
 
 Cinco barras horizontales que muestran el "embudo" del miembro:
 
@@ -152,7 +173,7 @@ ACTIVOS ESTA SEMANA       ███░░░░░░░░░░░░░  X%  
 
 ---
 
-### 9. Rankings (top y en riesgo)
+### 10. Rankings (top y en riesgo)
 
 Dos tablas lado a lado:
 
@@ -171,7 +192,7 @@ Los 10 miembros activos que NO han abierto la app en +7 días, ordenados por má
 
 ---
 
-### 10. Secciones más visitadas (últimos 7 días)
+### 11. Secciones más visitadas (últimos 7 días)
 
 Bar chart horizontal azul. Te dice **qué pestañas de la PWA usa más la gente**.
 
@@ -186,7 +207,7 @@ Bar chart horizontal azul. Te dice **qué pestañas de la PWA usa más la gente*
 
 ---
 
-### 11. Tiempo promedio por sección (últimos 14 días)
+### 12. Tiempo promedio por sección (últimos 14 días)
 
 Bar chart horizontal morado. Tiempo promedio (en MM:SS) que un miembro pasa en cada sección antes de cambiarse a otra.
 
@@ -204,17 +225,19 @@ Bar chart horizontal morado. Tiempo promedio (en MM:SS) que un miembro pasa en c
 
 **Cada lunes, 10 minutos:**
 
-1. Click en "Generar interpretación IA" → léete el resumen
-2. Revisa el **Heatmap** → ¿quién se está enfriando?
-3. Revisa **Top 10 en riesgo** → manda push a los rojos con el botón 📣
-4. Mira la **Retención por cohorte** → ¿la cohorte de hace 4 semanas sigue activa o ya se cayó?
-5. Revisa el **Funnel** → ¿hay un cuello de botella nuevo?
+1. Click en "Generar interpretación IA" → léete el resumen coloquial de Claude
+2. Revisa el **Heatmap de actividad** (sección 6) → ¿quién se está enfriando?
+3. Mira **Cuándo se conectan** (sección 7) → ¿la hora pico cambió esta semana? Ajusta tus pushes
+4. Revisa **Top 10 en riesgo** (sección 10) → manda push a los rojos con el botón 📣
+5. Mira la **Retención por cohorte** (sección 8) → ¿la cohorte de hace 4 semanas sigue activa o ya se cayó?
+6. Revisa el **Funnel** (sección 9) → ¿hay un cuello de botella nuevo?
 
 **Cada mes:**
 
-1. Cambia el período a **Mensual** y revisa las gráficas de barras
+1. Cambia el período a **Mensual** y revisa las gráficas de barras (sección 4)
 2. Compara el ranking del mes vs el del mes pasado (top activos)
-3. Mira las **Secciones más visitadas** → ¿hay secciones que vale la pena ajustar?
+3. Mira las **Secciones más visitadas** (sección 11) → ¿hay secciones que vale la pena ajustar?
+4. Revisa **Tiempo por sección** (sección 12) → ¿qué les engancha más?
 
 ---
 
