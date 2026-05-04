@@ -531,6 +531,16 @@
       </div>
     </div>
   </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">SECCIONES M&Aacute;S VISITADAS</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:14px">% DE MIEMBROS ACTIVOS QUE VISIT&Oacute; CADA SECCI&Oacute;N EN LOS &Uacute;LTIMOS 7 D&Iacute;AS</div>
+    <div id="dash-sections"></div>
+  </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">TIEMPO PROMEDIO POR SECCI&Oacute;N</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:14px">SEGUNDOS ENTRE CAMBIO DE SECCIONES (PROMEDIO POR VISITA)</div>
+    <div id="dash-timing"></div>
+  </div>
 </div>
 
 <div id="tab-content-guias" style="display:none;max-width:680px;margin:0 auto;padding:16px">
@@ -4187,6 +4197,153 @@ window.filterNotifUsers = function (q) {
     }
   }
 
+  function renderSectionUsage(allEventos, allMembers) {
+    const el = document.getElementById('dash-sections');
+    if (!el) return;
+
+    const NDAYS = 7;
+    const now = new Date();
+    const minDay = new Date(now); minDay.setDate(now.getDate() - NDAYS);
+    const minDayStr = minDay.toISOString().slice(0,10);
+
+    const SECTIONS = [
+      { id: 'home', label: 'INICIO' },
+      { id: 'metodo', label: 'M&Eacute;TODO' },
+      { id: 'metricas', label: 'M&Eacute;TRICAS' },
+      { id: 'qr', label: 'MI QR' },
+      { id: 'notif', label: 'AVISOS' },
+      { id: 'profile', label: 'MI PERFIL' }
+    ];
+
+    const activeMembers = (allMembers || []).filter(m => m.activo !== false);
+    const totalActive = activeMembers.length;
+    if (totalActive === 0) {
+      el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin miembros activos</div>';
+      return;
+    }
+
+    const visitsBySection = {};
+    SECTIONS.forEach(s => visitsBySection[s.id] = new Set());
+
+    (allEventos || []).forEach(e => {
+      if (e.tipo !== 'navegacion' || !e.uid || !e.dia) return;
+      if (e.dia < minDayStr) return;
+      if (!e.seccion || !visitsBySection[e.seccion]) return;
+      visitsBySection[e.seccion].add(e.uid);
+    });
+
+    const results = SECTIONS.map(s => ({
+      label: s.label,
+      count: visitsBySection[s.id].size,
+      pct: Math.round((visitsBySection[s.id].size / totalActive) * 100)
+    }));
+    results.sort((a, b) => b.count - a.count);
+
+    if (results.every(r => r.count === 0)) {
+      el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin datos de navegaci&oacute;n todav&iacute;a. Los datos se acumulan a partir del despliegue del tracking.</div>';
+      return;
+    }
+
+    let html = '<div style="display:flex;flex-direction:column;gap:8px">';
+    results.forEach(r => {
+      const fillPct = Math.max(2, r.pct);
+      html += `<div style="display:grid;grid-template-columns:120px 1fr auto;gap:10px;align-items:center">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">${r.label}</div>
+        <div style="background:#1a1a1a;border-radius:6px;height:18px;position:relative;overflow:hidden">
+          <div style="background:#60a5fa;height:100%;width:${fillPct}%;border-radius:6px"></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#fff;min-width:70px;text-align:right"><span style="color:#60a5fa;font-weight:700">${r.count}</span>&nbsp;<span style="color:#666">${r.pct}%</span></div>
+      </div>`;
+    });
+    html += '</div>';
+
+    el.innerHTML = html;
+  }
+
+  function renderSectionTiming(allEventos) {
+    const el = document.getElementById('dash-timing');
+    if (!el) return;
+
+    const NDAYS = 14;
+    const now = new Date();
+    const minDay = new Date(now); minDay.setDate(now.getDate() - NDAYS);
+    const minDayStr = minDay.toISOString().slice(0,10);
+
+    const SECTIONS = [
+      { id: 'home', label: 'INICIO' },
+      { id: 'metodo', label: 'M&Eacute;TODO' },
+      { id: 'metricas', label: 'M&Eacute;TRICAS' },
+      { id: 'qr', label: 'MI QR' },
+      { id: 'notif', label: 'AVISOS' },
+      { id: 'profile', label: 'MI PERFIL' }
+    ];
+
+    const groups = {};
+    (allEventos || []).forEach(e => {
+      if (e.tipo !== 'navegacion' || !e.uid || !e.dia || !e.seccion || !e.fecha) return;
+      if (e.dia < minDayStr) return;
+      const key = e.uid + '|' + e.dia;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(e);
+    });
+
+    const buckets = {};
+    SECTIONS.forEach(s => buckets[s.id] = { sum: 0, count: 0 });
+
+    Object.values(groups).forEach(events => {
+      events.sort((a, b) => a.fecha < b.fecha ? -1 : 1);
+      for (let i = 0; i < events.length - 1; i++) {
+        const cur = events[i];
+        const next = events[i+1];
+        if (!buckets[cur.seccion]) continue;
+        const dur = (new Date(next.fecha) - new Date(cur.fecha)) / 1000;
+        if (dur < 1 || dur > 1800) continue;
+        buckets[cur.seccion].sum += dur;
+        buckets[cur.seccion].count++;
+      }
+    });
+
+    const results = SECTIONS.map(s => {
+      const b = buckets[s.id];
+      return {
+        label: s.label,
+        avg: b.count > 0 ? Math.round(b.sum / b.count) : 0,
+        count: b.count
+      };
+    });
+
+    if (results.every(r => r.count === 0)) {
+      el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin datos suficientes todav&iacute;a. Necesita usuarios navegando entre secciones para calcular tiempos.</div>';
+      return;
+    }
+
+    results.sort((a, b) => b.avg - a.avg);
+    const maxAvg = Math.max(...results.map(r => r.avg), 1);
+
+    function fmtSec(s) {
+      if (s < 60) return s + ' s';
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return m + ':' + String(sec).padStart(2, '0');
+    }
+
+    let html = '<div style="display:flex;flex-direction:column;gap:8px">';
+    results.forEach(r => {
+      const fillPct = r.avg > 0 ? Math.max(2, Math.round((r.avg / maxAvg) * 100)) : 2;
+      const color = r.count > 0 ? '#a78bfa' : '#333';
+      html += `<div style="display:grid;grid-template-columns:120px 1fr auto;gap:10px;align-items:center">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">${r.label}</div>
+        <div style="background:#1a1a1a;border-radius:6px;height:18px;position:relative;overflow:hidden">
+          <div style="background:${color};height:100%;width:${fillPct}%;border-radius:6px"></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#fff;min-width:80px;text-align:right" title="${r.count} mediciones"><span style="color:#a78bfa;font-weight:700">${fmtSec(r.avg)}</span></div>
+      </div>`;
+    });
+    html += '</div>';
+
+    el.innerHTML = html;
+  }
+
   async function nudgeMember(uid, nombre) {
     if (window.currentStaffRole !== 'admin') {
       showToast('Solo admin puede enviar notificaciones', 'error');
@@ -4326,6 +4483,12 @@ window.filterNotifUsers = function (q) {
 
       // Insights: chips de stats rápidas + botón para resumen IA
       try { renderInsights(eventos, window._allMembers); } catch(ie) { console.error('renderInsights:', ie); }
+
+      // Secciones más visitadas (% de miembros activos por sección, últimos 7d)
+      try { renderSectionUsage(eventos, window._allMembers); } catch(se) { console.error('renderSectionUsage:', se); }
+
+      // Tiempo promedio por sección (deltas entre navegaciones consecutivas, últimos 14d)
+      try { renderSectionTiming(eventos); } catch(te) { console.error('renderSectionTiming:', te); }
 
     } catch(e) {
       console.error('loadDashboard:', e);
