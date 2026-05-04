@@ -482,8 +482,14 @@
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">INSIGHTS &middot; RESUMEN R&Aacute;PIDO</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">INSIGHTS &middot; RESUMEN R&Aacute;PIDO</div>
+        <button onclick="toggleHelp('help-insights')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+      </div>
       <button id="dash-ai-btn" onclick="generateInsights()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-family:'Space Mono',monospace;cursor:pointer">&#x1F916; Generar interpretaci&oacute;n IA</button>
+    </div>
+    <div id="help-insights" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      Resumen r&aacute;pido del Dashboard. Los chips de abajo son n&uacute;meros clave que se actualizan solos cada vez que entras. El bot&oacute;n &quot;Generar interpretaci&oacute;n IA&quot; le pide a Claude que lea TODOS los datos del dashboard y te escriba 1-2 p&aacute;rrafos coloquiales con lo m&aacute;s urgente. Tarda ~5 segundos y cuesta ~1 centavo de d&oacute;lar por click.
     </div>
     <div id="dash-insights"></div>
   </div>
@@ -505,26 +511,56 @@
     <div id="dash-table-miembros"></div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px;overflow-x:auto">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:10px;letter-spacing:.5px">HEATMAP DE ACTIVIDAD &middot; &Uacute;LTIMOS 30 D&Iacute;AS</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">HEATMAP DE ACTIVIDAD &middot; &Uacute;LTIMOS 30 D&Iacute;AS</div>
+      <button onclick="toggleHelp('help-heatmap')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
+    <div id="help-heatmap" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      Cada fila es un miembro (top 30 m&aacute;s activos), cada columna es uno de los &uacute;ltimos 30 d&iacute;as. La celda se pone m&aacute;s naranja entre m&aacute;s veces visit&oacute; la app ese d&iacute;a. Si una fila se va apagando hacia la derecha, ese miembro se est&aacute; enfriando &mdash; ah&iacute; vale la pena mandar un push.
+    </div>
     <div id="dash-heatmap"></div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px;overflow-x:auto">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">CU&Aacute;NDO SE CONECTAN &middot; HORA POR D&Iacute;A DE LA SEMANA</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">CU&Aacute;NDO SE CONECTAN &middot; HORA POR D&Iacute;A DE LA SEMANA</div>
+      <button onclick="toggleHelp('help-hour')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:10px">VISITAS POR HORA (HORARIO MX) &middot; &Uacute;LTIMOS 30 D&Iacute;AS</div>
+    <div id="help-hour" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      Cu&aacute;ndo abren la app durante la semana. Filas son los 7 d&iacute;as, columnas las 24 horas (en hora de M&eacute;xico). Las celdas m&aacute;s naranjas son tus horas pico &mdash; ah&iacute; es donde m&aacute;s rinden los pushes. La etiqueta de abajo te dice tu hora pico exacta. Si est&aacute;s mandando notificaciones a una hora distinta, considera moverlas a tu pico para mejor tasa de apertura.
+    </div>
     <div id="dash-hour-heatmap"></div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px;overflow-x:auto">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">RETENCI&Oacute;N POR COHORTE</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">RETENCI&Oacute;N POR COHORTE</div>
+      <button onclick="toggleHelp('help-cohort')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:10px">% DE CADA GRUPO QUE REGRES&Oacute; EN SU SEMANA N (S0=ALTA, S1=SIGUIENTE, ETC)</div>
+    <div id="help-cohort" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      Cada fila es un grupo de miembros que se dieron de alta la misma semana. S0 es esa misma semana, S1 la siguiente, S2 dos despu&eacute;s, etc. El porcentaje es cu&aacute;ntos del grupo regresaron a la app esa semana. Si los porcentajes caen r&aacute;pido (verde &rarr; amarillo &rarr; rojo), los miembros nuevos no se enganchan &mdash; revisa el onboarding o el email de bienvenida.
+    </div>
     <div id="dash-cohort"></div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">FUNNEL DE ACTIVACI&Oacute;N</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">FUNNEL DE ACTIVACI&Oacute;N</div>
+      <button onclick="toggleHelp('help-funnel')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:14px">DEL ALTA AL ENGAGEMENT &middot; CADA PASO ES INDEPENDIENTE</div>
+    <div id="help-funnel" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      El recorrido del miembro: cu&aacute;ntos est&aacute;n activos en la base, cu&aacute;ntos abrieron la app alguna vez, hicieron una reserva, usaron el chat IA, y cu&aacute;ntos est&aacute;n activos esta semana. Cada paso es independiente (no requiere los anteriores). Los saltos grandes entre barras te dicen d&oacute;nde se atoran los miembros &mdash; ah&iacute; hay fricci&oacute;n.
+    </div>
     <div id="dash-funnel"></div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:14px;letter-spacing:.5px">RANKINGS</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">RANKINGS</div>
+      <button onclick="toggleHelp('help-rankings')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
+    <div id="help-rankings" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#bbb;line-height:1.55">
+      Dos tablas. La izquierda son tus power users (m&aacute;s visitas en los &uacute;ltimos 30 d&iacute;as) &mdash; vale la pena reconocerlos. La derecha son los que llevan +7 d&iacute;as sin entrar &mdash; el bot&oacute;n &#x1F4E3; en cada fila manda un push directo con un mensaje predefinido tipo &quot;Te extra&ntilde;amos, vuelve a entrenar&quot;. Rojo = +14 d&iacute;as o nunca entr&oacute;. Amarillo = 8-14 d&iacute;as.
+    </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start">
       <div>
         <div style="font-family:'Space Mono',monospace;font-size:10px;color:#4ade80;margin-bottom:10px">&#x1F525; TOP 10 M&Aacute;S ACTIVOS (30D)</div>
@@ -537,13 +573,25 @@
     </div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">SECCIONES M&Aacute;S VISITADAS</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">SECCIONES M&Aacute;S VISITADAS</div>
+      <button onclick="toggleHelp('help-sections')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:14px">% DE MIEMBROS ACTIVOS QUE VISIT&Oacute; CADA SECCI&Oacute;N EN LOS &Uacute;LTIMOS 7 D&Iacute;AS</div>
+    <div id="help-sections" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      Qu&eacute; pesta&ntilde;as de la PWA visitan m&aacute;s los miembros (Inicio, M&eacute;todo, M&eacute;tricas, Mi QR, Avisos, Mi Perfil). El % es cu&aacute;ntos de tus miembros activos visitaron esa secci&oacute;n al menos 1 vez en los &uacute;ltimos 7 d&iacute;as. Te dice qu&eacute; les interesa y qu&eacute; ignoran. Si una secci&oacute;n tiene % muy bajo, considera replantear su contenido.
+    </div>
     <div id="dash-sections"></div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">TIEMPO PROMEDIO POR SECCI&Oacute;N</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">TIEMPO PROMEDIO POR SECCI&Oacute;N</div>
+      <button onclick="toggleHelp('help-timing')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:14px">SEGUNDOS ENTRE CAMBIO DE SECCIONES (PROMEDIO POR VISITA)</div>
+    <div id="help-timing" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      Cu&aacute;nto tiempo (en promedio) se queda un miembro en cada secci&oacute;n antes de cambiarse a otra. Secci&oacute;n con tiempo alto = ah&iacute; se enganchan, leen y exploran (contenido valioso). Tiempo bajo (5-10 segundos) = solo pasan, no encuentran lo que buscan &mdash; ah&iacute; vale la pena revisar UX o contenido.
+    </div>
     <div id="dash-timing"></div>
   </div>
 </div>
@@ -3604,6 +3652,12 @@ window.filterNotifUsers = function (q) {
 
   // âââ DASHBOARD ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   window._dashPeriod = 'day';
+
+  window.toggleHelp = function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  };
 
   function setDashPeriod(p) {
     window._dashPeriod = p;
