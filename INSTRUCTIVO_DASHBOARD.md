@@ -217,7 +217,29 @@ Bar chart horizontal morado. Tiempo promedio (en MM:SS) que un miembro pasa en c
 - **Sección con mucho tiempo:** ahí se enganchan, leen, exploran → contenido valioso
 - **Sección con poco tiempo (5-10 segundos):** solo pasan, no encuentran lo que buscan → mejorar UX o contenido
 
-> Misma nota que el #10: datos se acumulan a partir del 04/05/2026.
+> Misma nota que el #11: datos se acumulan a partir del 04/05/2026.
+
+---
+
+### 13. Citas de valoración
+
+Resumen del sistema de citas de valoración. **Consulta su propia colección** (`citas`) en Firestore — no depende de los eventos como las otras vistas.
+
+**5 chips arriba:**
+- **TOTAL 30D** — citas agendadas en los últimos 30 días (confirmadas + canceladas)
+- **CONFIRMADAS** — siguen activas
+- **CANCELADAS** — se cancelaron (ya sea por el miembro o por el sistema al re-agendar)
+- **% CANCELACIÓN** — `canceladas / total × 100`
+- **PRÓX 7D** — citas confirmadas en los próximos 7 días
+
+**Tabla abajo:** lista de las próximas 12 citas confirmadas, ordenadas por fecha + hora. Cada fila: día (ej: `Mar 06/05`), hora, nombre del miembro.
+
+**Lo que te dice:**
+- **% cancelación alto (>30%):** los miembros agendan pero no llegan o se arrepienten → revisa el flujo de recordatorios o las opciones de horario
+- **PRÓX 7D vacío:** no hay citas próximas → revisa que tus rangos de disponibilidad estén bien configurados
+- **Volumen TOTAL bajo:** los miembros no usan la cita de valoración → ¿saben que existe? ¿el botón está visible en la app?
+
+> **Nota técnica:** la cita de valoración ahora también cuenta para el funnel y para la barra "HICIERON UNA RESERVA" (junto con clicks al botón de "Reservar clase"). Antes del 04/05/2026, solo contaba el click a clase. La colección `citas` siempre tuvo todos los datos, este cambio solo los integra al dashboard analítico.
 
 ---
 

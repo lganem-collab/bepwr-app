@@ -594,6 +594,16 @@
     </div>
     <div id="dash-timing"></div>
   </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">CITAS DE VALORACI&Oacute;N</div>
+      <button onclick="toggleHelp('help-citas')" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:50%;width:18px;height:18px;color:#888;cursor:pointer;font-size:11px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:italic" title="&iquest;Qu&eacute; es esto?">i</button>
+    </div>
+    <div id="help-citas" style="display:none;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#bbb;line-height:1.55">
+      Resumen del sistema de citas de valoraci&oacute;n. Los chips de arriba: total agendadas en los &uacute;ltimos 30 d&iacute;as, cu&aacute;ntas siguen confirmadas, cu&aacute;ntas se cancelaron, % de cancelaci&oacute;n, y cu&aacute;ntas tienes en los pr&oacute;ximos 7 d&iacute;as. Abajo: lista de las pr&oacute;ximas citas confirmadas. Si la tasa de cancelaci&oacute;n es alta, ojo &mdash; vale la pena ver por qu&eacute;.
+    </div>
+    <div id="dash-citas"></div>
+  </div>
 </div>
 
 <div id="tab-content-guias" style="display:none;max-width:680px;margin:0 auto;padding:16px">
@@ -3829,7 +3839,7 @@ window.filterNotifUsers = function (q) {
     (eventos || []).forEach(e => {
       if (!e.uid || !activeUids.has(e.uid)) return;
       if (e.tipo === 'visita') visitedAny.add(e.uid);
-      if (e.tipo === 'reserva') reservedAny.add(e.uid);
+      if (e.tipo === 'reserva' || e.tipo === 'cita_valoracion') reservedAny.add(e.uid);
       if (e.tipo === 'mensaje_ia' || e.tipo === 'analisis_cientifico') usedIA.add(e.uid);
     });
 
@@ -3916,7 +3926,7 @@ window.filterNotifUsers = function (q) {
       'TOP 5 EN RIESGO ("nunca entró" = miembro registrado pero jamás abrió la app — problema distinto a "se enfriaron"): ' + top5RiskText + '\n\n' +
       'FUNNEL:\n' +
       '- Han abierto app: ' + s.visitedAny + ' (' + pct(s.visitedAny) + ')\n' +
-      '- Hicieron reserva: ' + s.reservedAny + ' (' + pct(s.reservedAny) + ')\n' +
+      '- Hicieron alguna reserva (clase O cita de valoración): ' + s.reservedAny + ' (' + pct(s.reservedAny) + ')\n' +
       '- Usaron chat IA: ' + s.usedIA + ' (' + pct(s.usedIA) + ')\n\n' +
       'Habla coloquial. Diferencia entre "se enfriaron" (problema de retención) y "nunca entraron" (problema de email de bienvenida). Si hay hora pico clara, sugiérela como momento para mandar push.';
 
@@ -4260,7 +4270,7 @@ window.filterNotifUsers = function (q) {
         visited.add(e.uid);
         if (e.dia && e.dia >= weekAgoStr) visitedThisWeek.add(e.uid);
       }
-      if (e.tipo === 'reserva') reserved.add(e.uid);
+      if (e.tipo === 'reserva' || e.tipo === 'cita_valoracion') reserved.add(e.uid);
       if (e.tipo === 'mensaje_ia' || e.tipo === 'analisis_cientifico') usedIA.add(e.uid);
     });
 
@@ -4525,6 +4535,74 @@ window.filterNotifUsers = function (q) {
     el.innerHTML = html;
   }
 
+  async function renderCitasDashboard() {
+    const el = document.getElementById('dash-citas');
+    if (!el) return;
+
+    try {
+      const now = new Date();
+      const ago30 = new Date(now); ago30.setDate(now.getDate() - 30);
+      const ago30Str = ago30.toISOString().slice(0,10);
+      const next7D = new Date(now); next7D.setDate(now.getDate() + 7);
+      const next7Str = next7D.toISOString().slice(0,10);
+      const todayStr = now.toISOString().slice(0,10);
+
+      const snap = await db.collection('citas').where('fecha', '>=', ago30Str).get();
+      const citas = snap.docs.map(d => ({...d.data(), id: d.id}));
+
+      const total = citas.length;
+      const confirmadas = citas.filter(c => c.estado === 'confirmada').length;
+      const canceladas = citas.filter(c => c.estado === 'cancelada').length;
+      const tasaCancel = total > 0 ? Math.round((canceladas / total) * 100) : 0;
+
+      const proximas = citas.filter(c =>
+        c.estado === 'confirmada' && c.fecha >= todayStr && c.fecha <= next7Str
+      ).sort((a,b) => {
+        if (a.fecha !== b.fecha) return a.fecha < b.fecha ? -1 : 1;
+        return a.hora < b.hora ? -1 : 1;
+      });
+
+      function chip(label, val, color) {
+        return `<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:${color};font-family:'Space Mono',monospace">${val}</div>
+          <div style="font-size:9px;color:#888;font-family:'Space Mono',monospace;margin-top:4px;letter-spacing:.5px">${label}</div>
+        </div>`;
+      }
+
+      let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:6px">';
+      html += chip('TOTAL 30D', total, '#FF5C1A');
+      html += chip('CONFIRMADAS', confirmadas, '#4ade80');
+      html += chip('CANCELADAS', canceladas, '#dc2626');
+      html += chip('% CANCELACI&Oacute;N', tasaCancel + '%', '#FFA940');
+      html += chip('PR&Oacute;X 7D', proximas.length, '#60a5fa');
+      html += '</div>';
+
+      if (proximas.length) {
+        html += '<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:#aaa;margin:14px 0 8px;letter-spacing:.5px">PR&Oacute;XIMOS 7 D&Iacute;AS</div>';
+        html += '<div style="display:flex;flex-direction:column">';
+        const ds = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        proximas.slice(0, 12).forEach(c => {
+          const [y,m,d] = c.fecha.split('-');
+          const dt = new Date(+y, +m-1, +d);
+          const fechaLabel = ds[dt.getDay()] + ' ' + d + '/' + m;
+          html += `<div style="display:grid;grid-template-columns:80px 60px 1fr;gap:10px;font-size:12px;font-family:'Space Mono',monospace;padding:8px 0;border-bottom:1px solid #1a1a1a;align-items:center">
+            <span style="color:#FF5C1A;font-weight:700">${fechaLabel}</span>
+            <span style="color:#888">${c.hora}</span>
+            <span style="color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nombre || ''}</span>
+          </div>`;
+        });
+        html += '</div>';
+      } else {
+        html += '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:14px 8px;font-style:italic">Sin citas confirmadas en los pr&oacute;ximos 7 d&iacute;as.</div>';
+      }
+
+      el.innerHTML = html;
+    } catch(e) {
+      console.error('renderCitasDashboard:', e);
+      el.innerHTML = `<div style="color:#dc2626;font-size:11px;padding:8px">Error: ${e.message}</div>`;
+    }
+  }
+
   async function nudgeMember(uid, nombre) {
     if (window.currentStaffRole !== 'admin') {
       showToast('Solo admin puede enviar notificaciones', 'error');
@@ -4673,6 +4751,9 @@ window.filterNotifUsers = function (q) {
 
       // Tiempo promedio por sección (deltas entre navegaciones consecutivas, últimos 14d)
       try { renderSectionTiming(eventos); } catch(te) { console.error('renderSectionTiming:', te); }
+
+      // Citas de valoración: stats + próximas (consulta su propia colección)
+      renderCitasDashboard().catch(ce => console.error('renderCitasDashboard:', ce));
 
     } catch(e) {
       console.error('loadDashboard:', e);

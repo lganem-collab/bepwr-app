@@ -4673,6 +4673,8 @@ window._applyIVF=applyIVF;
       const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
       document.getElementById('cita-confirmada-info').textContent=
         `${ds[new Date(+y,+m-1,+d).getDay()]} ${d}/${m}/${y} · ${window._slotSeleccionado}`;
+      // Tracking: registrar evento de cita agendada (para dashboard analítico)
+      try { logEvento('cita_valoracion'); } catch(_) {}
       // Refrescar tarjeta y countdown en Mi Metodo
       if(window.cargarProximaCita) window.cargarProximaCita();
       // Email de confirmacion al miembro
