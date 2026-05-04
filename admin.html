@@ -4540,14 +4540,20 @@ window.filterNotifUsers = function (q) {
     if (!el) return;
 
     try {
+      const period = window._dashPeriod || 'day';
+      // Mapeo del filtro general al rango de citas:
+      // Diario → 14 días, Semanal → 10 semanas (70d), Mensual → 6 meses (180d)
+      const ndays = period === 'day' ? 14 : period === 'week' ? 70 : 180;
+      const totalLabel = period === 'day' ? 'TOTAL 14D' : period === 'week' ? 'TOTAL 10S' : 'TOTAL 6M';
+
       const now = new Date();
-      const ago30 = new Date(now); ago30.setDate(now.getDate() - 30);
-      const ago30Str = ago30.toISOString().slice(0,10);
+      const agoD = new Date(now); agoD.setDate(now.getDate() - ndays);
+      const agoStr = agoD.toISOString().slice(0,10);
       const next7D = new Date(now); next7D.setDate(now.getDate() + 7);
       const next7Str = next7D.toISOString().slice(0,10);
       const todayStr = now.toISOString().slice(0,10);
 
-      const snap = await db.collection('citas').where('fecha', '>=', ago30Str).get();
+      const snap = await db.collection('citas').where('fecha', '>=', agoStr).get();
       const citas = snap.docs.map(d => ({...d.data(), id: d.id}));
 
       const total = citas.length;
@@ -4570,7 +4576,7 @@ window.filterNotifUsers = function (q) {
       }
 
       let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:6px">';
-      html += chip('TOTAL 30D', total, '#FF5C1A');
+      html += chip(totalLabel, total, '#FF5C1A');
       html += chip('CONFIRMADAS', confirmadas, '#4ade80');
       html += chip('CANCELADAS', canceladas, '#dc2626');
       html += chip('% CANCELACI&Oacute;N', tasaCancel + '%', '#FFA940');

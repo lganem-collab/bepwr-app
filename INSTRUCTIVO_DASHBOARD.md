@@ -223,14 +223,14 @@ Bar chart horizontal morado. Tiempo promedio (en MM:SS) que un miembro pasa en c
 
 ### 13. Citas de valoración
 
-Resumen del sistema de citas de valoración. **Consulta su propia colección** (`citas`) en Firestore — no depende de los eventos como las otras vistas.
+Resumen del sistema de citas de valoración. **Consulta su propia colección** (`citas`) en Firestore — no depende de los eventos como las otras vistas. **Respeta el filtro general de la página** (Diario / Semanal / Mensual).
 
 **5 chips arriba:**
-- **TOTAL 30D** — citas agendadas en los últimos 30 días (confirmadas + canceladas)
-- **CONFIRMADAS** — siguen activas
+- **TOTAL [14D / 10S / 6M]** — citas agendadas en el período seleccionado, según el filtro arriba (Diario=14d, Semanal=10 semanas, Mensual=6 meses). Confirmadas + canceladas.
+- **CONFIRMADAS** — siguen activas (en el período seleccionado)
 - **CANCELADAS** — se cancelaron (ya sea por el miembro o por el sistema al re-agendar)
 - **% CANCELACIÓN** — `canceladas / total × 100`
-- **PRÓX 7D** — citas confirmadas en los próximos 7 días
+- **PRÓX 7D** — citas confirmadas en los próximos 7 días (este chip NO se ve afectado por el filtro general, siempre son los próximos 7 días)
 
 **Tabla abajo:** lista de las próximas 12 citas confirmadas, ordenadas por fecha + hora. Cada fila: día (ej: `Mar 06/05`), hora, nombre del miembro.
 
