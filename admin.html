@@ -511,6 +511,19 @@
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:14px">DEL ALTA AL ENGAGEMENT &middot; CADA PASO ES INDEPENDIENTE</div>
     <div id="dash-funnel"></div>
   </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:14px;letter-spacing:.5px">RANKINGS</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start">
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#4ade80;margin-bottom:10px">&#x1F525; TOP 10 M&Aacute;S ACTIVOS (30D)</div>
+        <div id="dash-rank-top"></div>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#FFA940;margin-bottom:10px">&#x26A0; TOP 10 EN RIESGO (+7D SIN ENTRAR)</div>
+        <div id="dash-rank-risk"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="tab-content-guias" style="display:none;max-width:680px;margin:0 auto;padding:16px">
@@ -3906,6 +3919,126 @@ window.filterNotifUsers = function (q) {
     el.innerHTML = html;
   }
 
+  function renderRankings(allEventos, allMembers) {
+    const elTop = document.getElementById('dash-rank-top');
+    const elRisk = document.getElementById('dash-rank-risk');
+    if (!elTop || !elRisk) return;
+
+    const NDAYS = 30;
+    const RISK_DAYS = 7;
+    const TOP = 10;
+
+    const now = new Date();
+    const minDayD = new Date(now);
+    minDayD.setDate(now.getDate() - NDAYS);
+    const minDay = minDayD.toISOString().slice(0,10);
+
+    const stats = {};
+    (allEventos || []).forEach(e => {
+      if (e.tipo !== 'visita' || !e.uid || !e.dia) return;
+      if (!stats[e.uid]) stats[e.uid] = { visits30: 0, lastVisit: '' };
+      if (e.dia >= minDay) stats[e.uid].visits30++;
+      if (e.dia > stats[e.uid].lastVisit) stats[e.uid].lastVisit = e.dia;
+    });
+
+    const activeMembers = (allMembers || []).filter(m => m.activo !== false && m.uid);
+
+    const topList = activeMembers
+      .map(m => ({
+        uid: m.uid,
+        nombre: m.nombre || m.uid.slice(0,8),
+        visits30: (stats[m.uid] && stats[m.uid].visits30) || 0
+      }))
+      .filter(x => x.visits30 > 0)
+      .sort((a,b) => b.visits30 - a.visits30)
+      .slice(0, TOP);
+
+    const riskList = activeMembers
+      .map(m => {
+        const lv = (stats[m.uid] && stats[m.uid].lastVisit) || '';
+        let daysAgo;
+        if (!lv) daysAgo = 999;
+        else {
+          const lvD = new Date(lv + 'T12:00:00');
+          daysAgo = Math.floor((now - lvD) / (1000*60*60*24));
+        }
+        return {
+          uid: m.uid,
+          nombre: m.nombre || m.uid.slice(0,8),
+          daysAgo
+        };
+      })
+      .filter(x => x.daysAgo > RISK_DAYS)
+      .sort((a,b) => b.daysAgo - a.daysAgo)
+      .slice(0, TOP);
+
+    if (!topList.length) {
+      elTop.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin actividad reciente</div>';
+    } else {
+      let html = '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;font-family:\'Space Mono\',monospace;font-size:11px">';
+      html += '<div style="color:#666;font-size:9px;padding-bottom:4px">#</div>';
+      html += '<div style="color:#666;font-size:9px;padding-bottom:4px">MIEMBRO</div>';
+      html += '<div style="color:#666;font-size:9px;padding-bottom:4px;text-align:right">VISITAS</div>';
+      topList.forEach((x, i) => {
+        html += `<div style="color:#666">${i+1}</div>`;
+        html += `<div style="color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.nombre}</div>`;
+        html += `<div style="color:#FF5C1A;font-weight:700;text-align:right">${x.visits30}</div>`;
+      });
+      html += '</div>';
+      elTop.innerHTML = html;
+    }
+
+    if (!riskList.length) {
+      elRisk.innerHTML = '<div style="color:#4ade80;font-size:11px;font-family:Space Mono,monospace;padding:8px">&#x2705; Nadie en riesgo &mdash; todos los activos han entrado en los &uacute;ltimos ' + RISK_DAYS + ' d&iacute;as</div>';
+    } else {
+      let html = '<div style="display:grid;grid-template-columns:1fr auto auto;gap:6px 10px;font-family:\'Space Mono\',monospace;font-size:11px;align-items:center">';
+      html += '<div style="color:#666;font-size:9px;padding-bottom:4px">MIEMBRO</div>';
+      html += '<div style="color:#666;font-size:9px;padding-bottom:4px;text-align:right">SIN ENTRAR</div>';
+      html += '<div></div>';
+      riskList.forEach(x => {
+        const txt = x.daysAgo === 999 ? 'nunca' : 'hace ' + x.daysAgo + 'd';
+        const col = (x.daysAgo === 999 || x.daysAgo > 14) ? '#dc2626' : '#FFA940';
+        const safeNombre = x.nombre.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        html += `<div style="color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.nombre}</div>`;
+        html += `<div style="color:${col};font-weight:700;text-align:right;white-space:nowrap">${txt}</div>`;
+        html += `<button onclick="nudgeMember('${x.uid}', '${safeNombre}')" style="background:#FF5C1A;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:10px;font-family:'Space Mono',monospace;cursor:pointer" title="Mandar notificaci&oacute;n">&#x1F4E3;</button>`;
+      });
+      html += '</div>';
+      elRisk.innerHTML = html;
+    }
+  }
+
+  async function nudgeMember(uid, nombre) {
+    if (window.currentStaffRole !== 'admin') {
+      showToast('Solo admin puede enviar notificaciones', 'error');
+      return;
+    }
+    if (!confirm('Mandar notificación a ' + nombre + '?')) return;
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      const res = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+        body: JSON.stringify({
+          title: 'Te extrañamos en bePWR',
+          body: '¡Vuelve a entrenar! Tu progreso te espera.',
+          url: 'https://bepwr-app.vercel.app',
+          target: 'uid',
+          uid: uid
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.sent > 0) {
+        showToast('✅ Notificación enviada a ' + nombre, 'success');
+        try { logBitacora('envio_aviso', 'Nudge desde Dashboard a ' + nombre, ''); } catch(_) {}
+      } else {
+        showToast(data.message || 'No se pudo enviar (¿tiene notificaciones activadas?)', 'error');
+      }
+    } catch(e) {
+      showToast('Error: ' + e.message, 'error');
+    }
+  }
+
   async function loadDashboard() {
     const period = window._dashPeriod || 'day';
 
@@ -4008,6 +4141,9 @@ window.filterNotifUsers = function (q) {
 
       // Funnel de activación
       try { renderFunnel(eventos, window._allMembers); } catch(fe) { console.error('renderFunnel:', fe); }
+
+      // Rankings: top 10 más activos y top 10 en riesgo
+      try { renderRankings(eventos, window._allMembers); } catch(re) { console.error('renderRankings:', re); }
 
     } catch(e) {
       console.error('loadDashboard:', e);
