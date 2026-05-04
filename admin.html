@@ -497,6 +497,10 @@
     <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:10px;letter-spacing:.5px">VISITAS POR MIEMBRO</div>
     <div id="dash-table-miembros"></div>
   </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px;overflow-x:auto">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:10px;letter-spacing:.5px">HEATMAP DE ACTIVIDAD &middot; &Uacute;LTIMOS 30 D&Iacute;AS</div>
+    <div id="dash-heatmap"></div>
+  </div>
 </div>
 
 <div id="tab-content-guias" style="display:none;max-width:680px;margin:0 auto;padding:16px">
@@ -3641,6 +3645,82 @@ window.filterNotifUsers = function (q) {
     el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:auto">${yAxis}${bars}${vals}${labels}</svg>`;
   }
 
+  function renderHeatmap(allEventos) {
+    const el = document.getElementById('dash-heatmap');
+    if (!el) return;
+
+    const NDAYS = 30;
+    const now = new Date();
+    const dayKeys = [];
+    for (let i = NDAYS-1; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      dayKeys.push(d.toISOString().slice(0,10));
+    }
+    const minDay = dayKeys[0];
+
+    const visits = (allEventos || []).filter(e => e.tipo === 'visita' && e.dia && e.dia >= minDay);
+
+    if (!visits.length) {
+      el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin actividad en los &uacute;ltimos 30 d&iacute;as</div>';
+      return;
+    }
+
+    const matrix = {};
+    const memberNames = {};
+    visits.forEach(e => {
+      if (!matrix[e.uid]) matrix[e.uid] = {};
+      matrix[e.uid][e.dia] = (matrix[e.uid][e.dia] || 0) + 1;
+      if (e.nombre) memberNames[e.uid] = e.nombre;
+    });
+
+    const totals = Object.entries(matrix).map(([uid, dias]) => ({
+      uid,
+      nombre: memberNames[uid] || uid.slice(0,8),
+      total: Object.values(dias).reduce((a,b) => a+b, 0)
+    }));
+    totals.sort((a,b) => b.total - a.total);
+    const top = totals.slice(0, 30);
+
+    function colorFor(v) {
+      if (v <= 0) return '#1a1a1a';
+      if (v === 1) return '#3d2010';
+      if (v === 2) return '#7a3d1a';
+      if (v <= 4) return '#c45e1a';
+      return '#FF5C1A';
+    }
+
+    const dayLetters = ['D','L','M','M','J','V','S'];
+
+    let html = `<div style="display:grid;grid-template-columns:140px repeat(${NDAYS}, 14px);gap:2px;font-family:'Space Mono',monospace;font-size:9px;align-items:center">`;
+
+    html += '<div></div>';
+    dayKeys.forEach(d => {
+      const dt = new Date(d + 'T12:00:00');
+      const wd = dayLetters[dt.getDay()];
+      const isMonday = dt.getDay() === 1;
+      html += `<div style="text-align:center;color:${isMonday?'#aaa':'#555'};font-size:8px" title="${d}">${wd}</div>`;
+    });
+
+    top.forEach(m => {
+      html += `<div style="color:#ddd;font-size:10px;padding-right:6px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre} &middot; ${m.total} visitas">${m.nombre}</div>`;
+      dayKeys.forEach(d => {
+        const v = (matrix[m.uid] && matrix[m.uid][d]) || 0;
+        html += `<div style="width:14px;height:14px;background:${colorFor(v)};border-radius:2px" title="${m.nombre} &middot; ${d}: ${v} visita${v===1?'':'s'}"></div>`;
+      });
+    });
+
+    html += '</div>';
+
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-top:14px;font-family:\'Space Mono\',monospace;font-size:9px;color:#666"><span>Menos</span>';
+    [0,1,2,3,5].forEach(v => {
+      html += `<div style="width:12px;height:12px;background:${colorFor(v)};border-radius:2px"></div>`;
+    });
+    html += '<span>M&aacute;s</span></div>';
+
+    el.innerHTML = html;
+  }
+
   async function loadDashboard() {
     const period = window._dashPeriod || 'day';
 
@@ -3734,6 +3814,9 @@ window.filterNotifUsers = function (q) {
           </div>`;
         }
       }
+
+      // Heatmap de actividad (siempre últimos 30 días, independiente del período seleccionado)
+      try { renderHeatmap(eventos); } catch(he) { console.error('renderHeatmap:', he); }
 
     } catch(e) {
       console.error('loadDashboard:', e);
