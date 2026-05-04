@@ -509,6 +509,11 @@
     <div id="dash-heatmap"></div>
   </div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px;overflow-x:auto">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">CU&Aacute;NDO SE CONECTAN &middot; HORA POR D&Iacute;A DE LA SEMANA</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:10px">VISITAS POR HORA (HORARIO MX) &middot; &Uacute;LTIMOS 30 D&Iacute;AS</div>
+    <div id="dash-hour-heatmap"></div>
+  </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-top:12px;overflow-x:auto">
     <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:4px;letter-spacing:.5px">RETENCI&Oacute;N POR COHORTE</div>
     <div style="font-family:'Space Mono',monospace;font-size:9px;color:#666;margin-bottom:10px">% DE CADA GRUPO QUE REGRES&Oacute; EN SU SEMANA N (S0=ALTA, S1=SIGUIENTE, ETC)</div>
     <div id="dash-cohort"></div>
@@ -3730,6 +3735,27 @@ window.filterNotifUsers = function (q) {
     visitsByDow.forEach((v, i) => { if (v > visitsByDow[maxDow]) maxDow = i; });
     const diaPico = visitsByDow[maxDow] > 0 ? dows[maxDow] : '—';
 
+    // Hora pico (día x hora, zona horaria México)
+    let peakDow = -1, peakHour = -1, peakVal = 0;
+    try {
+      const hourFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Mexico_City', hour12: false, hour: '2-digit' });
+      const dowFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Mexico_City', weekday: 'short' });
+      const dowMap = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+      const mat = Array.from({length:7}, () => new Array(24).fill(0));
+      (eventos || []).forEach(e => {
+        if (e.tipo !== 'visita' || !e.fecha) return;
+        const d = new Date(e.fecha);
+        const h = parseInt(hourFmt.format(d), 10);
+        const dow = dowMap[dowFmt.format(d)];
+        if (h >= 0 && h < 24 && dow >= 0 && dow < 7) mat[dow][h]++;
+      });
+      for (let d = 0; d < 7; d++) {
+        for (let h = 0; h < 24; h++) {
+          if (mat[d][h] > peakVal) { peakVal = mat[d][h]; peakDow = d; peakHour = h; }
+        }
+      }
+    } catch(_) {}
+
     const top5 = Object.entries(visitsByUid).map(([uid, count]) => {
       const m = activeMembers.find(x => x.uid === uid);
       return { uid, nombre: (m && m.nombre) || uid.slice(0,8), count };
@@ -3760,6 +3786,9 @@ window.filterNotifUsers = function (q) {
       enRiesgo,
       diaPico,
       visitsByDow,
+      peakDow,
+      peakHour,
+      peakVal,
       top5,
       top5Risk,
       visitedAny: visitedAny.size,
@@ -3814,24 +3843,28 @@ window.filterNotifUsers = function (q) {
     const dowText = s.visitsByDow.map((v,i) => dows[i] + ':' + v).join(', ');
     const top5Text = s.top5.map(x => x.nombre + '(' + x.count + ')').join(', ') || 'ninguno';
     const top5RiskText = s.top5Risk.map(x => x.nombre + '(' + (x.days >= 999 ? 'nunca entró' : 'hace ' + x.days + 'd') + ')').join(', ') || 'ninguno';
+    const horaPico = (s.peakDow >= 0 && s.peakHour >= 0) ? (dows[s.peakDow] + ' ' + s.peakHour + ':00 (' + s.peakVal + ' visitas)') : 'sin datos';
     const total = s.totalActivos;
     const pct = (n) => total > 0 ? Math.round((n/total)*100) + '%' : '0%';
 
-    const prompt = 'Eres analista del gimnasio funcional bePWR (Querétaro, México). La app se lanzó el 01/05/2026 (con 15 días previos de pruebas con miembros reales), por lo que los datos abarcan máximo ~3 semanas. Lee los datos y da 3-4 insights accionables al staff en español mexicano natural, tono directo y útil. NO uses bullets, encabezados ni emojis. Escribe 1-2 párrafos cortos. Empieza por lo más urgente o relevante. Sé concreto con nombres y números. NUNCA inventes números que no aparezcan en los datos.\n\n' +
+    const prompt = 'Eres asesor del dueño de un gimnasio funcional llamado bePWR (Querétaro, México). El dueño se llama Luis y no es técnico. La app de los miembros se lanzó el 01/05/2026 (con 15 días previos de pruebas reales), así que los datos abarcan máximo ~3 semanas.\n\n' +
+      'TONO: háblale a Luis de tú, coloquial mexicano natural, como un coach o asesor de confianza. Frases tipo "Mira", "Aguas con", "Está chido pero...", "ahí hay que mover", "vale la pena", "ojo con". NUNCA suenes corporativo o consultor formal. NO digas "Se observa que" ni "Se recomienda". NO uses bullets ni encabezados ni emojis. NO inventes números que no estén en los datos.\n\n' +
+      'FORMATO: 1-2 párrafos cortos. Empieza por lo más urgente. Concreto con nombres y números. Cierra con la acción más obvia que debería tomar mañana.\n\n' +
       'DATOS HOY (' + new Date().toLocaleDateString('es-MX') + '):\n\n' +
       'MIEMBROS:\n' +
       '- Total activos: ' + total + '\n' +
       '- Nuevos en últimos 7 días: ' + s.nuevosSemana + '\n' +
       '- Abrieron app últimos 7 días: ' + s.activosSemana + ' (' + pct(s.activosSemana) + ')\n' +
       '- En riesgo (no entran +7d O nunca entraron): ' + s.enRiesgo + ' (' + pct(s.enRiesgo) + ')\n\n' +
-      'VISITAS POR DÍA DE LA SEMANA: ' + dowText + '\n\n' +
+      'VISITAS POR DÍA DE LA SEMANA: ' + dowText + '\n' +
+      'HORA PICO (día + hora local México): ' + horaPico + '\n\n' +
       'TOP 5 MÁS ACTIVOS (visitas totales): ' + top5Text + '\n\n' +
-      'TOP 5 EN RIESGO (estado de su última visita; "nunca entró" = miembro registrado pero que jamás abrió la app): ' + top5RiskText + '\n\n' +
+      'TOP 5 EN RIESGO ("nunca entró" = miembro registrado pero jamás abrió la app — problema distinto a "se enfriaron"): ' + top5RiskText + '\n\n' +
       'FUNNEL:\n' +
       '- Han abierto app: ' + s.visitedAny + ' (' + pct(s.visitedAny) + ')\n' +
       '- Hicieron reserva: ' + s.reservedAny + ' (' + pct(s.reservedAny) + ')\n' +
       '- Usaron chat IA: ' + s.usedIA + ' (' + pct(s.usedIA) + ')\n\n' +
-      'Da 3-4 insights útiles para tomar decisión. Diferencia entre "se enfriaron" (entraron pero ya no) y "nunca entraron" (problema de onboarding/email de bienvenida).';
+      'Habla coloquial. Diferencia entre "se enfriaron" (problema de retención) y "nunca entraron" (problema de email de bienvenida). Si hay hora pico clara, sugiérela como momento para mandar push.';
 
     try {
       const res = await fetch('/api/chat', {
@@ -3855,6 +3888,100 @@ window.filterNotifUsers = function (q) {
       btn.disabled = false;
       btn.innerHTML = oldLabel;
     }
+  }
+
+  function renderHourHeatmap(allEventos) {
+    const el = document.getElementById('dash-hour-heatmap');
+    if (!el) return;
+
+    const NDAYS = 30;
+    const now = new Date();
+    const minDayD = new Date(now); minDayD.setDate(now.getDate() - NDAYS);
+    const minDayStr = minDayD.toISOString().slice(0,10);
+
+    const hourFmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Mexico_City',
+      hour12: false,
+      hour: '2-digit'
+    });
+    const dowFmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Mexico_City',
+      weekday: 'short'
+    });
+    const dowMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+    const matrix = Array.from({length: 7}, () => new Array(24).fill(0));
+    let total = 0;
+
+    (allEventos || []).forEach(e => {
+      if (e.tipo !== 'visita' || !e.fecha || !e.dia) return;
+      if (e.dia < minDayStr) return;
+      try {
+        const d = new Date(e.fecha);
+        const h = parseInt(hourFmt.format(d), 10);
+        const dow = dowMap[dowFmt.format(d)];
+        if (h >= 0 && h < 24 && dow >= 0 && dow < 7) {
+          matrix[dow][h]++;
+          total++;
+        }
+      } catch(_) {}
+    });
+
+    if (total === 0) {
+      el.innerHTML = '<div style="color:#666;font-size:11px;font-family:Space Mono,monospace;padding:8px">Sin datos de visitas en los &uacute;ltimos 30 d&iacute;as</div>';
+      return;
+    }
+
+    let max = 0;
+    for (let d = 0; d < 7; d++) {
+      for (let h = 0; h < 24; h++) {
+        if (matrix[d][h] > max) max = matrix[d][h];
+      }
+    }
+
+    function colorFor(v) {
+      if (v <= 0) return '#1a1a1a';
+      const intensity = v / max;
+      if (intensity <= 0.2) return '#3d2010';
+      if (intensity <= 0.4) return '#7a3d1a';
+      if (intensity <= 0.7) return '#c45e1a';
+      return '#FF5C1A';
+    }
+
+    const displayOrder = [1, 2, 3, 4, 5, 6, 0];
+    const dayLabelsHtml = ['LUN', 'MAR', 'MI&Eacute;', 'JUE', 'VIE', 'S&Aacute;B', 'DOM'];
+    const dayLabelsTitle = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+    let html = `<div style="display:grid;grid-template-columns:50px repeat(24, 1fr);gap:2px;font-family:'Space Mono',monospace;font-size:9px;min-width:600px">`;
+
+    html += '<div></div>';
+    for (let h = 0; h < 24; h++) {
+      const showLabel = h % 3 === 0;
+      html += `<div style="text-align:center;color:${showLabel ? '#aaa' : 'transparent'};font-size:8px">${showLabel ? h : ''}</div>`;
+    }
+
+    displayOrder.forEach((dayIdx, i) => {
+      html += `<div style="color:#aaa;font-size:9px;text-align:right;padding-right:6px;align-self:center">${dayLabelsHtml[i]}</div>`;
+      for (let h = 0; h < 24; h++) {
+        const v = matrix[dayIdx][h];
+        html += `<div style="aspect-ratio:1;background:${colorFor(v)};border-radius:2px;min-height:14px" title="${dayLabelsTitle[i]} ${h}:00 — ${v} visita${v===1?'':'s'}"></div>`;
+      }
+    });
+
+    html += '</div>';
+
+    let peakDow = 0, peakHour = 0, peakVal = 0;
+    for (let d = 0; d < 7; d++) {
+      for (let h = 0; h < 24; h++) {
+        if (matrix[d][h] > peakVal) { peakVal = matrix[d][h]; peakDow = d; peakHour = h; }
+      }
+    }
+    const dayShort = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    if (peakVal > 0) {
+      html += `<div style="margin-top:12px;font-family:'Space Mono',monospace;font-size:10px;color:#888"><span style="color:#FF5C1A;font-weight:700">${dayShort[peakDow]} ${peakHour}:00</span> es tu hora pico (${peakVal} visitas en 30d) &middot; buen momento para mandar push</div>`;
+    }
+
+    el.innerHTML = html;
   }
 
   function renderHeatmap(allEventos) {
@@ -4471,6 +4598,9 @@ window.filterNotifUsers = function (q) {
 
       // Heatmap de actividad (siempre últimos 30 días, independiente del período seleccionado)
       try { renderHeatmap(eventos); } catch(he) { console.error('renderHeatmap:', he); }
+
+      // Heatmap por hora del día (cuándo se conectan)
+      try { renderHourHeatmap(eventos); } catch(hhe) { console.error('renderHourHeatmap:', hhe); }
 
       // Retención por cohorte (últimas 6 semanas de altas)
       try { renderCohort(eventos, window._allMembers); } catch(ce) { console.error('renderCohort:', ce); }
