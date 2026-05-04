@@ -480,6 +480,13 @@
       <button class="btn btn-sm" id="dash-period-month" onclick="setDashPeriod('month')" style="font-size:11px;background:#222;color:#aaa;border:1px solid #333;padding:4px 10px">Mensual</button>
     </div>
   </div>
+  <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;letter-spacing:.5px">INSIGHTS &middot; RESUMEN R&Aacute;PIDO</div>
+      <button id="dash-ai-btn" onclick="generateInsights()" style="background:#FF5C1A;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-family:'Space Mono',monospace;cursor:pointer">&#x1F916; Generar interpretaci&oacute;n IA</button>
+    </div>
+    <div id="dash-insights"></div>
+  </div>
   <div id="dash-stats-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px"></div>
   <div style="background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px">
     <div style="font-family:'Space Mono',monospace;font-size:10px;color:#aaa;margin-bottom:10px;letter-spacing:.5px">VISITAS A LA APP</div>
@@ -3668,6 +3675,178 @@ window.filterNotifUsers = function (q) {
     el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:auto">${yAxis}${bars}${vals}${labels}</svg>`;
   }
 
+  function computeQuickStats(eventos, allMembers) {
+    const now = new Date();
+    const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
+    const weekAgoStr = weekAgo.toISOString().slice(0,10);
+
+    const activeMembers = (allMembers || []).filter(m => m.activo !== false);
+    const activeUids = new Set(activeMembers.map(m => m.uid).filter(Boolean));
+
+    let nuevosSemana = 0;
+    activeMembers.forEach(m => {
+      if (!m.fechaInicio) return;
+      const fi = m.fechaInicio.toDate ? m.fechaInicio.toDate() : new Date(m.fechaInicio);
+      if (isNaN(fi.getTime())) return;
+      if (fi >= weekAgo) nuevosSemana++;
+    });
+
+    const visitsThisWeek = new Set();
+    const visitsByDow = [0,0,0,0,0,0,0];
+    const visitsByUid = {};
+    const lastVisitByUid = {};
+
+    (eventos || []).forEach(e => {
+      if (e.tipo !== 'visita' || !e.uid || !e.dia) return;
+      if (!activeUids.has(e.uid)) return;
+      if (e.dia >= weekAgoStr) visitsThisWeek.add(e.uid);
+      const dt = new Date(e.dia + 'T12:00:00');
+      visitsByDow[dt.getDay()]++;
+      visitsByUid[e.uid] = (visitsByUid[e.uid] || 0) + 1;
+      if (!lastVisitByUid[e.uid] || e.dia > lastVisitByUid[e.uid]) lastVisitByUid[e.uid] = e.dia;
+    });
+
+    let enRiesgo = 0;
+    activeMembers.forEach(m => {
+      const lv = lastVisitByUid[m.uid];
+      if (!lv) { enRiesgo++; return; }
+      const lvD = new Date(lv + 'T12:00:00');
+      const days = Math.floor((now - lvD) / (1000*60*60*24));
+      if (days > 7) enRiesgo++;
+    });
+
+    const dows = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    let maxDow = 0;
+    visitsByDow.forEach((v, i) => { if (v > visitsByDow[maxDow]) maxDow = i; });
+    const diaPico = visitsByDow[maxDow] > 0 ? dows[maxDow] : '—';
+
+    const top5 = Object.entries(visitsByUid).map(([uid, count]) => {
+      const m = activeMembers.find(x => x.uid === uid);
+      return { uid, nombre: (m && m.nombre) || uid.slice(0,8), count };
+    }).sort((a,b) => b.count - a.count).slice(0, 5);
+
+    const top5Risk = activeMembers.map(m => {
+      const lv = lastVisitByUid[m.uid];
+      let days;
+      if (!lv) days = 999;
+      else days = Math.floor((now - new Date(lv + 'T12:00:00')) / (1000*60*60*24));
+      return { nombre: m.nombre || (m.uid || '').slice(0,8), days };
+    }).filter(x => x.days > 7).sort((a,b) => b.days - a.days).slice(0, 5);
+
+    const visitedAny = new Set();
+    const reservedAny = new Set();
+    const usedIA = new Set();
+    (eventos || []).forEach(e => {
+      if (!e.uid || !activeUids.has(e.uid)) return;
+      if (e.tipo === 'visita') visitedAny.add(e.uid);
+      if (e.tipo === 'reserva') reservedAny.add(e.uid);
+      if (e.tipo === 'mensaje_ia' || e.tipo === 'analisis_cientifico') usedIA.add(e.uid);
+    });
+
+    return {
+      totalActivos: activeMembers.length,
+      nuevosSemana,
+      activosSemana: visitsThisWeek.size,
+      enRiesgo,
+      diaPico,
+      visitsByDow,
+      top5,
+      top5Risk,
+      visitedAny: visitedAny.size,
+      reservedAny: reservedAny.size,
+      usedIA: usedIA.size
+    };
+  }
+
+  function renderInsights(eventos, allMembers) {
+    const el = document.getElementById('dash-insights');
+    if (!el) return;
+
+    const stats = computeQuickStats(eventos, allMembers);
+    window._dashStats = stats;
+
+    const chips = [
+      { label: 'ACTIVOS', val: stats.totalActivos, color: '#FF5C1A' },
+      { label: 'NUEVOS 7D', val: stats.nuevosSemana, color: '#4ade80' },
+      { label: 'ABRIERON 7D', val: stats.activosSemana, color: '#FF5C1A' },
+      { label: 'EN RIESGO', val: stats.enRiesgo, color: '#FFA940' },
+      { label: 'D&Iacute;A PICO', val: stats.diaPico, color: '#60a5fa' }
+    ];
+
+    let html = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">';
+    chips.forEach(c => {
+      html += `<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:6px 10px;font-family:'Space Mono',monospace;display:flex;align-items:center;gap:8px">
+        <span style="color:${c.color};font-weight:700;font-size:14px">${c.val}</span>
+        <span style="color:#666;font-size:9px;letter-spacing:.5px">${c.label}</span>
+      </div>`;
+    });
+    html += '</div>';
+
+    const existing = document.getElementById('dash-ai-summary');
+    const aiContent = existing ? existing.innerHTML : '<div style="color:#666;font-size:11px;font-style:italic;padding:4px 0">Click en &quot;Generar interpretaci&oacute;n IA&quot; para que Claude analice los datos.</div>';
+    html += `<div id="dash-ai-summary">${aiContent}</div>`;
+
+    el.innerHTML = html;
+  }
+
+  async function generateInsights() {
+    const summaryEl = document.getElementById('dash-ai-summary');
+    const btn = document.getElementById('dash-ai-btn');
+    if (!summaryEl || !window._dashStats) return;
+
+    btn.disabled = true;
+    const oldLabel = btn.innerHTML;
+    btn.innerHTML = '&#x231B; Analizando...';
+    summaryEl.innerHTML = '<div style="color:#666;font-size:12px;font-style:italic;padding:8px 0">Claude est&aacute; leyendo los datos...</div>';
+
+    const s = window._dashStats;
+    const dows = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const dowText = s.visitsByDow.map((v,i) => dows[i] + ':' + v).join(', ');
+    const top5Text = s.top5.map(x => x.nombre + '(' + x.count + ')').join(', ') || 'ninguno';
+    const top5RiskText = s.top5Risk.map(x => x.nombre + '(' + x.days + 'd)').join(', ') || 'ninguno';
+    const total = s.totalActivos;
+    const pct = (n) => total > 0 ? Math.round((n/total)*100) + '%' : '0%';
+
+    const prompt = 'Eres analista del gimnasio funcional bePWR (Querétaro, México). Lee los datos y da 3-4 insights accionables al staff en español mexicano natural, tono directo y útil. NO uses bullets, encabezados ni emojis. Escribe 1-2 párrafos cortos. Empieza por lo más urgente o relevante. Sé concreto con nombres y números.\n\n' +
+      'DATOS HOY (' + new Date().toLocaleDateString('es-MX') + '):\n\n' +
+      'MIEMBROS:\n' +
+      '- Total activos: ' + total + '\n' +
+      '- Nuevos en últimos 7 días: ' + s.nuevosSemana + '\n' +
+      '- Abrieron app últimos 7 días: ' + s.activosSemana + ' (' + pct(s.activosSemana) + ')\n' +
+      '- En riesgo (no entran +7d): ' + s.enRiesgo + ' (' + pct(s.enRiesgo) + ')\n\n' +
+      'VISITAS POR DÍA DE LA SEMANA: ' + dowText + '\n\n' +
+      'TOP 5 MÁS ACTIVOS (visitas totales): ' + top5Text + '\n\n' +
+      'TOP 5 EN RIESGO (días sin entrar): ' + top5RiskText + '\n\n' +
+      'FUNNEL:\n' +
+      '- Han abierto app: ' + s.visitedAny + ' (' + pct(s.visitedAny) + ')\n' +
+      '- Hicieron reserva: ' + s.reservedAny + ' (' + pct(s.reservedAny) + ')\n' +
+      '- Usaron chat IA: ' + s.usedIA + ' (' + pct(s.usedIA) + ')\n\n' +
+      'Da 3-4 insights útiles para tomar decisión.';
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, maxTokens: 700 })
+      });
+      const data = await res.json();
+      if (data.message) {
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'color:#ddd;font-size:13px;line-height:1.6;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:14px;white-space:pre-wrap;margin-top:8px';
+        wrap.textContent = data.message;
+        summaryEl.innerHTML = '';
+        summaryEl.appendChild(wrap);
+      } else {
+        summaryEl.innerHTML = '<div style="color:#dc2626;font-size:12px;padding:8px 0">Sin respuesta de Claude. Intenta de nuevo.</div>';
+      }
+    } catch(e) {
+      summaryEl.innerHTML = '<div style="color:#dc2626;font-size:12px;padding:8px 0">Error: ' + e.message + '</div>';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = oldLabel;
+    }
+  }
+
   function renderHeatmap(allEventos) {
     const el = document.getElementById('dash-heatmap');
     if (!el) return;
@@ -4144,6 +4323,9 @@ window.filterNotifUsers = function (q) {
 
       // Rankings: top 10 más activos y top 10 en riesgo
       try { renderRankings(eventos, window._allMembers); } catch(re) { console.error('renderRankings:', re); }
+
+      // Insights: chips de stats rápidas + botón para resumen IA
+      try { renderInsights(eventos, window._allMembers); } catch(ie) { console.error('renderInsights:', ie); }
 
     } catch(e) {
       console.error('loadDashboard:', e);
