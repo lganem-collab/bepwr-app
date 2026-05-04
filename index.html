@@ -1690,7 +1690,7 @@ function renderProfileMetrics(m) {
   const messaging = getMessaging(app);
   const VAPID_KEY = 'BO7GCvvD-fYQTApeCtt4eWPUuMBAOfMHAtF3B7htcrj8PA1k_19eutw1l4rQTTs-yZwD1lPrCXyqgdn-AJMjSUQ';
 
-  async function logEvento(tipo) {
+  async function logEvento(tipo, extra) {
     try {
       const uid = window._currentUid;
       if (!uid) return;
@@ -1701,12 +1701,20 @@ function renderProfileMetrics(m) {
         if (localStorage.getItem(key)) return;
         localStorage.setItem(key, '1');
       }
+      // Para navegacion: solo 1 por sección por día por dispositivo
+      if (tipo === 'navegacion' && extra && extra.seccion) {
+        const navKey = 'bepwr_nav_' + hoy + '_' + extra.seccion;
+        if (localStorage.getItem(navKey)) return;
+        localStorage.setItem(navKey, '1');
+      }
       const nombre = window._nombreUsuario || '';
-      await addDoc(collection(db, 'eventos'), {
+      const docData = {
         uid, nombre, tipo,
         dia: hoy,
         fecha: new Date().toISOString()
-      });
+      };
+      if (extra && typeof extra === 'object') Object.assign(docData, extra);
+      await addDoc(collection(db, 'eventos'), docData);
     } catch(e) { console.log('logEvento:', e.message); }
   }
 
@@ -2298,6 +2306,7 @@ let cachedMetricas = [];
     if(id==='metodo'){initMetodoTab();setTimeout(()=>window.cargarProximaCita&&window.cargarProximaCita(),600);}
     if(id==='home') loadAsistencias(window._currentUid);
     if(id==='qr') generateQR();
+    if(window._currentUid) logEvento('navegacion', { seccion: id });
   }
 
     // ── Mi QR ──────────────────────────────────────────────────────────────────
